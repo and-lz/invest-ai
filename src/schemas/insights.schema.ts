@@ -1,0 +1,47 @@
+import { z } from "zod/v4";
+
+// ============================================================
+// Zod schemas para insights gerados pela Claude API.
+// ============================================================
+
+export const InsightCategoriaEnum = z.enum([
+  "performance_positiva",
+  "performance_negativa",
+  "acao_recomendada",
+  "risco",
+  "oportunidade",
+  "diversificacao",
+  "custos",
+]);
+
+export const InsightPrioridadeEnum = z.enum(["alta", "media", "baixa"]);
+
+export const InsightSchema = z.object({
+  titulo: z.string(),
+  descricao: z.string(),
+  categoria: InsightCategoriaEnum,
+  prioridade: InsightPrioridadeEnum,
+  ativosRelacionados: z.array(z.string()),
+  acaoSugerida: z.string().nullable(),
+  impactoEstimado: z.string().nullable(),
+});
+
+export const AlertaSchema = z.object({
+  tipo: z.enum(["urgente", "atencao", "informativo"]),
+  mensagem: z.string(),
+});
+
+export const InsightsResponseSchema = z.object({
+  mesReferencia: z.string(),
+  dataGeracao: z.string(),
+  resumoExecutivo: z.string().describe("Paragrafo resumindo a saude geral da carteira"),
+  insights: z.array(InsightSchema),
+  alertas: z.array(AlertaSchema),
+  recomendacoesLongoPrazo: z.array(z.string()),
+});
+
+// ---- Tipos inferidos ----
+
+export type InsightsResponse = z.infer<typeof InsightsResponseSchema>;
+export type Insight = z.infer<typeof InsightSchema>;
+export type Alerta = z.infer<typeof AlertaSchema>;
