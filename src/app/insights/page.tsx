@@ -38,8 +38,8 @@ const ICONES_CATEGORIA: Record<string, typeof TrendingUp> = {
 
 const CORES_PRIORIDADE: Record<string, string> = {
   alta: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  media: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  baixa: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+  media: "bg-muted text-muted-foreground",
+  baixa: "bg-muted text-muted-foreground",
 };
 
 const LABELS_CATEGORIA: Record<string, string> = {
@@ -122,9 +122,9 @@ function InsightCard({
 
       {/* Ação Sugerida */}
       {insight.acaoSugerida && (
-        <div className="mt-4 rounded-lg border-l-4 border-primary bg-primary/5 px-5 py-4">
+        <div className="mt-4 rounded-lg border-l-4 border-muted-foreground/20 bg-muted/50 px-5 py-4">
           <p className="text-base leading-relaxed">
-            <span className="font-bold">Ação sugerida:</span>{" "}
+            <span className="font-bold">Acao sugerida:</span>{" "}
             <span className="italic">{insight.acaoSugerida}</span>
           </p>
         </div>
@@ -445,7 +445,7 @@ export default function InsightsPage() {
                         ? "border-l-red-500 bg-red-50 dark:bg-red-950/40"
                         : alerta.tipo === "atencao"
                           ? "border-l-amber-500 bg-amber-50 dark:bg-amber-950/40"
-                          : "border-l-blue-500 bg-blue-50 dark:bg-blue-950/40",
+                          : "border-l-muted-foreground/30 bg-muted/50",
                     )}
                   >
                     <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
@@ -489,7 +489,7 @@ export default function InsightsPage() {
                       key={indice}
                       className="flex items-start gap-3 text-lg leading-relaxed"
                     >
-                      <span className="mt-1 font-bold text-primary">
+                      <span className="mt-1 font-bold text-muted-foreground">
                         {indice + 1}.
                       </span>
                       <span>{recomendacao}</span>
