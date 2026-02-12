@@ -8,6 +8,7 @@ import { BenchmarkComparisonChart } from "@/components/dashboard/benchmark-compa
 import { TopPerformersTable } from "@/components/dashboard/top-performers-table";
 import { StrategyGainsTable } from "@/components/dashboard/strategy-gains-table";
 import { FinancialEventsList } from "@/components/dashboard/financial-events-list";
+import { WealthEvolutionChart } from "@/components/dashboard/wealth-evolution-chart";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,6 +25,7 @@ function DashboardSkeleton() {
           <Skeleton key={indice} className="h-32" />
         ))}
       </div>
+      <Skeleton className="h-96" />
       <div className="grid gap-6 lg:grid-cols-2">
         <Skeleton className="h-96" />
         <Skeleton className="h-96" />
@@ -81,6 +83,10 @@ export default function DashboardPage() {
           <SummaryCards
             resumo={dadosDashboard.resumoAtual}
             variacaoPatrimonialCentavos={dadosDashboard.variacaoPatrimonialCentavos}
+          />
+
+          <WealthEvolutionChart
+            evolucaoPatrimonial={dadosDashboard.evolucaoPatrimonial}
           />
 
           <div className="grid gap-6 lg:grid-cols-2">
