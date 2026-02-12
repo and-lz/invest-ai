@@ -42,14 +42,38 @@ describe("Money value object", () => {
   });
 
   describe("somarMoney", () => {
-    it("deve somar dois valores em centavos", () => {
+    it("deve somar dois valores positivos em centavos", () => {
       expect(somarMoney(1000, 2000)).toBe(3000);
+    });
+
+    it("deve somar com valores negativos", () => {
+      expect(somarMoney(1000, -500)).toBe(500);
+    });
+
+    it("deve somar dois valores negativos", () => {
+      expect(somarMoney(-1000, -2000)).toBe(-3000);
+    });
+
+    it("deve somar com zero", () => {
+      expect(somarMoney(0, 1000)).toBe(1000);
     });
   });
 
   describe("subtrairMoney", () => {
     it("deve subtrair dois valores em centavos", () => {
       expect(subtrairMoney(3000, 1000)).toBe(2000);
+    });
+
+    it("deve subtrair resultando em negativo", () => {
+      expect(subtrairMoney(1000, 3000)).toBe(-2000);
+    });
+
+    it("deve subtrair com zero", () => {
+      expect(subtrairMoney(0, 1000)).toBe(-1000);
+    });
+
+    it("deve subtrair valores negativos", () => {
+      expect(subtrairMoney(-1000, 500)).toBe(-1500);
     });
   });
 
