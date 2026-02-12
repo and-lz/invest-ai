@@ -61,7 +61,6 @@ function CabecalhoOrdenavel({ coluna, colunaAtiva, direcao, onClick, className, 
 
 export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableProps) {
   const Icone = tipo === "melhores" ? TrendingUp : TrendingDown;
-  const corIcone = tipo === "melhores" ? "text-green-600" : "text-red-600";
 
   const obterValor = useCallback(
     (ativo: PosicaoAtivo, coluna: ColunaPerformers) => obterValorColuna(ativo, coluna),
@@ -74,7 +73,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
-        <Icone className={`h-5 w-5 ${corIcone}`} />
+        <Icone className="h-5 w-5 text-muted-foreground" />
         <CardTitle>{titulo}</CardTitle>
       </CardHeader>
       <CardContent>

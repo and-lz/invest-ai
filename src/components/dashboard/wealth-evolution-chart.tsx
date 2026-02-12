@@ -38,13 +38,13 @@ function TooltipCustomizado({ active, payload, label }: TooltipCustomizadoProps)
     <div className="rounded-lg border bg-background p-3 shadow-sm">
       <p className="mb-2 text-sm font-medium">{label}</p>
       {patrimonioTotal && (
-        <p className="text-sm" style={{ color: patrimonioTotal.color }}>
-          Patrimonio: {formatarMoeda(patrimonioTotal.value)}
+        <p className="text-sm text-muted-foreground">
+          Patrimonio: <span className="font-medium text-foreground">{formatarMoeda(patrimonioTotal.value)}</span>
         </p>
       )}
       {totalAportado && (
-        <p className="text-sm" style={{ color: totalAportado.color }}>
-          Aportado: {formatarMoeda(totalAportado.value)}
+        <p className="text-sm text-muted-foreground">
+          Aportado: <span className="font-medium text-foreground">{formatarMoeda(totalAportado.value)}</span>
         </p>
       )}
       <p className={`text-sm font-medium ${rendimentosCentavos >= 0 ? "text-green-600" : "text-red-600"}`}>
@@ -72,7 +72,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
         </p>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={configGraficoPatrimonio} className="h-[300px] w-full">
+        <ChartContainer config={configGraficoPatrimonio} className="h-75 w-full">
           <AreaChart data={dadosGrafico}>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -116,7 +116,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
             <span className="text-muted-foreground">Total Aportado</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="h-3 w-3 rounded-sm bg-gradient-to-b from-orange-300/30 to-blue-400/30" />
+            <div className="h-3 w-3 rounded-sm bg-linear-to-b from-orange-300/30 to-blue-400/30" />
             <span className="text-muted-foreground">Rendimentos (diferenca)</span>
           </div>
         </div>
