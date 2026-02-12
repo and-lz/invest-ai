@@ -24,6 +24,7 @@ export const InsightSchema = z.object({
   ativosRelacionados: z.array(z.string()),
   acaoSugerida: z.string().nullable(),
   impactoEstimado: z.string().nullable(),
+  concluida: z.boolean().optional().default(false),
 });
 
 export const AlertaSchema = z.object({

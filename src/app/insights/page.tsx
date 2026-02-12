@@ -3,10 +3,12 @@
 import { useState, useCallback, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { InsightsManualStepper } from "@/components/insights/insights-manual-stepper";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
 import {
@@ -18,7 +20,10 @@ import {
   Shield,
   Loader2,
   MessageSquare,
+  CheckCircle2,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { formatarMesAno } from "@/lib/format-date";
 import type { InsightsResponse, Insight } from "@/schemas/insights.schema";
 
 const ICONES_CATEGORIA: Record<string, typeof TrendingUp> = {
@@ -32,45 +37,133 @@ const ICONES_CATEGORIA: Record<string, typeof TrendingUp> = {
 };
 
 const CORES_PRIORIDADE: Record<string, string> = {
-  alta: "bg-red-100 text-red-800",
-  media: "bg-amber-100 text-amber-800",
-  baixa: "bg-blue-100 text-blue-800",
+  alta: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+  media: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  baixa: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
 };
 
-function InsightCard({ insight }: { insight: Insight }) {
+const LABELS_CATEGORIA: Record<string, string> = {
+  performance_positiva: "Performance positiva",
+  performance_negativa: "Performance negativa",
+  acao_recomendada: "Ação recomendada",
+  risco: "Risco",
+  oportunidade: "Oportunidade",
+  diversificacao: "Diversificação",
+  custos: "Custos",
+};
+
+interface InsightCardProps {
+  insight: Insight;
+  indiceInsight: number;
+  identificadorRelatorio: string;
+  onConclusaoAlterada: (indiceInsight: number, concluida: boolean) => void;
+}
+
+function InsightCard({
+  insight,
+  indiceInsight,
+  identificadorRelatorio,
+  onConclusaoAlterada,
+}: InsightCardProps) {
   const Icone = ICONES_CATEGORIA[insight.categoria] ?? Lightbulb;
+  const estaConcluido = insight.concluida ?? false;
+  const [estaAtualizando, setEstaAtualizando] = useState(false);
+
+  const handleToggleConcluido = useCallback(async () => {
+    setEstaAtualizando(true);
+    try {
+      const resposta = await fetch("/api/insights", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          identificadorRelatorio,
+          indiceInsight,
+          concluida: !estaConcluido,
+        }),
+      });
+
+      if (resposta.ok) {
+        await resposta.json();
+        onConclusaoAlterada(indiceInsight, !estaConcluido);
+      }
+    } catch (erro) {
+      console.error("Erro ao atualizar conclusao do insight:", erro);
+    } finally {
+      setEstaAtualizando(false);
+    }
+  }, [identificadorRelatorio, indiceInsight, estaConcluido, onConclusaoAlterada]);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-start gap-3 pb-2">
-        <Icone className="mt-1 h-5 w-5 text-muted-foreground" />
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <CardTitle className="text-base">{insight.titulo}</CardTitle>
-            <Badge className={CORES_PRIORIDADE[insight.prioridade] ?? ""}>
-              {insight.prioridade}
-            </Badge>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="pl-11">
-        <p className="text-sm text-muted-foreground">{insight.descricao}</p>
-        {insight.acaoSugerida && (
-          <p className="mt-2 text-sm font-medium">
-            Acao sugerida: {insight.acaoSugerida}
+    <article
+      className={`transition-all ${estaConcluido ? "opacity-60" : ""}`}
+    >
+      {/* Categoria + Prioridade */}
+      <div className="mb-2 flex items-center gap-3">
+        <Icone className="h-5 w-5 text-muted-foreground" />
+        <span className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+          {LABELS_CATEGORIA[insight.categoria] ?? insight.categoria}
+        </span>
+        <Badge className={CORES_PRIORIDADE[insight.prioridade] ?? ""}>
+          {insight.prioridade}
+        </Badge>
+      </div>
+
+      {/* Título */}
+      <h3 className={`text-xl font-bold leading-snug ${estaConcluido ? "line-through" : ""}`}>
+        {insight.titulo}
+      </h3>
+
+      {/* Descrição */}
+      <p
+        className={`mt-2 text-lg leading-relaxed ${estaConcluido ? "line-through text-muted-foreground/60" : "text-muted-foreground"}`}
+      >
+        {insight.descricao}
+      </p>
+
+      {/* Ação Sugerida */}
+      {insight.acaoSugerida && (
+        <div className="mt-4 rounded-lg border-l-4 border-primary bg-primary/5 px-5 py-4">
+          <p className="text-base leading-relaxed">
+            <span className="font-bold">Ação sugerida:</span>{" "}
+            <span className="italic">{insight.acaoSugerida}</span>
           </p>
-        )}
-        {insight.ativosRelacionados.length > 0 && (
-          <div className="mt-2 flex gap-1">
-            {insight.ativosRelacionados.map((ativo) => (
-              <Badge key={ativo} variant="outline" className="text-xs">
-                {ativo}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+
+      {/* Ativos Relacionados */}
+      {insight.ativosRelacionados.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-sm font-semibold text-muted-foreground">
+            Ativos:
+          </span>
+          {insight.ativosRelacionados.map((ativo) => (
+            <Badge key={ativo} variant="outline">
+              {ativo}
+            </Badge>
+          ))}
+        </div>
+      )}
+
+      {/* Checkbox de conclusão */}
+      {insight.acaoSugerida && (
+        <label
+          className="mt-4 flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50"
+        >
+          <Checkbox
+            checked={estaConcluido}
+            onCheckedChange={handleToggleConcluido}
+            disabled={estaAtualizando}
+            aria-label={`Marcar "${insight.titulo}" como concluído`}
+          />
+          <span className={`text-sm ${estaConcluido ? "text-muted-foreground line-through" : "font-medium"}`}>
+            {estaConcluido ? "Ação concluída" : "Marcar ação como concluída"}
+          </span>
+          {estaConcluido && (
+            <CheckCircle2 className="ml-auto h-4 w-4 text-green-600" />
+          )}
+        </label>
+      )}
+    </article>
   );
 }
 
@@ -201,6 +294,23 @@ export default function InsightsPage() {
     setModoVisualizacao("inicial");
   }, []);
 
+  const handleConclusaoAlterada = useCallback(
+    (indiceInsight: number, concluida: boolean) => {
+      if (insights) {
+        const insightsAtualizados: InsightsResponse = {
+          ...insights,
+          insights: insights.insights.map((insight, indice) =>
+            indice === indiceInsight
+              ? { ...insight, concluida }
+              : insight,
+          ),
+        };
+        setInsights(insightsAtualizados);
+      }
+    },
+    [insights],
+  );
+
   // Encontrar relatório do período selecionado
   const relatorioSelecionado = relatorios.find(
     (relatorio) => relatorio.mesReferencia === periodoSelecionado
@@ -284,84 +394,120 @@ export default function InsightsPage() {
           />
         )}
 
-      {modoVisualizacao === "insights" && insights && (
-        <>
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Coluna Esquerda: Resumo e Alertas */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Resumo Executivo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm leading-relaxed">
-                    {insights.resumoExecutivo}
-                  </p>
-                </CardContent>
-              </Card>
+      {modoVisualizacao === "insights" && insights && relatorioSelecionado && (
+        <div className="mx-auto max-w-3xl space-y-10">
 
-              {insights.alertas.length > 0 && (
-                <div className="space-y-2">
-                  {insights.alertas.map((alerta, indice) => (
-                    <Card
-                      key={indice}
-                      className={
-                        alerta.tipo === "urgente"
-                          ? "border-red-200 bg-red-50"
-                          : alerta.tipo === "atencao"
-                            ? "border-amber-200 bg-amber-50"
-                            : ""
-                      }
-                    >
-                      <CardContent className="flex items-start gap-3 py-3">
-                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
-                        <p className="text-sm">{alerta.mensagem}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
+          {/* --- Cabeçalho Editorial --- */}
+          <header className="text-center">
+            <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+              Análise de Carteira
+            </p>
+            <h1 className="mt-2 text-3xl font-bold">
+              {formatarMesAno(insights.mesReferencia, "extenso")}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Gerado em{" "}
+              {new Date(insights.dataGeracao).toLocaleDateString("pt-BR", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
+          </header>
 
-              {insights.recomendacoesLongoPrazo.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Recomendacoes de Longo Prazo</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-inside list-disc space-y-2">
-                      {insights.recomendacoesLongoPrazo.map(
-                        (recomendacao, indice) => (
-                          <li
-                            key={indice}
-                            className="text-sm text-muted-foreground"
-                          >
-                            {recomendacao}
-                          </li>
-                        ),
-                      )}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+          <Separator />
 
-            {/* Coluna Direita: Insights */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Insights</h3>
-              <div className="space-y-4">
-                {insights.insights.map((insight, indice) => (
-                  <InsightCard key={indice} insight={insight} />
+          {/* --- Resumo Executivo --- */}
+          <section>
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+              Resumo Executivo
+            </h2>
+            <Separator className="my-3" />
+            <p className="text-xl leading-relaxed">
+              {insights.resumoExecutivo}
+            </p>
+          </section>
+
+          {/* --- Alertas --- */}
+          {insights.alertas.length > 0 && (
+            <section>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                Alertas
+              </h2>
+              <Separator className="my-3" />
+              <div className="space-y-3">
+                {insights.alertas.map((alerta, indice) => (
+                  <div
+                    key={indice}
+                    className={cn(
+                      "flex items-start gap-3 rounded-lg border-l-4 px-5 py-4",
+                      alerta.tipo === "urgente"
+                        ? "border-l-red-500 bg-red-50 dark:bg-red-950/40"
+                        : alerta.tipo === "atencao"
+                          ? "border-l-amber-500 bg-amber-50 dark:bg-amber-950/40"
+                          : "border-l-blue-500 bg-blue-50 dark:bg-blue-950/40",
+                    )}
+                  >
+                    <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                    <p className="text-base leading-relaxed">{alerta.mensagem}</p>
+                  </div>
                 ))}
               </div>
-            </div>
-          </div>
+            </section>
+          )}
 
-          <div className="flex justify-center">
+          {/* --- Insights Detalhados --- */}
+          <section>
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+              Insights Detalhados
+            </h2>
+            <Separator className="my-3" />
+            <div className="space-y-10">
+              {insights.insights.map((insight, indice) => (
+                <InsightCard
+                  key={indice}
+                  insight={insight}
+                  indiceInsight={indice}
+                  identificadorRelatorio={relatorioSelecionado.identificador}
+                  onConclusaoAlterada={handleConclusaoAlterada}
+                />
+              ))}
+            </div>
+          </section>
+
+          {/* --- Recomendações de Longo Prazo --- */}
+          {insights.recomendacoesLongoPrazo.length > 0 && (
+            <section>
+              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+                Recomendações de Longo Prazo
+              </h2>
+              <Separator className="my-3" />
+              <ul className="space-y-4">
+                {insights.recomendacoesLongoPrazo.map(
+                  (recomendacao, indice) => (
+                    <li
+                      key={indice}
+                      className="flex items-start gap-3 text-lg leading-relaxed"
+                    >
+                      <span className="mt-1 font-bold text-primary">
+                        {indice + 1}.
+                      </span>
+                      <span>{recomendacao}</span>
+                    </li>
+                  ),
+                )}
+              </ul>
+            </section>
+          )}
+
+          {/* --- Rodapé --- */}
+          <Separator />
+          <div className="flex justify-center pb-8">
             <Button variant="outline" onClick={handleRegerar}>
               Gerar novos insights
             </Button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
