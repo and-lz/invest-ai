@@ -7,6 +7,7 @@ import { GetReportDetailUseCase } from "@/application/use-cases/get-report-detai
 import { GetDashboardDataUseCase } from "@/application/use-cases/get-dashboard-data";
 import { GenerateInsightsUseCase } from "@/application/use-cases/generate-insights";
 import { DeleteReportUseCase } from "@/application/use-cases/delete-report";
+import { SalvarRelatorioManualUseCase } from "@/application/use-cases/salvar-relatorio-manual";
 import { obterClienteAnthropic } from "@/lib/anthropic-client";
 import path from "path";
 
@@ -46,4 +47,8 @@ export function obterGenerateInsightsUseCase() {
 
 export function obterDeleteReportUseCase() {
   return new DeleteReportUseCase(criarRepositorio());
+}
+
+export function obterSalvarRelatorioManualUseCase() {
+  return new SalvarRelatorioManualUseCase(criarRepositorio());
 }

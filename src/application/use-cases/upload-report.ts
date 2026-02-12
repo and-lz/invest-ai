@@ -39,6 +39,7 @@ export class UploadReportUseCase {
       caminhoArquivoInsights: null,
       dataUpload: new Date().toISOString(),
       statusExtracao: "concluido",
+      origemDados: "upload-automatico",
       erroExtracao: null,
     };
 
