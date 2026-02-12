@@ -1,11 +1,19 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { configGraficoPatrimonio } from "@/lib/chart-config";
 import { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
+import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { formatarMesAno } from "@/lib/format-date";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
+import {
+  GLOSSARIO_EVOLUCAO_PATRIMONIAL,
+  GLOSSARIO_TOTAL_APORTADO,
+  GLOSSARIO_RENDIMENTOS,
+} from "@/lib/glossario-financeiro";
+import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { DashboardData } from "@/application/use-cases/get-dashboard-data";
 
 interface WealthEvolutionChartProps {
@@ -54,6 +62,52 @@ function TooltipCustomizado({ active, payload, label }: TooltipCustomizadoProps)
   );
 }
 
+function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]): Conclusao[] {
+  const conclusoes: Conclusao[] = [];
+  const pontoAtual = evolucao[evolucao.length - 1];
+  if (!pontoAtual) return conclusoes;
+
+  const rendimentosCentavos = pontoAtual.patrimonioTotalCentavos - pontoAtual.totalAportadoCentavos;
+  const percentualRendimento = pontoAtual.totalAportadoCentavos > 0
+    ? (rendimentosCentavos / pontoAtual.totalAportadoCentavos) * 100
+    : 0;
+
+  if (rendimentosCentavos > 0) {
+    conclusoes.push({
+      texto: `Seus investimentos já geraram ${formatarMoeda(rendimentosCentavos)} de rendimentos, o que representa ${formatarPercentualSimples(percentualRendimento)} sobre o que você investiu do próprio bolso.`,
+      tipo: "positivo",
+    });
+  } else if (rendimentosCentavos < 0) {
+    conclusoes.push({
+      texto: `Seus investimentos estão com ${formatarMoeda(Math.abs(rendimentosCentavos))} de prejuízo acumulado. Isso pode ser temporário — investimentos de longo prazo costumam se recuperar.`,
+      tipo: "atencao",
+    });
+  }
+
+  if (evolucao.length >= 3) {
+    const penultimo = evolucao[evolucao.length - 2];
+    const antepenultimo = evolucao[evolucao.length - 3];
+    const cresceu2Meses = pontoAtual.patrimonioTotalCentavos > penultimo.patrimonioTotalCentavos
+      && penultimo.patrimonioTotalCentavos > antepenultimo.patrimonioTotalCentavos;
+    const caiu2Meses = pontoAtual.patrimonioTotalCentavos < penultimo.patrimonioTotalCentavos
+      && penultimo.patrimonioTotalCentavos < antepenultimo.patrimonioTotalCentavos;
+
+    if (cresceu2Meses) {
+      conclusoes.push({
+        texto: "Seu patrimônio está em tendência de alta — cresceu nos últimos meses consecutivos.",
+        tipo: "positivo",
+      });
+    } else if (caiu2Meses) {
+      conclusoes.push({
+        texto: "Seu patrimônio caiu nos últimos meses consecutivos. Fique atento, mas evite decisões por impulso.",
+        tipo: "atencao",
+      });
+    }
+  }
+
+  return conclusoes;
+}
+
 export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionChartProps) {
   if (evolucaoPatrimonial.length < 2) return null;
 
@@ -63,13 +117,18 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
     totalAportadoCentavos: ponto.totalAportadoCentavos,
   }));
 
+  const conclusoesEvolucao = gerarConclusaoEvolucao(evolucaoPatrimonial);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Evolucao Patrimonial</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Patrimonio total vs total aportado ao longo do tempo
-        </p>
+        <CardTitle className="flex items-center gap-1">
+          Evolucao Patrimonial
+          <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_PATRIMONIAL.explicacao} />
+        </CardTitle>
+        <CardDescription className="leading-relaxed">
+          Acompanhe a evolução do seu dinheiro. Quanto mais a área de cima se distancia da de baixo, mais seus investimentos estão rendendo. Se as duas linhas estão juntas, os rendimentos estão baixos.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGraficoPatrimonio} className="h-75 w-full">
@@ -113,13 +172,20 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
           </div>
           <div className="flex items-center gap-2 text-sm">
             <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-totalAportado)" }} />
-            <span className="text-muted-foreground">Total Aportado</span>
+            <span className="flex items-center gap-1 text-muted-foreground">
+              Total Aportado
+              <InfoTooltip conteudo={GLOSSARIO_TOTAL_APORTADO.explicacao} tamanhoIcone="h-3 w-3" />
+            </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <div className="h-3 w-3 rounded-sm bg-linear-to-b from-orange-300/30 to-blue-400/30" />
-            <span className="text-muted-foreground">Rendimentos (diferenca)</span>
+            <span className="flex items-center gap-1 text-muted-foreground">
+              Rendimentos (diferença)
+              <InfoTooltip conteudo={GLOSSARIO_RENDIMENTOS.explicacao} tamanhoIcone="h-3 w-3" />
+            </span>
           </div>
         </div>
+        <TakeawayBox conclusoes={conclusoesEvolucao} />
       </CardContent>
     </Card>
   );

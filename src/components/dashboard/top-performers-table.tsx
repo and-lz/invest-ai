@@ -1,13 +1,23 @@
 "use client";
 
 import { useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
+import {
+  GLOSSARIO_MELHORES_PERFORMERS,
+  GLOSSARIO_PIORES_PERFORMERS,
+  GLOSSARIO_ATIVO,
+  GLOSSARIO_SALDO,
+  GLOSSARIO_RENTABILIDADE_MES,
+  GLOSSARIO_PARTICIPACAO,
+} from "@/lib/glossario-financeiro";
+import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { PosicaoAtivo } from "@/schemas/report-extraction.schema";
 
 type ColunaPerformers = "ativo" | "estrategia" | "saldo" | "rentabilidadeMes" | "participacao";
@@ -59,8 +69,36 @@ function CabecalhoOrdenavel({ coluna, colunaAtiva, direcao, onClick, className, 
   );
 }
 
+function gerarConclusaoPerformers(ativos: PosicaoAtivo[], tipo: "melhores" | "piores"): Conclusao[] {
+  if (ativos.length === 0) return [];
+
+  const primeiroAtivo = ativos[0];
+  const nomeAtivo = primeiroAtivo.codigoAtivo ?? primeiroAtivo.nomeAtivo;
+  const rentabilidade = formatarPercentualSimples(primeiroAtivo.rentabilidadeMes.valor);
+
+  if (tipo === "melhores") {
+    return [{
+      texto: `Seu campeão do mês é ${nomeAtivo} com ${rentabilidade} de retorno. Ele representa ${formatarPercentualSimples(primeiroAtivo.participacaoNaCarteira.valor)} da sua carteira.`,
+      tipo: "positivo",
+    }];
+  }
+
+  if (primeiroAtivo.rentabilidadeMes.valor < 0) {
+    return [{
+      texto: `${nomeAtivo} teve a maior queda: ${rentabilidade}. Prejuízos pontuais são normais — avalie se a estratégia de longo prazo ainda faz sentido.`,
+      tipo: "atencao",
+    }];
+  }
+
+  return [{
+    texto: `Mesmo o pior resultado (${nomeAtivo}, ${rentabilidade}) foi positivo. Bom mês para a carteira!`,
+    tipo: "positivo",
+  }];
+}
+
 export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableProps) {
   const Icone = tipo === "melhores" ? TrendingUp : TrendingDown;
+  const conclusoesPerformer = gerarConclusaoPerformers(ativos, tipo);
 
   const obterValor = useCallback(
     (ativo: PosicaoAtivo, coluna: ColunaPerformers) => obterValorColuna(ativo, coluna),
@@ -74,26 +112,54 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
         <Icone className="h-5 w-5 text-muted-foreground" />
-        <CardTitle>{titulo}</CardTitle>
+        <div>
+          <CardTitle className="flex items-center gap-1">
+            {titulo}
+            <InfoTooltip
+              conteudo={
+                tipo === "melhores"
+                  ? GLOSSARIO_MELHORES_PERFORMERS.explicacao
+                  : GLOSSARIO_PIORES_PERFORMERS.explicacao
+              }
+            />
+          </CardTitle>
+          <CardDescription className="text-xs">
+            {tipo === "melhores"
+              ? "Seus investimentos com melhor desempenho neste período."
+              : "Investimentos com menor desempenho. Perdas no curto prazo são normais."}
+          </CardDescription>
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
               <CabecalhoOrdenavel coluna="ativo" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
-                Ativo
+                <span className="flex items-center gap-1">
+                  Ativo
+                  <InfoTooltip conteudo={GLOSSARIO_ATIVO.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="estrategia" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
                 Estrategia
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="saldo" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
-                Saldo
+                <span className="flex items-center gap-1">
+                  Saldo
+                  <InfoTooltip conteudo={GLOSSARIO_SALDO.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="rentabilidadeMes" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
-                Rent. Mes
+                <span className="flex items-center gap-1">
+                  Rent. Mes
+                  <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_MES.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="participacao" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
-                Part.
+                <span className="flex items-center gap-1">
+                  Part.
+                  <InfoTooltip conteudo={GLOSSARIO_PARTICIPACAO.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
             </TableRow>
           </TableHeader>
@@ -119,6 +185,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
             ))}
           </TableBody>
         </Table>
+        <TakeawayBox conclusoes={conclusoesPerformer} />
       </CardContent>
     </Card>
   );

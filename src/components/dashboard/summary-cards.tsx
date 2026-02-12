@@ -5,6 +5,15 @@ import { TrendingUp, TrendingDown, DollarSign, Percent, BarChart3, CalendarDays 
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { formatarDataBrasileira } from "@/lib/format-date";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
+import {
+  GLOSSARIO_PATRIMONIO_TOTAL,
+  GLOSSARIO_VARIACAO_PATRIMONIAL,
+  GLOSSARIO_GANHOS_NO_MES,
+  GLOSSARIO_RENTABILIDADE_MENSAL,
+  GLOSSARIO_RENTABILIDADE_ANUAL,
+  GLOSSARIO_DESDE_INICIO,
+} from "@/lib/glossario-financeiro";
 import type { Resumo } from "@/schemas/report-extraction.schema";
 
 interface SummaryCardsProps {
@@ -19,7 +28,10 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Patrimonio Total</CardTitle>
+          <CardTitle className="flex items-center gap-1 text-sm font-medium">
+            Patrimonio Total
+            <InfoTooltip conteudo={GLOSSARIO_PATRIMONIO_TOTAL.explicacao} />
+          </CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -30,6 +42,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
             <p className={`text-xs ${variacaoPositiva ? "text-green-600" : "text-red-600"} flex items-center gap-1`}>
               {variacaoPositiva ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
               {formatarMoeda(Math.abs(variacaoPatrimonialCentavos))} vs mes anterior
+              <InfoTooltip conteudo={GLOSSARIO_VARIACAO_PATRIMONIAL.explicacao} tamanhoIcone="h-3 w-3" />
             </p>
           )}
         </CardContent>
@@ -37,22 +50,29 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Ganhos no Mes</CardTitle>
+          <CardTitle className="flex items-center gap-1 text-sm font-medium">
+            Ganhos no Mes
+            <InfoTooltip conteudo={GLOSSARIO_GANHOS_NO_MES.explicacao} />
+          </CardTitle>
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {formatarMoeda(resumo.ganhosFinanceirosNoMes.valorEmCentavos)}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="flex items-center gap-1 text-xs text-muted-foreground">
             Rentabilidade: {formatarPercentualSimples(resumo.rentabilidadeMensal.valor)}
+            <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_MENSAL.explicacao} tamanhoIcone="h-3 w-3" />
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Rentabilidade Anual</CardTitle>
+          <CardTitle className="flex items-center gap-1 text-sm font-medium">
+            Rentabilidade Anual
+            <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_ANUAL.explicacao} />
+          </CardTitle>
           <Percent className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -69,7 +89,10 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Desde o Inicio</CardTitle>
+          <CardTitle className="flex items-center gap-1 text-sm font-medium">
+            Desde o Inicio
+            <InfoTooltip conteudo={GLOSSARIO_DESDE_INICIO.explicacao} />
+          </CardTitle>
           <CalendarDays className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>

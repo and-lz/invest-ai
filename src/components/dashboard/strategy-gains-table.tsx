@@ -1,11 +1,20 @@
 "use client";
 
 import { useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
+import { InfoTooltip } from "@/components/ui/info-tooltip";
+import {
+  GLOSSARIO_GANHOS_POR_ESTRATEGIA,
+  GLOSSARIO_PERIODO_NO_MES,
+  GLOSSARIO_PERIODO_NO_ANO,
+  GLOSSARIO_PERIODO_12_MESES,
+  GLOSSARIO_PERIODO_DESDE_INICIO,
+} from "@/lib/glossario-financeiro";
+import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { GanhosPorEstrategia } from "@/schemas/report-extraction.schema";
 
 type ColunaGanhos = "estrategia" | "ganhoNoMes" | "ganhoNoAno" | "ganho12Meses" | "ganhoDesdeInicio";
@@ -64,7 +73,37 @@ function CabecalhoOrdenavel({ coluna, colunaAtiva, direcao, onClick, className, 
   );
 }
 
+function gerarConclusaoGanhos(ganhos: GanhosPorEstrategia[]): Conclusao[] {
+  if (ganhos.length === 0) return [];
+
+  const ordenadosPorGanhoMensal = [...ganhos].sort(
+    (ganhoA, ganhoB) => ganhoB.ganhoNoMes.valorEmCentavos - ganhoA.ganhoNoMes.valorEmCentavos,
+  );
+
+  const melhorEstrategia = ordenadosPorGanhoMensal.at(0);
+  const piorEstrategia = ordenadosPorGanhoMensal.at(-1);
+
+  if (!melhorEstrategia) return [];
+
+  const conclusoes: Conclusao[] = [];
+
+  conclusoes.push({
+    texto: `No mês, ${melhorEstrategia.nomeEstrategia} foi a estratégia que mais rendeu (${formatarMoeda(melhorEstrategia.ganhoNoMes.valorEmCentavos)}).`,
+    tipo: "positivo",
+  });
+
+  if (piorEstrategia && piorEstrategia.ganhoNoMes.valorEmCentavos < 0) {
+    conclusoes.push({
+      texto: `${piorEstrategia.nomeEstrategia} teve prejuízo de ${formatarMoeda(Math.abs(piorEstrategia.ganhoNoMes.valorEmCentavos))}.`,
+      tipo: "atencao",
+    });
+  }
+
+  return conclusoes;
+}
+
 export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
+  const conclusaoGanhos = gerarConclusaoGanhos(ganhos);
   const obterValor = useCallback(
     (ganho: GanhosPorEstrategia, coluna: ColunaGanhos) => obterValorColuna(ganho, coluna),
     [],
@@ -76,7 +115,13 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ganhos por Estrategia</CardTitle>
+        <CardTitle className="flex items-center gap-1">
+          Ganhos por Estrategia
+          <InfoTooltip conteudo={GLOSSARIO_GANHOS_POR_ESTRATEGIA.explicacao} />
+        </CardTitle>
+        <CardDescription className="leading-relaxed">
+          Quanto cada tipo de investimento rendeu em reais. Valores em vermelho indicam prejuízo no período. Clique nos cabeçalhos para ordenar.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -86,16 +131,28 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                 Estrategia
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="ganhoNoMes" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
-                No Mes
+                <span className="flex items-center gap-1">
+                  No Mes
+                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_NO_MES.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="ganhoNoAno" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
-                No Ano
+                <span className="flex items-center gap-1">
+                  No Ano
+                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_NO_ANO.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="ganho12Meses" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
-                12 Meses
+                <span className="flex items-center gap-1">
+                  12 Meses
+                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_12_MESES.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
               <CabecalhoOrdenavel coluna="ganhoDesdeInicio" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
-                Desde Inicio
+                <span className="flex items-center gap-1">
+                  Desde Inicio
+                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_DESDE_INICIO.explicacao} tamanhoIcone="h-3 w-3" />
+                </span>
               </CabecalhoOrdenavel>
             </TableRow>
           </TableHeader>
@@ -119,6 +176,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
             ))}
           </TableBody>
         </Table>
+        <TakeawayBox conclusoes={conclusaoGanhos} />
       </CardContent>
     </Card>
   );

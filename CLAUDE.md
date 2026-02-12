@@ -134,7 +134,8 @@ All tests use realistic data factories that create valid domain objects:
 | Domain Value Objects | 2 | 27 | ✅ High - Tests real business logic |
 | Date/Time Utilities | 1 | 48 | ✅ High - Tests edge cases and boundaries |
 | Application Use Cases | 1 | 22 | ✅ High - Tests orchestration logic |
-| **TOTAL** | **4** | **97** | ✅ All meaningful tests |
+| Glossario Financeiro | 1 | 84 | ✅ High - Tests schema alignment and content |
+| **TOTAL** | **5** | **181** | ✅ All meaningful tests |
 
 ## Priority for Additional Tests
 
@@ -161,6 +162,36 @@ All tests use realistic data factories that create valid domain objects:
 - ❌ Never test mock behavior
 - ❌ Don't test library code (shadcn/ui, Zod, Vitest)
 - ❌ Don't add tests for unused/stub functions
+
+## Educational Tooltips Pattern
+- Glossario de termos financeiros: `src/lib/glossario-financeiro.ts`
+- Componente InfoTooltip: `src/components/ui/info-tooltip.tsx`
+- Uso: `<InfoTooltip conteudo={GLOSSARIO_XYZ.explicacao} />`
+- Descricoes educacionais em graficos usam `<CardDescription>` com texto do glossario
+- Todas as explicacoes assumem zero conhecimento sobre investimentos
+- Estrategias e tipos de evento usam `Record<string, EntradaGlossario>` com chaves alinhadas aos Zod enums
+- Testes: `__tests__/unit/lib/glossario-financeiro.test.ts` valida alinhamento com schemas
+
+## Data-Driven Takeaways Pattern
+- O usuario nao deve precisar interpretar graficos sozinho — o dashboard deve mostrar conclusoes automaticas
+- Componente reutilizavel: `src/components/ui/takeaway-box.tsx` (`TakeawayBox`)
+- Tipo `Conclusao`: `{ texto: string, tipo: "positivo" | "neutro" | "atencao" }`
+- Padrao: funcao pura `gerarConclusaoXyz(dados)` que retorna `Conclusao[]`
+- Uso: `<TakeawayBox conclusoes={conclusoes} />`
+- Implementado em todos os cards do dashboard:
+  - `benchmark-comparison-chart.tsx` — carteira vs CDI/Ibovespa/IPCA
+  - `wealth-evolution-chart.tsx` — rendimentos acumulados e tendencia
+  - `asset-allocation-chart.tsx` — concentracao e diversificacao
+  - `top-performers-table.tsx` — melhor/pior ativo do mes
+  - `strategy-gains-table.tsx` — melhor/pior estrategia do mes
+  - `financial-events-list.tsx` — renda passiva total e tipo mais frequente
+
+## 80/20 Color Rule
+- Cor reservada para apenas 20% dos elementos: indicadores, CTAs, alertas urgentes
+- Os outros 80% usam `text-muted-foreground` e tons neutros
+- TakeawayBox usa texto `text-muted-foreground` com apenas um pequeno dot colorido (`h-2 w-2 rounded-full`) como indicador
+- Valores negativos usam `text-red-600`, positivos `text-green-600` — apenas onde necessario
+- Evitar cor em elementos decorativos ou informativos que nao exigem atencao imediata
 
 # Reports
 
