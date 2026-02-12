@@ -33,9 +33,7 @@ export class SalvarRelatorioManualUseCase {
         .slice(0, 10)
         .map((issue) => `- ${issue.path.join(".")}: ${issue.message}`)
         .join("\n");
-      throw new ValidationError(
-        `Dados nao correspondem ao schema esperado:\n${errosFormatados}`,
-      );
+      throw new ValidationError(`Dados nao correspondem ao schema esperado:\n${errosFormatados}`);
     }
 
     const dadosExtraidos = resultado.data;

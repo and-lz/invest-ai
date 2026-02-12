@@ -29,9 +29,7 @@ export function PeriodSelector({
   onPeriodoChange,
 }: PeriodSelectorProps) {
   // Ordenar períodos do mais recente para o mais antigo
-  const periodosOrdenados = [...periodosDisponiveis].sort((a, b) =>
-    b.localeCompare(a)
-  );
+  const periodosOrdenados = [...periodosDisponiveis].sort((a, b) => b.localeCompare(a));
 
   // Determinar se o período selecionado é o mais recente
   const periodoMaisRecente = periodosOrdenados[0];
@@ -53,10 +51,7 @@ export function PeriodSelector({
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>Selecionar Período</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup
-          value={periodoSelecionado}
-          onValueChange={onPeriodoChange}
-        >
+        <DropdownMenuRadioGroup value={periodoSelecionado} onValueChange={onPeriodoChange}>
           {periodosOrdenados.map((periodo, index) => {
             const ehMaisRecente = index === 0;
             const label = ehMaisRecente
@@ -67,7 +62,7 @@ export function PeriodSelector({
               <DropdownMenuRadioItem key={periodo} value={periodo}>
                 <div className="flex flex-col">
                   <span className="font-medium">{label}</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-muted-foreground text-xs">
                     {formatarMesAno(periodo, "compacto")}
                   </span>
                 </div>

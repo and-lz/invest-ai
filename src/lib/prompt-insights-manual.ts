@@ -39,8 +39,7 @@ export function gerarPromptInsightsManual(
 
   const dadosParaAnalise = {
     relatorioAtual,
-    relatorioAnterior:
-      relatorioAnterior ?? "Nao disponivel (primeiro relatorio)",
+    relatorioAnterior: relatorioAnterior ?? "Nao disponivel (primeiro relatorio)",
   };
   const dadosFormatados = JSON.stringify(dadosParaAnalise, null, 2);
 

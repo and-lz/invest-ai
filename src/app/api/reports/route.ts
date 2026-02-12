@@ -11,10 +11,7 @@ export async function GET() {
     return NextResponse.json({ relatorios });
   } catch (erro) {
     console.error("Erro ao listar relatorios:", erro);
-    return NextResponse.json(
-      { erro: "Falha ao listar relatorios" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao listar relatorios" }, { status: 500 });
   }
 }
 
@@ -24,17 +21,11 @@ export async function POST(request: Request) {
     const arquivo = formData.get("file");
 
     if (!arquivo || !(arquivo instanceof File)) {
-      return NextResponse.json(
-        { erro: "Nenhum arquivo PDF enviado" },
-        { status: 400 },
-      );
+      return NextResponse.json({ erro: "Nenhum arquivo PDF enviado" }, { status: 400 });
     }
 
     if (!arquivo.name.toLowerCase().endsWith(".pdf")) {
-      return NextResponse.json(
-        { erro: "Apenas arquivos PDF sao aceitos" },
-        { status: 400 },
-      );
+      return NextResponse.json({ erro: "Apenas arquivos PDF sao aceitos" }, { status: 400 });
     }
 
     if (arquivo.size > TAMANHO_MAXIMO_PDF_BYTES) {
@@ -62,15 +53,9 @@ export async function POST(request: Request) {
     console.error("Erro ao processar upload:", erro);
 
     if (erro instanceof AppError) {
-      return NextResponse.json(
-        { erro: erro.message, codigo: erro.code },
-        { status: 422 },
-      );
+      return NextResponse.json({ erro: erro.message, codigo: erro.code }, { status: 422 });
     }
 
-    return NextResponse.json(
-      { erro: "Falha ao processar o relatorio" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao processar o relatorio" }, { status: 500 });
   }
 }

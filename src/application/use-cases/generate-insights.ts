@@ -15,9 +15,7 @@ export class GenerateInsightsUseCase {
   ) {}
 
   async executar(input: GenerateInsightsInput): Promise<InsightsResponse> {
-    const dadosAtuais = await this.repository.obterDadosExtraidos(
-      input.identificadorRelatorio,
-    );
+    const dadosAtuais = await this.repository.obterDadosExtraidos(input.identificadorRelatorio);
     if (!dadosAtuais) {
       throw new ReportNotFoundError(input.identificadorRelatorio);
     }

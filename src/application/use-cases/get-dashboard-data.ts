@@ -82,14 +82,11 @@ export class GetDashboardDataUseCase {
     }));
 
     const posicoesOrdenadas = [...relatorioMaisRecente.dados.posicoesDetalhadas].sort(
-      (posicaoA, posicaoB) =>
-        posicaoB.rentabilidadeMes.valor - posicaoA.rentabilidadeMes.valor,
+      (posicaoA, posicaoB) => posicaoB.rentabilidadeMes.valor - posicaoA.rentabilidadeMes.valor,
     );
 
     const melhoresPerformers = posicoesOrdenadas.slice(0, QUANTIDADE_TOP_PERFORMERS);
-    const pioresPerformers = posicoesOrdenadas
-      .slice(-QUANTIDADE_TOP_PERFORMERS)
-      .reverse();
+    const pioresPerformers = posicoesOrdenadas.slice(-QUANTIDADE_TOP_PERFORMERS).reverse();
 
     let variacaoPatrimonialCentavos: number | null = null;
     if (relatoriosExtraidos.length >= 2) {
@@ -120,8 +117,7 @@ export class GetDashboardDataUseCase {
   }
 
   private calcularTotalAportado(dados: RelatorioExtraido): number {
-    const ultimoMesEvolucao =
-      dados.evolucaoPatrimonial[dados.evolucaoPatrimonial.length - 1];
+    const ultimoMesEvolucao = dados.evolucaoPatrimonial[dados.evolucaoPatrimonial.length - 1];
     if (ultimoMesEvolucao) {
       return ultimoMesEvolucao.totalAportado.valorEmCentavos;
     }

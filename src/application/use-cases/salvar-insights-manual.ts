@@ -12,9 +12,7 @@ export class SalvarInsightsManualUseCase {
   constructor(private readonly repository: ReportRepository) {}
 
   async executar(input: SalvarInsightsManualInput): Promise<InsightsResponse> {
-    const metadados = await this.repository.obterMetadados(
-      input.identificadorRelatorio,
-    );
+    const metadados = await this.repository.obterMetadados(input.identificadorRelatorio);
     if (!metadados) {
       throw new ReportNotFoundError(input.identificadorRelatorio);
     }
@@ -42,10 +40,7 @@ export class SalvarInsightsManualUseCase {
 
     const insightsValidados = resultado.data;
 
-    await this.repository.salvarInsights(
-      input.identificadorRelatorio,
-      insightsValidados,
-    );
+    await this.repository.salvarInsights(input.identificadorRelatorio, insightsValidados);
 
     return insightsValidados;
   }

@@ -59,9 +59,7 @@ export function FormularioInsightsManual({
       }
     } catch (erro) {
       setStatusSubmissao("erro");
-      setErroSubmissao(
-        erro instanceof Error ? erro.message : "Erro desconhecido",
-      );
+      setErroSubmissao(erro instanceof Error ? erro.message : "Erro desconhecido");
     }
   }, [conteudoJson, identificadorRelatorio, onInsightsSalvos]);
 
@@ -73,7 +71,7 @@ export function FormularioInsightsManual({
             <CheckCircle className="h-12 w-12 text-green-600" />
             <div className="text-center">
               <h3 className="text-lg font-semibold">Insights salvos!</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Os insights foram validados e salvos com sucesso.
               </p>
             </div>
@@ -87,12 +85,9 @@ export function FormularioInsightsManual({
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className="text-lg font-semibold">
-            Passo 2: Colar a resposta do Claude
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            Cole abaixo o JSON que o Claude Chat retornou com os insights da sua
-            carteira.
+          <h3 className="text-lg font-semibold">Passo 2: Colar a resposta do Claude</h3>
+          <p className="text-muted-foreground text-sm">
+            Cole abaixo o JSON que o Claude Chat retornou com os insights da sua carteira.
           </p>
         </div>
 
@@ -107,26 +102,17 @@ export function FormularioInsightsManual({
         {statusSubmissao === "erro" && erroSubmissao && (
           <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
             <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
-            <pre className="whitespace-pre-wrap text-xs text-red-700">
-              {erroSubmissao}
-            </pre>
+            <pre className="text-xs whitespace-pre-wrap text-red-700">{erroSubmissao}</pre>
           </div>
         )}
 
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={onVoltar}
-            disabled={estaValidando}
-          >
+          <Button variant="outline" onClick={onVoltar} disabled={estaValidando}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Voltar ao prompt
           </Button>
 
-          <Button
-            onClick={handleSubmeter}
-            disabled={!conteudoJson.trim() || estaValidando}
-          >
+          <Button onClick={handleSubmeter} disabled={!conteudoJson.trim() || estaValidando}>
             {estaValidando ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

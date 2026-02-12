@@ -12,9 +12,7 @@ export function obterConfiguracaoAmbiente() {
   });
 
   if (!resultado.success) {
-    throw new Error(
-      `Configuracao de ambiente invalida: ${JSON.stringify(resultado.error.issues)}`,
-    );
+    throw new Error(`Configuracao de ambiente invalida: ${JSON.stringify(resultado.error.issues)}`);
   }
 
   return resultado.data;

@@ -6,7 +6,10 @@ import { PieChart, Pie, Cell } from "recharts";
 import { CORES_ESTRATEGIA } from "@/lib/chart-config";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_ALOCACAO_POR_ESTRATEGIA, GLOSSARIO_ESTRATEGIAS } from "@/lib/glossario-financeiro";
+import {
+  GLOSSARIO_ALOCACAO_POR_ESTRATEGIA,
+  GLOSSARIO_ESTRATEGIAS,
+} from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { AlocacaoMensal } from "@/schemas/report-extraction.schema";
 
@@ -14,9 +17,7 @@ interface AssetAllocationChartProps {
   alocacaoMensal: AlocacaoMensal[];
 }
 
-function gerarConclusaoAlocacao(
-  dadosGrafico: Array<{ nome: string; valor: number }>,
-): Conclusao[] {
+function gerarConclusaoAlocacao(dadosGrafico: Array<{ nome: string; valor: number }>): Conclusao[] {
   const conclusoes: Conclusao[] = [];
   if (dadosGrafico.length === 0) return conclusoes;
 
@@ -70,7 +71,8 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
           <InfoTooltip conteudo={GLOSSARIO_ALOCACAO_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
-          Veja como seu dinheiro está distribuído. Cada fatia representa um tipo de investimento — passe o mouse sobre os nomes para entender cada um.
+          Veja como seu dinheiro está distribuído. Cada fatia representa um tipo de investimento —
+          passe o mouse sobre os nomes para entender cada um.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -96,11 +98,17 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
             const explicacaoEstrategia = GLOSSARIO_ESTRATEGIAS[item.nome];
             return (
               <div key={item.nome} className="flex items-center gap-2 text-sm">
-                <div className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: item.fill }} />
-                <span className="flex items-center gap-1 text-muted-foreground">
+                <div
+                  className="h-3 w-3 shrink-0 rounded-full"
+                  style={{ backgroundColor: item.fill }}
+                />
+                <span className="text-muted-foreground flex items-center gap-1">
                   {item.nome}
                   {explicacaoEstrategia && (
-                    <InfoTooltip conteudo={explicacaoEstrategia.explicacao} tamanhoIcone="h-3 w-3" />
+                    <InfoTooltip
+                      conteudo={explicacaoEstrategia.explicacao}
+                      tamanhoIcone="h-3 w-3"
+                    />
                   )}
                 </span>
                 <span className="ml-auto font-medium">{formatarPercentualSimples(item.valor)}</span>

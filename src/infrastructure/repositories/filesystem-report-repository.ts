@@ -19,10 +19,7 @@ export class FilesystemReportRepository implements ReportRepository {
     return this.fileManager.salvarArquivo(`reports/${identificador}.pdf`, pdfBuffer);
   }
 
-  async salvarDadosExtraidos(
-    identificador: string,
-    dados: RelatorioExtraido,
-  ): Promise<string> {
+  async salvarDadosExtraidos(identificador: string, dados: RelatorioExtraido): Promise<string> {
     return this.fileManager.salvarJson(`extracted/${identificador}.json`, dados);
   }
 

@@ -10,9 +10,7 @@ interface ImportacaoManualStepperProps {
   onImportacaoSucesso?: (identificador: string) => void;
 }
 
-export function ImportacaoManualStepper({
-  onImportacaoSucesso,
-}: ImportacaoManualStepperProps) {
+export function ImportacaoManualStepper({ onImportacaoSucesso }: ImportacaoManualStepperProps) {
   const [passoAtual, setPassoAtual] = useState<PassoImportacao>("copiar-prompt");
 
   const avancarParaColarJson = useCallback(() => {

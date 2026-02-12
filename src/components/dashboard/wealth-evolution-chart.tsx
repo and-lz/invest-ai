@@ -39,23 +39,28 @@ function TooltipCustomizado({ active, payload, label }: TooltipCustomizadoProps)
   const patrimonioTotal = payload.find((ponto) => ponto.dataKey === "patrimonioTotalCentavos");
   const totalAportado = payload.find((ponto) => ponto.dataKey === "totalAportadoCentavos");
 
-  const rendimentosCentavos =
-    (patrimonioTotal?.value ?? 0) - (totalAportado?.value ?? 0);
+  const rendimentosCentavos = (patrimonioTotal?.value ?? 0) - (totalAportado?.value ?? 0);
 
   return (
-    <div className="rounded-lg border bg-background p-3 shadow-sm">
+    <div className="bg-background rounded-lg border p-3 shadow-sm">
       <p className="mb-2 text-sm font-medium">{label}</p>
       {patrimonioTotal && (
-        <p className="text-sm text-muted-foreground">
-          Patrimonio: <span className="font-medium text-foreground">{formatarMoeda(patrimonioTotal.value)}</span>
+        <p className="text-muted-foreground text-sm">
+          Patrimonio:{" "}
+          <span className="text-foreground font-medium">
+            {formatarMoeda(patrimonioTotal.value)}
+          </span>
         </p>
       )}
       {totalAportado && (
-        <p className="text-sm text-muted-foreground">
-          Aportado: <span className="font-medium text-foreground">{formatarMoeda(totalAportado.value)}</span>
+        <p className="text-muted-foreground text-sm">
+          Aportado:{" "}
+          <span className="text-foreground font-medium">{formatarMoeda(totalAportado.value)}</span>
         </p>
       )}
-      <p className={`text-sm font-medium ${rendimentosCentavos >= 0 ? "text-green-600" : "text-red-600"}`}>
+      <p
+        className={`text-sm font-medium ${rendimentosCentavos >= 0 ? "text-green-600" : "text-red-600"}`}
+      >
         Rendimentos: {formatarMoeda(rendimentosCentavos)}
       </p>
     </div>
@@ -68,9 +73,10 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
   if (!pontoAtual) return conclusoes;
 
   const rendimentosCentavos = pontoAtual.patrimonioTotalCentavos - pontoAtual.totalAportadoCentavos;
-  const percentualRendimento = pontoAtual.totalAportadoCentavos > 0
-    ? (rendimentosCentavos / pontoAtual.totalAportadoCentavos) * 100
-    : 0;
+  const percentualRendimento =
+    pontoAtual.totalAportadoCentavos > 0
+      ? (rendimentosCentavos / pontoAtual.totalAportadoCentavos) * 100
+      : 0;
 
   if (rendimentosCentavos > 0) {
     conclusoes.push({
@@ -87,10 +93,12 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
   if (evolucao.length >= 3) {
     const penultimo = evolucao[evolucao.length - 2];
     const antepenultimo = evolucao[evolucao.length - 3];
-    const cresceu2Meses = pontoAtual.patrimonioTotalCentavos > penultimo.patrimonioTotalCentavos
-      && penultimo.patrimonioTotalCentavos > antepenultimo.patrimonioTotalCentavos;
-    const caiu2Meses = pontoAtual.patrimonioTotalCentavos < penultimo.patrimonioTotalCentavos
-      && penultimo.patrimonioTotalCentavos < antepenultimo.patrimonioTotalCentavos;
+    const cresceu2Meses =
+      pontoAtual.patrimonioTotalCentavos > penultimo.patrimonioTotalCentavos &&
+      penultimo.patrimonioTotalCentavos > antepenultimo.patrimonioTotalCentavos;
+    const caiu2Meses =
+      pontoAtual.patrimonioTotalCentavos < penultimo.patrimonioTotalCentavos &&
+      penultimo.patrimonioTotalCentavos < antepenultimo.patrimonioTotalCentavos;
 
     if (cresceu2Meses) {
       conclusoes.push({
@@ -99,7 +107,8 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
       });
     } else if (caiu2Meses) {
       conclusoes.push({
-        texto: "Seu patrimônio caiu nos últimos meses consecutivos. Fique atento, mas evite decisões por impulso.",
+        texto:
+          "Seu patrimônio caiu nos últimos meses consecutivos. Fique atento, mas evite decisões por impulso.",
         tipo: "atencao",
       });
     }
@@ -127,19 +136,16 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
           <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_PATRIMONIAL.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
-          Acompanhe a evolução do seu dinheiro. Quanto mais a área de cima se distancia da de baixo, mais seus investimentos estão rendendo. Se as duas linhas estão juntas, os rendimentos estão baixos.
+          Acompanhe a evolução do seu dinheiro. Quanto mais a área de cima se distancia da de baixo,
+          mais seus investimentos estão rendendo. Se as duas linhas estão juntas, os rendimentos
+          estão baixos.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGraficoPatrimonio} className="h-75 w-full">
           <AreaChart data={dadosGrafico}>
             <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="mesAno"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
+            <XAxis dataKey="mesAno" tickLine={false} axisLine={false} tickMargin={8} />
             <YAxis
               tickLine={false}
               axisLine={false}
@@ -167,19 +173,25 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
         </ChartContainer>
         <div className="mt-4 flex items-center justify-center gap-6">
           <div className="flex items-center gap-2 text-sm">
-            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-patrimonioTotal)" }} />
+            <div
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: "var(--color-patrimonioTotal)" }}
+            />
             <span className="text-muted-foreground">Patrimonio Total</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-totalAportado)" }} />
-            <span className="flex items-center gap-1 text-muted-foreground">
+            <div
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: "var(--color-totalAportado)" }}
+            />
+            <span className="text-muted-foreground flex items-center gap-1">
               Total Aportado
               <InfoTooltip conteudo={GLOSSARIO_TOTAL_APORTADO.explicacao} tamanhoIcone="h-3 w-3" />
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <div className="h-3 w-3 rounded-sm bg-linear-to-b from-orange-300/30 to-blue-400/30" />
-            <span className="flex items-center gap-1 text-muted-foreground">
+            <span className="text-muted-foreground flex items-center gap-1">
               Rendimentos (diferença)
               <InfoTooltip conteudo={GLOSSARIO_RENDIMENTOS.explicacao} tamanhoIcone="h-3 w-3" />
             </span>

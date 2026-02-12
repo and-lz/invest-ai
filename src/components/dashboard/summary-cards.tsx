@@ -1,7 +1,14 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Percent, BarChart3, CalendarDays } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Percent,
+  BarChart3,
+  CalendarDays,
+} from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { formatarDataBrasileira } from "@/lib/format-date";
@@ -32,17 +39,26 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
             Patrimonio Total
             <InfoTooltip conteudo={GLOSSARIO_PATRIMONIO_TOTAL.explicacao} />
           </CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <DollarSign className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {formatarMoeda(resumo.patrimonioTotal.valorEmCentavos)}
           </div>
           {variacaoPatrimonialCentavos !== null && (
-            <p className={`text-xs ${variacaoPositiva ? "text-green-600" : "text-red-600"} flex items-center gap-1`}>
-              {variacaoPositiva ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            <p
+              className={`text-xs ${variacaoPositiva ? "text-green-600" : "text-red-600"} flex items-center gap-1`}
+            >
+              {variacaoPositiva ? (
+                <TrendingUp className="h-3 w-3" />
+              ) : (
+                <TrendingDown className="h-3 w-3" />
+              )}
               {formatarMoeda(Math.abs(variacaoPatrimonialCentavos))} vs mes anterior
-              <InfoTooltip conteudo={GLOSSARIO_VARIACAO_PATRIMONIAL.explicacao} tamanhoIcone="h-3 w-3" />
+              <InfoTooltip
+                conteudo={GLOSSARIO_VARIACAO_PATRIMONIAL.explicacao}
+                tamanhoIcone="h-3 w-3"
+              />
             </p>
           )}
         </CardContent>
@@ -54,15 +70,18 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
             Ganhos no Mes
             <InfoTooltip conteudo={GLOSSARIO_GANHOS_NO_MES.explicacao} />
           </CardTitle>
-          <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          <BarChart3 className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {formatarMoeda(resumo.ganhosFinanceirosNoMes.valorEmCentavos)}
           </div>
-          <p className="flex items-center gap-1 text-xs text-muted-foreground">
+          <p className="text-muted-foreground flex items-center gap-1 text-xs">
             Rentabilidade: {formatarPercentualSimples(resumo.rentabilidadeMensal.valor)}
-            <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_MENSAL.explicacao} tamanhoIcone="h-3 w-3" />
+            <InfoTooltip
+              conteudo={GLOSSARIO_RENTABILIDADE_MENSAL.explicacao}
+              tamanhoIcone="h-3 w-3"
+            />
           </p>
         </CardContent>
       </Card>
@@ -73,14 +92,14 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
             Rentabilidade Anual
             <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_ANUAL.explicacao} />
           </CardTitle>
-          <Percent className="h-4 w-4 text-muted-foreground" />
+          <Percent className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {formatarPercentualSimples(resumo.rentabilidadeAnual.valor)}
           </div>
           {resumo.rentabilidadeAnoAnterior && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               {formatarPercentualSimples(resumo.rentabilidadeAnoAnterior.valor)} no ano anterior
             </p>
           )}
@@ -93,13 +112,13 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
             Desde o Inicio
             <InfoTooltip conteudo={GLOSSARIO_DESDE_INICIO.explicacao} />
           </CardTitle>
-          <CalendarDays className="h-4 w-4 text-muted-foreground" />
+          <CalendarDays className="text-muted-foreground h-4 w-4" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {formatarPercentualSimples(resumo.rentabilidadeDesdeInicio.valor)}
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Desde {formatarDataBrasileira(resumo.dataInicioCarteira)}
           </p>
         </CardContent>

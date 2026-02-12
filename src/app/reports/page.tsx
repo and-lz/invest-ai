@@ -3,7 +3,14 @@
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -34,17 +41,14 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <Header
-        titulo="Relatorios"
-        descricao="Historico de relatorios uploadados"
-      />
+      <Header titulo="Relatorios" descricao="Historico de relatorios uploadados" />
 
       {estaCarregando && <Skeleton className="h-64" />}
 
       {!estaCarregando && relatorios.length === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
-            <FileText className="h-12 w-12 text-muted-foreground" />
+            <FileText className="text-muted-foreground h-12 w-12" />
             <p className="text-muted-foreground">Nenhum relatorio encontrado.</p>
             <Link href="/upload">
               <Button>Fazer Upload</Button>
@@ -72,9 +76,7 @@ export default function ReportsPage() {
               <TableBody>
                 {relatorios.map((relatorio) => (
                   <TableRow key={relatorio.identificador}>
-                    <TableCell className="font-medium">
-                      {relatorio.mesReferencia}
-                    </TableCell>
+                    <TableCell className="font-medium">{relatorio.mesReferencia}</TableCell>
                     <TableCell>{relatorio.nomeArquivoOriginal}</TableCell>
                     <TableCell>
                       {new Date(relatorio.dataUpload).toLocaleDateString("pt-BR")}

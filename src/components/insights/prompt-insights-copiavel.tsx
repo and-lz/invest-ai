@@ -53,8 +53,8 @@ export function PromptInsightsCopiavel({
     return (
       <Card>
         <CardContent className="flex items-center justify-center gap-3 p-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          <p className="text-muted-foreground text-sm">
             Preparando prompt com dados do relatorio...
           </p>
         </CardContent>
@@ -76,17 +76,15 @@ export function PromptInsightsCopiavel({
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className="text-lg font-semibold">
-            Passo 1: Copiar o prompt com dados do relatorio
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            O prompt abaixo ja inclui os dados do seu relatorio. Copie e cole no
-            Claude Chat para gerar os insights.
+          <h3 className="text-lg font-semibold">Passo 1: Copiar o prompt com dados do relatorio</h3>
+          <p className="text-muted-foreground text-sm">
+            O prompt abaixo ja inclui os dados do seu relatorio. Copie e cole no Claude Chat para
+            gerar os insights.
           </p>
         </div>
 
-        <ScrollArea className="h-64 rounded-md border bg-muted/50 p-4">
-          <pre className="whitespace-pre-wrap text-xs">{promptCompleto}</pre>
+        <ScrollArea className="bg-muted/50 h-64 rounded-md border p-4">
+          <pre className="text-xs whitespace-pre-wrap">{promptCompleto}</pre>
         </ScrollArea>
 
         <div className="flex items-center gap-3">

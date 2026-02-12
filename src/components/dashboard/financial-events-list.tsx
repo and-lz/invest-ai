@@ -2,7 +2,14 @@
 
 import { useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarDataBrasileira } from "@/lib/format-date";
@@ -40,18 +47,29 @@ interface CabecalhoOrdenaveProps {
   children: React.ReactNode;
 }
 
-function CabecalhoOrdenavel({ coluna, colunaAtiva, direcao, onClick, className, children }: CabecalhoOrdenaveProps) {
+function CabecalhoOrdenavel({
+  coluna,
+  colunaAtiva,
+  direcao,
+  onClick,
+  className,
+  children,
+}: CabecalhoOrdenaveProps) {
   const eAtiva = colunaAtiva === coluna;
   const Icone = eAtiva ? (direcao === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
 
   return (
     <TableHead
-      className={`group cursor-pointer select-none hover:text-foreground ${className ?? ""}`}
+      className={`group hover:text-foreground cursor-pointer select-none ${className ?? ""}`}
       onClick={() => onClick(coluna)}
     >
-      <div className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}>
+      <div
+        className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}
+      >
         {children}
-        <Icone className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`} />
+        <Icone
+          className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`}
+        />
       </div>
     </TableHead>
   );
@@ -62,15 +80,12 @@ function gerarConclusaoEventos(eventos: EventoFinanceiro[], totalCentavos: numbe
 
   const contagemPorTipo = new Map<string, number>();
   for (const evento of eventos) {
-    contagemPorTipo.set(
-      evento.tipoEvento,
-      (contagemPorTipo.get(evento.tipoEvento) ?? 0) + 1,
-    );
+    contagemPorTipo.set(evento.tipoEvento, (contagemPorTipo.get(evento.tipoEvento) ?? 0) + 1);
   }
 
-  const tipoMaisFrequente = [...contagemPorTipo.entries()].sort(
-    (entradaA, entradaB) => entradaB[1] - entradaA[1],
-  ).at(0);
+  const tipoMaisFrequente = [...contagemPorTipo.entries()]
+    .sort((entradaA, entradaB) => entradaB[1] - entradaA[1])
+    .at(0);
 
   let texto = `Neste mês você recebeu ${formatarMoeda(totalCentavos)} em renda passiva de ${eventos.length} eventos.`;
 
@@ -112,21 +127,42 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
       </CardHeader>
       <CardContent>
         {eventos.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum evento financeiro neste mes.</p>
+          <p className="text-muted-foreground text-sm">Nenhum evento financeiro neste mes.</p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <CabecalhoOrdenavel coluna="tipo" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
+                <CabecalhoOrdenavel
+                  coluna="tipo"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                >
                   Tipo
                 </CabecalhoOrdenavel>
-                <CabecalhoOrdenavel coluna="ativo" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
+                <CabecalhoOrdenavel
+                  coluna="ativo"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                >
                   Ativo
                 </CabecalhoOrdenavel>
-                <CabecalhoOrdenavel coluna="data" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
+                <CabecalhoOrdenavel
+                  coluna="data"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                >
                   Data
                 </CabecalhoOrdenavel>
-                <CabecalhoOrdenavel coluna="valor" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+                <CabecalhoOrdenavel
+                  coluna="valor"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="text-right"
+                >
                   Valor
                 </CabecalhoOrdenavel>
               </TableRow>
@@ -145,7 +181,9 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                       )}
                     </span>
                   </TableCell>
-                  <TableCell className="font-medium">{evento.codigoAtivo ?? evento.nomeAtivo}</TableCell>
+                  <TableCell className="font-medium">
+                    {evento.codigoAtivo ?? evento.nomeAtivo}
+                  </TableCell>
                   <TableCell className="text-muted-foreground">
                     {evento.dataEvento ? formatarDataBrasileira(evento.dataEvento) : "—"}
                   </TableCell>

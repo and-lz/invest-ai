@@ -62,7 +62,9 @@ function gerarConclusoes(dadosGrafico: DadosComparacao[]): Conclusao[] {
     conclusoes.push(gerarConclusaoMensal(dadosMensal));
   }
 
-  const dadosDesdeInicio = dadosGrafico.find((dado) => dado.periodo.toLowerCase().includes("inicio"));
+  const dadosDesdeInicio = dadosGrafico.find((dado) =>
+    dado.periodo.toLowerCase().includes("inicio"),
+  );
   if (dadosDesdeInicio) {
     const superouIpca = dadosDesdeInicio.carteira > dadosDesdeInicio.ipca;
     const superouCdi = dadosDesdeInicio.carteira > dadosDesdeInicio.cdi;
@@ -111,7 +113,9 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
           <InfoTooltip conteudo={GLOSSARIO_CARTEIRA_VS_BENCHMARKS.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
-          Cada grupo de barras mostra um período. Sua carteira é comparada com 3 referências: o CDI (renda fixa básica), o Ibovespa (média da bolsa) e o IPCA (inflação). Se a barra da sua carteira é a maior do grupo, você está indo muito bem naquele período!
+          Cada grupo de barras mostra um período. Sua carteira é comparada com 3 referências: o CDI
+          (renda fixa básica), o Ibovespa (média da bolsa) e o IPCA (inflação). Se a barra da sua
+          carteira é a maior do grupo, você está indo muito bem naquele período!
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -119,7 +123,11 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
           <BarChart data={dadosGrafico}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="periodo" tickLine={false} axisLine={false} />
-            <YAxis tickLine={false} axisLine={false} tickFormatter={(value: number) => `${value}%`} />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value: number) => `${value}%`}
+            />
             <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="carteira" fill="var(--color-carteira)" radius={[4, 4, 0, 0]} />
             <Bar dataKey="cdi" fill="var(--color-cdi)" radius={[4, 4, 0, 0]} />
@@ -128,22 +136,31 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
           </BarChart>
         </ChartContainer>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-carteira)" }} />
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <div
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: "var(--color-carteira)" }}
+            />
             Sua Carteira
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
             <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-cdi)" }} />
             CDI
             <InfoTooltip conteudo={GLOSSARIO_CDI.explicacao} tamanhoIcone="h-3 w-3" />
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-ibovespa)" }} />
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <div
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: "var(--color-ibovespa)" }}
+            />
             Ibovespa
             <InfoTooltip conteudo={GLOSSARIO_IBOVESPA.explicacao} tamanhoIcone="h-3 w-3" />
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-ipca)" }} />
+          <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <div
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: "var(--color-ipca)" }}
+            />
             IPCA
             <InfoTooltip conteudo={GLOSSARIO_IPCA.explicacao} tamanhoIcone="h-3 w-3" />
           </div>

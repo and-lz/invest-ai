@@ -6,7 +6,8 @@ interface DashboardApiResponse {
   vazio: boolean;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<DashboardApiResponse>);
+const fetcher = (url: string) =>
+  fetch(url).then((res) => res.json() as Promise<DashboardApiResponse>);
 
 interface UseDashboardDataParams {
   mesAno?: string; // Período específico no formato "YYYY-MM". Se não fornecido, usa o último mês disponível
@@ -18,10 +19,7 @@ export function useDashboardData(params?: UseDashboardDataParams) {
     ? `/api/dashboard?mesAno=${encodeURIComponent(params.mesAno)}`
     : "/api/dashboard";
 
-  const { data, error, isLoading, mutate } = useSWR<DashboardApiResponse>(
-    url,
-    fetcher,
-  );
+  const { data, error, isLoading, mutate } = useSWR<DashboardApiResponse>(url, fetcher);
 
   return {
     dadosDashboard: data?.dadosDashboard ?? null,

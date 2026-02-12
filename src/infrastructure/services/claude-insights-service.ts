@@ -4,10 +4,7 @@ import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
 import { ClaudeApiError } from "@/domain/errors/app-errors";
-import {
-  SYSTEM_PROMPT_INSIGHTS,
-  INSTRUCAO_USUARIO_INSIGHTS,
-} from "@/lib/prompt-insights-manual";
+import { SYSTEM_PROMPT_INSIGHTS, INSTRUCAO_USUARIO_INSIGHTS } from "@/lib/prompt-insights-manual";
 
 export class ClaudeInsightsService implements InsightsService {
   constructor(private readonly anthropicClient: Anthropic) {}

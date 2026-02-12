@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { obterGenerateInsightsUseCase, obterListReportsUseCase, obterFilesystemReportRepository, obterAtualizarConclusaoInsightUseCase } from "@/lib/container";
+import {
+  obterGenerateInsightsUseCase,
+  obterListReportsUseCase,
+  obterFilesystemReportRepository,
+  obterAtualizarConclusaoInsightUseCase,
+} from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
 import { z } from "zod/v4";
 
@@ -25,7 +30,7 @@ export async function GET(request: Request) {
     // Se mesAno foi fornecido, buscar o relatório específico
     if (mesAnoParam) {
       const relatorioEncontrado = relatorios.find(
-        (relatorio) => relatorio.mesReferencia === mesAnoParam
+        (relatorio) => relatorio.mesReferencia === mesAnoParam,
       );
       if (relatorioEncontrado) {
         relatorioSelecionado = relatorioEncontrado;
@@ -42,14 +47,11 @@ export async function GET(request: Request) {
     return NextResponse.json({
       insights,
       identificadorRelatorio: relatorioSelecionado.identificador,
-      mesReferencia: relatorioSelecionado.mesReferencia
+      mesReferencia: relatorioSelecionado.mesReferencia,
     });
   } catch (erro) {
     console.error("Erro ao buscar insights:", erro);
-    return NextResponse.json(
-      { erro: "Falha ao buscar insights" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao buscar insights" }, { status: 500 });
   }
 }
 
@@ -76,16 +78,10 @@ export async function POST(request: Request) {
     console.error("Erro ao gerar insights:", erro);
 
     if (erro instanceof AppError) {
-      return NextResponse.json(
-        { erro: erro.message, codigo: erro.code },
-        { status: 422 },
-      );
+      return NextResponse.json({ erro: erro.message, codigo: erro.code }, { status: 422 });
     }
 
-    return NextResponse.json(
-      { erro: "Falha ao gerar insights" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao gerar insights" }, { status: 500 });
   }
 }
 
@@ -119,15 +115,9 @@ export async function PATCH(request: Request) {
     console.error("Erro ao atualizar conclusao de insight:", erro);
 
     if (erro instanceof AppError) {
-      return NextResponse.json(
-        { erro: erro.message, codigo: erro.code },
-        { status: 422 },
-      );
+      return NextResponse.json({ erro: erro.message, codigo: erro.code }, { status: 422 });
     }
 
-    return NextResponse.json(
-      { erro: "Falha ao atualizar conclusao de insight" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao atualizar conclusao de insight" }, { status: 500 });
   }
 }

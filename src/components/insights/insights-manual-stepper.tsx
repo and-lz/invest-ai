@@ -18,8 +18,7 @@ export function InsightsManualStepper({
   onInsightsSalvos,
   onCancelar,
 }: InsightsManualStepperProps) {
-  const [passoAtual, setPassoAtual] =
-    useState<PassoInsightsManual>("copiar-prompt");
+  const [passoAtual, setPassoAtual] = useState<PassoInsightsManual>("copiar-prompt");
 
   const avancarParaColarJson = useCallback(() => {
     setPassoAtual("colar-json");
@@ -39,7 +38,7 @@ export function InsightsManualStepper({
         <div className="flex justify-center">
           <button
             onClick={onCancelar}
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="text-muted-foreground text-sm underline-offset-4 hover:underline"
           >
             Cancelar
           </button>

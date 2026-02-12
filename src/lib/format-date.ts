@@ -44,7 +44,7 @@ const MESES_ABREVIADO = [
  */
 export function formatarMesAno(
   mesAno: string,
-  formato: "extenso" | "abreviado" | "compacto" = "extenso"
+  formato: "extenso" | "abreviado" | "compacto" = "extenso",
 ): string {
   const partes = mesAno.split("-");
   const ano = partes[0];

@@ -1,12 +1,7 @@
 "use client";
 
 import { HelpCircle } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface InfoTooltipProps {
@@ -33,7 +28,7 @@ export function InfoTooltip({
             className={cn(
               "inline-flex items-center justify-center rounded-full",
               "text-muted-foreground/60 hover:text-muted-foreground",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              "focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none",
               "transition-colors",
               className,
             )}

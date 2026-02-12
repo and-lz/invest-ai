@@ -2,7 +2,14 @@
 
 import { useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
@@ -52,24 +59,38 @@ interface CabecalhoOrdenaveProps {
   children: React.ReactNode;
 }
 
-function CabecalhoOrdenavel({ coluna, colunaAtiva, direcao, onClick, className, children }: CabecalhoOrdenaveProps) {
+function CabecalhoOrdenavel({
+  coluna,
+  colunaAtiva,
+  direcao,
+  onClick,
+  className,
+  children,
+}: CabecalhoOrdenaveProps) {
   const eAtiva = colunaAtiva === coluna;
   const Icone = eAtiva ? (direcao === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
 
   return (
     <TableHead
-      className={`group cursor-pointer select-none hover:text-foreground ${className ?? ""}`}
+      className={`group hover:text-foreground cursor-pointer select-none ${className ?? ""}`}
       onClick={() => onClick(coluna)}
     >
-      <div className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}>
+      <div
+        className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}
+      >
         {children}
-        <Icone className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`} />
+        <Icone
+          className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`}
+        />
       </div>
     </TableHead>
   );
 }
 
-function gerarConclusaoPerformers(ativos: PosicaoAtivo[], tipo: "melhores" | "piores"): Conclusao[] {
+function gerarConclusaoPerformers(
+  ativos: PosicaoAtivo[],
+  tipo: "melhores" | "piores",
+): Conclusao[] {
   if (ativos.length === 0) return [];
 
   const primeiroAtivo = ativos[0];
@@ -77,23 +98,29 @@ function gerarConclusaoPerformers(ativos: PosicaoAtivo[], tipo: "melhores" | "pi
   const rentabilidade = formatarPercentualSimples(primeiroAtivo.rentabilidadeMes.valor);
 
   if (tipo === "melhores") {
-    return [{
-      texto: `Seu campeão do mês é ${nomeAtivo} com ${rentabilidade} de retorno. Ele representa ${formatarPercentualSimples(primeiroAtivo.participacaoNaCarteira.valor)} da sua carteira.`,
-      tipo: "positivo",
-    }];
+    return [
+      {
+        texto: `Seu campeão do mês é ${nomeAtivo} com ${rentabilidade} de retorno. Ele representa ${formatarPercentualSimples(primeiroAtivo.participacaoNaCarteira.valor)} da sua carteira.`,
+        tipo: "positivo",
+      },
+    ];
   }
 
   if (primeiroAtivo.rentabilidadeMes.valor < 0) {
-    return [{
-      texto: `${nomeAtivo} teve a maior queda: ${rentabilidade}. Prejuízos pontuais são normais — avalie se a estratégia de longo prazo ainda faz sentido.`,
-      tipo: "atencao",
-    }];
+    return [
+      {
+        texto: `${nomeAtivo} teve a maior queda: ${rentabilidade}. Prejuízos pontuais são normais — avalie se a estratégia de longo prazo ainda faz sentido.`,
+        tipo: "atencao",
+      },
+    ];
   }
 
-  return [{
-    texto: `Mesmo o pior resultado (${nomeAtivo}, ${rentabilidade}) foi positivo. Bom mês para a carteira!`,
-    tipo: "positivo",
-  }];
+  return [
+    {
+      texto: `Mesmo o pior resultado (${nomeAtivo}, ${rentabilidade}) foi positivo. Bom mês para a carteira!`,
+      tipo: "positivo",
+    },
+  ];
 }
 
 export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableProps) {
@@ -111,7 +138,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2">
-        <Icone className="h-5 w-5 text-muted-foreground" />
+        <Icone className="text-muted-foreground h-5 w-5" />
         <div>
           <CardTitle className="flex items-center gap-1">
             {titulo}
@@ -134,31 +161,65 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
         <Table>
           <TableHeader>
             <TableRow>
-              <CabecalhoOrdenavel coluna="ativo" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
+              <CabecalhoOrdenavel
+                coluna="ativo"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+              >
                 <span className="flex items-center gap-1">
                   Ativo
                   <InfoTooltip conteudo={GLOSSARIO_ATIVO.explicacao} tamanhoIcone="h-3 w-3" />
                 </span>
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="estrategia" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
+              <CabecalhoOrdenavel
+                coluna="estrategia"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+              >
                 Estrategia
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="saldo" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+              <CabecalhoOrdenavel
+                coluna="saldo"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
                 <span className="flex items-center gap-1">
                   Saldo
                   <InfoTooltip conteudo={GLOSSARIO_SALDO.explicacao} tamanhoIcone="h-3 w-3" />
                 </span>
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="rentabilidadeMes" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+              <CabecalhoOrdenavel
+                coluna="rentabilidadeMes"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
                 <span className="flex items-center gap-1">
                   Rent. Mes
-                  <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_MES.explicacao} tamanhoIcone="h-3 w-3" />
+                  <InfoTooltip
+                    conteudo={GLOSSARIO_RENTABILIDADE_MES.explicacao}
+                    tamanhoIcone="h-3 w-3"
+                  />
                 </span>
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="participacao" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+              <CabecalhoOrdenavel
+                coluna="participacao"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
                 <span className="flex items-center gap-1">
                   Part.
-                  <InfoTooltip conteudo={GLOSSARIO_PARTICIPACAO.explicacao} tamanhoIcone="h-3 w-3" />
+                  <InfoTooltip
+                    conteudo={GLOSSARIO_PARTICIPACAO.explicacao}
+                    tamanhoIcone="h-3 w-3"
+                  />
                 </span>
               </CabecalhoOrdenavel>
             </TableRow>
@@ -170,15 +231,19 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                   {ativo.codigoAtivo ?? ativo.nomeAtivo}
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="text-xs">{ativo.estrategia}</Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {ativo.estrategia}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   {formatarMoeda(ativo.saldoBruto.valorEmCentavos)}
                 </TableCell>
-                <TableCell className={`text-right font-medium ${ativo.rentabilidadeMes.valor >= 0 ? "text-green-600" : "text-red-600"}`}>
+                <TableCell
+                  className={`text-right font-medium ${ativo.rentabilidadeMes.valor >= 0 ? "text-green-600" : "text-red-600"}`}
+                >
                   {formatarPercentualSimples(ativo.rentabilidadeMes.valor)}
                 </TableCell>
-                <TableCell className="text-right text-muted-foreground">
+                <TableCell className="text-muted-foreground text-right">
                   {formatarPercentualSimples(ativo.participacaoNaCarteira.valor)}
                 </TableCell>
               </TableRow>

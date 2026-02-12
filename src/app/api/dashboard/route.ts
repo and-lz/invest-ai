@@ -26,9 +26,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ dadosDashboard, vazio: false });
   } catch (erro) {
     console.error("Erro ao obter dados do dashboard:", erro);
-    return NextResponse.json(
-      { erro: "Falha ao obter dados do dashboard" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao obter dados do dashboard" }, { status: 500 });
   }
 }

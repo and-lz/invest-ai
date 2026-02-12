@@ -27,11 +27,11 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
 
   return (
     <div className={cn("mt-4 space-y-2 rounded-lg border p-3", className)}>
-      <p className="text-xs font-medium text-muted-foreground">Resumo para você:</p>
+      <p className="text-muted-foreground text-xs font-medium">Resumo para você:</p>
       {conclusoes.map((conclusao) => (
         <p
           key={conclusao.texto}
-          className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground"
+          className="text-muted-foreground flex items-start gap-2 text-sm leading-relaxed"
         >
           <span
             className={cn(

@@ -16,8 +16,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   const [estaSobreDropzone, setEstaSobreDropzone] = useState(false);
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(null);
   const inputArquivoRef = useRef<HTMLInputElement>(null);
-  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando } =
-    useUploadReport();
+  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando } = useUploadReport();
 
   const validarArquivo = useCallback((arquivo: File): boolean => {
     if (!arquivo.name.toLowerCase().endsWith(".pdf")) {
@@ -88,9 +87,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
             <CheckCircle className="h-12 w-12 text-green-600" />
             <div className="text-center">
               <h3 className="text-lg font-semibold">Upload concluido!</h3>
-              <p className="text-sm text-muted-foreground">
-                Relatorio processado com sucesso.
-              </p>
+              <p className="text-muted-foreground text-sm">Relatorio processado com sucesso.</p>
             </div>
             <Button variant="outline" onClick={handleNovoUpload}>
               Enviar outro relatorio
@@ -114,42 +111,31 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
             onDragLeave={handleDragLeave}
             className={cn(
               "flex flex-col items-center gap-4 rounded-lg border-2 border-dashed p-12 transition-colors",
-              estaSobreDropzone
-                ? "border-primary bg-primary/5"
-                : "border-muted-foreground/25",
+              estaSobreDropzone ? "border-primary bg-primary/5" : "border-muted-foreground/25",
               estaProcessando && "pointer-events-none opacity-60",
             )}
           >
             {estaProcessando ? (
               <>
-                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                <Loader2 className="text-primary h-12 w-12 animate-spin" />
                 <div className="text-center">
                   <h3 className="text-lg font-semibold">
-                    {statusUpload === "uploading"
-                      ? "Enviando arquivo..."
-                      : "Processando com IA..."}
+                    {statusUpload === "uploading" ? "Enviando arquivo..." : "Processando com IA..."}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {arquivoSelecionado?.name}
-                  </p>
+                  <p className="text-muted-foreground text-sm">{arquivoSelecionado?.name}</p>
                 </div>
-                <Progress
-                  value={statusUpload === "uploading" ? 30 : 70}
-                  className="w-64"
-                />
+                <Progress value={statusUpload === "uploading" ? 30 : 70} className="w-64" />
               </>
             ) : (
               <>
                 {arquivoSelecionado ? (
-                  <FileText className="h-12 w-12 text-muted-foreground" />
+                  <FileText className="text-muted-foreground h-12 w-12" />
                 ) : (
-                  <Upload className="h-12 w-12 text-muted-foreground" />
+                  <Upload className="text-muted-foreground h-12 w-12" />
                 )}
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold">
-                    Arraste seu relatorio PDF aqui
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="text-lg font-semibold">Arraste seu relatorio PDF aqui</h3>
+                  <p className="text-muted-foreground text-sm">
                     ou clique para selecionar (max 32MB)
                   </p>
                 </div>
@@ -160,10 +146,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
                   className="hidden"
                   onChange={handleSelecionarArquivo}
                 />
-                <Button
-                  variant="outline"
-                  onClick={() => inputArquivoRef.current?.click()}
-                >
+                <Button variant="outline" onClick={() => inputArquivoRef.current?.click()}>
                   Selecionar arquivo
                 </Button>
               </>

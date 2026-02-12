@@ -94,35 +94,31 @@ function InsightCard({
   }, [identificadorRelatorio, indiceInsight, estaConcluido, onConclusaoAlterada]);
 
   return (
-    <article
-      className={`transition-all ${estaConcluido ? "opacity-60" : ""}`}
-    >
+    <article className={`transition-all ${estaConcluido ? "opacity-60" : ""}`}>
       {/* Categoria + Prioridade */}
       <div className="mb-2 flex items-center gap-3">
-        <Icone className="h-5 w-5 text-muted-foreground" />
-        <span className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+        <Icone className="text-muted-foreground h-5 w-5" />
+        <span className="text-muted-foreground text-sm font-medium tracking-wide uppercase">
           {LABELS_CATEGORIA[insight.categoria] ?? insight.categoria}
         </span>
-        <Badge className={CORES_PRIORIDADE[insight.prioridade] ?? ""}>
-          {insight.prioridade}
-        </Badge>
+        <Badge className={CORES_PRIORIDADE[insight.prioridade] ?? ""}>{insight.prioridade}</Badge>
       </div>
 
       {/* Título */}
-      <h3 className={`text-xl font-bold leading-snug ${estaConcluido ? "line-through" : ""}`}>
+      <h3 className={`text-xl leading-snug font-bold ${estaConcluido ? "line-through" : ""}`}>
         {insight.titulo}
       </h3>
 
       {/* Descrição */}
       <p
-        className={`mt-2 text-lg leading-relaxed ${estaConcluido ? "line-through text-muted-foreground/60" : "text-muted-foreground"}`}
+        className={`mt-2 text-lg leading-relaxed ${estaConcluido ? "text-muted-foreground/60 line-through" : "text-muted-foreground"}`}
       >
         {insight.descricao}
       </p>
 
       {/* Ação Sugerida */}
       {insight.acaoSugerida && (
-        <div className="mt-4 rounded-lg border-l-4 border-muted-foreground/20 bg-muted/50 px-5 py-4">
+        <div className="border-muted-foreground/20 bg-muted/50 mt-4 rounded-lg border-l-4 px-5 py-4">
           <p className="text-base leading-relaxed">
             <span className="font-bold">Acao sugerida:</span>{" "}
             <span className="italic">{insight.acaoSugerida}</span>
@@ -133,9 +129,7 @@ function InsightCard({
       {/* Ativos Relacionados */}
       {insight.ativosRelacionados.length > 0 && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-sm font-semibold text-muted-foreground">
-            Ativos:
-          </span>
+          <span className="text-muted-foreground text-sm font-semibold">Ativos:</span>
           {insight.ativosRelacionados.map((ativo) => (
             <Badge key={ativo} variant="outline">
               {ativo}
@@ -146,21 +140,19 @@ function InsightCard({
 
       {/* Checkbox de conclusão */}
       {insight.acaoSugerida && (
-        <label
-          className="mt-4 flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors hover:bg-muted/50"
-        >
+        <label className="hover:bg-muted/50 mt-4 flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors">
           <Checkbox
             checked={estaConcluido}
             onCheckedChange={handleToggleConcluido}
             disabled={estaAtualizando}
             aria-label={`Marcar "${insight.titulo}" como concluído`}
           />
-          <span className={`text-sm ${estaConcluido ? "text-muted-foreground line-through" : "font-medium"}`}>
+          <span
+            className={`text-sm ${estaConcluido ? "text-muted-foreground line-through" : "font-medium"}`}
+          >
             {estaConcluido ? "Ação concluída" : "Marcar ação como concluída"}
           </span>
-          {estaConcluido && (
-            <CheckCircle2 className="ml-auto h-4 w-4 text-green-600" />
-          )}
+          {estaConcluido && <CheckCircle2 className="ml-auto h-4 w-4 text-green-600" />}
         </label>
       )}
     </article>
@@ -174,8 +166,7 @@ export default function InsightsPage() {
   const [insights, setInsights] = useState<InsightsResponse | null>(null);
   const [estaGerando, setEstaGerando] = useState(false);
   const [erroInsights, setErroInsights] = useState<string | null>(null);
-  const [modoVisualizacao, setModoVisualizacao] =
-    useState<ModoVisualizacao>("inicial");
+  const [modoVisualizacao, setModoVisualizacao] = useState<ModoVisualizacao>("inicial");
   const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
 
@@ -236,7 +227,7 @@ export default function InsightsPage() {
     try {
       // Encontrar relatório do período selecionado
       const relatorioSelecionado = relatorios.find(
-        (relatorio) => relatorio.mesReferencia === periodoSelecionado
+        (relatorio) => relatorio.mesReferencia === periodoSelecionado,
       );
       if (!relatorioSelecionado) return;
 
@@ -246,7 +237,7 @@ export default function InsightsPage() {
 
       // Encontrar relatório anterior (próximo na lista)
       const indiceAtual = relatorios.findIndex(
-        (relatorio) => relatorio.identificador === relatorioSelecionado.identificador
+        (relatorio) => relatorio.identificador === relatorioSelecionado.identificador,
       );
       if (indiceAtual >= 0 && indiceAtual < relatorios.length - 1) {
         const relatorioAnterior = relatorios[indiceAtual + 1];
@@ -269,21 +260,16 @@ export default function InsightsPage() {
       setInsights(dados.insights);
       setModoVisualizacao("insights");
     } catch (erro) {
-      setErroInsights(
-        erro instanceof Error ? erro.message : "Erro desconhecido",
-      );
+      setErroInsights(erro instanceof Error ? erro.message : "Erro desconhecido");
     } finally {
       setEstaGerando(false);
     }
   }, [relatorios, periodoSelecionado]);
 
-  const handleInsightsManualSalvos = useCallback(
-    (insightsSalvos: InsightsResponse) => {
-      setInsights(insightsSalvos);
-      setModoVisualizacao("insights");
-    },
-    [],
-  );
+  const handleInsightsManualSalvos = useCallback((insightsSalvos: InsightsResponse) => {
+    setInsights(insightsSalvos);
+    setModoVisualizacao("insights");
+  }, []);
 
   const handleCancelarManual = useCallback(() => {
     setModoVisualizacao("inicial");
@@ -300,9 +286,7 @@ export default function InsightsPage() {
         const insightsAtualizados: InsightsResponse = {
           ...insights,
           insights: insights.insights.map((insight, indice) =>
-            indice === indiceInsight
-              ? { ...insight, concluida }
-              : insight,
+            indice === indiceInsight ? { ...insight, concluida } : insight,
           ),
         };
         setInsights(insightsAtualizados);
@@ -313,7 +297,7 @@ export default function InsightsPage() {
 
   // Encontrar relatório do período selecionado
   const relatorioSelecionado = relatorios.find(
-    (relatorio) => relatorio.mesReferencia === periodoSelecionado
+    (relatorio) => relatorio.mesReferencia === periodoSelecionado,
   );
 
   return (
@@ -337,7 +321,7 @@ export default function InsightsPage() {
       {!carregandoRelatorios && !estaCarregandoInsights && relatorios.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Lightbulb className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <Lightbulb className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
             <p className="text-muted-foreground">
               Faca upload de um relatorio para gerar insights.
             </p>
@@ -351,19 +335,14 @@ export default function InsightsPage() {
         modoVisualizacao === "inicial" && (
           <Card>
             <CardContent className="flex flex-col items-center gap-4 py-12">
-              <Lightbulb className="h-12 w-12 text-muted-foreground" />
+              <Lightbulb className="text-muted-foreground h-12 w-12" />
               <p className="text-muted-foreground">
-                Gere insights baseados no período selecionado (
-                {relatorioSelecionado?.mesReferencia}).
+                Gere insights baseados no período selecionado ({relatorioSelecionado?.mesReferencia}
+                ).
               </p>
               <div className="flex items-center gap-3">
-                <Button
-                  onClick={() => void gerarInsightsViaApi()}
-                  disabled={estaGerando}
-                >
-                  {estaGerando && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                <Button onClick={() => void gerarInsightsViaApi()} disabled={estaGerando}>
+                  {estaGerando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {estaGerando ? "Gerando insights..." : "Gerar via API"}
                 </Button>
                 <Button
@@ -375,9 +354,7 @@ export default function InsightsPage() {
                   Gerar via Claude Chat
                 </Button>
               </div>
-              {erroInsights && (
-                <p className="text-sm text-red-600">{erroInsights}</p>
-              )}
+              {erroInsights && <p className="text-sm text-red-600">{erroInsights}</p>}
             </CardContent>
           </Card>
         )}
@@ -396,16 +373,15 @@ export default function InsightsPage() {
 
       {modoVisualizacao === "insights" && insights && relatorioSelecionado && (
         <div className="mx-auto max-w-3xl space-y-16">
-
           {/* --- Cabeçalho Editorial --- */}
           <header className="text-center">
-            <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+            <p className="text-muted-foreground text-sm font-medium tracking-widest uppercase">
               Análise de Carteira
             </p>
             <h1 className="mt-2 text-3xl font-bold">
               {formatarMesAno(insights.mesReferencia, "extenso")}
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-sm">
               Gerado em{" "}
               {new Date(insights.dataGeracao).toLocaleDateString("pt-BR", {
                 day: "2-digit",
@@ -419,19 +395,17 @@ export default function InsightsPage() {
 
           {/* --- Resumo Executivo --- */}
           <section>
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">
               Resumo Executivo
             </h2>
             <Separator className="my-3" />
-            <p className="text-xl leading-relaxed">
-              {insights.resumoExecutivo}
-            </p>
+            <p className="text-xl leading-relaxed">{insights.resumoExecutivo}</p>
           </section>
 
           {/* --- Alertas --- */}
           {insights.alertas.length > 0 && (
             <section>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+              <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">
                 Alertas
               </h2>
               <Separator className="my-3" />
@@ -448,7 +422,7 @@ export default function InsightsPage() {
                           : "border-l-muted-foreground/30 bg-muted/50",
                     )}
                   >
-                    <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                    <AlertTriangle className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0" />
                     <p className="text-base leading-relaxed">{alerta.mensagem}</p>
                   </div>
                 ))}
@@ -458,7 +432,7 @@ export default function InsightsPage() {
 
           {/* --- Insights Detalhados --- */}
           <section>
-            <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+            <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">
               Insights Detalhados
             </h2>
             <Separator className="my-3" />
@@ -478,24 +452,17 @@ export default function InsightsPage() {
           {/* --- Recomendações de Longo Prazo --- */}
           {insights.recomendacoesLongoPrazo.length > 0 && (
             <section>
-              <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+              <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">
                 Recomendações de Longo Prazo
               </h2>
               <Separator className="my-3" />
               <ul className="space-y-6">
-                {insights.recomendacoesLongoPrazo.map(
-                  (recomendacao, indice) => (
-                    <li
-                      key={indice}
-                      className="flex items-start gap-3 text-lg leading-relaxed"
-                    >
-                      <span className="mt-1 font-bold text-muted-foreground">
-                        {indice + 1}.
-                      </span>
-                      <span>{recomendacao}</span>
-                    </li>
-                  ),
-                )}
+                {insights.recomendacoesLongoPrazo.map((recomendacao, indice) => (
+                  <li key={indice} className="flex items-start gap-3 text-lg leading-relaxed">
+                    <span className="text-muted-foreground mt-1 font-bold">{indice + 1}.</span>
+                    <span>{recomendacao}</span>
+                  </li>
+                ))}
               </ul>
             </section>
           )}

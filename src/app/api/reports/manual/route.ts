@@ -9,10 +9,7 @@ export async function GET() {
     return NextResponse.json({ prompt: promptCompleto });
   } catch (erro) {
     console.error("Erro ao gerar prompt de extracao:", erro);
-    return NextResponse.json(
-      { erro: "Falha ao gerar prompt de extracao" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao gerar prompt de extracao" }, { status: 500 });
   }
 }
 
@@ -25,10 +22,7 @@ export async function POST(request: Request) {
     const corpo = (await request.json()) as CorpoRequisicaoManual;
 
     if (!corpo.json || typeof corpo.json !== "string") {
-      return NextResponse.json(
-        { erro: "Nenhum JSON fornecido" },
-        { status: 400 },
-      );
+      return NextResponse.json({ erro: "Nenhum JSON fornecido" }, { status: 400 });
     }
 
     const useCase = obterSalvarRelatorioManualUseCase();
@@ -43,15 +37,9 @@ export async function POST(request: Request) {
     console.error("Erro ao processar importacao manual:", erro);
 
     if (erro instanceof AppError) {
-      return NextResponse.json(
-        { erro: erro.message, codigo: erro.code },
-        { status: 422 },
-      );
+      return NextResponse.json({ erro: erro.message, codigo: erro.code }, { status: 422 });
     }
 
-    return NextResponse.json(
-      { erro: "Falha ao processar os dados" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao processar os dados" }, { status: 500 });
   }
 }

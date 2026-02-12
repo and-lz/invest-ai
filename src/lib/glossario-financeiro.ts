@@ -203,8 +203,7 @@ export const GLOSSARIO_ATIVO: EntradaGlossario = {
 
 export const GLOSSARIO_SALDO: EntradaGlossario = {
   termo: "Saldo",
-  explicacao:
-    "É quanto dinheiro você tem investido naquele ativo específico neste momento.",
+  explicacao: "É quanto dinheiro você tem investido naquele ativo específico neste momento.",
 };
 
 export const GLOSSARIO_RENTABILIDADE_MES: EntradaGlossario = {

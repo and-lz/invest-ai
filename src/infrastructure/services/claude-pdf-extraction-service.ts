@@ -3,10 +3,7 @@ import type { ExtractionService } from "@/domain/interfaces/extraction-service";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import { RelatorioExtraidoSchema } from "@/schemas/report-extraction.schema";
 import { ClaudeApiError, PdfParsingError } from "@/domain/errors/app-errors";
-import {
-  SYSTEM_PROMPT_EXTRACAO,
-  INSTRUCAO_USUARIO_EXTRACAO,
-} from "@/lib/prompt-extracao-manual";
+import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/prompt-extracao-manual";
 
 export class ClaudePdfExtractionService implements ExtractionService {
   constructor(private readonly anthropicClient: Anthropic) {}

@@ -2,7 +2,14 @@
 
 import { useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
@@ -17,7 +24,12 @@ import {
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { GanhosPorEstrategia } from "@/schemas/report-extraction.schema";
 
-type ColunaGanhos = "estrategia" | "ganhoNoMes" | "ganhoNoAno" | "ganho12Meses" | "ganhoDesdeInicio";
+type ColunaGanhos =
+  | "estrategia"
+  | "ganhoNoMes"
+  | "ganhoNoAno"
+  | "ganho12Meses"
+  | "ganhoDesdeInicio";
 
 interface StrategyGainsTableProps {
   ganhos: GanhosPorEstrategia[];
@@ -25,11 +37,7 @@ interface StrategyGainsTableProps {
 
 function formatarCelulaMoeda(valorEmCentavos: number) {
   const eNegativo = valorEmCentavos < 0;
-  return (
-    <span className={eNegativo ? "text-red-600" : ""}>
-      {formatarMoeda(valorEmCentavos)}
-    </span>
-  );
+  return <span className={eNegativo ? "text-red-600" : ""}>{formatarMoeda(valorEmCentavos)}</span>;
 }
 
 function obterValorColuna(ganho: GanhosPorEstrategia, coluna: ColunaGanhos): string | number {
@@ -56,18 +64,29 @@ interface CabecalhoOrdenaveProps {
   children: React.ReactNode;
 }
 
-function CabecalhoOrdenavel({ coluna, colunaAtiva, direcao, onClick, className, children }: CabecalhoOrdenaveProps) {
+function CabecalhoOrdenavel({
+  coluna,
+  colunaAtiva,
+  direcao,
+  onClick,
+  className,
+  children,
+}: CabecalhoOrdenaveProps) {
   const eAtiva = colunaAtiva === coluna;
   const Icone = eAtiva ? (direcao === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
 
   return (
     <TableHead
-      className={`group cursor-pointer select-none hover:text-foreground ${className ?? ""}`}
+      className={`group hover:text-foreground cursor-pointer select-none ${className ?? ""}`}
       onClick={() => onClick(coluna)}
     >
-      <div className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}>
+      <div
+        className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}
+      >
         {children}
-        <Icone className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`} />
+        <Icone
+          className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`}
+        />
       </div>
     </TableHead>
   );
@@ -120,38 +139,80 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
           <InfoTooltip conteudo={GLOSSARIO_GANHOS_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
-          Quanto cada tipo de investimento rendeu em reais. Valores em vermelho indicam prejuízo no período. Clique nos cabeçalhos para ordenar.
+          Quanto cada tipo de investimento rendeu em reais. Valores em vermelho indicam prejuízo no
+          período. Clique nos cabeçalhos para ordenar.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <CabecalhoOrdenavel coluna="estrategia" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao}>
+              <CabecalhoOrdenavel
+                coluna="estrategia"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+              >
                 Estrategia
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="ganhoNoMes" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+              <CabecalhoOrdenavel
+                coluna="ganhoNoMes"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
                 <span className="flex items-center gap-1">
                   No Mes
-                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_NO_MES.explicacao} tamanhoIcone="h-3 w-3" />
+                  <InfoTooltip
+                    conteudo={GLOSSARIO_PERIODO_NO_MES.explicacao}
+                    tamanhoIcone="h-3 w-3"
+                  />
                 </span>
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="ganhoNoAno" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+              <CabecalhoOrdenavel
+                coluna="ganhoNoAno"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
                 <span className="flex items-center gap-1">
                   No Ano
-                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_NO_ANO.explicacao} tamanhoIcone="h-3 w-3" />
+                  <InfoTooltip
+                    conteudo={GLOSSARIO_PERIODO_NO_ANO.explicacao}
+                    tamanhoIcone="h-3 w-3"
+                  />
                 </span>
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="ganho12Meses" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+              <CabecalhoOrdenavel
+                coluna="ganho12Meses"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
                 <span className="flex items-center gap-1">
                   12 Meses
-                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_12_MESES.explicacao} tamanhoIcone="h-3 w-3" />
+                  <InfoTooltip
+                    conteudo={GLOSSARIO_PERIODO_12_MESES.explicacao}
+                    tamanhoIcone="h-3 w-3"
+                  />
                 </span>
               </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel coluna="ganhoDesdeInicio" colunaAtiva={colunaOrdenacao} direcao={direcaoOrdenacao} onClick={alternarOrdenacao} className="text-right">
+              <CabecalhoOrdenavel
+                coluna="ganhoDesdeInicio"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
                 <span className="flex items-center gap-1">
                   Desde Inicio
-                  <InfoTooltip conteudo={GLOSSARIO_PERIODO_DESDE_INICIO.explicacao} tamanhoIcone="h-3 w-3" />
+                  <InfoTooltip
+                    conteudo={GLOSSARIO_PERIODO_DESDE_INICIO.explicacao}
+                    tamanhoIcone="h-3 w-3"
+                  />
                 </span>
               </CabecalhoOrdenavel>
             </TableRow>

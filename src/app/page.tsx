@@ -38,9 +38,9 @@ function EstadoVazio() {
   return (
     <Card className="flex flex-col items-center justify-center p-12">
       <CardContent className="text-center">
-        <Upload className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+        <Upload className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
         <h3 className="mb-2 text-lg font-semibold">Nenhum relatorio encontrado</h3>
-        <p className="mb-4 text-muted-foreground">
+        <p className="text-muted-foreground mb-4">
           Faca upload do seu relatorio Inter Prime para comecar a visualizar seus investimentos.
         </p>
         <Link href="/upload">
@@ -55,16 +55,13 @@ export default function DashboardPage() {
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string | undefined>(undefined);
 
   const { dadosDashboard, estaVazio, estaCarregando } = useDashboardData(
-    periodoSelecionado ? { mesAno: periodoSelecionado } : undefined
+    periodoSelecionado ? { mesAno: periodoSelecionado } : undefined,
   );
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <Header
-          titulo="Dashboard"
-          descricao="Visao geral dos seus investimentos"
-        />
+        <Header titulo="Dashboard" descricao="Visao geral dos seus investimentos" />
         {dadosDashboard && dadosDashboard.periodosDisponiveis.length > 0 && (
           <PeriodSelector
             periodosDisponiveis={dadosDashboard.periodosDisponiveis}
@@ -85,9 +82,7 @@ export default function DashboardPage() {
             variacaoPatrimonialCentavos={dadosDashboard.variacaoPatrimonialCentavos}
           />
 
-          <WealthEvolutionChart
-            evolucaoPatrimonial={dadosDashboard.evolucaoPatrimonial}
-          />
+          <WealthEvolutionChart evolucaoPatrimonial={dadosDashboard.evolucaoPatrimonial} />
 
           <div className="grid gap-6 lg:grid-cols-2">
             <AssetAllocationChart alocacaoMensal={dadosDashboard.alocacaoAtual} />

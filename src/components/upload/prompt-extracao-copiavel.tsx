@@ -10,9 +10,7 @@ interface PromptExtracaoCopiavelProps {
   onProximoPasso: () => void;
 }
 
-export function PromptExtracaoCopiavel({
-  onProximoPasso,
-}: PromptExtracaoCopiavelProps) {
+export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiavelProps) {
   const [promptCompleto, setPromptCompleto] = useState<string>("");
   const [estaCarregando, setEstaCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState<string | null>(null);
@@ -44,7 +42,7 @@ export function PromptExtracaoCopiavel({
     return (
       <Card>
         <CardContent className="flex items-center justify-center p-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
         </CardContent>
       </Card>
     );
@@ -65,14 +63,13 @@ export function PromptExtracaoCopiavel({
       <CardContent className="space-y-4 p-6">
         <div>
           <h3 className="text-lg font-semibold">Passo 1: Copiar o prompt</h3>
-          <p className="text-sm text-muted-foreground">
-            Copie o prompt abaixo e cole no Claude Chat junto com o PDF do
-            relatorio.
+          <p className="text-muted-foreground text-sm">
+            Copie o prompt abaixo e cole no Claude Chat junto com o PDF do relatorio.
           </p>
         </div>
 
-        <ScrollArea className="h-64 rounded-md border bg-muted/50 p-4">
-          <pre className="whitespace-pre-wrap text-xs">{promptCompleto}</pre>
+        <ScrollArea className="bg-muted/50 h-64 rounded-md border p-4">
+          <pre className="text-xs whitespace-pre-wrap">{promptCompleto}</pre>
         </ScrollArea>
 
         <div className="flex items-center gap-3">

@@ -41,9 +41,7 @@ export async function POST(request: Request) {
 
     if (dados.acao === "gerar-prompt") {
       const detailUseCase = obterGetReportDetailUseCase();
-      const relatorioAtual = await detailUseCase.executar(
-        dados.identificadorRelatorio,
-      );
+      const relatorioAtual = await detailUseCase.executar(dados.identificadorRelatorio);
 
       let dadosRelatorioAnterior = null;
       if (dados.identificadorRelatorioAnterior) {
@@ -55,8 +53,7 @@ export async function POST(request: Request) {
         const listUseCase = obterListReportsUseCase();
         const todosRelatorios = await listUseCase.executar();
         const indiceAtual = todosRelatorios.findIndex(
-          (relatorio) =>
-            relatorio.identificador === dados.identificadorRelatorio,
+          (relatorio) => relatorio.identificador === dados.identificadorRelatorio,
         );
         if (indiceAtual >= 0 && indiceAtual < todosRelatorios.length - 1) {
           const relatorioAnteriorMeta = todosRelatorios[indiceAtual + 1];
@@ -89,15 +86,9 @@ export async function POST(request: Request) {
     console.error("Erro ao processar insights manual:", erro);
 
     if (erro instanceof AppError) {
-      return NextResponse.json(
-        { erro: erro.message, codigo: erro.code },
-        { status: 422 },
-      );
+      return NextResponse.json({ erro: erro.message, codigo: erro.code }, { status: 422 });
     }
 
-    return NextResponse.json(
-      { erro: "Falha ao processar insights" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao processar insights" }, { status: 500 });
   }
 }
