@@ -3,9 +3,17 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Upload, FileText, Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  LayoutDashboard,
+  Upload,
+  FileText,
+  Lightbulb,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { AlternarTema } from "@/components/layout/alternar-tema";
 
 const itensNavegacao = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
@@ -39,42 +47,36 @@ export function SidebarNavigation() {
   return (
     <aside
       className={cn(
-        "flex h-screen flex-col border-r bg-card transition-all duration-300",
-        sidebarCompactada ? "w-20" : "w-64"
+        "bg-card flex h-screen flex-col border-r transition-all duration-300",
+        sidebarCompactada ? "w-20" : "w-64",
       )}
     >
       <div
         className={cn(
           "flex h-16 items-center border-b",
-          sidebarCompactada ? "justify-center px-2" : "justify-between px-6"
+          sidebarCompactada ? "justify-center px-2" : "justify-between px-6",
         )}
       >
-        {!sidebarCompactada && (
-          <h1 className="text-lg font-bold">Investimentos</h1>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={alternarModoBotao}
-          className="h-8 w-8"
-          aria-label={
-            sidebarCompactada
-              ? "Expandir menu lateral"
-              : "Compactar menu lateral"
-          }
-        >
-          {sidebarCompactada ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
+        {!sidebarCompactada && <h1 className="text-lg font-bold">Investimentos</h1>}
+        <div className="flex items-center gap-2">
+          <AlternarTema />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={alternarModoBotao}
+            className="h-8 w-8"
+            aria-label={sidebarCompactada ? "Expandir menu lateral" : "Compactar menu lateral"}
+          >
+            {sidebarCompactada ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </div>
       <nav
-        className={cn(
-          "flex-1 space-y-1 p-4",
-          sidebarCompactada && "flex flex-col items-center"
-        )}
+        className={cn("flex-1 space-y-1 p-4", sidebarCompactada && "flex flex-col items-center")}
       >
         {itensNavegacao.map((item) => {
           const estaAtivo = pathname === item.href;

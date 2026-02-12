@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { SidebarNavigation } from "@/components/layout/sidebar-navigation";
 import "./globals.css";
@@ -31,17 +32,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}
-      >
-        <div className="flex h-screen overflow-hidden">
-          <SidebarNavigation />
-          <main className="flex-1 overflow-y-auto p-8">
-            {children}
-          </main>
-        </div>
-        <Toaster />
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <div className="flex h-screen overflow-hidden">
+            <SidebarNavigation />
+            <main className="flex-1 overflow-y-auto p-8">{children}</main>
+          </div>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
