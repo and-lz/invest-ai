@@ -36,3 +36,7 @@
 - PDFs em `data/reports/`
 - JSON extraido em `data/extracted/`
 - Insights em `data/insights/`
+
+# Reports
+
+All changes to the report JSON structure must be backward compatible. New fields should be optional with sensible defaults so that previously generated reports remain valid and functional.
