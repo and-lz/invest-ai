@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InsightsManualStepper } from "@/components/insights/insights-manual-stepper";
+import { PeriodSelector } from "@/components/dashboard/period-selector";
 import {
   Lightbulb,
   AlertTriangle,
@@ -85,6 +86,9 @@ export default function InsightsPage() {
   const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
 
+  // Criar lista de períodos disponíveis a partir dos relatórios
+  const periodosDisponiveis = relatorios.map((relatorio) => relatorio.mesReferencia);
+
   // Definir período padrão como o mais recente quando carregar relatórios
   useEffect(() => {
     if (relatorios.length > 0 && !periodoSelecionado) {
@@ -131,21 +135,31 @@ export default function InsightsPage() {
   }, [periodoSelecionado]);
 
   const gerarInsightsViaApi = useCallback(async () => {
-    if (relatorios.length === 0) return;
+    if (relatorios.length === 0 || !periodoSelecionado) return;
 
     setEstaGerando(true);
     setErroInsights(null);
 
     try {
-      const relatorioRecente = relatorios[0];
-      if (!relatorioRecente) return;
+      // Encontrar relatório do período selecionado
+      const relatorioSelecionado = relatorios.find(
+        (relatorio) => relatorio.mesReferencia === periodoSelecionado
+      );
+      if (!relatorioSelecionado) return;
 
       const corpo: Record<string, string> = {
-        identificadorRelatorio: relatorioRecente.identificador,
+        identificadorRelatorio: relatorioSelecionado.identificador,
       };
 
-      if (relatorios.length >= 2 && relatorios[1]) {
-        corpo.identificadorRelatorioAnterior = relatorios[1].identificador;
+      // Encontrar relatório anterior (próximo na lista)
+      const indiceAtual = relatorios.findIndex(
+        (relatorio) => relatorio.identificador === relatorioSelecionado.identificador
+      );
+      if (indiceAtual >= 0 && indiceAtual < relatorios.length - 1) {
+        const relatorioAnterior = relatorios[indiceAtual + 1];
+        if (relatorioAnterior) {
+          corpo.identificadorRelatorioAnterior = relatorioAnterior.identificador;
+        }
       }
 
       const resposta = await fetch("/api/insights", {
@@ -168,7 +182,7 @@ export default function InsightsPage() {
     } finally {
       setEstaGerando(false);
     }
-  }, [relatorios]);
+  }, [relatorios, periodoSelecionado]);
 
   const handleInsightsManualSalvos = useCallback(
     (insightsSalvos: InsightsResponse) => {
@@ -187,14 +201,26 @@ export default function InsightsPage() {
     setModoVisualizacao("inicial");
   }, []);
 
-  const relatorioRecente = relatorios[0];
+  // Encontrar relatório do período selecionado
+  const relatorioSelecionado = relatorios.find(
+    (relatorio) => relatorio.mesReferencia === periodoSelecionado
+  );
 
   return (
     <div className="space-y-6">
-      <Header
-        titulo="Insights IA"
-        descricao="Analise inteligente da sua carteira de investimentos"
-      />
+      <div className="flex items-center justify-between">
+        <Header
+          titulo="Insights IA"
+          descricao="Analise inteligente da sua carteira de investimentos"
+        />
+        {!carregandoRelatorios && periodosDisponiveis.length > 0 && periodoSelecionado && (
+          <PeriodSelector
+            periodosDisponiveis={periodosDisponiveis}
+            periodoSelecionado={periodoSelecionado}
+            onPeriodoChange={setPeriodoSelecionado}
+          />
+        )}
+      </div>
 
       {(carregandoRelatorios || estaCarregandoInsights) && <Skeleton className="h-64" />}
 
@@ -217,8 +243,8 @@ export default function InsightsPage() {
             <CardContent className="flex flex-col items-center gap-4 py-12">
               <Lightbulb className="h-12 w-12 text-muted-foreground" />
               <p className="text-muted-foreground">
-                Gere insights baseados no relatorio mais recente (
-                {relatorioRecente?.mesReferencia}).
+                Gere insights baseados no período selecionado (
+                {relatorioSelecionado?.mesReferencia}).
               </p>
               <div className="flex items-center gap-3">
                 <Button
@@ -250,9 +276,9 @@ export default function InsightsPage() {
         !estaCarregandoInsights &&
         relatorios.length > 0 &&
         modoVisualizacao === "manual" &&
-        relatorioRecente && (
+        relatorioSelecionado && (
           <InsightsManualStepper
-            identificadorRelatorio={relatorioRecente.identificador}
+            identificadorRelatorio={relatorioSelecionado.identificador}
             onInsightsSalvos={handleInsightsManualSalvos}
             onCancelar={handleCancelarManual}
           />
