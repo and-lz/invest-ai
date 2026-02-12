@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { InsightsManualStepper } from "@/components/insights/insights-manual-stepper";
 import {
   Lightbulb,
   AlertTriangle,
@@ -15,6 +16,7 @@ import {
   Target,
   Shield,
   Loader2,
+  MessageSquare,
 } from "lucide-react";
 import type { InsightsResponse, Insight } from "@/schemas/insights.schema";
 
@@ -71,13 +73,64 @@ function InsightCard({ insight }: { insight: Insight }) {
   );
 }
 
+type ModoVisualizacao = "inicial" | "manual" | "insights";
+
 export default function InsightsPage() {
   const { relatorios, estaCarregando: carregandoRelatorios } = useReports();
   const [insights, setInsights] = useState<InsightsResponse | null>(null);
   const [estaGerando, setEstaGerando] = useState(false);
   const [erroInsights, setErroInsights] = useState<string | null>(null);
+  const [modoVisualizacao, setModoVisualizacao] =
+    useState<ModoVisualizacao>("inicial");
+  const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
+  const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
 
-  const gerarInsights = useCallback(async () => {
+  // Definir período padrão como o mais recente quando carregar relatórios
+  useEffect(() => {
+    if (relatorios.length > 0 && !periodoSelecionado) {
+      const relatorioRecente = relatorios[0];
+      if (relatorioRecente) {
+        setPeriodoSelecionado(relatorioRecente.mesReferencia);
+      }
+    }
+  }, [relatorios, periodoSelecionado]);
+
+  // Carregar insights salvos quando o período mudar
+  useEffect(() => {
+    if (!periodoSelecionado) return;
+
+    const carregarInsightsSalvos = async () => {
+      setEstaCarregandoInsights(true);
+      try {
+        const url = `/api/insights?mesAno=${encodeURIComponent(periodoSelecionado)}`;
+        const resposta = await fetch(url);
+        if (resposta.ok) {
+          const dados = (await resposta.json()) as {
+            insights: InsightsResponse | null;
+            identificadorRelatorio: string | null;
+            mesReferencia: string;
+          };
+          if (dados.insights) {
+            setInsights(dados.insights);
+            setModoVisualizacao("insights");
+          } else {
+            setInsights(null);
+            setModoVisualizacao("inicial");
+          }
+        }
+      } catch (erro) {
+        console.error("Erro ao carregar insights salvos:", erro);
+        setInsights(null);
+        setModoVisualizacao("inicial");
+      } finally {
+        setEstaCarregandoInsights(false);
+      }
+    };
+
+    void carregarInsightsSalvos();
+  }, [periodoSelecionado]);
+
+  const gerarInsightsViaApi = useCallback(async () => {
     if (relatorios.length === 0) return;
 
     setEstaGerando(true);
@@ -107,6 +160,7 @@ export default function InsightsPage() {
 
       const dados = (await resposta.json()) as { insights: InsightsResponse };
       setInsights(dados.insights);
+      setModoVisualizacao("insights");
     } catch (erro) {
       setErroInsights(
         erro instanceof Error ? erro.message : "Erro desconhecido",
@@ -116,6 +170,25 @@ export default function InsightsPage() {
     }
   }, [relatorios]);
 
+  const handleInsightsManualSalvos = useCallback(
+    (insightsSalvos: InsightsResponse) => {
+      setInsights(insightsSalvos);
+      setModoVisualizacao("insights");
+    },
+    [],
+  );
+
+  const handleCancelarManual = useCallback(() => {
+    setModoVisualizacao("inicial");
+  }, []);
+
+  const handleRegerar = useCallback(() => {
+    setInsights(null);
+    setModoVisualizacao("inicial");
+  }, []);
+
+  const relatorioRecente = relatorios[0];
+
   return (
     <div className="space-y-6">
       <Header
@@ -123,9 +196,9 @@ export default function InsightsPage() {
         descricao="Analise inteligente da sua carteira de investimentos"
       />
 
-      {carregandoRelatorios && <Skeleton className="h-64" />}
+      {(carregandoRelatorios || estaCarregandoInsights) && <Skeleton className="h-64" />}
 
-      {!carregandoRelatorios && relatorios.length === 0 && (
+      {!carregandoRelatorios && !estaCarregandoInsights && relatorios.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
             <Lightbulb className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
@@ -136,25 +209,56 @@ export default function InsightsPage() {
         </Card>
       )}
 
-      {!carregandoRelatorios && relatorios.length > 0 && !insights && (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-4 py-12">
-            <Lightbulb className="h-12 w-12 text-muted-foreground" />
-            <p className="text-muted-foreground">
-              Gere insights baseados no relatorio mais recente ({relatorios[0]?.mesReferencia}).
-            </p>
-            <Button onClick={() => void gerarInsights()} disabled={estaGerando}>
-              {estaGerando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {estaGerando ? "Gerando insights..." : "Gerar Insights"}
-            </Button>
-            {erroInsights && (
-              <p className="text-sm text-red-600">{erroInsights}</p>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      {!carregandoRelatorios &&
+        !estaCarregandoInsights &&
+        relatorios.length > 0 &&
+        modoVisualizacao === "inicial" && (
+          <Card>
+            <CardContent className="flex flex-col items-center gap-4 py-12">
+              <Lightbulb className="h-12 w-12 text-muted-foreground" />
+              <p className="text-muted-foreground">
+                Gere insights baseados no relatorio mais recente (
+                {relatorioRecente?.mesReferencia}).
+              </p>
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => void gerarInsightsViaApi()}
+                  disabled={estaGerando}
+                >
+                  {estaGerando && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {estaGerando ? "Gerando insights..." : "Gerar via API"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setModoVisualizacao("manual")}
+                  disabled={estaGerando}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Gerar via Claude Chat
+                </Button>
+              </div>
+              {erroInsights && (
+                <p className="text-sm text-red-600">{erroInsights}</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-      {insights && (
+      {!carregandoRelatorios &&
+        !estaCarregandoInsights &&
+        relatorios.length > 0 &&
+        modoVisualizacao === "manual" &&
+        relatorioRecente && (
+          <InsightsManualStepper
+            identificadorRelatorio={relatorioRecente.identificador}
+            onInsightsSalvos={handleInsightsManualSalvos}
+            onCancelar={handleCancelarManual}
+          />
+        )}
+
+      {modoVisualizacao === "insights" && insights && (
         <>
           <Card>
             <CardHeader>
@@ -203,24 +307,24 @@ export default function InsightsPage() {
               </CardHeader>
               <CardContent>
                 <ul className="list-inside list-disc space-y-2">
-                  {insights.recomendacoesLongoPrazo.map((recomendacao, indice) => (
-                    <li key={indice} className="text-sm text-muted-foreground">
-                      {recomendacao}
-                    </li>
-                  ))}
+                  {insights.recomendacoesLongoPrazo.map(
+                    (recomendacao, indice) => (
+                      <li
+                        key={indice}
+                        className="text-sm text-muted-foreground"
+                      >
+                        {recomendacao}
+                      </li>
+                    ),
+                  )}
                 </ul>
               </CardContent>
             </Card>
           )}
 
           <div className="flex justify-center">
-            <Button
-              variant="outline"
-              onClick={() => void gerarInsights()}
-              disabled={estaGerando}
-            >
-              {estaGerando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Regenerar Insights
+            <Button variant="outline" onClick={handleRegerar}>
+              Gerar novos insights
             </Button>
           </div>
         </>
