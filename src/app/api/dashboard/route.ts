@@ -1,10 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { obterGetDashboardDataUseCase } from "@/lib/container";
+import { validarMesAno } from "@/lib/format-date";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Extrair query param mesAno se fornecido
+    const { searchParams } = new URL(request.url);
+    const mesAnoParam = searchParams.get("mesAno");
+
+    // Validar formato se fornecido
+    if (mesAnoParam && !validarMesAno(mesAnoParam)) {
+      return NextResponse.json(
+        { erro: "Formato de mesAno inválido. Esperado: YYYY-MM" },
+        { status: 400 },
+      );
+    }
+
     const useCase = obterGetDashboardDataUseCase();
-    const dadosDashboard = await useCase.executar();
+    const dadosDashboard = await useCase.executar(mesAnoParam ?? undefined);
 
     if (!dadosDashboard) {
       return NextResponse.json({ dadosDashboard: null, vazio: true });

@@ -286,67 +286,75 @@ export default function InsightsPage() {
 
       {modoVisualizacao === "insights" && insights && (
         <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Resumo Executivo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm leading-relaxed">
-                {insights.resumoExecutivo}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Coluna Esquerda: Resumo e Alertas */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Resumo Executivo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm leading-relaxed">
+                    {insights.resumoExecutivo}
+                  </p>
+                </CardContent>
+              </Card>
 
-          {insights.alertas.length > 0 && (
-            <div className="space-y-2">
-              {insights.alertas.map((alerta, indice) => (
-                <Card
-                  key={indice}
-                  className={
-                    alerta.tipo === "urgente"
-                      ? "border-red-200 bg-red-50"
-                      : alerta.tipo === "atencao"
-                        ? "border-amber-200 bg-amber-50"
-                        : ""
-                  }
-                >
-                  <CardContent className="flex items-center gap-3 py-3">
-                    <AlertTriangle className="h-5 w-5" />
-                    <p className="text-sm">{alerta.mensagem}</p>
+              {insights.alertas.length > 0 && (
+                <div className="space-y-2">
+                  {insights.alertas.map((alerta, indice) => (
+                    <Card
+                      key={indice}
+                      className={
+                        alerta.tipo === "urgente"
+                          ? "border-red-200 bg-red-50"
+                          : alerta.tipo === "atencao"
+                            ? "border-amber-200 bg-amber-50"
+                            : ""
+                      }
+                    >
+                      <CardContent className="flex items-start gap-3 py-3">
+                        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+                        <p className="text-sm">{alerta.mensagem}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {insights.recomendacoesLongoPrazo.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recomendacoes de Longo Prazo</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="list-inside list-disc space-y-2">
+                      {insights.recomendacoesLongoPrazo.map(
+                        (recomendacao, indice) => (
+                          <li
+                            key={indice}
+                            className="text-sm text-muted-foreground"
+                          >
+                            {recomendacao}
+                          </li>
+                        ),
+                      )}
+                    </ul>
                   </CardContent>
                 </Card>
-              ))}
+              )}
             </div>
-          )}
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Insights</h3>
-            {insights.insights.map((insight, indice) => (
-              <InsightCard key={indice} insight={insight} />
-            ))}
+            {/* Coluna Direita: Insights */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Insights</h3>
+              <div className="space-y-4">
+                {insights.insights.map((insight, indice) => (
+                  <InsightCard key={indice} insight={insight} />
+                ))}
+              </div>
+            </div>
           </div>
-
-          {insights.recomendacoesLongoPrazo.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Recomendacoes de Longo Prazo</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="list-inside list-disc space-y-2">
-                  {insights.recomendacoesLongoPrazo.map(
-                    (recomendacao, indice) => (
-                      <li
-                        key={indice}
-                        className="text-sm text-muted-foreground"
-                      >
-                        {recomendacao}
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </CardContent>
-            </Card>
-          )}
 
           <div className="flex justify-center">
             <Button variant="outline" onClick={handleRegerar}>

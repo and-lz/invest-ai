@@ -8,9 +8,18 @@ interface DashboardApiResponse {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json() as Promise<DashboardApiResponse>);
 
-export function useDashboardData() {
+interface UseDashboardDataParams {
+  mesAno?: string; // Período específico no formato "YYYY-MM". Se não fornecido, usa o último mês disponível
+}
+
+export function useDashboardData(params?: UseDashboardDataParams) {
+  // Construir URL com query param se mesAno for fornecido
+  const url = params?.mesAno
+    ? `/api/dashboard?mesAno=${encodeURIComponent(params.mesAno)}`
+    : "/api/dashboard";
+
   const { data, error, isLoading, mutate } = useSWR<DashboardApiResponse>(
-    "/api/dashboard",
+    url,
     fetcher,
   );
 

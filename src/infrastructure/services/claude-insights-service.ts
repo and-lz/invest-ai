@@ -4,26 +4,10 @@ import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
 import { ClaudeApiError } from "@/domain/errors/app-errors";
-
-const SYSTEM_PROMPT_INSIGHTS = `Voce e um consultor financeiro especializado em investimentos brasileiros, com profundo conhecimento do mercado de capitais brasileiro, renda fixa, fundos imobiliarios e fundos de investimento.
-
-Analise os dados da carteira de investimentos e forneca insights acionaveis.
-
-DIRETRIZES:
-1. Compare a rentabilidade da carteira com benchmarks (CDI, Ibovespa, IPCA)
-2. Identifique ativos com performance muito acima ou abaixo da media
-3. Avalie a diversificacao da carteira (concentracao por estrategia)
-4. Analise a liquidez da carteira vs necessidades
-5. Identifique tendencias (se dados do mes anterior disponiveis)
-6. Sugira acoes concretas: rebalancear, resgatar, aplicar mais
-7. Considere o cenario macroeconomico brasileiro (Selic, inflacao)
-8. Avalie o risco-retorno dos ativos
-9. Para recomendacoes de longo prazo, considere horizonte de 12-36 meses
-10. Seja direto e pratico. Evite jargao excessivo.
-11. Priorize insights por impacto financeiro potencial.
-12. Responda em portugues brasileiro.
-
-Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
+import {
+  SYSTEM_PROMPT_INSIGHTS,
+  INSTRUCAO_USUARIO_INSIGHTS,
+} from "@/lib/prompt-insights-manual";
 
 export class ClaudeInsightsService implements InsightsService {
   constructor(private readonly anthropicClient: Anthropic) {}
@@ -45,7 +29,7 @@ export class ClaudeInsightsService implements InsightsService {
         messages: [
           {
             role: "user",
-            content: `Analise a seguinte carteira de investimentos e gere insights detalhados. Retorne APENAS JSON valido:\n\n${JSON.stringify(dadosParaAnalise, null, 2)}`,
+            content: `${INSTRUCAO_USUARIO_INSIGHTS}\n\n${JSON.stringify(dadosParaAnalise, null, 2)}`,
           },
         ],
       });

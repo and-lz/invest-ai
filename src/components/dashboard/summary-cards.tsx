@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, DollarSign, Percent, BarChart3, CalendarDays } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatarDataBrasileira } from "@/lib/format-date";
 import type { Resumo } from "@/schemas/report-extraction.schema";
 
 interface SummaryCardsProps {
@@ -76,7 +77,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
             {formatarPercentualSimples(resumo.rentabilidadeDesdeInicio.valor)}
           </div>
           <p className="text-xs text-muted-foreground">
-            Desde {resumo.dataInicioCarteira}
+            Desde {formatarDataBrasileira(resumo.dataInicioCarteira)}
           </p>
         </CardContent>
       </Card>

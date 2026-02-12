@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Header } from "@/components/layout/header";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { AssetAllocationChart } from "@/components/dashboard/asset-allocation-chart";
@@ -7,6 +8,7 @@ import { BenchmarkComparisonChart } from "@/components/dashboard/benchmark-compa
 import { TopPerformersTable } from "@/components/dashboard/top-performers-table";
 import { StrategyGainsTable } from "@/components/dashboard/strategy-gains-table";
 import { FinancialEventsList } from "@/components/dashboard/financial-events-list";
+import { PeriodSelector } from "@/components/dashboard/period-selector";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,14 +50,27 @@ function EstadoVazio() {
 }
 
 export default function DashboardPage() {
-  const { dadosDashboard, estaVazio, estaCarregando } = useDashboardData();
+  const [periodoSelecionado, setPeriodoSelecionado] = useState<string | undefined>(undefined);
+
+  const { dadosDashboard, estaVazio, estaCarregando } = useDashboardData(
+    periodoSelecionado ? { mesAno: periodoSelecionado } : undefined
+  );
 
   return (
     <div className="space-y-6">
-      <Header
-        titulo="Dashboard"
-        descricao="Visao geral dos seus investimentos"
-      />
+      <div className="flex items-start justify-between gap-4">
+        <Header
+          titulo="Dashboard"
+          descricao="Visao geral dos seus investimentos"
+        />
+        {dadosDashboard && dadosDashboard.periodosDisponiveis.length > 0 && (
+          <PeriodSelector
+            periodosDisponiveis={dadosDashboard.periodosDisponiveis}
+            periodoSelecionado={periodoSelecionado ?? dadosDashboard.mesAtual}
+            onPeriodoChange={setPeriodoSelecionado}
+          />
+        )}
+      </div>
 
       {estaCarregando && <DashboardSkeleton />}
 

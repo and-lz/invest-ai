@@ -12,6 +12,7 @@ import type {
 export interface DashboardData {
   resumoAtual: Resumo;
   mesAtual: string;
+  periodosDisponiveis: string[]; // Array de mesAno disponíveis para seleção
   evolucaoPatrimonial: Array<{
     mesAno: string;
     patrimonioTotalCentavos: number;
@@ -32,7 +33,12 @@ const QUANTIDADE_TOP_PERFORMERS = 5;
 export class GetDashboardDataUseCase {
   constructor(private readonly repository: ReportRepository) {}
 
-  async executar(): Promise<DashboardData | null> {
+  /**
+   * Executa a busca de dados do dashboard
+   * @param mesAnoSelecionado - Opcional. Período específico no formato "YYYY-MM". Se não fornecido, usa o último mês disponível.
+   * @returns Dados do dashboard ou null se não houver relatórios
+   */
+  async executar(mesAnoSelecionado?: string): Promise<DashboardData | null> {
     const todosMetadados = await this.repository.listarTodosMetadados();
 
     if (todosMetadados.length === 0) return null;
@@ -58,7 +64,16 @@ export class GetDashboardDataUseCase {
       relatorioA.mesAno.localeCompare(relatorioB.mesAno),
     );
 
-    const relatorioMaisRecente = relatoriosExtraidos[relatoriosExtraidos.length - 1]!;
+    // Determinar qual relatório usar: selecionado pelo usuário ou o mais recente
+    const relatorioSelecionado = mesAnoSelecionado
+      ? relatoriosExtraidos.find((r) => r.mesAno === mesAnoSelecionado)
+      : relatoriosExtraidos[relatoriosExtraidos.length - 1];
+
+    if (!relatorioSelecionado) {
+      return null; // Período selecionado não encontrado
+    }
+
+    const relatorioMaisRecente = relatorioSelecionado;
 
     const evolucaoPatrimonial = relatoriosExtraidos.map((relatorio) => ({
       mesAno: relatorio.mesAno,
@@ -91,6 +106,7 @@ export class GetDashboardDataUseCase {
     return {
       resumoAtual: relatorioMaisRecente.dados.resumo,
       mesAtual: relatorioMaisRecente.mesAno,
+      periodosDisponiveis: relatoriosExtraidos.map((r) => r.mesAno),
       evolucaoPatrimonial,
       alocacaoAtual: relatorioMaisRecente.dados.evolucaoAlocacao,
       comparacaoBenchmarksAtual: relatorioMaisRecente.dados.comparacaoBenchmarks,

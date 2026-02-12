@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatarMoeda } from "@/domain/value-objects/money";
+import { formatarDataBrasileira } from "@/lib/format-date";
 import type { EventoFinanceiro } from "@/schemas/report-extraction.schema";
 
 interface FinancialEventsListProps {
@@ -36,9 +37,16 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                 <Badge variant="secondary" className={CORES_TIPO_EVENTO[evento.tipoEvento] ?? ""}>
                   {evento.tipoEvento}
                 </Badge>
-                <span className="text-sm font-medium">
-                  {evento.codigoAtivo ?? evento.nomeAtivo}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">
+                    {evento.codigoAtivo ?? evento.nomeAtivo}
+                  </span>
+                  {evento.dataEvento && (
+                    <span className="text-xs text-muted-foreground">
+                      {formatarDataBrasileira(evento.dataEvento)}
+                    </span>
+                  )}
+                </div>
               </div>
               <span className="text-sm font-semibold text-green-600">
                 {formatarMoeda(evento.valor.valorEmCentavos)}

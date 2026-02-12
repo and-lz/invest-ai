@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { obterGenerateInsightsUseCase } from "@/lib/container";
+import { obterGenerateInsightsUseCase, obterListReportsUseCase, obterFilesystemReportRepository } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
 import { z } from "zod/v4";
 
@@ -7,6 +7,51 @@ const InsightsRequestSchema = z.object({
   identificadorRelatorio: z.string().min(1),
   identificadorRelatorioAnterior: z.string().optional(),
 });
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const mesAnoParam = searchParams.get("mesAno");
+
+    const listUseCase = obterListReportsUseCase();
+    const relatorios = await listUseCase.executar();
+
+    if (relatorios.length === 0) {
+      return NextResponse.json({ insights: null, identificadorRelatorio: null });
+    }
+
+    let relatorioSelecionado = relatorios[0];
+
+    // Se mesAno foi fornecido, buscar o relatório específico
+    if (mesAnoParam) {
+      const relatorioEncontrado = relatorios.find(
+        (relatorio) => relatorio.mesReferencia === mesAnoParam
+      );
+      if (relatorioEncontrado) {
+        relatorioSelecionado = relatorioEncontrado;
+      }
+    }
+
+    if (!relatorioSelecionado) {
+      return NextResponse.json({ insights: null, identificadorRelatorio: null });
+    }
+
+    const repository = obterFilesystemReportRepository();
+    const insights = await repository.obterInsights(relatorioSelecionado.identificador);
+
+    return NextResponse.json({
+      insights,
+      identificadorRelatorio: relatorioSelecionado.identificador,
+      mesReferencia: relatorioSelecionado.mesReferencia
+    });
+  } catch (erro) {
+    console.error("Erro ao buscar insights:", erro);
+    return NextResponse.json(
+      { erro: "Falha ao buscar insights" },
+      { status: 500 },
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {
