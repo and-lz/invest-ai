@@ -395,7 +395,7 @@ export default function InsightsPage() {
         )}
 
       {modoVisualizacao === "insights" && insights && relatorioSelecionado && (
-        <div className="mx-auto max-w-3xl space-y-10">
+        <div className="mx-auto max-w-3xl space-y-16">
 
           {/* --- Cabeçalho Editorial --- */}
           <header className="text-center">
@@ -462,7 +462,7 @@ export default function InsightsPage() {
               Insights Detalhados
             </h2>
             <Separator className="my-3" />
-            <div className="space-y-10">
+            <div className="space-y-14">
               {insights.insights.map((insight, indice) => (
                 <InsightCard
                   key={indice}
@@ -482,7 +482,7 @@ export default function InsightsPage() {
                 Recomendações de Longo Prazo
               </h2>
               <Separator className="my-3" />
-              <ul className="space-y-4">
+              <ul className="space-y-6">
                 {insights.recomendacoesLongoPrazo.map(
                   (recomendacao, indice) => (
                     <li
@@ -502,7 +502,7 @@ export default function InsightsPage() {
 
           {/* --- Rodapé --- */}
           <Separator />
-          <div className="flex justify-center pb-8">
+          <div className="flex justify-center pb-12">
             <Button variant="outline" onClick={handleRegerar}>
               Gerar novos insights
             </Button>
