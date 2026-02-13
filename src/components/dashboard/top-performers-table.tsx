@@ -240,7 +240,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                   {formatarMoeda(ativo.saldoBruto.valorEmCentavos)}
                 </TableCell>
                 <TableCell
-                  className={`text-right font-medium ${ativo.rentabilidadeMes.valor >= 0 ? "text-green-600" : "text-red-600"}`}
+                  className={`text-right font-medium ${ativo.rentabilidadeMes.valor >= 0 ? "text-success" : "text-destructive"}`}
                 >
                   {formatarPercentualSimples(ativo.rentabilidadeMes.valor)}
                 </TableCell>

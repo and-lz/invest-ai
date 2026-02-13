@@ -4,7 +4,10 @@ import {
   obterGetReportDetailUseCase,
   obterListReportsUseCase,
 } from "@/lib/container";
-import { gerarPromptInsightsManual } from "@/lib/prompt-insights-manual";
+import {
+  gerarPromptInsightsManual,
+  gerarPromptInsightsConsolidadoManual,
+} from "@/lib/prompt-insights-manual";
 import { AppError } from "@/domain/errors/app-errors";
 import { z } from "zod/v4";
 
@@ -12,6 +15,7 @@ const GerarPromptRequestSchema = z.object({
   acao: z.literal("gerar-prompt"),
   identificadorRelatorio: z.string().min(1),
   identificadorRelatorioAnterior: z.string().optional(),
+  consolidado: z.boolean().optional(),
 });
 
 const SalvarInsightsRequestSchema = z.object({
@@ -40,6 +44,29 @@ export async function POST(request: Request) {
     const dados = resultado.data;
 
     if (dados.acao === "gerar-prompt") {
+      // Modo consolidado: gerar prompt com todos os relatórios
+      if (dados.consolidado) {
+        const detailUseCase = obterGetReportDetailUseCase();
+        const listUseCase = obterListReportsUseCase();
+        const todosMetadados = await listUseCase.executar();
+
+        const todosRelatorios = await Promise.all(
+          todosMetadados.map(async (metadados) => {
+            const detalhe = await detailUseCase.executar(metadados.identificador);
+            return detalhe.dados;
+          }),
+        );
+
+        // Ordenar cronologicamente (mais antigo primeiro)
+        const relatoriosOrdenados = todosRelatorios.sort((relatorioA, relatorioB) =>
+          relatorioA.metadados.mesReferencia.localeCompare(relatorioB.metadados.mesReferencia),
+        );
+
+        const promptCompleto = gerarPromptInsightsConsolidadoManual(relatoriosOrdenados);
+        return NextResponse.json({ prompt: promptCompleto });
+      }
+
+      // Modo mensal: gerar prompt com relatório atual + anterior
       const detailUseCase = obterGetReportDetailUseCase();
       const relatorioAtual = await detailUseCase.executar(dados.identificadorRelatorio);
 

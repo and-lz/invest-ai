@@ -21,6 +21,7 @@ import {
   BarChart3,
   Bitcoin,
   Package,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
@@ -59,7 +60,7 @@ interface StrategyGainsTableProps {
 
 function formatarCelulaMoeda(valorEmCentavos: number) {
   const eNegativo = valorEmCentavos < 0;
-  return <span className={eNegativo ? "text-red-600" : ""}>{formatarMoeda(valorEmCentavos)}</span>;
+  return <span className={eNegativo ? "text-destructive" : ""}>{formatarMoeda(valorEmCentavos)}</span>;
 }
 
 function obterValorColuna(ganho: GanhosPorEstrategia, coluna: ColunaGanhos): string | number {
@@ -157,6 +158,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Wallet className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Ganhos por Estrategia
           <InfoTooltip conteudo={GLOSSARIO_GANHOS_POR_ESTRATEGIA.explicacao} />
         </CardTitle>

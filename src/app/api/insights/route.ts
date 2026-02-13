@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   obterGenerateInsightsUseCase,
+  obterGenerateInsightsConsolidadosUseCase,
   obterListReportsUseCase,
   obterFilesystemReportRepository,
   obterAtualizarConclusaoInsightUseCase,
@@ -12,12 +13,24 @@ import { StatusAcaoEnum } from "@/schemas/insights.schema";
 const InsightsRequestSchema = z.object({
   identificadorRelatorio: z.string().min(1),
   identificadorRelatorioAnterior: z.string().optional(),
+  consolidado: z.boolean().optional(),
 });
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const mesAnoParam = searchParams.get("mesAno");
+
+    // Busca direta para insights consolidados
+    if (mesAnoParam === "consolidado") {
+      const repository = obterFilesystemReportRepository();
+      const insights = await repository.obterInsights("consolidado");
+      return NextResponse.json({
+        insights,
+        identificadorRelatorio: "consolidado",
+        mesReferencia: "consolidado",
+      });
+    }
 
     const listUseCase = obterListReportsUseCase();
     const relatorios = await listUseCase.executar();
@@ -66,6 +79,12 @@ export async function POST(request: Request) {
         { erro: "Parametros invalidos", detalhes: resultado.error.issues },
         { status: 400 },
       );
+    }
+
+    if (resultado.data.consolidado) {
+      const useCaseConsolidado = obterGenerateInsightsConsolidadosUseCase();
+      const insightsConsolidados = await useCaseConsolidado.executar();
+      return NextResponse.json({ insights: insightsConsolidados });
     }
 
     const useCase = obterGenerateInsightsUseCase();

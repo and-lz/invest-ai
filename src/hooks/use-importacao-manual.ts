@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { ReportMetadata } from "@/schemas/report-metadata.schema";
 
 type StatusImportacao = "idle" | "validando" | "sucesso" | "erro";
@@ -13,11 +13,31 @@ export function useImportacaoManual() {
   const [statusImportacao, setStatusImportacao] = useState<StatusImportacao>("idle");
   const [erroImportacao, setErroImportacao] = useState<string | null>(null);
   const [metadadosResultado, setMetadadosResultado] = useState<ReportMetadata | null>(null);
+  const [segundosDecorridos, setSegundosDecorridos] = useState(0);
+  const tempoInicioRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const estaAtivo = statusImportacao === "validando";
+    if (!estaAtivo) {
+      tempoInicioRef.current = null;
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      if (tempoInicioRef.current) {
+        setSegundosDecorridos(Math.floor((Date.now() - tempoInicioRef.current) / 1000));
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [statusImportacao]);
 
   const submeterJson = useCallback(async (jsonBruto: string): Promise<ImportacaoManualResult> => {
     setStatusImportacao("validando");
     setErroImportacao(null);
     setMetadadosResultado(null);
+    setSegundosDecorridos(0);
+    tempoInicioRef.current = Date.now();
 
     try {
       const resposta = await fetch("/api/reports/manual", {
@@ -52,6 +72,8 @@ export function useImportacaoManual() {
     setStatusImportacao("idle");
     setErroImportacao(null);
     setMetadadosResultado(null);
+    setSegundosDecorridos(0);
+    tempoInicioRef.current = null;
   }, []);
 
   return {
@@ -60,6 +82,7 @@ export function useImportacaoManual() {
     statusImportacao,
     erroImportacao,
     metadadosResultado,
+    segundosDecorridos,
     estaValidando: statusImportacao === "validando",
   };
 }

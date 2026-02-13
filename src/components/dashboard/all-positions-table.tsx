@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowUpDown, Briefcase } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
@@ -141,6 +141,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Briefcase className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Todas as Posições
           <InfoTooltip conteudo={GLOSSARIO_TODAS_POSICOES.explicacao} />
         </CardTitle>
@@ -248,8 +249,8 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     <TableCell
                       className={cn(
                         "text-right tabular-nums",
-                        posicao.rentabilidadeMes.valor > 0 && "text-green-600",
-                        posicao.rentabilidadeMes.valor < 0 && "text-red-600",
+                        posicao.rentabilidadeMes.valor > 0 && "text-success",
+                        posicao.rentabilidadeMes.valor < 0 && "text-destructive",
                       )}
                     >
                       {formatarPercentualSimples(posicao.rentabilidadeMes.valor)}
@@ -259,10 +260,10 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                         "text-right tabular-nums",
                         posicao.rentabilidade12Meses &&
                           posicao.rentabilidade12Meses.valor > 0 &&
-                          "text-green-600",
+                          "text-success",
                         posicao.rentabilidade12Meses &&
                           posicao.rentabilidade12Meses.valor < 0 &&
-                          "text-red-600",
+                          "text-destructive",
                       )}
                     >
                       {posicao.rentabilidade12Meses
@@ -274,10 +275,10 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                         "text-right tabular-nums",
                         posicao.rentabilidadeDesdeInicio &&
                           posicao.rentabilidadeDesdeInicio.valor > 0 &&
-                          "text-green-600",
+                          "text-success",
                         posicao.rentabilidadeDesdeInicio &&
                           posicao.rentabilidadeDesdeInicio.valor < 0 &&
-                          "text-red-600",
+                          "text-destructive",
                       )}
                     >
                       {posicao.rentabilidadeDesdeInicio

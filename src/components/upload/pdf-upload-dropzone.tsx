@@ -1,13 +1,14 @@
 "use client";
 
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, FileText, CheckCircle, XCircle, Loader2, Lock } from "lucide-react";
+import { Upload, FileText, Loader2, Lock } from "lucide-react";
 import { useUploadReport } from "@/hooks/use-upload-report";
+import { EtapasProcessamento } from "./etapas-processamento";
+import { ResultadoUpload } from "./resultado-upload";
 import { cn } from "@/lib/utils";
 
 interface PdfUploadDropzoneProps {
@@ -19,8 +20,42 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(null);
   const [senhaPdf, setSenhaPdf] = useState<string>("");
   const [mostrarCampoSenha, setMostrarCampoSenha] = useState(false);
+  const [mostrarInputSenha, setMostrarInputSenha] = useState(false);
   const inputArquivoRef = useRef<HTMLInputElement>(null);
-  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando } = useUploadReport();
+  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando, segundosDecorridos } =
+    useUploadReport();
+
+  const etapasUpload = useMemo(
+    () =>
+      [
+        {
+          id: "envio",
+          rotulo: "Enviando arquivo para o servidor",
+          status:
+            statusUpload === "uploading"
+              ? ("ativa" as const)
+              : statusUpload === "processing"
+                ? ("concluida" as const)
+                : ("pendente" as const),
+        },
+        {
+          id: "extracao",
+          rotulo: "Extraindo dados do PDF com IA",
+          status: statusUpload === "processing" ? ("ativa" as const) : ("pendente" as const),
+          detalhes: [
+            "Lendo todas as paginas do relatorio",
+            "Identificando ativos e eventos financeiros",
+            "Validando informacoes extraidas",
+          ],
+        },
+        {
+          id: "salvamento",
+          rotulo: "Salvando dados no sistema",
+          status: "pendente" as const,
+        },
+      ] as const,
+    [statusUpload],
+  );
 
   const validarArquivo = useCallback((arquivo: File): boolean => {
     if (!arquivo.name.toLowerCase().endsWith(".pdf")) {
@@ -38,6 +73,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
       setArquivoSelecionado(arquivo);
       setMostrarCampoSenha(true);
       setSenhaPdf("");
+      setMostrarInputSenha(false);
     },
     [validarArquivo],
   );
@@ -86,37 +122,62 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
     setArquivoSelecionado(null);
     setSenhaPdf("");
     setMostrarCampoSenha(false);
+    setMostrarInputSenha(false);
     if (inputArquivoRef.current) {
       inputArquivoRef.current.value = "";
     }
   }, [resetar]);
 
-  return (
-    <Card>
-      <CardContent className="p-6">
-        {statusUpload === "success" ? (
-          <div className="flex flex-col items-center gap-4 py-8">
-            <CheckCircle className="h-12 w-12 text-green-600" />
-            <div className="text-center">
-              <h3 className="text-lg font-semibold">Upload concluido!</h3>
-              <p className="text-muted-foreground text-sm">Relatorio processado com sucesso.</p>
-            </div>
-            <Button variant="outline" onClick={handleNovoUpload}>
-              Enviar outro relatorio
-            </Button>
-          </div>
-        ) : statusUpload === "error" ? (
-          <div className="flex flex-col items-center gap-4 py-8">
-            <XCircle className="h-12 w-12 text-red-600" />
-            <div className="text-center">
-              <h3 className="text-lg font-semibold">Erro no processamento</h3>
-              <p className="text-sm text-red-600">{erroUpload}</p>
-            </div>
-            <Button variant="outline" onClick={handleNovoUpload}>
-              Tentar novamente
-            </Button>
-          </div>
-        ) : mostrarCampoSenha && arquivoSelecionado ? (
+  if (statusUpload === "success") {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <ResultadoUpload
+            tipo="sucesso"
+            titulo="Upload concluido!"
+            mensagem="Relatorio processado com sucesso."
+            rotuloAcao="Enviar outro relatorio"
+            onAcao={handleNovoUpload}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (statusUpload === "error") {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <ResultadoUpload
+            tipo="erro"
+            titulo="Erro no processamento"
+            mensagem={erroUpload ?? "Erro desconhecido"}
+            rotuloAcao="Tentar novamente"
+            onAcao={handleNovoUpload}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (estaProcessando) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <EtapasProcessamento
+            etapas={etapasUpload}
+            nomeArquivo={arquivoSelecionado?.name ?? ""}
+            segundosDecorridos={segundosDecorridos}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (mostrarCampoSenha && arquivoSelecionado) {
+    return (
+      <Card>
+        <CardContent className="p-6">
           <div className="flex flex-col items-center gap-6 py-8">
             <FileText className="text-primary h-12 w-12" />
             <div className="space-y-2 text-center">
@@ -124,102 +185,79 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
               <p className="text-muted-foreground text-sm">{arquivoSelecionado.name}</p>
             </div>
             <div className="w-full max-w-sm space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="senha-pdf" className="flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  Senha do PDF (opcional)
-                </Label>
-                <Input
-                  id="senha-pdf"
-                  type="password"
-                  placeholder="Deixe em branco se não tiver senha"
-                  value={senhaPdf}
-                  onChange={(e) => setSenhaPdf(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      void confirmarUpload();
-                    }
-                  }}
-                />
-                <p className="text-muted-foreground text-xs">
-                  Se o PDF estiver protegido por senha, informe acima.
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={confirmarUpload} className="flex-1" disabled={estaProcessando}>
-                  {estaProcessando ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processando...
-                    </>
-                  ) : (
-                    "Processar relatório"
-                  )}
+              {mostrarInputSenha ? (
+                <div className="space-y-2">
+                  <Label htmlFor="senha-pdf" className="flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Senha do PDF
+                  </Label>
+                  <Input
+                    id="senha-pdf"
+                    type="password"
+                    placeholder="Digite a senha do PDF"
+                    value={senhaPdf}
+                    onChange={(e) => setSenhaPdf(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        void confirmarUpload();
+                      }
+                    }}
+                    autoFocus
+                  />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setMostrarInputSenha(true)}
+                  className="text-muted-foreground hover:text-foreground flex w-full items-center justify-center gap-1.5 text-xs underline-offset-4 transition-colors hover:underline"
+                >
+                  <Lock className="h-3 w-3" />
+                  Meu PDF tem senha
+                </button>
+              )}
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Button onClick={confirmarUpload} className="flex-1">
+                  Processar relatorio
                 </Button>
-                <Button variant="outline" onClick={handleNovoUpload} disabled={estaProcessando}>
+                <Button variant="outline" onClick={handleNovoUpload}>
                   Cancelar
                 </Button>
               </div>
             </div>
           </div>
-        ) : (
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            className={cn(
-              "flex flex-col items-center gap-4 rounded-lg border-2 border-dashed p-12 transition-colors",
-              estaSobreDropzone ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-              estaProcessando && "pointer-events-none opacity-60",
-            )}
-          >
-            {estaProcessando ? (
-              <>
-                <Loader2 className="text-primary h-12 w-12 animate-spin" />
-                <div className="space-y-2 text-center">
-                  <h3 className="text-lg font-semibold">
-                    {statusUpload === "uploading" ? "Enviando arquivo..." : "Processando com IA..."}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">{arquivoSelecionado?.name}</p>
-                  {statusUpload === "processing" && (
-                    <div className="text-muted-foreground space-y-1 text-xs">
-                      <p>Extraindo dados do relatório com IA...</p>
-                      <p>Extraindo dados de todas as páginas do relatório.</p>
-                      <p className="text-xs text-gray-500">
-                        Isso pode levar alguns minutos. Aguarde...
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <Progress value={statusUpload === "uploading" ? 30 : 70} className="w-64" />
-              </>
-            ) : (
-              <>
-                {arquivoSelecionado ? (
-                  <FileText className="text-muted-foreground h-12 w-12" />
-                ) : (
-                  <Upload className="text-muted-foreground h-12 w-12" />
-                )}
-                <div className="text-center">
-                  <h3 className="text-lg font-semibold">Arraste seu relatorio PDF aqui</h3>
-                  <p className="text-muted-foreground text-sm">
-                    ou clique para selecionar (max 32MB)
-                  </p>
-                </div>
-                <input
-                  ref={inputArquivoRef}
-                  type="file"
-                  accept=".pdf"
-                  className="hidden"
-                  onChange={handleSelecionarArquivo}
-                />
-                <Button variant="outline" onClick={() => inputArquivoRef.current?.click()}>
-                  Selecionar arquivo
-                </Button>
-              </>
-            )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardContent className="p-6">
+        <div
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          className={cn(
+            "flex flex-col items-center gap-4 rounded-lg border-2 border-dashed p-6 transition-colors md:p-12",
+            estaSobreDropzone ? "border-primary bg-primary/5" : "border-muted-foreground/25",
+          )}
+        >
+          <Upload className="text-muted-foreground h-12 w-12" />
+          <div className="text-center">
+            <h3 className="text-lg font-semibold">Arraste seu relatorio PDF aqui</h3>
+            <p className="text-muted-foreground text-sm">ou clique para selecionar (max 32MB)</p>
           </div>
-        )}
+          <input
+            ref={inputArquivoRef}
+            type="file"
+            accept=".pdf"
+            className="hidden"
+            onChange={handleSelecionarArquivo}
+          />
+          <Button variant="outline" onClick={() => inputArquivoRef.current?.click()}>
+            Selecionar arquivo
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

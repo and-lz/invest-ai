@@ -92,10 +92,10 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
                 strokeLinecap="round"
                 className={cn(
                   taxaAcerto >= 60
-                    ? "text-green-500"
+                    ? "text-success"
                     : taxaAcerto >= 40
-                      ? "text-amber-500"
-                      : "text-red-500",
+                      ? "text-warning"
+                      : "text-destructive",
                 )}
                 stroke="currentColor"
               />
@@ -110,9 +110,9 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
           </p>
         </div>
 
-        <div className="w-full overflow-hidden rounded-full bg-red-400/20">
+        <div className="w-full overflow-hidden rounded-full bg-destructive/20">
           <div
-            className="h-3 rounded-full bg-green-500/60 transition-all"
+            className="h-3 rounded-full bg-success/60 transition-all"
             style={{ width: `${percentualAcima}%` }}
           />
         </div>
@@ -120,7 +120,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs">Melhor Mês</p>
-            <p className="text-lg font-bold text-green-600">
+            <p className="text-lg font-bold text-success">
               {formatarPercentualSimples(analiseRiscoRetorno.maiorRentabilidade.valor.valor)}
             </p>
             <p className="text-muted-foreground text-xs">
@@ -129,7 +129,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
           </div>
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs">Pior Mês</p>
-            <p className="text-lg font-bold text-red-600">
+            <p className="text-lg font-bold text-destructive">
               {formatarPercentualSimples(analiseRiscoRetorno.menorRentabilidade.valor.valor)}
             </p>
             <p className="text-muted-foreground text-xs">

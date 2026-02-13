@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   X,
   Check,
+  Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatarMesAno } from "@/lib/format-date";
@@ -38,7 +39,7 @@ const ICONES_CATEGORIA: Record<string, typeof TrendingUp> = {
 };
 
 const CORES_PRIORIDADE: Record<string, string> = {
-  alta: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+  alta: "bg-destructive/15 text-destructive",
   media: "bg-muted text-muted-foreground",
   baixa: "bg-muted text-muted-foreground",
 };
@@ -101,7 +102,7 @@ function InsightCard({
   const estilosBloco = {
     pendente: "border border-transparent rounded-lg p-4",
     concluida:
-      "bg-green-50/50 dark:bg-green-950/10 border border-green-200/50 dark:border-green-900/30 rounded-lg p-4",
+      "bg-success/5 border border-success/20 rounded-lg p-4",
     ignorada:
       "bg-muted/30 dark:bg-muted/10 border border-muted-foreground/20 dark:border-muted-foreground/10 rounded-lg p-4",
   };
@@ -139,7 +140,7 @@ function InsightCard({
           className={cn(
             "mt-4 rounded-lg border-l-4 px-5 py-4",
             statusAtual === "concluida"
-              ? "border-green-300 dark:border-green-800 bg-green-50/30 dark:bg-green-950/20"
+              ? "border-success/40 bg-success/5"
               : statusAtual === "ignorada"
                 ? "border-muted-foreground/30 bg-muted/30"
                 : "border-muted-foreground/20 bg-muted/50",
@@ -174,7 +175,7 @@ function InsightCard({
                 size="sm"
                 onClick={() => void handleAlterarStatus("concluida")}
                 disabled={estaAtualizando}
-                className="text-muted-foreground hover:text-green-600 h-8 gap-1.5 text-xs"
+                className="text-muted-foreground hover:text-success h-8 gap-1.5 text-xs"
               >
                 <Check className="h-3.5 w-3.5" />
                 Concluir
@@ -184,7 +185,7 @@ function InsightCard({
                 size="sm"
                 onClick={() => void handleAlterarStatus("ignorada")}
                 disabled={estaAtualizando}
-                className="text-muted-foreground hover:text-amber-600 h-8 gap-1.5 text-xs"
+                className="text-muted-foreground hover:text-warning h-8 gap-1.5 text-xs"
               >
                 <X className="h-3.5 w-3.5" />
                 Ignorar
@@ -192,7 +193,7 @@ function InsightCard({
             </>
           )}
           {statusAtual === "concluida" && (
-            <div className="flex items-center gap-2 text-sm text-green-600">
+            <div className="flex items-center gap-2 text-sm text-success">
               <CheckCircle2 className="h-4 w-4" />
               <span>Ação concluída</span>
               <Button
@@ -238,8 +239,13 @@ export default function InsightsPage() {
   const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
 
-  // Criar lista de períodos disponíveis a partir dos relatórios
-  const periodosDisponiveis = relatorios.map((relatorio) => relatorio.mesReferencia);
+  // Criar lista de períodos disponíveis a partir dos relatórios + opção consolidada
+  const periodosDisponiveis = [
+    ...relatorios.map((relatorio) => relatorio.mesReferencia),
+    ...(relatorios.length > 1 ? ["consolidado"] : []),
+  ];
+
+  const ehConsolidado = periodoSelecionado === "consolidado";
 
   // Definir período padrão como o mais recente quando carregar relatórios
   useEffect(() => {
@@ -293,19 +299,43 @@ export default function InsightsPage() {
     setErroInsights(null);
 
     try {
+      // Modo consolidado: gerar com todos os meses
+      if (ehConsolidado) {
+        const primeiroRelatorio = relatorios[0];
+        if (!primeiroRelatorio) return;
+
+        const resposta = await fetch("/api/insights", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identificadorRelatorio: primeiroRelatorio.identificador,
+            consolidado: true,
+          }),
+        });
+
+        if (!resposta.ok) {
+          throw new Error("Falha ao gerar insights consolidados");
+        }
+
+        const dados = (await resposta.json()) as { insights: InsightsResponse };
+        setInsights(dados.insights);
+        setModoVisualizacao("insights");
+        return;
+      }
+
       // Encontrar relatório do período selecionado
-      const relatorioSelecionado = relatorios.find(
+      const relatorioDoPerido = relatorios.find(
         (relatorio) => relatorio.mesReferencia === periodoSelecionado,
       );
-      if (!relatorioSelecionado) return;
+      if (!relatorioDoPerido) return;
 
       const corpo: Record<string, string> = {
-        identificadorRelatorio: relatorioSelecionado.identificador,
+        identificadorRelatorio: relatorioDoPerido.identificador,
       };
 
       // Encontrar relatório anterior (próximo na lista)
       const indiceAtual = relatorios.findIndex(
-        (relatorio) => relatorio.identificador === relatorioSelecionado.identificador,
+        (relatorio) => relatorio.identificador === relatorioDoPerido.identificador,
       );
       if (indiceAtual >= 0 && indiceAtual < relatorios.length - 1) {
         const relatorioAnterior = relatorios[indiceAtual + 1];
@@ -332,7 +362,7 @@ export default function InsightsPage() {
     } finally {
       setEstaGerando(false);
     }
-  }, [relatorios, periodoSelecionado]);
+  }, [relatorios, periodoSelecionado, ehConsolidado]);
 
   const handleInsightsManualSalvos = useCallback((insightsSalvos: InsightsResponse) => {
     setInsights(insightsSalvos);
@@ -405,15 +435,24 @@ export default function InsightsPage() {
         modoVisualizacao === "inicial" && (
           <Card>
             <CardContent className="flex flex-col items-center gap-4 py-12">
-              <Lightbulb className="text-muted-foreground h-12 w-12" />
-              <p className="text-muted-foreground">
-                Gere insights baseados no período selecionado ({relatorioSelecionado?.mesReferencia}
-                ).
+              {ehConsolidado ? (
+                <Layers className="text-muted-foreground h-12 w-12" />
+              ) : (
+                <Lightbulb className="text-muted-foreground h-12 w-12" />
+              )}
+              <p className="text-muted-foreground text-center">
+                {ehConsolidado
+                  ? `Gere insights analisando todos os ${relatorios.length} meses disponíveis.`
+                  : `Gere insights baseados no período selecionado (${relatorioSelecionado?.mesReferencia}).`}
               </p>
               <div className="flex items-center gap-3">
                 <Button onClick={() => void gerarInsightsViaApi()} disabled={estaGerando}>
                   {estaGerando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {estaGerando ? "Gerando insights..." : "Gerar via API"}
+                  {estaGerando
+                    ? "Gerando insights..."
+                    : ehConsolidado
+                      ? "Gerar analise consolidada"
+                      : "Gerar via API"}
                 </Button>
                 <Button
                   variant="outline"
@@ -424,7 +463,7 @@ export default function InsightsPage() {
                   Gerar via Claude Chat
                 </Button>
               </div>
-              {erroInsights && <p className="text-sm text-red-600">{erroInsights}</p>}
+              {erroInsights && <p className="text-sm text-destructive">{erroInsights}</p>}
             </CardContent>
           </Card>
         )}
@@ -433,25 +472,35 @@ export default function InsightsPage() {
         !estaCarregandoInsights &&
         relatorios.length > 0 &&
         modoVisualizacao === "manual" &&
-        relatorioSelecionado && (
+        (relatorioSelecionado || ehConsolidado) && (
           <InsightsManualStepper
-            identificadorRelatorio={relatorioSelecionado.identificador}
+            identificadorRelatorio={
+              ehConsolidado
+                ? (relatorios[0]?.identificador ?? "")
+                : (relatorioSelecionado?.identificador ?? "")
+            }
+            consolidado={ehConsolidado}
             onInsightsSalvos={handleInsightsManualSalvos}
             onCancelar={handleCancelarManual}
           />
         )}
 
-      {modoVisualizacao === "insights" && insights && relatorioSelecionado && (
+      {modoVisualizacao === "insights" && insights && (relatorioSelecionado || ehConsolidado) && (
         <div className="mx-auto max-w-3xl space-y-16">
           {/* --- Cabeçalho Editorial --- */}
           <header className="text-center">
             <p className="text-muted-foreground text-sm font-medium tracking-widest uppercase">
-              Análise de Carteira
+              {ehConsolidado ? "Análise Consolidada" : "Análise de Carteira"}
             </p>
             <h1 className="mt-2 text-3xl font-bold">
-              {formatarMesAno(insights.mesReferencia, "extenso")}
+              {ehConsolidado
+                ? "Todos os meses"
+                : formatarMesAno(insights.mesReferencia, "extenso")}
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
+              {ehConsolidado && (
+                <span>{relatorios.length} relatórios analisados — </span>
+              )}
               Gerado em{" "}
               {new Date(insights.dataGeracao).toLocaleDateString("pt-BR", {
                 day: "2-digit",
@@ -486,9 +535,9 @@ export default function InsightsPage() {
                     className={cn(
                       "flex items-start gap-3 rounded-lg border-l-4 px-5 py-4",
                       alerta.tipo === "urgente"
-                        ? "border-l-red-500 bg-red-50 dark:bg-red-950/40"
+                        ? "border-l-destructive bg-destructive/5"
                         : alerta.tipo === "atencao"
-                          ? "border-l-amber-500 bg-amber-50 dark:bg-amber-950/40"
+                          ? "border-l-warning bg-warning/5"
                           : "border-l-muted-foreground/30 bg-muted/50",
                     )}
                   >
@@ -512,7 +561,11 @@ export default function InsightsPage() {
                   key={indice}
                   insight={insight}
                   indiceInsight={indice}
-                  identificadorRelatorio={relatorioSelecionado.identificador}
+                  identificadorRelatorio={
+                    ehConsolidado
+                      ? "consolidado"
+                      : (relatorioSelecionado?.identificador ?? "")
+                  }
                   onStatusAlterado={handleStatusAlterado}
                 />
               ))}

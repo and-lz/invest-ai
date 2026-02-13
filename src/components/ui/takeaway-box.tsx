@@ -22,8 +22,8 @@ const ICONES_INDICADOR: Record<TipoConclusao, LucideIcon> = {
 };
 
 const CORES_ICONE: Record<TipoConclusao, string> = {
-  positivo: "text-green-600",
-  atencao: "text-amber-600",
+  positivo: "text-success",
+  atencao: "text-warning",
   neutro: "text-muted-foreground",
 };
 

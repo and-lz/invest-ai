@@ -12,6 +12,7 @@ import { DeleteReportUseCase } from "@/application/use-cases/delete-report";
 import { SalvarRelatorioManualUseCase } from "@/application/use-cases/salvar-relatorio-manual";
 import { SalvarInsightsManualUseCase } from "@/application/use-cases/salvar-insights-manual";
 import { AtualizarConclusaoInsightUseCase } from "@/application/use-cases/atualizar-conclusao-insight";
+import { GenerateInsightsConsolidadosUseCase } from "@/application/use-cases/generate-insights-consolidados";
 import { obterClienteAnthropic } from "@/lib/anthropic-client";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import path from "path";
@@ -97,6 +98,10 @@ export function obterSalvarInsightsManualUseCase() {
 
 export function obterAtualizarConclusaoInsightUseCase() {
   return new AtualizarConclusaoInsightUseCase(criarRepositorio());
+}
+
+export function obterGenerateInsightsConsolidadosUseCase() {
+  return new GenerateInsightsConsolidadosUseCase(criarRepositorio(), criarServicoInsights());
 }
 
 export function obterFilesystemReportRepository() {

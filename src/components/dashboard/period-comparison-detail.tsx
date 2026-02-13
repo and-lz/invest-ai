@@ -114,7 +114,7 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
                   <TableCell
                     className={cn(
                       "text-right font-medium tabular-nums",
-                      superouCdi ? "text-green-600" : "text-red-600",
+                      superouCdi ? "text-success" : "text-destructive",
                     )}
                   >
                     {formatarPercentualSimples(periodo.rentabilidadeCarteira.valor)}
@@ -125,7 +125,7 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
                   <TableCell
                     className={cn(
                       "text-right tabular-nums",
-                      periodo.percentualDoCDI.valor >= 100 ? "text-green-600" : "text-red-600",
+                      periodo.percentualDoCDI.valor >= 100 ? "text-success" : "text-destructive",
                     )}
                   >
                     {formatarPercentualSimples(periodo.percentualDoCDI.valor)}

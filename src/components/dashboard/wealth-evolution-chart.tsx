@@ -60,7 +60,7 @@ function TooltipCustomizado({ active, payload, label }: TooltipCustomizadoProps)
         </p>
       )}
       <p
-        className={`text-sm font-medium ${rendimentosCentavos >= 0 ? "text-green-600" : "text-red-600"}`}
+        className={`text-sm font-medium ${rendimentosCentavos >= 0 ? "text-success" : "text-destructive"}`}
       >
         Rendimentos: {formatarMoeda(rendimentosCentavos)}
       </p>

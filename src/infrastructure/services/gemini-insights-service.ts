@@ -4,7 +4,12 @@ import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
 import { ClaudeApiError } from "@/domain/errors/app-errors";
-import { SYSTEM_PROMPT_INSIGHTS, INSTRUCAO_USUARIO_INSIGHTS } from "@/lib/prompt-insights-manual";
+import {
+  SYSTEM_PROMPT_INSIGHTS,
+  INSTRUCAO_USUARIO_INSIGHTS,
+  SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
+  INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO,
+} from "@/lib/prompt-insights-manual";
 
 /**
  * Serviço de geração de insights usando Google Gemini 2.5 Flash
@@ -84,6 +89,60 @@ export class GeminiInsightsService implements InsightsService {
     }
   }
 
+  async gerarInsightsConsolidados(
+    todosRelatorios: RelatorioExtraido[],
+  ): Promise<InsightsResponse> {
+    try {
+      const model = this.client.getGenerativeModel({
+        model: this.modelo,
+        systemInstruction: SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.7,
+        },
+      });
+
+      const dadosParaAnalise = {
+        quantidadeMeses: todosRelatorios.length,
+        relatorios: todosRelatorios,
+      };
+
+      const prompt = this.construirPromptConsolidado(dadosParaAnalise);
+
+      const resultado = await model.generateContent(prompt);
+      const resposta = resultado.response;
+      const textoResposta = resposta.text();
+
+      if (!textoResposta) {
+        throw new ClaudeApiError("Resposta do Gemini API não contém texto");
+      }
+
+      const dadosBrutos: unknown = JSON.parse(textoResposta);
+      const validacao = InsightsResponseSchema.safeParse(dadosBrutos);
+
+      if (!validacao.success) {
+        throw new ClaudeApiError(
+          `Insights consolidados não correspondem ao schema: ${JSON.stringify(validacao.error.issues.slice(0, 5))}`,
+        );
+      }
+
+      if (resultado.response.usageMetadata) {
+        const usage = resultado.response.usageMetadata;
+        console.info(
+          `[Insights Consolidados] Tokens: ${usage.promptTokenCount} input, ${usage.candidatesTokenCount} output`,
+        );
+      }
+
+      return validacao.data;
+    } catch (erro) {
+      if (erro instanceof ClaudeApiError) throw erro;
+
+      throw new ClaudeApiError(
+        `Falha na geração de insights consolidados via Gemini API: ${erro instanceof Error ? erro.message : String(erro)}`,
+      );
+    }
+  }
+
   private construirPrompt(dadosParaAnalise: Record<string, unknown>): string {
     let prompt = INSTRUCAO_USUARIO_INSIGHTS;
 
@@ -98,6 +157,24 @@ export class GeminiInsightsService implements InsightsService {
     prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
     prompt += "- Compare com o mês anterior quando disponível para identificar tendências\n";
     prompt += "- Destaque riscos de concentração e oportunidades de diversificação\n";
+
+    return prompt;
+  }
+
+  private construirPromptConsolidado(dadosParaAnalise: Record<string, unknown>): string {
+    let prompt = INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO;
+
+    prompt += "\n\n📊 DADOS HISTÓRICOS DA CARTEIRA:\n";
+    prompt += "```json\n";
+    prompt += JSON.stringify(dadosParaAnalise, null, 2);
+    prompt += "\n```\n\n";
+
+    prompt += "⚠️  REGRAS CRÍTICAS:\n";
+    prompt += "- Retorne APENAS o JSON válido, sem texto adicional ou markdown\n";
+    prompt += "- Analise a EVOLUÇÃO ao longo de todos os meses disponíveis\n";
+    prompt += "- Identifique tendências, padrões e decisões passadas boas/ruins\n";
+    prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
+    prompt += "- No campo mesReferencia, use 'consolidado' como valor\n";
 
     return prompt;
   }

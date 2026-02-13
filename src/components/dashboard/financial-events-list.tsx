@@ -20,6 +20,7 @@ import {
   ArrowDownCircle,
   Building2,
   Circle,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
@@ -136,6 +137,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Zap className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Eventos Financeiros
           <InfoTooltip conteudo={GLOSSARIO_EVENTO_FINANCEIRO.explicacao} />
         </CardTitle>

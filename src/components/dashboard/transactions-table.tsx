@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { ArrowUp, ArrowDown, ArrowUpDown, ArrowRightLeft, ArrowUpRight, ArrowDownRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarDataBrasileira } from "@/lib/format-date";
@@ -19,6 +19,11 @@ import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_MOVIMENTACOES } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { Movimentacao } from "@/schemas/report-extraction.schema";
+
+const ICONES_TIPO_MOVIMENTACAO: Record<string, LucideIcon> = {
+  Aplicacao: ArrowUpRight,
+  Resgate: ArrowDownRight,
+};
 
 type ColunaMovimentacoes = "data" | "tipo" | "ativo" | "valor";
 
@@ -120,6 +125,7 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <ArrowRightLeft className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Movimentações
           <InfoTooltip conteudo={GLOSSARIO_MOVIMENTACOES.explicacao} />
         </CardTitle>
@@ -181,7 +187,16 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
                         {formatarDataBrasileira(movimentacao.data)}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
-                        {movimentacao.tipoMovimentacao}
+                        <span className="flex items-center gap-1">
+                          {(() => {
+                            const IconeMovimentacao = ICONES_TIPO_MOVIMENTACAO[movimentacao.tipoMovimentacao];
+                            if (IconeMovimentacao) {
+                              return <IconeMovimentacao className="h-3.5 w-3.5" aria-hidden="true" />;
+                            }
+                            return null;
+                          })()}
+                          {movimentacao.tipoMovimentacao}
+                        </span>
                       </TableCell>
                       <TableCell className="max-w-48 truncate font-medium">
                         {movimentacao.codigoAtivo ?? movimentacao.nomeAtivo}
@@ -189,8 +204,8 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
                       <TableCell
                         className={cn(
                           "text-right font-medium tabular-nums",
-                          eEntrada && "text-green-600",
-                          eSaida && "text-red-600",
+                          eEntrada && "text-success",
+                          eSaida && "text-destructive",
                         )}
                       >
                         {eSaida ? "- " : ""}

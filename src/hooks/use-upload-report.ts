@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { ReportMetadata } from "@/schemas/report-metadata.schema";
 
 type StatusUpload = "idle" | "uploading" | "processing" | "success" | "error";
@@ -13,11 +13,31 @@ export function useUploadReport() {
   const [statusUpload, setStatusUpload] = useState<StatusUpload>("idle");
   const [erroUpload, setErroUpload] = useState<string | null>(null);
   const [metadadosResultado, setMetadadosResultado] = useState<ReportMetadata | null>(null);
+  const [segundosDecorridos, setSegundosDecorridos] = useState(0);
+  const tempoInicioRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const estaAtivo = statusUpload === "uploading" || statusUpload === "processing";
+    if (!estaAtivo) {
+      tempoInicioRef.current = null;
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      if (tempoInicioRef.current) {
+        setSegundosDecorridos(Math.floor((Date.now() - tempoInicioRef.current) / 1000));
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [statusUpload]);
 
   const fazerUpload = useCallback(async (arquivo: File, senha?: string): Promise<UploadResult> => {
     setStatusUpload("uploading");
     setErroUpload(null);
     setMetadadosResultado(null);
+    setSegundosDecorridos(0);
+    tempoInicioRef.current = Date.now();
 
     try {
       const formData = new FormData();
@@ -57,6 +77,8 @@ export function useUploadReport() {
     setStatusUpload("idle");
     setErroUpload(null);
     setMetadadosResultado(null);
+    setSegundosDecorridos(0);
+    tempoInicioRef.current = null;
   }, []);
 
   return {
@@ -65,6 +87,7 @@ export function useUploadReport() {
     statusUpload,
     erroUpload,
     metadadosResultado,
+    segundosDecorridos,
     estaProcessando: statusUpload === "uploading" || statusUpload === "processing",
   };
 }

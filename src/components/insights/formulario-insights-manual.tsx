@@ -68,7 +68,7 @@ export function FormularioInsightsManual({
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-col items-center gap-4 py-8">
-            <CheckCircle className="h-12 w-12 text-green-600" />
+            <CheckCircle className="h-12 w-12 text-success" />
             <div className="text-center">
               <h3 className="text-lg font-semibold">Insights salvos!</h3>
               <p className="text-muted-foreground text-sm">
@@ -100,9 +100,9 @@ export function FormularioInsightsManual({
         />
 
         {statusSubmissao === "erro" && erroSubmissao && (
-          <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
-            <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
-            <pre className="text-xs whitespace-pre-wrap text-red-700">{erroSubmissao}</pre>
+          <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 p-3">
+            <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+            <pre className="text-xs whitespace-pre-wrap text-destructive">{erroSubmissao}</pre>
           </div>
         )}
 

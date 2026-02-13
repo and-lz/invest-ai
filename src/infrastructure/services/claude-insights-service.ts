@@ -5,7 +5,12 @@ import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
 import { ClaudeApiError } from "@/domain/errors/app-errors";
-import { SYSTEM_PROMPT_INSIGHTS, INSTRUCAO_USUARIO_INSIGHTS } from "@/lib/prompt-insights-manual";
+import {
+  SYSTEM_PROMPT_INSIGHTS,
+  INSTRUCAO_USUARIO_INSIGHTS,
+  SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
+  INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO,
+} from "@/lib/prompt-insights-manual";
 import { CLAUDE_MODEL_INSIGHTS, CLAUDE_MAX_TOKENS_INSIGHTS } from "@/lib/claude-config";
 
 export class ClaudeInsightsService implements InsightsService {
@@ -61,6 +66,59 @@ export class ClaudeInsightsService implements InsightsService {
 
       throw new ClaudeApiError(
         `Falha na geracao de insights via Claude API: ${erro instanceof Error ? erro.message : String(erro)}`,
+      );
+    }
+  }
+
+  async gerarInsightsConsolidados(
+    todosRelatorios: RelatorioExtraido[],
+  ): Promise<InsightsResponse> {
+    try {
+      const dadosParaAnalise = {
+        quantidadeMeses: todosRelatorios.length,
+        relatorios: todosRelatorios,
+      };
+
+      const esquemaJson = toJSONSchema(InsightsResponseSchema);
+      const promptComSchema = this.construirPromptComSchema(
+        INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO,
+        esquemaJson as Record<string, unknown>,
+        dadosParaAnalise,
+      );
+
+      const resposta = await this.anthropicClient.messages.create({
+        model: CLAUDE_MODEL_INSIGHTS,
+        max_tokens: CLAUDE_MAX_TOKENS_INSIGHTS,
+        system: SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
+        messages: [
+          {
+            role: "user",
+            content: promptComSchema,
+          },
+        ],
+      });
+
+      const conteudoResposta = resposta.content[0];
+      if (!conteudoResposta || conteudoResposta.type !== "text") {
+        throw new ClaudeApiError("Resposta da Claude API nao contem texto");
+      }
+
+      const textoJson = this.extrairJsonDaResposta(conteudoResposta.text);
+      const dadosBrutos: unknown = JSON.parse(textoJson);
+      const resultado = InsightsResponseSchema.safeParse(dadosBrutos);
+
+      if (!resultado.success) {
+        throw new ClaudeApiError(
+          `Insights consolidados nao correspondem ao schema: ${JSON.stringify(resultado.error.issues.slice(0, 5))}`,
+        );
+      }
+
+      return resultado.data;
+    } catch (erro) {
+      if (erro instanceof ClaudeApiError) throw erro;
+
+      throw new ClaudeApiError(
+        `Falha na geracao de insights consolidados via Claude API: ${erro instanceof Error ? erro.message : String(erro)}`,
       );
     }
   }

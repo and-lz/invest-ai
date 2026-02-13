@@ -28,17 +28,24 @@ export function PeriodSelector({
   periodoSelecionado,
   onPeriodoChange,
 }: PeriodSelectorProps) {
+  // Separar períodos normais (YYYY-MM) do especial "consolidado"
+  const periodosNormais = periodosDisponiveis.filter((periodo) => periodo !== "consolidado");
+  const temConsolidado = periodosDisponiveis.includes("consolidado");
+
   // Ordenar períodos do mais recente para o mais antigo
-  const periodosOrdenados = [...periodosDisponiveis].sort((a, b) => b.localeCompare(a));
+  const periodosOrdenados = [...periodosNormais].sort((a, b) => b.localeCompare(a));
 
   // Determinar se o período selecionado é o mais recente
   const periodoMaisRecente = periodosOrdenados[0];
   const ehPeriodoMaisRecente = periodoSelecionado === periodoMaisRecente;
 
-  // Label do botão: mostrar "Último mês" se for o mais recente, senão mostrar o mês formatado
-  const labelBotao = ehPeriodoMaisRecente
-    ? "Último mês"
-    : formatarMesAno(periodoSelecionado, "abreviado");
+  // Label do botão
+  const labelBotao =
+    periodoSelecionado === "consolidado"
+      ? "Todos os meses"
+      : ehPeriodoMaisRecente
+        ? "Último mês"
+        : formatarMesAno(periodoSelecionado, "abreviado");
 
   return (
     <DropdownMenu>
@@ -52,6 +59,15 @@ export function PeriodSelector({
         <DropdownMenuLabel>Selecionar Período</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={periodoSelecionado} onValueChange={onPeriodoChange}>
+          {temConsolidado && (
+            <DropdownMenuRadioItem value="consolidado">
+              <div className="flex flex-col">
+                <span className="font-medium">Todos os meses</span>
+                <span className="text-muted-foreground text-xs">Análise consolidada</span>
+              </div>
+            </DropdownMenuRadioItem>
+          )}
+          {temConsolidado && <DropdownMenuSeparator />}
           {periodosOrdenados.map((periodo, index) => {
             const ehMaisRecente = index === 0;
             const label = ehMaisRecente

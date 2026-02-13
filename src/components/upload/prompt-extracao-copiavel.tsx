@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Copy, Check, Loader2, ArrowRight } from "lucide-react";
+import { IndicadorPassos } from "./indicador-passos";
 
 interface PromptExtracaoCopiavelProps {
   onProximoPasso: () => void;
@@ -52,7 +53,7 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-sm text-red-600">{erroCarregamento}</p>
+          <p className="text-sm text-destructive">{erroCarregamento}</p>
         </CardContent>
       </Card>
     );
@@ -61,8 +62,14 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
   return (
     <Card>
       <CardContent className="space-y-4 p-6">
+        <IndicadorPassos
+          passos={[
+            { numero: 1, rotulo: "Copiar prompt", status: "ativo" },
+            { numero: 2, rotulo: "Colar resposta", status: "pendente" },
+          ]}
+        />
         <div>
-          <h3 className="text-lg font-semibold">Passo 1: Copiar o prompt</h3>
+          <h3 className="text-lg font-semibold">Copiar o prompt</h3>
           <p className="text-muted-foreground text-sm">
             Copie o prompt abaixo e cole no Claude Chat junto com o PDF do relatorio.
           </p>

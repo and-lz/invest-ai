@@ -8,11 +8,13 @@ import { Copy, Check, Loader2, ArrowRight } from "lucide-react";
 
 interface PromptInsightsCopiavelProps {
   identificadorRelatorio: string;
+  consolidado?: boolean;
   onProximoPasso: () => void;
 }
 
 export function PromptInsightsCopiavel({
   identificadorRelatorio,
+  consolidado,
   onProximoPasso,
 }: PromptInsightsCopiavelProps) {
   const [promptCompleto, setPromptCompleto] = useState<string>("");
@@ -27,6 +29,7 @@ export function PromptInsightsCopiavel({
       body: JSON.stringify({
         acao: "gerar-prompt",
         identificadorRelatorio,
+        ...(consolidado ? { consolidado: true } : {}),
       }),
     })
       .then((resposta) => {
@@ -41,7 +44,7 @@ export function PromptInsightsCopiavel({
         setErroCarregamento(erro.message);
         setEstaCarregando(false);
       });
-  }, [identificadorRelatorio]);
+  }, [identificadorRelatorio, consolidado]);
 
   const copiarPrompt = useCallback(async () => {
     await navigator.clipboard.writeText(promptCompleto);
@@ -66,7 +69,7 @@ export function PromptInsightsCopiavel({
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-sm text-red-600">{erroCarregamento}</p>
+          <p className="text-sm text-destructive">{erroCarregamento}</p>
         </CardContent>
       </Card>
     );

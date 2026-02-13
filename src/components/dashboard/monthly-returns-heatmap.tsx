@@ -39,13 +39,13 @@ interface MonthlyReturnsHeatmapProps {
 
 function obterClasseCor(valor: number | null): string {
   if (valor === null) return "bg-muted/30 text-muted-foreground/50";
-  if (valor >= 3) return "bg-green-600/20 text-green-700 dark:text-green-400";
-  if (valor >= 1.5) return "bg-green-500/15 text-green-600 dark:text-green-400";
-  if (valor > 0) return "bg-green-400/10 text-green-600 dark:text-green-400";
+  if (valor >= 3) return "bg-success/20 text-success";
+  if (valor >= 1.5) return "bg-success/15 text-success";
+  if (valor > 0) return "bg-success/10 text-success";
   if (valor === 0) return "text-muted-foreground";
-  if (valor > -1.5) return "bg-red-400/10 text-red-600 dark:text-red-400";
-  if (valor > -3) return "bg-red-500/15 text-red-600 dark:text-red-400";
-  return "bg-red-600/20 text-red-700 dark:text-red-400";
+  if (valor > -1.5) return "bg-destructive/10 text-destructive";
+  if (valor > -3) return "bg-destructive/15 text-destructive";
+  return "bg-destructive/20 text-destructive";
 }
 
 export function gerarConclusaoRetornosMensais(retornos: RetornoAnual[]): Conclusao[] {

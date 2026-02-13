@@ -54,11 +54,11 @@ export function HeaderNavigation() {
         estaVisivel ? "h-16" : "h-0"
       )}
     >
-      <header className="bg-background border-border h-16 border-b">
+      <header className="h-16 border-b border-border/50 bg-background/80 backdrop-blur-md backdrop-saturate-150">
         <div className="flex h-16 items-center justify-between px-6">
-        <h1 className="text-lg font-bold">Investimentos</h1>
+        <h1 className="font-serif text-lg font-semibold tracking-tight">Investimentos</h1>
 
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-1">
           {itensNavegacao.map((item) => {
             const estaAtivo = pathname === item.href;
             const Icone = item.icone;
@@ -67,14 +67,17 @@ export function HeaderNavigation() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "relative flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   estaAtivo
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <Icone className="h-4 w-4" />
                 {item.rotulo}
+                {estaAtivo && (
+                  <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-foreground/60" />
+                )}
               </Link>
             );
           })}

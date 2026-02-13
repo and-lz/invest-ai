@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { PromptExtracaoCopiavel } from "./prompt-extracao-copiavel";
 import { FormularioJsonManual } from "./formulario-json-manual";
+import { IndicadorPassos } from "./indicador-passos";
 
 type PassoImportacao = "copiar-prompt" | "colar-json";
 
@@ -21,14 +22,36 @@ export function ImportacaoManualStepper({ onImportacaoSucesso }: ImportacaoManua
     setPassoAtual("copiar-prompt");
   }, []);
 
-  if (passoAtual === "copiar-prompt") {
-    return <PromptExtracaoCopiavel onProximoPasso={avancarParaColarJson} />;
-  }
+  const passosIndicador = [
+    {
+      numero: 1,
+      rotulo: "Copiar prompt",
+      status:
+        passoAtual === "copiar-prompt"
+          ? ("ativo" as const)
+          : ("concluido" as const),
+    },
+    {
+      numero: 2,
+      rotulo: "Colar resposta",
+      status:
+        passoAtual === "colar-json"
+          ? ("ativo" as const)
+          : ("pendente" as const),
+    },
+  ];
 
   return (
-    <FormularioJsonManual
-      onImportacaoSucesso={onImportacaoSucesso}
-      onVoltar={voltarParaCopiarPrompt}
-    />
+    <div className="space-y-4">
+      <IndicadorPassos passos={passosIndicador} />
+      {passoAtual === "copiar-prompt" ? (
+        <PromptExtracaoCopiavel onProximoPasso={avancarParaColarJson} />
+      ) : (
+        <FormularioJsonManual
+          onImportacaoSucesso={onImportacaoSucesso}
+          onVoltar={voltarParaCopiarPrompt}
+        />
+      )}
+    </div>
   );
 }
