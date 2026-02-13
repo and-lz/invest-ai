@@ -3,8 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell } from "recharts";
-import { getCoresEstrategia } from "@/lib/chart-config";
-import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
+import { CORES_ESTRATEGIA } from "@/lib/chart-config";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
@@ -48,8 +47,7 @@ function gerarConclusaoAlocacao(dadosGrafico: Array<{ nome: string; valor: numbe
 }
 
 export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartProps) {
-  const { palette } = useCyberpunkPalette();
-  const cores = getCoresEstrategia(palette);
+  const cores = CORES_ESTRATEGIA;
 
   const alocacaoRecente = alocacaoMensal[alocacaoMensal.length - 1];
   if (!alocacaoRecente) return null;

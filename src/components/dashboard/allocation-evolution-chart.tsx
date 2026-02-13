@@ -3,8 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
-import { getCoresEstrategia } from "@/lib/chart-config";
-import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
+import { CORES_ESTRATEGIA } from "@/lib/chart-config";
 import { formatarMesAno } from "@/lib/format-date";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_EVOLUCAO_ALOCACAO, GLOSSARIO_ESTRATEGIAS } from "@/lib/glossario-financeiro";
@@ -73,8 +72,7 @@ export function gerarConclusaoEvolucaoAlocacao(evolucao: AlocacaoMensal[]): Conc
 }
 
 export function AllocationEvolutionChart({ evolucaoAlocacao }: AllocationEvolutionChartProps) {
-  const { palette } = useCyberpunkPalette();
-  const cores = getCoresEstrategia(palette);
+  const cores = CORES_ESTRATEGIA;
 
   if (evolucaoAlocacao.length < 2) return null;
 

@@ -3,7 +3,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, ReferenceLine } from "recharts";
-import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_RENTABILIDADE_POR_CATEGORIA } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
@@ -89,16 +88,6 @@ export function gerarConclusaoCategorias(
 }
 
 export function CategoryPerformanceChart({ categorias, cdiAnual }: CategoryPerformanceChartProps) {
-  const { palette } = useCyberpunkPalette();
-
-  const coresPaleta: Record<string, string> = {
-    synthwave: "oklch(0.70 0.28 195)",
-    "cyberpunk-2077": "oklch(0.75 0.35 330)",
-    "blade-runner": "oklch(0.65 0.30 280)",
-    matrix: "oklch(0.75 0.32 140)",
-    none: "hsl(221, 83%, 53%)",
-  };
-
   if (categorias.length === 0) return null;
 
   const dadosGrafico = [...categorias]
@@ -114,7 +103,7 @@ export function CategoryPerformanceChart({ categorias, cdiAnual }: CategoryPerfo
   const configGrafico: ChartConfig = {
     rentabilidade: {
       label: "Rentabilidade 12M",
-      color: coresPaleta[palette] || coresPaleta.none,
+      color: "hsl(221, 83%, 53%)",
     },
   };
 

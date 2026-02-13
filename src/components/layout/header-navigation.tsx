@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Upload, FileText, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlternarTema } from "@/components/layout/alternar-tema";
-import { PaletteSelector } from "@/components/layout/palette-selector";
-import { useScrollDirection } from "@/hooks/use-scroll-direction";
 
 const itensNavegacao = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
@@ -17,17 +15,9 @@ const itensNavegacao = [
 
 export function HeaderNavigation() {
   const pathname = usePathname();
-  const scrollDirecao = useScrollDirection();
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 transition-all duration-300 ease-in-out",
-        scrollDirecao === "baixo"
-          ? "h-0 overflow-hidden opacity-0"
-          : "bg-background border-border h-16 border-b",
-      )}
-    >
+    <header className="bg-background border-border sticky top-0 z-50 h-16 border-b">
       <div className="flex h-16 items-center justify-between px-6">
         <h1 className="text-lg font-bold">Investimentos</h1>
 
@@ -54,7 +44,6 @@ export function HeaderNavigation() {
         </nav>
 
         <div className="flex items-center gap-1">
-          <PaletteSelector />
           <AlternarTema />
         </div>
       </div>

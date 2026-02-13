@@ -3,7 +3,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
-import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_LIQUIDEZ } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
@@ -16,56 +15,15 @@ interface LiquidityLadderProps {
   faixasLiquidez: FaixaLiquidez[];
 }
 
-function getCoresLiquidez(palette: string): string[] {
-  const paletaLiquidez: Record<string, string[]> = {
-    synthwave: [
-      "oklch(0.75 0.35 330)",
-      "oklch(0.70 0.28 195)",
-      "oklch(0.65 0.32 295)",
-      "oklch(0.75 0.28 45)",
-      "oklch(0.75 0.28 45)",
-      "oklch(0.70 0.28 195)",
-      "oklch(0.65 0.32 295)",
-    ],
-    "cyberpunk-2077": [
-      "oklch(0.85 0.25 95)",
-      "oklch(0.75 0.35 330)",
-      "oklch(0.70 0.28 195)",
-      "oklch(0.85 0.25 95)",
-      "oklch(0.75 0.35 330)",
-      "oklch(0.70 0.28 195)",
-      "oklch(0.85 0.25 95)",
-    ],
-    "blade-runner": [
-      "oklch(0.75 0.28 45)",
-      "oklch(0.70 0.28 195)",
-      "oklch(0.65 0.30 280)",
-      "oklch(0.75 0.28 45)",
-      "oklch(0.70 0.28 195)",
-      "oklch(0.65 0.30 280)",
-      "oklch(0.75 0.28 45)",
-    ],
-    matrix: [
-      "oklch(0.75 0.32 140)",
-      "oklch(0.70 0.25 160)",
-      "oklch(0.80 0.30 125)",
-      "oklch(0.75 0.32 140)",
-      "oklch(0.70 0.25 160)",
-      "oklch(0.80 0.30 125)",
-      "oklch(0.75 0.32 140)",
-    ],
-    none: [
-      "hsl(142, 76%, 36%)",
-      "hsl(142, 60%, 50%)",
-      "hsl(45, 93%, 47%)",
-      "hsl(25, 95%, 53%)",
-      "hsl(0, 84%, 60%)",
-      "hsl(262, 83%, 58%)",
-      "hsl(221, 83%, 53%)",
-    ],
-  };
-  return (paletaLiquidez[palette] || paletaLiquidez.none) as string[];
-}
+const CORES_LIQUIDEZ: string[] = [
+  "hsl(142, 76%, 36%)",
+  "hsl(142, 60%, 50%)",
+  "hsl(45, 93%, 47%)",
+  "hsl(25, 95%, 53%)",
+  "hsl(0, 84%, 60%)",
+  "hsl(262, 83%, 58%)",
+  "hsl(221, 83%, 53%)",
+];
 
 interface PontoGraficoTooltipPayload {
   value: number;
@@ -154,8 +112,6 @@ export function gerarConclusaoLiquidez(faixas: FaixaLiquidez[]): Conclusao[] {
 }
 
 export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
-  const { palette } = useCyberpunkPalette();
-
   if (faixasLiquidez.length === 0) return null;
 
   const dadosGrafico = faixasLiquidez.map((faixa) => ({
@@ -165,9 +121,8 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
     acumulado: faixa.percentualAcumulado.valor,
   }));
 
-  const coresLiquidez = getCoresLiquidez(palette);
   const configGrafico: ChartConfig = {
-    percentual: { label: "Percentual", color: coresLiquidez[0] ?? "hsl(142, 76%, 36%)" },
+    percentual: { label: "Percentual", color: CORES_LIQUIDEZ[0] ?? "hsl(142, 76%, 36%)" },
   };
 
   const conclusoes = gerarConclusaoLiquidez(faixasLiquidez);
@@ -205,7 +160,7 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
             <ChartTooltip content={<TooltipLiquidez />} />
             <Bar dataKey="percentual" radius={[0, 4, 4, 0]}>
               {dadosGrafico.map((_, indice) => (
-                <Cell key={indice} fill={coresLiquidez[indice % coresLiquidez.length]} />
+                <Cell key={indice} fill={CORES_LIQUIDEZ[indice % CORES_LIQUIDEZ.length]} />
               ))}
             </Bar>
           </BarChart>

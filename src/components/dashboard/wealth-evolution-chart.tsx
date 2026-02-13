@@ -3,8 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
-import { getConfigGraficoPatrimonio } from "@/lib/chart-config";
-import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
+import { configGraficoPatrimonio } from "@/lib/chart-config";
 import { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { formatarMesAno } from "@/lib/format-date";
@@ -120,8 +119,6 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
 }
 
 export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionChartProps) {
-  const { palette } = useCyberpunkPalette();
-
   if (evolucaoPatrimonial.length < 2) return null;
 
   const dadosGrafico = evolucaoPatrimonial.map((ponto) => ({
@@ -131,7 +128,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
   }));
 
   const conclusoesEvolucao = gerarConclusaoEvolucao(evolucaoPatrimonial);
-  const configGrafico = getConfigGraficoPatrimonio(palette);
+  const configGrafico = configGraficoPatrimonio;
 
   return (
     <Card>

@@ -3,8 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { getConfigGraficoBenchmarks } from "@/lib/chart-config";
-import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
+import { configGraficoBenchmarks } from "@/lib/chart-config";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
   GLOSSARIO_CARTEIRA_VS_BENCHMARKS,
@@ -96,8 +95,6 @@ interface BenchmarkComparisonChartProps {
 }
 
 export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonChartProps) {
-  const { palette } = useCyberpunkPalette();
-
   const dadosGrafico = comparacoes.map((comparacao) => ({
     periodo: comparacao.periodo,
     carteira: comparacao.carteira.valor,
@@ -107,7 +104,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
   }));
 
   const conclusoes = gerarConclusoes(dadosGrafico);
-  const configGrafico = getConfigGraficoBenchmarks(palette);
+  const configGrafico = configGraficoBenchmarks;
 
   return (
     <Card>

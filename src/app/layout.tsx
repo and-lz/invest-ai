@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Lora, Orbitron, Rajdhani } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Lora } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
-import { CyberpunkPaletteProvider } from "@/contexts/cyberpunk-palette-context";
-import { CircuitBoardBackground } from "@/components/layout/circuit-board-background";
-import { FloatingParticles } from "@/components/layout/floating-particles";
-import { ScanLinesOverlay } from "@/components/layout/scan-lines-overlay";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,14 +21,8 @@ const lora = Lora({
   weight: ["400", "500", "600", "700"],
 });
 
-const orbitron = Orbitron({
-  variable: "--font-orbitron",
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-});
-
-const rajdhani = Rajdhani({
-  variable: "--font-rajdhani",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -50,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${orbitron.variable} ${rajdhani.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${inter.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"
@@ -58,15 +48,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <CyberpunkPaletteProvider>
-            <CircuitBoardBackground />
-            <FloatingParticles />
-            <div className="flex h-screen flex-col">
-              <HeaderNavigation />
-              <main className="flex-1 overflow-y-auto p-8">{children}</main>
-            </div>
-            <ScanLinesOverlay />
-          </CyberpunkPaletteProvider>
+          <div className="flex h-screen flex-col">
+            <HeaderNavigation />
+            <main className="flex-1 overflow-y-auto p-8">{children}</main>
+          </div>
           <Toaster />
         </ThemeProvider>
       </body>
