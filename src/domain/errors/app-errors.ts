@@ -2,6 +2,7 @@ export class AppError extends Error {
   constructor(
     message: string,
     public readonly code: string,
+    public readonly recuperavel: boolean = false,
   ) {
     super(message);
     this.name = "AppError";
@@ -30,9 +31,16 @@ export class FileStorageError extends AppError {
 }
 
 export class AiApiError extends AppError {
-  constructor(message: string) {
-    super(message, "AI_API_ERROR");
+  constructor(message: string, recuperavel: boolean = false) {
+    super(message, "AI_API_ERROR", recuperavel);
     this.name = "AiApiError";
+  }
+}
+
+export class AiApiTransientError extends AiApiError {
+  constructor(message: string) {
+    super(message, /* recuperavel */ true);
+    this.name = "AiApiTransientError";
   }
 }
 

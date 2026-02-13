@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { notificar } from "@/lib/notificar";
+import { toast } from "sonner";
+import { dispararEventoNotificacaoCriada } from "@/hooks/use-notificacoes";
 import { useTarefaBackground } from "@/hooks/use-tarefa-background";
 
 const CHAVE_LOCAL_STORAGE = "tarefasAtivas";
@@ -63,9 +64,9 @@ function MonitorTarefa({
 
     if (estaConcluido && tarefa) {
       setJaNotificou(true);
-      notificar.success("Tarefa concluída!", {
+      // Toast apenas (notificacao server-side ja foi criada pelo executor)
+      toast.success("Tarefa concluida!", {
         description: tarefa.descricaoResultado,
-        actionUrl: tarefa.urlRedirecionamento ?? undefined,
         action: tarefa.urlRedirecionamento
           ? {
               label: "Ver resultado",
@@ -73,15 +74,18 @@ function MonitorTarefa({
             }
           : undefined,
       });
+      dispararEventoNotificacaoCriada();
       window.dispatchEvent(new CustomEvent("tarefa-background-concluida"));
       onConcluida(identificadorTarefa);
     }
 
     if (estaComErro && tarefa) {
       setJaNotificou(true);
-      notificar.error("Erro no processamento", {
+      // Toast apenas (notificacao server-side ja foi criada pelo executor)
+      toast.error("Erro no processamento", {
         description: tarefa.erro ?? "Erro desconhecido",
       });
+      dispararEventoNotificacaoCriada();
       window.dispatchEvent(new CustomEvent("tarefa-background-concluida"));
       onConcluida(identificadorTarefa);
     }
@@ -92,7 +96,7 @@ function MonitorTarefa({
         (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
       if (iniciadoHaMinutos > TIMEOUT_MINUTOS) {
         setJaNotificou(true);
-        notificar.error("Tarefa parece ter falhado", {
+        toast.error("Tarefa parece ter falhado", {
           description: "O processamento excedeu o tempo limite. Tente novamente.",
         });
         onConcluida(identificadorTarefa);

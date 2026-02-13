@@ -1,6 +1,6 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { toJSONSchema } from "zod/v4";
 import type { InsightsService } from "@/domain/interfaces/extraction-service";
+import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
@@ -17,122 +17,88 @@ import {
 } from "@/lib/serializar-relatorio-markdown";
 
 /**
- * Serviço de geração de insights usando Google Gemini 2.5 Flash
+ * Servico de geracao de insights usando ProvedorAi.
+ * Responsabilidade: construir prompts + validar schema.
+ * Criacao de cliente, log de tokens e classificacao de erros ficam no ProvedorAi.
  */
 export class GeminiInsightsService implements InsightsService {
-  private readonly modelo: string = "models/gemini-2.5-flash";
-  private readonly client: GoogleGenerativeAI;
-
-  constructor(apiKey: string) {
-    this.client = new GoogleGenerativeAI(apiKey);
-  }
+  constructor(private readonly provedor: ProvedorAi) {}
 
   async gerarInsights(
     relatorioAtual: RelatorioExtraido,
     relatorioAnterior: RelatorioExtraido | null,
   ): Promise<InsightsResponse> {
-    try {
-      const model = this.client.getGenerativeModel({
-        model: this.modelo,
-        systemInstruction: SYSTEM_PROMPT_INSIGHTS,
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.7, // Temperatura moderada para insights criativos mas fundamentados
+    const prompt = this.construirPrompt(relatorioAtual, relatorioAnterior);
+
+    const resposta = await this.provedor.gerar({
+      instrucaoSistema: SYSTEM_PROMPT_INSIGHTS,
+      mensagens: [
+        {
+          papel: "usuario",
+          partes: [{ tipo: "texto", dados: prompt }],
         },
-      });
+      ],
+      temperatura: 0.7,
+      formatoResposta: "json",
+    });
 
-      const prompt = this.construirPrompt(relatorioAtual, relatorioAnterior);
+    const dadosBrutos = this.parseJsonSeguro(resposta.texto);
+    const validacao = InsightsResponseSchema.safeParse(dadosBrutos);
 
-      const resultado = await model.generateContent(prompt);
-      const resposta = resultado.response;
-      const textoResposta = resposta.text();
-
-      if (!textoResposta) {
-        throw new AiApiError("Resposta do Gemini API não contém texto");
-      }
-
-      const dadosBrutos: unknown = JSON.parse(textoResposta);
-      const validacao = InsightsResponseSchema.safeParse(dadosBrutos);
-
-      if (!validacao.success) {
-        throw new AiApiError(
-          `Insights não correspondem ao schema: ${JSON.stringify(validacao.error.issues.slice(0, 5))}`,
-        );
-      }
-
-      // Log de uso de tokens (se disponível)
-      if (resultado.response.usageMetadata) {
-        const usage = resultado.response.usageMetadata;
-        console.info(
-          `[Insights] Tokens: ${usage.promptTokenCount} input, ${usage.candidatesTokenCount} output`,
-        );
-      }
-
-      // Sobrescrever dataGeracao com a data atual do sistema para garantir precisão
-      const dataAtual = new Date().toISOString().split("T")[0] ?? "";
-      return {
-        ...validacao.data,
-        dataGeracao: dataAtual,
-      };
-    } catch (erro) {
-      if (erro instanceof AiApiError) throw erro;
-
+    if (!validacao.success) {
       throw new AiApiError(
-        `Falha na geração de insights via Gemini API: ${erro instanceof Error ? erro.message : String(erro)}`,
+        `Insights nao correspondem ao schema: ${JSON.stringify(validacao.error.issues.slice(0, 5))}`,
       );
     }
+
+    // Sobrescrever dataGeracao com a data atual do sistema para garantir precisao
+    const dataAtual = new Date().toISOString().split("T")[0] ?? "";
+    return {
+      ...validacao.data,
+      dataGeracao: dataAtual,
+    };
   }
 
   async gerarInsightsConsolidados(
     todosRelatorios: RelatorioExtraido[],
   ): Promise<InsightsResponse> {
-    try {
-      const model = this.client.getGenerativeModel({
-        model: this.modelo,
-        systemInstruction: SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.7,
+    const prompt = this.construirPromptConsolidado(todosRelatorios);
+
+    const resposta = await this.provedor.gerar({
+      instrucaoSistema: SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
+      mensagens: [
+        {
+          papel: "usuario",
+          partes: [{ tipo: "texto", dados: prompt }],
         },
-      });
+      ],
+      temperatura: 0.7,
+      formatoResposta: "json",
+    });
 
-      const prompt = this.construirPromptConsolidado(todosRelatorios);
+    const dadosBrutos = this.parseJsonSeguro(resposta.texto);
+    const validacao = InsightsResponseSchema.safeParse(dadosBrutos);
 
-      const resultado = await model.generateContent(prompt);
-      const resposta = resultado.response;
-      const textoResposta = resposta.text();
-
-      if (!textoResposta) {
-        throw new AiApiError("Resposta do Gemini API não contém texto");
-      }
-
-      const dadosBrutos: unknown = JSON.parse(textoResposta);
-      const validacao = InsightsResponseSchema.safeParse(dadosBrutos);
-
-      if (!validacao.success) {
-        throw new AiApiError(
-          `Insights consolidados não correspondem ao schema: ${JSON.stringify(validacao.error.issues.slice(0, 5))}`,
-        );
-      }
-
-      if (resultado.response.usageMetadata) {
-        const usage = resultado.response.usageMetadata;
-        console.info(
-          `[Insights Consolidados] Tokens: ${usage.promptTokenCount} input, ${usage.candidatesTokenCount} output`,
-        );
-      }
-
-      // Sobrescrever dataGeracao com a data atual do sistema para garantir precisão
-      const dataAtual = new Date().toISOString().split("T")[0] ?? "";
-      return {
-        ...validacao.data,
-        dataGeracao: dataAtual,
-      };
-    } catch (erro) {
-      if (erro instanceof AiApiError) throw erro;
-
+    if (!validacao.success) {
       throw new AiApiError(
-        `Falha na geração de insights consolidados via Gemini API: ${erro instanceof Error ? erro.message : String(erro)}`,
+        `Insights consolidados nao correspondem ao schema: ${JSON.stringify(validacao.error.issues.slice(0, 5))}`,
+      );
+    }
+
+    // Sobrescrever dataGeracao com a data atual do sistema para garantir precisao
+    const dataAtual = new Date().toISOString().split("T")[0] ?? "";
+    return {
+      ...validacao.data,
+      dataGeracao: dataAtual,
+    };
+  }
+
+  private parseJsonSeguro(texto: string): unknown {
+    try {
+      return JSON.parse(texto);
+    } catch {
+      throw new AiApiError(
+        `Resposta nao e JSON valido: ${texto.substring(0, 200)}`,
       );
     }
   }

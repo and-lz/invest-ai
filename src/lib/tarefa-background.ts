@@ -24,6 +24,13 @@ export const TarefaBackgroundSchema = z.object({
   erro: z.string().optional(),
   descricaoResultado: z.string().optional(),
   urlRedirecionamento: z.string().optional(),
+  // Campos de retry (todos opcionais para retrocompatibilidade com tarefas existentes)
+  tentativaAtual: z.number().int().nonnegative().optional(),
+  maximoTentativas: z.number().int().nonnegative().optional(),
+  erroRecuperavel: z.boolean().optional(),
+  proximaTentativaEm: z.string().datetime().optional(),
+  // Contexto generico para re-despacho (ex: identificadorRelatorio para retry de insights)
+  parametros: z.record(z.string(), z.string()).optional(),
 });
 
 export type TarefaBackground = z.infer<typeof TarefaBackgroundSchema>;

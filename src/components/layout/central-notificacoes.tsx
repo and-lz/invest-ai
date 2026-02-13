@@ -11,8 +11,11 @@ import {
   Info,
   CheckCircle,
   OctagonX,
+  RotateCcw,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useNotificacoes } from "@/hooks/use-notificacoes";
+import { adicionarTarefaAtivaNoStorage } from "@/components/layout/indicador-tarefa-ativa";
 import {
   Sheet,
   SheetContent,
@@ -48,22 +51,66 @@ interface ItemNotificacaoProps {
   onFecharSheet: () => void;
 }
 
+function ehAcaoDeRetry(url: string): boolean {
+  return url.includes("/retry");
+}
+
+function extrairTaskIdDeUrlRetry(url: string): string | null {
+  const partes = url.split("/tasks/");
+  if (partes.length < 2) return null;
+  const restante = partes[1];
+  if (!restante) return null;
+  return restante.split("/")[0] ?? null;
+}
+
 function ItemNotificacao({
   notificacao,
   onMarcarComoLida,
   onFecharSheet,
 }: ItemNotificacaoProps) {
   const router = useRouter();
+  const [retryEmAndamento, setRetryEmAndamento] = useState(false);
   const Icone = ICONES_TIPO[notificacao.tipo];
   const corIcone = CORES_TIPO[notificacao.tipo];
 
-  const handleVerResultado = useCallback(() => {
-    if (notificacao.acao?.url) {
+  const handleAcao = useCallback(async () => {
+    if (!notificacao.acao?.url) return;
+
+    if (ehAcaoDeRetry(notificacao.acao.url)) {
+      setRetryEmAndamento(true);
+      try {
+        const resposta = await fetch(notificacao.acao.url, { method: "POST" });
+        if (resposta.ok) {
+          const taskId = extrairTaskIdDeUrlRetry(notificacao.acao.url);
+          if (taskId) {
+            adicionarTarefaAtivaNoStorage(taskId);
+          }
+          onMarcarComoLida(notificacao.identificador);
+          onFecharSheet();
+          toast.info("Retentando tarefa...");
+        } else {
+          const corpo = (await resposta.json()) as { erro?: string };
+          toast.error("Falha ao retentar", {
+            description: corpo.erro ?? "Erro desconhecido",
+          });
+        }
+      } catch {
+        toast.error("Falha ao retentar", {
+          description: "Erro de conexao",
+        });
+      } finally {
+        setRetryEmAndamento(false);
+      }
+    } else {
       onMarcarComoLida(notificacao.identificador);
       onFecharSheet();
       router.push(notificacao.acao.url);
     }
   }, [notificacao, onMarcarComoLida, onFecharSheet, router]);
+
+  const ehRetry = notificacao.acao?.url
+    ? ehAcaoDeRetry(notificacao.acao.url)
+    : false;
 
   return (
     <div
@@ -105,10 +152,12 @@ function ItemNotificacao({
         <Button
           variant="ghost"
           size="sm"
-          onClick={handleVerResultado}
-          className="mt-3 h-7 w-full text-xs"
+          onClick={handleAcao}
+          disabled={retryEmAndamento}
+          className="mt-3 h-7 w-full gap-1.5 text-xs"
         >
-          {notificacao.acao.rotulo}
+          {ehRetry && <RotateCcw className="h-3 w-3" />}
+          {retryEmAndamento ? "Retentando..." : notificacao.acao.rotulo}
         </Button>
       )}
     </div>

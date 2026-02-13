@@ -1,100 +1,74 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { toJSONSchema } from "zod/v4";
 import type { ExtractionService } from "@/domain/interfaces/extraction-service";
+import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import { RelatorioExtraidoSchema } from "@/schemas/report-extraction.schema";
 import { PdfParsingError } from "@/domain/errors/app-errors";
 import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/prompt-extracao-manual";
 
 /**
- * Serviço de extração de PDFs usando Google Gemini 2.5 Flash
+ * Servico de extracao de PDFs usando ProvedorAi.
+ * Responsabilidade: construir prompt + validar schema.
+ * Criacao de cliente, log de tokens e classificacao de erros ficam no ProvedorAi.
  */
 export class GeminiPdfExtractionService implements ExtractionService {
-  private readonly modelo: string = "models/gemini-2.5-flash";
-  private readonly client: GoogleGenerativeAI;
-
-  constructor(apiKey: string) {
-    this.client = new GoogleGenerativeAI(apiKey);
-  }
+  constructor(private readonly provedor: ProvedorAi) {}
 
   async extrairDadosDoRelatorio(pdfBase64: string): Promise<RelatorioExtraido> {
-    const tempoInicio = Date.now();
+    console.info("[PDF Extraction] Iniciando extracao via ProvedorAi");
 
-    try {
-      console.info(`[PDF Extraction] Iniciando extração com ${this.modelo} (Gemini)`);
+    const prompt = this.construirPrompt();
 
-      const model = this.client.getGenerativeModel({
-        model: this.modelo,
-        systemInstruction: SYSTEM_PROMPT_EXTRACAO,
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.1, // Baixa temperatura para extração precisa
-        },
-      });
-
-      const prompt = this.construirPrompt();
-
-      const resultado = await model.generateContent([
+    const resposta = await this.provedor.gerar({
+      instrucaoSistema: SYSTEM_PROMPT_EXTRACAO,
+      mensagens: [
         {
-          inlineData: {
-            mimeType: "application/pdf",
-            data: pdfBase64,
-          },
+          papel: "usuario",
+          partes: [
+            { tipo: "pdf", dados: pdfBase64 },
+            { tipo: "texto", dados: prompt },
+          ],
         },
-        { text: prompt },
-      ]);
+      ],
+      temperatura: 0.1,
+      formatoResposta: "json",
+    });
 
-      const tempoDecorrido = Date.now() - tempoInicio;
+    const dadosBrutos: unknown = this.parseJsonSeguro(resposta.texto);
 
-      const resposta = resultado.response;
-      const textoResposta = resposta.text();
+    console.info(
+      "[PDF Extraction] Dados extraidos (primeiros 500 chars):",
+      JSON.stringify(dadosBrutos, null, 2).substring(0, 500),
+    );
 
-      if (!textoResposta) {
-        throw new PdfParsingError("Resposta do Gemini API não contém conteúdo");
-      }
+    const validacao = RelatorioExtraidoSchema.safeParse(dadosBrutos);
 
-      const dadosBrutos: unknown = JSON.parse(textoResposta);
-
-      // Debug: log dos dados extraídos
-      console.info(
-        "[PDF Extraction] Dados extraídos (primeiros 500 chars):",
-        JSON.stringify(dadosBrutos, null, 2).substring(0, 500),
+    if (!validacao.success) {
+      console.error(
+        "[PDF Extraction] Erros de validacao:",
+        JSON.stringify(validacao.error.issues, null, 2),
       );
-
-      const validacao = RelatorioExtraidoSchema.safeParse(dadosBrutos);
-
-      if (!validacao.success) {
-        console.error(
-          "[PDF Extraction] Erros de validação:",
-          JSON.stringify(validacao.error.issues, null, 2),
-        );
-        console.error("[PDF Extraction] Dados completos:", JSON.stringify(dadosBrutos, null, 2));
-
-        throw new PdfParsingError(
-          `Dados extraídos não correspondem ao schema: ${JSON.stringify(
-            validacao.error.issues,
-            null,
-            2,
-          )}`,
-        );
-      }
-
-      console.info(`[PDF Extraction] Sucesso com ${this.modelo} em ${tempoDecorrido}ms`);
-
-      // Log de uso de tokens (se disponível)
-      if (resultado.response.usageMetadata) {
-        const usage = resultado.response.usageMetadata;
-        console.info(
-          `[PDF Extraction] Tokens: ${usage.promptTokenCount} input, ${usage.candidatesTokenCount} output`,
-        );
-      }
-
-      return validacao.data;
-    } catch (erro) {
-      if (erro instanceof PdfParsingError) throw erro;
+      console.error("[PDF Extraction] Dados completos:", JSON.stringify(dadosBrutos, null, 2));
 
       throw new PdfParsingError(
-        `Falha na extração via Gemini API: ${erro instanceof Error ? erro.message : String(erro)}`,
+        `Dados extraidos nao correspondem ao schema: ${JSON.stringify(
+          validacao.error.issues,
+          null,
+          2,
+        )}`,
+      );
+    }
+
+    console.info("[PDF Extraction] Extracao concluida com sucesso");
+    return validacao.data;
+  }
+
+  private parseJsonSeguro(texto: string): unknown {
+    try {
+      return JSON.parse(texto);
+    } catch {
+      throw new PdfParsingError(
+        `Resposta nao e JSON valido: ${texto.substring(0, 200)}`,
       );
     }
   }

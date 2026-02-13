@@ -12,7 +12,9 @@ import { SalvarInsightsManualUseCase } from "@/application/use-cases/salvar-insi
 import { AtualizarConclusaoInsightUseCase } from "@/application/use-cases/atualizar-conclusao-insight";
 import { GenerateInsightsConsolidadosUseCase } from "@/application/use-cases/generate-insights-consolidados";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
+import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
+import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-provedor-ai";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
 import path from "path";
@@ -33,12 +35,16 @@ function obterGoogleApiKey(): string {
   return apiKey;
 }
 
+export function criarProvedorAi(): ProvedorAi {
+  return new GeminiProvedorAi(obterGoogleApiKey());
+}
+
 function criarServicoExtracao(): ExtractionService {
-  return new GeminiPdfExtractionService(obterGoogleApiKey());
+  return new GeminiPdfExtractionService(criarProvedorAi());
 }
 
 function criarServicoInsights(): InsightsService {
-  return new GeminiInsightsService(obterGoogleApiKey());
+  return new GeminiInsightsService(criarProvedorAi());
 }
 
 export function obterUploadReportUseCase() {

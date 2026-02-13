@@ -10,6 +10,7 @@ import { AppError } from "@/domain/errors/app-errors";
 import { z } from "zod/v4";
 import { StatusAcaoEnum } from "@/schemas/insights.schema";
 import { salvarTarefa } from "@/lib/tarefa-background";
+import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
 import type { TarefaBackground } from "@/lib/tarefa-background";
 
 const InsightsRequestSchema = z.object({
@@ -71,76 +72,6 @@ export async function GET(request: Request) {
   }
 }
 
-async function processarInsightsMensaisEmBackground(
-  tarefa: TarefaBackground,
-  identificadorRelatorio: string,
-  identificadorRelatorioAnterior: string | undefined,
-): Promise<void> {
-  try {
-    const useCase = obterGenerateInsightsUseCase();
-    await useCase.executar({
-      identificadorRelatorio,
-      identificadorRelatorioAnterior,
-    });
-
-    await salvarTarefa({
-      ...tarefa,
-      status: "concluido",
-      concluidoEm: new Date().toISOString(),
-      descricaoResultado: `Insights para ${identificadorRelatorio} gerados`,
-      urlRedirecionamento: `/insights?mesAno=${encodeURIComponent(identificadorRelatorio)}`,
-    });
-
-    console.info(
-      `[Insights] Tarefa ${tarefa.identificador} concluída: ${identificadorRelatorio}`,
-    );
-  } catch (erro) {
-    const mensagemErro = erro instanceof Error ? erro.message : String(erro);
-
-    await salvarTarefa({
-      ...tarefa,
-      status: "erro",
-      concluidoEm: new Date().toISOString(),
-      erro: mensagemErro,
-    });
-
-    console.error(`[Insights] Tarefa ${tarefa.identificador} falhou:`, mensagemErro);
-  }
-}
-
-async function processarInsightsConsolidadosEmBackground(
-  tarefa: TarefaBackground,
-): Promise<void> {
-  try {
-    const useCase = obterGenerateInsightsConsolidadosUseCase();
-    await useCase.executar();
-
-    await salvarTarefa({
-      ...tarefa,
-      status: "concluido",
-      concluidoEm: new Date().toISOString(),
-      descricaoResultado: "Insights consolidados gerados",
-      urlRedirecionamento: "/insights?mesAno=consolidado",
-    });
-
-    console.info(`[Insights Consolidados] Tarefa ${tarefa.identificador} concluída`);
-  } catch (erro) {
-    const mensagemErro = erro instanceof Error ? erro.message : String(erro);
-
-    await salvarTarefa({
-      ...tarefa,
-      status: "erro",
-      concluidoEm: new Date().toISOString(),
-      erro: mensagemErro,
-    });
-
-    console.error(
-      `[Insights Consolidados] Tarefa ${tarefa.identificador} falhou:`,
-      mensagemErro,
-    );
-  }
-}
-
 export async function POST(request: Request) {
   try {
     const corpo: unknown = await request.json();
@@ -161,19 +92,50 @@ export async function POST(request: Request) {
       tipo: ehConsolidado ? "gerar-insights-consolidados" : "gerar-insights",
       status: "processando",
       iniciadoEm: new Date().toISOString(),
+      parametros: ehConsolidado
+        ? undefined
+        : {
+            identificadorRelatorio: resultado.data.identificadorRelatorio,
+            ...(resultado.data.identificadorRelatorioAnterior && {
+              identificadorRelatorioAnterior: resultado.data.identificadorRelatorioAnterior,
+            }),
+          },
     };
 
     await salvarTarefa(tarefa);
 
-    // Fire-and-forget: processar em background
     if (ehConsolidado) {
-      void processarInsightsConsolidadosEmBackground(tarefa);
-    } else {
-      void processarInsightsMensaisEmBackground(
+      void executarTarefaEmBackground({
         tarefa,
-        resultado.data.identificadorRelatorio,
-        resultado.data.identificadorRelatorioAnterior,
-      );
+        rotuloLog: "Insights Consolidados",
+        executarOperacao: async () => {
+          const useCase = obterGenerateInsightsConsolidadosUseCase();
+          await useCase.executar();
+          return {
+            descricaoResultado: "Insights consolidados gerados",
+            urlRedirecionamento: "/insights?mesAno=consolidado",
+          };
+        },
+      });
+    } else {
+      const identificadorRelatorio = resultado.data.identificadorRelatorio;
+      const identificadorRelatorioAnterior = resultado.data.identificadorRelatorioAnterior;
+
+      void executarTarefaEmBackground({
+        tarefa,
+        rotuloLog: "Insights",
+        executarOperacao: async () => {
+          const useCase = obterGenerateInsightsUseCase();
+          await useCase.executar({
+            identificadorRelatorio,
+            identificadorRelatorioAnterior,
+          });
+          return {
+            descricaoResultado: `Insights para ${identificadorRelatorio} gerados`,
+            urlRedirecionamento: `/insights?mesAno=${encodeURIComponent(identificadorRelatorio)}`,
+          };
+        },
+      });
     }
 
     return NextResponse.json(
