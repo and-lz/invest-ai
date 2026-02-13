@@ -36,6 +36,7 @@
 - PDFs em `data/reports/`
 - JSON extraido em `data/extracted/`
 - Insights em `data/insights/`
+- Tarefas em background em `data/tasks/`
 
 # Testing Strategy
 
@@ -302,6 +303,40 @@ Registradas no `@theme inline` do Tailwind v4 — suporte nativo a `text-success
 - SEMPRE usar `tracking-tight` em h1 e h2 para melhor legibilidade
 - SEMPRE usar `text-muted-foreground` em helper text para hierarquia visual
 - O logo `font-serif` e a UNICA excecao permitida ao sistema de headings
+
+## Background Tasks Pattern (Fire-and-Forget)
+
+Operacoes longas (upload PDF, geracao de insights via Gemini) usam fire-and-forget para nao bloquear a UI.
+
+### Fluxo
+1. API route valida request, cria tarefa em `data/tasks/{uuid}.json`, retorna `202 Accepted`
+2. Processamento continua em background via `void asyncFunction()` no event loop do Node.js
+3. Frontend salva `identificadorTarefa` no `localStorage` e navega normalmente
+4. `IndicadorTarefaAtiva` no header faz polling via SWR (2s) e exibe toast ao concluir/falhar
+
+### Arquivos-chave
+- `src/lib/tarefa-background.ts` — Schema Zod + `salvarTarefa()` / `lerTarefa()`
+- `src/app/api/tasks/[taskId]/route.ts` — GET para polling de status
+- `src/hooks/use-tarefa-background.ts` — SWR hook com polling condicional
+- `src/components/layout/indicador-tarefa-ativa.tsx` — Componente global no header
+  - Exporta `adicionarTarefaAtivaNoStorage()` para outros componentes
+
+### Tipos de tarefa
+- `upload-pdf` — Processamento de PDF via Gemini
+- `gerar-insights` — Insights mensais via Gemini
+- `gerar-insights-consolidados` — Insights consolidados via Gemini
+
+### Comunicacao entre componentes
+- `localStorage("tarefasAtivas")` — Array de IDs de tarefas ativas
+- Evento `tarefa-ativa-adicionada` — Notifica header quando nova tarefa e criada
+- Evento `tarefa-background-concluida` — Notifica paginas para recarregar dados
+
+### Decisoes de design
+- Fire-and-forget em vez de job queue: Node.js mantem promises vivas apos enviar response
+- Sem retry automatico: usuario pode re-tentar manualmente (uso esporadico)
+- Timeout de 5 minutos: tarefas "processando" por mais de 5min sao consideradas falhas
+- Sem cancel: operacoes de 30-60s nao justificam cancelamento
+- `next/after` nao disponivel no Next.js 15.5.12 instalado
 
 # Reports
 

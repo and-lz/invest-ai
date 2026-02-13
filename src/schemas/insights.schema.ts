@@ -38,7 +38,9 @@ export const AlertaSchema = z.object({
 
 export const InsightsResponseSchema = z.object({
   mesReferencia: z.string(),
-  dataGeracao: z.string(),
+  dataGeracao: z
+    .string()
+    .describe("Data atual no formato YYYY-MM-DD (data em que os insights foram gerados)"),
   resumoExecutivo: z.string().describe("Paragrafo resumindo a saude geral da carteira"),
   insights: z.array(InsightSchema),
   alertas: z.array(AlertaSchema),

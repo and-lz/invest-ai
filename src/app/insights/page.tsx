@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
+import { adicionarTarefaAtivaNoStorage } from "@/components/layout/indicador-tarefa-ativa";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -101,16 +102,14 @@ function InsightCard({
   // Estilos diferentes para cada status
   const estilosBloco = {
     pendente: "border border-transparent rounded-lg p-4",
-    concluida:
-      "bg-success/5 border border-success/20 rounded-lg p-4",
-    ignorada:
-      "bg-muted/30 dark:bg-muted/10 border border-muted-foreground/20 dark:border-muted-foreground/10 rounded-lg p-4",
+    concluida: "border border-transparent rounded-lg p-4 opacity-60",
+    ignorada: "border border-transparent rounded-lg p-4 opacity-50",
   };
 
   const estiloTexto = {
     pendente: "",
-    concluida: "opacity-70 line-through",
-    ignorada: "opacity-60 line-through",
+    concluida: "",
+    ignorada: "",
   };
 
   return (
@@ -139,11 +138,7 @@ function InsightCard({
         <div
           className={cn(
             "mt-4 rounded-lg border-l-4 px-5 py-4",
-            statusAtual === "concluida"
-              ? "border-success/40 bg-success/5"
-              : statusAtual === "ignorada"
-                ? "border-muted-foreground/30 bg-muted/30"
-                : "border-muted-foreground/20 bg-muted/50",
+            "border-muted-foreground/20 bg-muted/50",
           )}
         >
           <p className={cn("text-base leading-relaxed", estiloTexto[statusAtual])}>
@@ -299,48 +294,37 @@ export default function InsightsPage() {
     setErroInsights(null);
 
     try {
+      let corpo: Record<string, string | boolean>;
+
       // Modo consolidado: gerar com todos os meses
       if (ehConsolidado) {
         const primeiroRelatorio = relatorios[0];
         if (!primeiroRelatorio) return;
 
-        const resposta = await fetch("/api/insights", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            identificadorRelatorio: primeiroRelatorio.identificador,
-            consolidado: true,
-          }),
-        });
+        corpo = {
+          identificadorRelatorio: primeiroRelatorio.identificador,
+          consolidado: true,
+        };
+      } else {
+        // Encontrar relatório do período selecionado
+        const relatorioDoPerido = relatorios.find(
+          (relatorio) => relatorio.mesReferencia === periodoSelecionado,
+        );
+        if (!relatorioDoPerido) return;
 
-        if (!resposta.ok) {
-          throw new Error("Falha ao gerar insights consolidados");
-        }
+        corpo = {
+          identificadorRelatorio: relatorioDoPerido.identificador,
+        };
 
-        const dados = (await resposta.json()) as { insights: InsightsResponse };
-        setInsights(dados.insights);
-        setModoVisualizacao("insights");
-        return;
-      }
-
-      // Encontrar relatório do período selecionado
-      const relatorioDoPerido = relatorios.find(
-        (relatorio) => relatorio.mesReferencia === periodoSelecionado,
-      );
-      if (!relatorioDoPerido) return;
-
-      const corpo: Record<string, string> = {
-        identificadorRelatorio: relatorioDoPerido.identificador,
-      };
-
-      // Encontrar relatório anterior (próximo na lista)
-      const indiceAtual = relatorios.findIndex(
-        (relatorio) => relatorio.identificador === relatorioDoPerido.identificador,
-      );
-      if (indiceAtual >= 0 && indiceAtual < relatorios.length - 1) {
-        const relatorioAnterior = relatorios[indiceAtual + 1];
-        if (relatorioAnterior) {
-          corpo.identificadorRelatorioAnterior = relatorioAnterior.identificador;
+        // Encontrar relatório anterior (próximo na lista)
+        const indiceAtual = relatorios.findIndex(
+          (relatorio) => relatorio.identificador === relatorioDoPerido.identificador,
+        );
+        if (indiceAtual >= 0 && indiceAtual < relatorios.length - 1) {
+          const relatorioAnterior = relatorios[indiceAtual + 1];
+          if (relatorioAnterior) {
+            corpo.identificadorRelatorioAnterior = relatorioAnterior.identificador;
+          }
         }
       }
 
@@ -351,12 +335,17 @@ export default function InsightsPage() {
       });
 
       if (!resposta.ok) {
-        throw new Error("Falha ao gerar insights");
+        throw new Error("Falha ao solicitar geração de insights");
       }
 
-      const dados = (await resposta.json()) as { insights: InsightsResponse };
-      setInsights(dados.insights);
-      setModoVisualizacao("insights");
+      // 202 Accepted: processamento em background
+      const dados = (await resposta.json()) as { identificadorTarefa?: string };
+      if (dados.identificadorTarefa) {
+        adicionarTarefaAtivaNoStorage(dados.identificadorTarefa);
+      }
+
+      setModoVisualizacao("inicial");
+      setErroInsights(null);
     } catch (erro) {
       setErroInsights(erro instanceof Error ? erro.message : "Erro desconhecido");
     } finally {

@@ -1,18 +1,17 @@
 "use client";
 
-import { useCallback, useState, useRef, useMemo } from "react";
+import { useCallback, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, FileText, Lock } from "lucide-react";
+import { Upload, FileText, Lock, Loader2 } from "lucide-react";
 import { useUploadReport } from "@/hooks/use-upload-report";
-import { EtapasProcessamento } from "./etapas-processamento";
 import { ResultadoUpload } from "./resultado-upload";
 import { cn } from "@/lib/utils";
 
 interface PdfUploadDropzoneProps {
-  onUploadSucesso?: (identificador: string) => void;
+  onUploadSucesso?: (identificadorTarefa: string) => void;
 }
 
 export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
@@ -22,40 +21,8 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   const [mostrarCampoSenha, setMostrarCampoSenha] = useState(false);
   const [mostrarInputSenha, setMostrarInputSenha] = useState(false);
   const inputArquivoRef = useRef<HTMLInputElement>(null);
-  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando, segundosDecorridos } =
+  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando } =
     useUploadReport();
-
-  const etapasUpload = useMemo(
-    () =>
-      [
-        {
-          id: "envio",
-          rotulo: "Enviando arquivo para o servidor",
-          status:
-            statusUpload === "uploading"
-              ? ("ativa" as const)
-              : statusUpload === "processing"
-                ? ("concluida" as const)
-                : ("pendente" as const),
-        },
-        {
-          id: "extracao",
-          rotulo: "Extraindo dados do PDF com IA",
-          status: statusUpload === "processing" ? ("ativa" as const) : ("pendente" as const),
-          detalhes: [
-            "Lendo todas as paginas do relatorio",
-            "Identificando ativos e eventos financeiros",
-            "Validando informacoes extraidas",
-          ],
-        },
-        {
-          id: "salvamento",
-          rotulo: "Salvando dados no sistema",
-          status: "pendente" as const,
-        },
-      ] as const,
-    [statusUpload],
-  );
 
   const validarArquivo = useCallback((arquivo: File): boolean => {
     if (!arquivo.name.toLowerCase().endsWith(".pdf")) {
@@ -81,8 +48,8 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   const confirmarUpload = useCallback(async () => {
     if (!arquivoSelecionado) return;
     const resultado = await fazerUpload(arquivoSelecionado, senhaPdf || undefined);
-    if (resultado.sucesso && resultado.metadados) {
-      onUploadSucesso?.(resultado.metadados.identificador);
+    if (resultado.sucesso && resultado.identificadorTarefa) {
+      onUploadSucesso?.(resultado.identificadorTarefa);
     }
   }, [arquivoSelecionado, senhaPdf, fazerUpload, onUploadSucesso]);
 
@@ -134,8 +101,8 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
         <CardContent className="p-6">
           <ResultadoUpload
             tipo="sucesso"
-            titulo="Upload concluido!"
-            mensagem="Relatorio processado com sucesso."
+            titulo="Upload aceito!"
+            mensagem="O relatório está sendo processado em background. Você será notificado quando concluir."
             rotuloAcao="Enviar outro relatorio"
             onAcao={handleNovoUpload}
           />
@@ -163,12 +130,9 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   if (estaProcessando) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <EtapasProcessamento
-            etapas={etapasUpload}
-            nomeArquivo={arquivoSelecionado?.name ?? ""}
-            segundosDecorridos={segundosDecorridos}
-          />
+        <CardContent className="flex flex-col items-center gap-4 p-6 py-12">
+          <Loader2 className="text-muted-foreground h-12 w-12 animate-spin" />
+          <p className="text-muted-foreground text-sm">Enviando arquivo...</p>
         </CardContent>
       </Card>
     );

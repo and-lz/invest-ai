@@ -1,43 +1,30 @@
-import { useState, useCallback, useEffect, useRef } from "react";
-import type { ReportMetadata } from "@/schemas/report-metadata.schema";
+import { useState, useCallback } from "react";
+import { adicionarTarefaAtivaNoStorage } from "@/components/layout/indicador-tarefa-ativa";
 
-type StatusUpload = "idle" | "uploading" | "processing" | "success" | "error";
+type StatusUpload = "idle" | "uploading" | "success" | "error";
+
+interface RespostaApiUpload {
+  identificadorTarefa?: string;
+  status?: string;
+  erro?: string;
+  codigo?: string;
+}
 
 interface UploadResult {
   sucesso: boolean;
-  metadados?: ReportMetadata;
+  identificadorTarefa?: string;
   erro?: string;
 }
 
 export function useUploadReport() {
   const [statusUpload, setStatusUpload] = useState<StatusUpload>("idle");
   const [erroUpload, setErroUpload] = useState<string | null>(null);
-  const [metadadosResultado, setMetadadosResultado] = useState<ReportMetadata | null>(null);
-  const [segundosDecorridos, setSegundosDecorridos] = useState(0);
-  const tempoInicioRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    const estaAtivo = statusUpload === "uploading" || statusUpload === "processing";
-    if (!estaAtivo) {
-      tempoInicioRef.current = null;
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      if (tempoInicioRef.current) {
-        setSegundosDecorridos(Math.floor((Date.now() - tempoInicioRef.current) / 1000));
-      }
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [statusUpload]);
+  const [identificadorTarefa, setIdentificadorTarefa] = useState<string | null>(null);
 
   const fazerUpload = useCallback(async (arquivo: File, senha?: string): Promise<UploadResult> => {
     setStatusUpload("uploading");
     setErroUpload(null);
-    setMetadadosResultado(null);
-    setSegundosDecorridos(0);
-    tempoInicioRef.current = Date.now();
+    setIdentificadorTarefa(null);
 
     try {
       const formData = new FormData();
@@ -46,14 +33,12 @@ export function useUploadReport() {
         formData.append("password", senha);
       }
 
-      setStatusUpload("processing");
-
       const resposta = await fetch("/api/reports", {
         method: "POST",
         body: formData,
       });
 
-      const dados = (await resposta.json()) as UploadResult & { codigo?: string };
+      const dados = (await resposta.json()) as RespostaApiUpload;
 
       if (!resposta.ok) {
         const mensagemErro = dados.erro ?? "Falha no upload";
@@ -62,9 +47,14 @@ export function useUploadReport() {
         return { sucesso: false, erro: mensagemErro };
       }
 
+      // 202 Accepted: processamento em background
+      if (dados.identificadorTarefa) {
+        adicionarTarefaAtivaNoStorage(dados.identificadorTarefa);
+        setIdentificadorTarefa(dados.identificadorTarefa);
+      }
+
       setStatusUpload("success");
-      setMetadadosResultado(dados.metadados ?? null);
-      return { sucesso: true, metadados: dados.metadados };
+      return { sucesso: true, identificadorTarefa: dados.identificadorTarefa };
     } catch (erro) {
       const mensagemErro = erro instanceof Error ? erro.message : "Erro desconhecido";
       setStatusUpload("error");
@@ -76,9 +66,7 @@ export function useUploadReport() {
   const resetar = useCallback(() => {
     setStatusUpload("idle");
     setErroUpload(null);
-    setMetadadosResultado(null);
-    setSegundosDecorridos(0);
-    tempoInicioRef.current = null;
+    setIdentificadorTarefa(null);
   }, []);
 
   return {
@@ -86,8 +74,7 @@ export function useUploadReport() {
     resetar,
     statusUpload,
     erroUpload,
-    metadadosResultado,
-    segundosDecorridos,
-    estaProcessando: statusUpload === "uploading" || statusUpload === "processing",
+    identificadorTarefa,
+    estaProcessando: statusUpload === "uploading",
   };
 }

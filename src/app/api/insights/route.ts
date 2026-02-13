@@ -9,6 +9,8 @@ import {
 import { AppError } from "@/domain/errors/app-errors";
 import { z } from "zod/v4";
 import { StatusAcaoEnum } from "@/schemas/insights.schema";
+import { salvarTarefa } from "@/lib/tarefa-background";
+import type { TarefaBackground } from "@/lib/tarefa-background";
 
 const InsightsRequestSchema = z.object({
   identificadorRelatorio: z.string().min(1),
@@ -69,6 +71,76 @@ export async function GET(request: Request) {
   }
 }
 
+async function processarInsightsMensaisEmBackground(
+  tarefa: TarefaBackground,
+  identificadorRelatorio: string,
+  identificadorRelatorioAnterior: string | undefined,
+): Promise<void> {
+  try {
+    const useCase = obterGenerateInsightsUseCase();
+    await useCase.executar({
+      identificadorRelatorio,
+      identificadorRelatorioAnterior,
+    });
+
+    await salvarTarefa({
+      ...tarefa,
+      status: "concluido",
+      concluidoEm: new Date().toISOString(),
+      descricaoResultado: `Insights para ${identificadorRelatorio} gerados`,
+      urlRedirecionamento: `/insights?mesAno=${encodeURIComponent(identificadorRelatorio)}`,
+    });
+
+    console.info(
+      `[Insights] Tarefa ${tarefa.identificador} concluída: ${identificadorRelatorio}`,
+    );
+  } catch (erro) {
+    const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+
+    await salvarTarefa({
+      ...tarefa,
+      status: "erro",
+      concluidoEm: new Date().toISOString(),
+      erro: mensagemErro,
+    });
+
+    console.error(`[Insights] Tarefa ${tarefa.identificador} falhou:`, mensagemErro);
+  }
+}
+
+async function processarInsightsConsolidadosEmBackground(
+  tarefa: TarefaBackground,
+): Promise<void> {
+  try {
+    const useCase = obterGenerateInsightsConsolidadosUseCase();
+    await useCase.executar();
+
+    await salvarTarefa({
+      ...tarefa,
+      status: "concluido",
+      concluidoEm: new Date().toISOString(),
+      descricaoResultado: "Insights consolidados gerados",
+      urlRedirecionamento: "/insights?mesAno=consolidado",
+    });
+
+    console.info(`[Insights Consolidados] Tarefa ${tarefa.identificador} concluída`);
+  } catch (erro) {
+    const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+
+    await salvarTarefa({
+      ...tarefa,
+      status: "erro",
+      concluidoEm: new Date().toISOString(),
+      erro: mensagemErro,
+    });
+
+    console.error(
+      `[Insights Consolidados] Tarefa ${tarefa.identificador} falhou:`,
+      mensagemErro,
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const corpo: unknown = await request.json();
@@ -81,19 +153,33 @@ export async function POST(request: Request) {
       );
     }
 
-    if (resultado.data.consolidado) {
-      const useCaseConsolidado = obterGenerateInsightsConsolidadosUseCase();
-      const insightsConsolidados = await useCaseConsolidado.executar();
-      return NextResponse.json({ insights: insightsConsolidados });
+    const identificadorTarefa = crypto.randomUUID();
+    const ehConsolidado = resultado.data.consolidado === true;
+
+    const tarefa: TarefaBackground = {
+      identificador: identificadorTarefa,
+      tipo: ehConsolidado ? "gerar-insights-consolidados" : "gerar-insights",
+      status: "processando",
+      iniciadoEm: new Date().toISOString(),
+    };
+
+    await salvarTarefa(tarefa);
+
+    // Fire-and-forget: processar em background
+    if (ehConsolidado) {
+      void processarInsightsConsolidadosEmBackground(tarefa);
+    } else {
+      void processarInsightsMensaisEmBackground(
+        tarefa,
+        resultado.data.identificadorRelatorio,
+        resultado.data.identificadorRelatorioAnterior,
+      );
     }
 
-    const useCase = obterGenerateInsightsUseCase();
-    const insights = await useCase.executar({
-      identificadorRelatorio: resultado.data.identificadorRelatorio,
-      identificadorRelatorioAnterior: resultado.data.identificadorRelatorioAnterior,
-    });
-
-    return NextResponse.json({ insights });
+    return NextResponse.json(
+      { identificadorTarefa, status: "processando" },
+      { status: 202 },
+    );
   } catch (erro) {
     console.error("Erro ao gerar insights:", erro);
 

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { obterUploadReportUseCase, obterListReportsUseCase } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
 import { descriptografarPdf } from "@/lib/pdf-decrypt";
+import { salvarTarefa } from "@/lib/tarefa-background";
+import type { TarefaBackground } from "@/lib/tarefa-background";
 
 const TAMANHO_MAXIMO_PDF_BYTES = 32 * 1024 * 1024; // 32MB
 
@@ -13,6 +15,40 @@ export async function GET() {
   } catch (erro) {
     console.error("Erro ao listar relatorios:", erro);
     return NextResponse.json({ erro: "Falha ao listar relatorios" }, { status: 500 });
+  }
+}
+
+async function processarUploadEmBackground(
+  tarefa: TarefaBackground,
+  nomeArquivoOriginal: string,
+  pdfBuffer: Buffer,
+): Promise<void> {
+  try {
+    const useCase = obterUploadReportUseCase();
+    const resultado = await useCase.executar({ nomeArquivoOriginal, pdfBuffer });
+
+    await salvarTarefa({
+      ...tarefa,
+      status: "concluido",
+      concluidoEm: new Date().toISOString(),
+      descricaoResultado: `Relatório ${resultado.metadados.mesReferencia} processado`,
+      urlRedirecionamento: "/",
+    });
+
+    console.info(
+      `[Upload] Tarefa ${tarefa.identificador} concluída: ${resultado.metadados.mesReferencia}`,
+    );
+  } catch (erro) {
+    const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+
+    await salvarTarefa({
+      ...tarefa,
+      status: "erro",
+      concluidoEm: new Date().toISOString(),
+      erro: mensagemErro,
+    });
+
+    console.error(`[Upload] Tarefa ${tarefa.identificador} falhou:`, mensagemErro);
   }
 }
 
@@ -53,17 +89,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ erro: mensagem }, { status: 400 });
     }
 
-    const useCase = obterUploadReportUseCase();
-    const resultado = await useCase.executar({
-      nomeArquivoOriginal: arquivo.name,
-      pdfBuffer,
-    });
+    // Criar tarefa e processar em background (fire-and-forget)
+    const identificadorTarefa = crypto.randomUUID();
+    const tarefa: TarefaBackground = {
+      identificador: identificadorTarefa,
+      tipo: "upload-pdf",
+      status: "processando",
+      iniciadoEm: new Date().toISOString(),
+    };
 
-    return NextResponse.json({
-      sucesso: true,
-      metadados: resultado.metadados,
-      dadosExtraidos: resultado.dadosExtraidos,
-    });
+    await salvarTarefa(tarefa);
+
+    // Fire-and-forget: a promise NÃO é awaited, o processamento
+    // continua em background no event loop do Node.js
+    void processarUploadEmBackground(tarefa, arquivo.name, pdfBuffer);
+
+    return NextResponse.json(
+      { identificadorTarefa, status: "processando" },
+      { status: 202 },
+    );
   } catch (erro) {
     console.error("Erro ao processar upload:", erro);
 

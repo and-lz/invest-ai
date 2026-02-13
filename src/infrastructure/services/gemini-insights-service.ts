@@ -68,7 +68,12 @@ export class GeminiInsightsService implements InsightsService {
         );
       }
 
-      return validacao.data;
+      // Sobrescrever dataGeracao com a data atual do sistema para garantir precisão
+      const dataAtual = new Date().toISOString().split("T")[0] ?? "";
+      return {
+        ...validacao.data,
+        dataGeracao: dataAtual,
+      };
     } catch (erro) {
       if (erro instanceof AiApiError) throw erro;
 
@@ -117,7 +122,12 @@ export class GeminiInsightsService implements InsightsService {
         );
       }
 
-      return validacao.data;
+      // Sobrescrever dataGeracao com a data atual do sistema para garantir precisão
+      const dataAtual = new Date().toISOString().split("T")[0] ?? "";
+      return {
+        ...validacao.data,
+        dataGeracao: dataAtual,
+      };
     } catch (erro) {
       if (erro instanceof AiApiError) throw erro;
 

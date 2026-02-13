@@ -18,7 +18,7 @@ const EXEMPLO_SAIDA_INSIGHTS = `EXEMPLO MINIMO DE RESPOSTA VALIDA:
 \`\`\`json
 {
   "mesReferencia": "2026-01",
-  "dataGeracao": "2026-02-12",
+  "dataGeracao": "YYYY-MM-DD (data atual)",
   "resumoExecutivo": "Carteira de R$ 445.700 apresentou rentabilidade de 3,14% no mes, superando CDI (1,16%). Diversificacao adequada entre renda fixa e variavel.",
   "insights": [
     {
