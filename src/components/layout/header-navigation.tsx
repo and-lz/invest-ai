@@ -17,33 +17,45 @@ const itensNavegacao = [
 export function HeaderNavigation() {
   const pathname = usePathname();
   const [estaVisivel, setEstaVisivel] = useState(true);
-  const [scrollAnterior, setScrollAnterior] = useState(0);
 
   useEffect(() => {
+    let scrollAnteriorLocal = 0;
+
     const handleScroll = () => {
-      const scrollAtual = window.scrollY;
+      const elementoScroll = document.querySelector("main") as HTMLElement | null;
+      if (!elementoScroll) return;
+
+      const scrollAtual = elementoScroll.scrollTop;
 
       if (scrollAtual < 50) {
         setEstaVisivel(true);
-      } else if (scrollAtual > scrollAnterior) {
+      } else if (scrollAtual > scrollAnteriorLocal) {
         setEstaVisivel(false);
       } else {
         setEstaVisivel(true);
       }
 
-      setScrollAnterior(scrollAtual);
+      scrollAnteriorLocal = scrollAtual;
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [scrollAnterior]);
+    // Find the scrollable main element
+    const elementoScroll = document.querySelector("main") as HTMLElement | null;
+
+    if (elementoScroll) {
+      elementoScroll.addEventListener("scroll", handleScroll, { passive: true });
+      return () => elementoScroll.removeEventListener("scroll", handleScroll);
+    }
+  }, []);
 
   return (
-    <header className={cn(
-      "bg-background border-border sticky top-0 z-50 h-16 border-b transition-transform duration-300",
-      estaVisivel ? "translate-y-0" : "-translate-y-full"
-    )}>
-      <div className="flex h-16 items-center justify-between px-6">
+    <div
+      className={cn(
+        "sticky top-0 z-50 overflow-hidden transition-all duration-300",
+        estaVisivel ? "h-16" : "h-0"
+      )}
+    >
+      <header className="bg-background border-border h-16 border-b">
+        <div className="flex h-16 items-center justify-between px-6">
         <h1 className="text-lg font-bold">Investimentos</h1>
 
         <nav className="flex items-center gap-2">
@@ -72,6 +84,7 @@ export function HeaderNavigation() {
           <AlternarTema />
         </div>
       </div>
-    </header>
+      </header>
+    </div>
   );
 }
