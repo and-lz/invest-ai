@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Upload,
   FileText,
   Lightbulb,
   ChevronLeft,
@@ -17,7 +16,6 @@ import { AlternarTema } from "@/components/layout/alternar-tema";
 
 const itensNavegacao = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
-  { href: "/upload", rotulo: "Upload", icone: Upload },
   { href: "/reports", rotulo: "Relatorios", icone: FileText },
   { href: "/insights", rotulo: "Insights", icone: Lightbulb },
 ];

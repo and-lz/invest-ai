@@ -1,8 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useCallback, useState, useRef } from "react";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PdfUploadDropzone } from "@/components/upload/pdf-upload-dropzone";
+import { ImportacaoManualStepper } from "@/components/upload/importacao-manual-stepper";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -14,13 +18,44 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trash2, FileText } from "lucide-react";
-import Link from "next/link";
+import { Trash2, FileText, Upload, MessageSquare, X } from "lucide-react";
 import { toast } from "sonner";
-import { useCallback } from "react";
 
 export default function ReportsPage() {
+  const router = useRouter();
   const { relatorios, estaCarregando, revalidar } = useReports();
+  const [metodoUploadSelecionado, setMetodoUploadSelecionado] = useState<"automatico" | "manual">(
+    "automatico",
+  );
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  const abrirDialog = useCallback(() => {
+    dialogRef.current?.showModal();
+  }, []);
+
+  const fecharDialog = useCallback(() => {
+    dialogRef.current?.close();
+  }, []);
+
+  const handleUploadAceito = useCallback(() => {
+    toast.success("Upload aceito!", {
+      description:
+        "O relatório está sendo processado em background. Você será notificado quando concluir.",
+    });
+    fecharDialog();
+    router.push("/");
+  }, [router, fecharDialog]);
+
+  const handleImportacaoManualSucesso = useCallback(
+    (identificador: string) => {
+      toast.success("Relatorio importado com sucesso!", {
+        description: `Referencia: ${identificador}`,
+      });
+      fecharDialog();
+      router.push("/");
+    },
+    [router, fecharDialog],
+  );
 
   const handleRemover = useCallback(
     async (identificador: string) => {
@@ -41,75 +76,126 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <Header titulo="Relatorios" descricao="Historico de relatorios uploadados" />
+      <div className="flex items-center justify-between">
+        <Header titulo="Relatorios" descricao="Historico de relatorios importados" />
+        <Button onClick={abrirDialog} className="gap-2">
+          <Upload className="h-4 w-4" />
+          Importar Novo Relatorio
+        </Button>
+      </div>
 
-      {estaCarregando && <Skeleton className="h-64" />}
+      <dialog
+        ref={dialogRef}
+        className="bg-background fixed left-1/2 top-1/2 m-0 max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border p-0 shadow-lg backdrop:bg-background/80 backdrop:backdrop-blur-sm"
+        style={{ maxWidth: "42rem", width: "90vw" }}
+      >
+        <div className="flex items-center justify-between border-b p-6">
+          <h2 className="text-lg font-semibold">Importar Relatorio</h2>
+          <Button variant="ghost" size="icon" onClick={fecharDialog}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
 
-      {!estaCarregando && relatorios.length === 0 && (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-4 py-12">
-            <FileText className="text-muted-foreground h-12 w-12" />
-            <p className="text-muted-foreground">Nenhum relatorio encontrado.</p>
-            <Link href="/upload">
-              <Button>Fazer Upload</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      )}
+        <div className="space-y-4 p-6">
+          <div className="flex gap-2">
+            <Button
+              variant={metodoUploadSelecionado === "automatico" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMetodoUploadSelecionado("automatico")}
+              className="gap-1.5"
+            >
+              <Upload className="h-4 w-4" />
+              Upload Direto
+              <span className="bg-background/80 rounded px-1 py-0.5 text-[9px] font-medium leading-none">
+                REC
+              </span>
+            </Button>
+            <Button
+              variant={metodoUploadSelecionado === "manual" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMetodoUploadSelecionado("manual")}
+              className="gap-1.5"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Via Chat
+            </Button>
+          </div>
 
-      {!estaCarregando && relatorios.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Relatorios Processados</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Referencia</TableHead>
-                  <TableHead>Arquivo</TableHead>
-                  <TableHead>Data Upload</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Acoes</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {relatorios.map((relatorio) => (
-                  <TableRow key={relatorio.identificador}>
-                    <TableCell className="font-medium">{relatorio.mesReferencia}</TableCell>
-                    <TableCell>{relatorio.nomeArquivoOriginal}</TableCell>
-                    <TableCell>
-                      {new Date(relatorio.dataUpload).toLocaleDateString("pt-BR")}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          relatorio.statusExtracao === "concluido"
-                            ? "default"
-                            : relatorio.statusExtracao === "erro"
-                              ? "destructive"
-                              : "secondary"
-                        }
-                      >
-                        {relatorio.statusExtracao}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => void handleRemover(relatorio.identificador)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+          {metodoUploadSelecionado === "automatico" && (
+            <PdfUploadDropzone onUploadSucesso={handleUploadAceito} />
+          )}
+          {metodoUploadSelecionado === "manual" && (
+            <ImportacaoManualStepper onImportacaoSucesso={handleImportacaoManualSucesso} />
+          )}
+        </div>
+      </dialog>
+
+      {/* Lista de Histórico */}
+      <section className="space-y-4">
+
+        {estaCarregando && <Skeleton className="h-64" />}
+
+        {!estaCarregando && relatorios.length === 0 && (
+          <Card>
+            <CardContent className="flex flex-col items-center gap-4 py-12">
+              <FileText className="text-muted-foreground h-12 w-12" />
+              <p className="text-muted-foreground mb-4">Nenhum relatorio encontrado.</p>
+              <Button onClick={abrirDialog}>Importar Primeiro Relatorio</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {!estaCarregando && relatorios.length > 0 && (
+          <Card>
+            <CardContent className="pt-6">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Referencia</TableHead>
+                    <TableHead>Arquivo</TableHead>
+                    <TableHead>Data Upload</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Acoes</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
+                </TableHeader>
+                <TableBody>
+                  {relatorios.map((relatorio) => (
+                    <TableRow key={relatorio.identificador}>
+                      <TableCell className="font-medium">{relatorio.mesReferencia}</TableCell>
+                      <TableCell>{relatorio.nomeArquivoOriginal}</TableCell>
+                      <TableCell>
+                        {new Date(relatorio.dataUpload).toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            relatorio.statusExtracao === "concluido"
+                              ? "default"
+                              : relatorio.statusExtracao === "erro"
+                                ? "destructive"
+                                : "secondary"
+                          }
+                        >
+                          {relatorio.statusExtracao}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => void handleRemover(relatorio.identificador)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+      </section>
     </div>
   );
 }

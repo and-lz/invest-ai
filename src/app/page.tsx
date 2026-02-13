@@ -51,7 +51,7 @@ function EstadoVazio() {
         <p className="text-muted-foreground mb-4">
           Faca upload do seu relatorio Inter Prime para comecar a visualizar seus investimentos.
         </p>
-        <Link href="/upload">
+        <Link href="/reports">
           <Button>Fazer Upload</Button>
         </Link>
       </CardContent>
