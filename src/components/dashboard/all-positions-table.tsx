@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -236,7 +237,12 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                 {itensOrdenados.map((posicao, indice) => (
                   <TableRow key={`${posicao.codigoAtivo ?? posicao.nomeAtivo}-${indice}`}>
                     <TableCell className="max-w-48 truncate font-medium">
-                      {posicao.codigoAtivo ?? posicao.nomeAtivo}
+                      <Link
+                        href={`/desempenho?ticker=${encodeURIComponent(posicao.codigoAtivo ?? posicao.nomeAtivo)}`}
+                        className="hover:text-primary underline-offset-4 hover:underline"
+                      >
+                        {posicao.codigoAtivo ?? posicao.nomeAtivo}
+                      </Link>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="text-xs">

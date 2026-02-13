@@ -11,11 +11,14 @@ import { SalvarRelatorioManualUseCase } from "@/application/use-cases/salvar-rel
 import { SalvarInsightsManualUseCase } from "@/application/use-cases/salvar-insights-manual";
 import { AtualizarConclusaoInsightUseCase } from "@/application/use-cases/atualizar-conclusao-insight";
 import { GenerateInsightsConsolidadosUseCase } from "@/application/use-cases/generate-insights-consolidados";
+import { AnalyzeAssetPerformanceUseCase } from "@/application/use-cases/analyze-asset-performance";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-provedor-ai";
+import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
+import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
 import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
 import path from "path";
 
@@ -107,4 +110,17 @@ export function obterBrapiMarketDataService(): MarketDataService {
 
 export function obterBcbMacroDataService(): MacroDataService {
   return new BcbMacroDataService();
+}
+
+export function obterBrapiAssetDetailService(): BrapiAssetDetailService {
+  return new BrapiAssetDetailService(obterBrapiToken());
+}
+
+export function obterAnalyzeAssetPerformanceUseCase() {
+  return new AnalyzeAssetPerformanceUseCase(
+    criarRepositorio(),
+    new GeminiAssetAnalysisService(criarProvedorAi()),
+    obterBrapiAssetDetailService(),
+    obterBcbMacroDataService(),
+  );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -227,7 +228,12 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
             {itensOrdenados.map((ativo) => (
               <TableRow key={ativo.nomeAtivo}>
                 <TableCell className="font-medium">
-                  {ativo.codigoAtivo ?? ativo.nomeAtivo}
+                  <Link
+                    href={`/desempenho?ticker=${encodeURIComponent(ativo.codigoAtivo ?? ativo.nomeAtivo)}`}
+                    className="hover:text-primary underline-offset-4 hover:underline"
+                  >
+                    {ativo.codigoAtivo ?? ativo.nomeAtivo}
+                  </Link>
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="text-xs">

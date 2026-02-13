@@ -11,6 +11,7 @@ export const TipoTarefaEnum = z.enum([
   "upload-pdf",
   "gerar-insights",
   "gerar-insights-consolidados",
+  "analisar-ativo",
 ]);
 
 export const StatusTarefaEnum = z.enum(["processando", "concluido", "erro"]);

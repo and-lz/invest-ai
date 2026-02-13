@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
@@ -211,7 +212,12 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                     </span>
                   </TableCell>
                   <TableCell className="font-medium">
-                    {evento.codigoAtivo ?? evento.nomeAtivo}
+                    <Link
+                      href={`/desempenho?ticker=${encodeURIComponent(evento.codigoAtivo ?? evento.nomeAtivo)}`}
+                      className="hover:text-primary underline-offset-4 hover:underline"
+                    >
+                      {evento.codigoAtivo ?? evento.nomeAtivo}
+                    </Link>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {evento.dataEvento ? formatarDataBrasileira(evento.dataEvento) : "—"}

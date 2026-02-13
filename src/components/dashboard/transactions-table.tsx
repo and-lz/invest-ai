@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -199,7 +200,12 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
                         </span>
                       </TableCell>
                       <TableCell className="max-w-48 truncate font-medium">
-                        {movimentacao.codigoAtivo ?? movimentacao.nomeAtivo}
+                        <Link
+                          href={`/desempenho?ticker=${encodeURIComponent(movimentacao.codigoAtivo ?? movimentacao.nomeAtivo)}`}
+                          className="hover:text-primary underline-offset-4 hover:underline"
+                        >
+                          {movimentacao.codigoAtivo ?? movimentacao.nomeAtivo}
+                        </Link>
                       </TableCell>
                       <TableCell
                         className={cn(
