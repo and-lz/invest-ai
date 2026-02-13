@@ -138,25 +138,23 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center gap-2">
-        <Icone className="text-muted-foreground h-5 w-5" />
-        <div>
-          <CardTitle className="flex items-center gap-1">
-            {titulo}
-            <InfoTooltip
-              conteudo={
-                tipo === "melhores"
-                  ? GLOSSARIO_MELHORES_PERFORMERS.explicacao
-                  : GLOSSARIO_PIORES_PERFORMERS.explicacao
-              }
-            />
-          </CardTitle>
-          <CardDescription className="text-xs">
-            {tipo === "melhores"
-              ? "Seus investimentos com melhor desempenho neste período."
-              : "Investimentos com menor desempenho. Perdas no curto prazo são normais."}
-          </CardDescription>
-        </div>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-1">
+          <Icone className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          {titulo}
+          <InfoTooltip
+            conteudo={
+              tipo === "melhores"
+                ? GLOSSARIO_MELHORES_PERFORMERS.explicacao
+                : GLOSSARIO_PIORES_PERFORMERS.explicacao
+            }
+          />
+        </CardTitle>
+        <CardDescription className="text-xs">
+          {tipo === "melhores"
+            ? "Seus investimentos com melhor desempenho neste período."
+            : "Investimentos com menor desempenho. Perdas no curto prazo são normais."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>

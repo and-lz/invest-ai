@@ -39,17 +39,21 @@ export default function UploadPage() {
             Via Claude Chat
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="automatico" className="space-y-2">
+        <TabsContent value="automatico" className="mt-4">
           <p className="text-muted-foreground text-sm">
             Envie o PDF e extraimos os dados automaticamente com IA.
           </p>
-          <PdfUploadDropzone onUploadSucesso={handleSucesso} />
+          <div className="mt-8">
+            <PdfUploadDropzone onUploadSucesso={handleSucesso} />
+          </div>
         </TabsContent>
-        <TabsContent value="manual" className="space-y-2">
-          <p className="text-muted-foreground mb-2 text-sm">
+        <TabsContent value="manual" className="mt-4">
+          <p className="text-muted-foreground text-sm">
             Copie um prompt, cole no Claude Chat junto com o PDF e retorne o resultado aqui.
           </p>
-          <ImportacaoManualStepper onImportacaoSucesso={handleSucesso} />
+          <div className="mt-8">
+            <ImportacaoManualStepper onImportacaoSucesso={handleSucesso} />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { toJSONSchema } from "zod/v4";
 import type { InsightsService } from "@/domain/interfaces/extraction-service";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
@@ -144,15 +145,23 @@ export class GeminiInsightsService implements InsightsService {
   }
 
   private construirPrompt(dadosParaAnalise: Record<string, unknown>): string {
+    const esquemaJson = toJSONSchema(InsightsResponseSchema);
+
     let prompt = INSTRUCAO_USUARIO_INSIGHTS;
 
-    prompt += "\n\n📊 DADOS DA CARTEIRA:\n";
+    prompt += "\n\n📋 SCHEMA JSON DA RESPOSTA (OBRIGATÓRIO):\n";
+    prompt += "```json\n";
+    prompt += JSON.stringify(esquemaJson, null, 2);
+    prompt += "\n```\n\n";
+
+    prompt += "📊 DADOS DA CARTEIRA:\n";
     prompt += "```json\n";
     prompt += JSON.stringify(dadosParaAnalise, null, 2);
     prompt += "\n```\n\n";
 
     prompt += "⚠️  REGRAS CRÍTICAS:\n";
     prompt += "- Retorne APENAS o JSON válido, sem texto adicional ou markdown\n";
+    prompt += "- Siga EXATAMENTE o schema JSON fornecido acima\n";
     prompt += "- Insights devem ser práticos e acionáveis para o investidor\n";
     prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
     prompt += "- Compare com o mês anterior quando disponível para identificar tendências\n";
@@ -162,15 +171,23 @@ export class GeminiInsightsService implements InsightsService {
   }
 
   private construirPromptConsolidado(dadosParaAnalise: Record<string, unknown>): string {
+    const esquemaJson = toJSONSchema(InsightsResponseSchema);
+
     let prompt = INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO;
 
-    prompt += "\n\n📊 DADOS HISTÓRICOS DA CARTEIRA:\n";
+    prompt += "\n\n📋 SCHEMA JSON DA RESPOSTA (OBRIGATÓRIO):\n";
+    prompt += "```json\n";
+    prompt += JSON.stringify(esquemaJson, null, 2);
+    prompt += "\n```\n\n";
+
+    prompt += "📊 DADOS HISTÓRICOS DA CARTEIRA:\n";
     prompt += "```json\n";
     prompt += JSON.stringify(dadosParaAnalise, null, 2);
     prompt += "\n```\n\n";
 
     prompt += "⚠️  REGRAS CRÍTICAS:\n";
     prompt += "- Retorne APENAS o JSON válido, sem texto adicional ou markdown\n";
+    prompt += "- Siga EXATAMENTE o schema JSON fornecido acima\n";
     prompt += "- Analise a EVOLUÇÃO ao longo de todos os meses disponíveis\n";
     prompt += "- Identifique tendências, padrões e decisões passadas boas/ruins\n";
     prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
