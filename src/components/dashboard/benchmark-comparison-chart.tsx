@@ -111,7 +111,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Scale className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Scale className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           Carteira vs Benchmarks
           <InfoTooltip conteudo={GLOSSARIO_CARTEIRA_VS_BENCHMARKS.explicacao} />
         </CardTitle>

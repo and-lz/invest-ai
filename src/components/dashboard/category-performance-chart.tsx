@@ -114,7 +114,7 @@ export function CategoryPerformanceChart({ categorias, cdiAnual }: CategoryPerfo
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <BarChart3 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <BarChart3 className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           Rentabilidade por Categoria
           <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_POR_CATEGORIA.explicacao} />
         </CardTitle>

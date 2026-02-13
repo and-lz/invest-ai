@@ -135,7 +135,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <TrendingUp className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <TrendingUp className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           Evolucao Patrimonial
           <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_PATRIMONIAL.explicacao} />
         </CardTitle>

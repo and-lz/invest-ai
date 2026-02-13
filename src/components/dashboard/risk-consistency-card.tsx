@@ -60,7 +60,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Shield className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Shield className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           Risco e Consistência
           <InfoTooltip conteudo={GLOSSARIO_RISCO_CONSISTENCIA.explicacao} />
         </CardTitle>

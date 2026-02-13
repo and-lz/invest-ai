@@ -111,99 +111,155 @@ export class GeminiPdfExtractionService implements ExtractionService {
   }
 
   private construirPrompt(): string {
+    const esquemaJson = toJSONSchema(RelatorioExtraidoSchema);
+
     let prompt = INSTRUCAO_USUARIO_EXTRACAO;
 
-    prompt += "\n\n⚠️  REGRAS CRÍTICAS DE FORMATAÇÃO:\n\n";
+    prompt += "\n\n📋 SCHEMA JSON (OBRIGATÓRIO - SIGA EXATAMENTE):\n";
+    prompt += "```json\n";
+    prompt += JSON.stringify(esquemaJson, null, 2);
+    prompt += "\n```\n\n";
 
-    prompt +=
-      '1. Valores monetários DEVEM ser objetos: { valorEmCentavos: number, moeda: "BRL" }\n';
-    prompt += '   Exemplo: { valorEmCentavos: 123456, moeda: "BRL" } representa R$ 1.234,56\n\n';
+    prompt += "⚠️  REGRAS CRÍTICAS DE FORMATAÇÃO:\n";
+    prompt += '- Valores monetários DEVEM ser objetos: { "valorEmCentavos": number, "moeda": "BRL" }\n';
+    prompt += "- Percentuais DEVEM ser objetos: { \"valor\": number }\n";
+    prompt += "- Datas no formato YYYY-MM-DD\n";
+    prompt += "- Mês de referência no formato YYYY-MM\n";
+    prompt += "- NÃO retorne valores como primitivos (números/strings simples)\n";
+    prompt += "- Campos nullable podem ser null se não houver dados no PDF\n";
+    prompt += "- Arrays podem estar vazios [] se não houver dados correspondentes\n";
+    prompt += "- Se um campo obrigatório não estiver no PDF, use valores padrão sensatos\n\n";
 
-    prompt += "2. Percentuais DEVEM ser objetos: { valor: number }\n";
-    prompt += "   Exemplo: { valor: 12.5 } representa 12,5%\n\n";
-
-    prompt += "3. Datas no formato YYYY-MM-DD (ISO 8601)\n";
-    prompt += '   Exemplo: "2024-01-15"\n\n';
-
-    prompt += "4. Mês de referência no formato YYYY-MM\n";
-    prompt += '   Exemplo: "2024-01"\n\n';
-
-    prompt += "5. Tipos de Ativo (use EXATAMENTE um destes valores):\n";
-    prompt += "   - RENDA_FIXA\n";
-    prompt += "   - ACOES\n";
-    prompt += "   - FIIS\n";
-    prompt += "   - BDRS\n";
-    prompt += "   - CRIPTOMOEDAS\n";
-    prompt += "   - FUNDOS_INVESTIMENTO\n";
-    prompt += "   - PREVIDENCIA\n";
-    prompt += "   - OURO\n";
-    prompt += "   - CAMBIO\n";
-    prompt += "   - OUTRO\n\n";
-
-    prompt += "6. Estratégias (use EXATAMENTE um destes valores):\n";
-    prompt += "   - APOSENTADORIA\n";
-    prompt += "   - RESERVA_EMERGENCIA\n";
-    prompt += "   - EDUCACAO\n";
-    prompt += "   - IMOVEL\n";
-    prompt += "   - LIBERDADE_FINANCEIRA\n";
-    prompt += "   - RENDA_PASSIVA\n";
-    prompt += "   - ESPECULACAO\n";
-    prompt += "   - DIVERSIFICACAO\n";
-    prompt += "   - PROTECAO_PATRIMONIO\n";
-    prompt += "   - OUTRO\n\n";
-
-    prompt += "7. Tipos de Evento Financeiro (use EXATAMENTE um destes valores):\n";
-    prompt += "   - DIVIDENDO\n";
-    prompt += "   - JCP\n";
-    prompt += "   - RENDIMENTO\n";
-    prompt += "   - AMORTIZACAO\n";
-    prompt += "   - VENCIMENTO\n";
-    prompt += "   - RESGATE\n";
-    prompt += "   - APORTE\n";
-    prompt += "   - OUTRO\n\n";
-
-    prompt += "8. Tipos de Movimentação (use EXATAMENTE um destes valores):\n";
-    prompt += "   - Aplicacao\n";
-    prompt += "   - Resgate\n";
-    prompt += "   - Dividendo\n";
-    prompt += "   - JCP\n";
-    prompt += "   - Rendimento\n";
-    prompt += "   - Amortizacao\n";
-    prompt += "   - Aluguel\n";
-    prompt += "   - Outro\n\n";
-
-    prompt += "9. TODOS os arrays podem estar vazios [] se não houver dados no PDF\n\n";
-
-    prompt += "10. Campos opcionais (podem ser omitidos se não estiverem no PDF):\n";
-    prompt += "    - codigoAtivo, categoria, subTipo, observacoes, instituicaoFinanceira\n\n";
-
-    prompt += "\n📋 EXEMPLO COMPLETO DE JSON (siga exatamente esta estrutura):\n";
+    prompt += "📋 EXEMPLO RESUMIDO DA ESTRUTURA ESPERADA:\n";
     prompt += "```json\n";
     prompt += JSON.stringify(
       {
-        mesReferencia: "2024-01",
-        dataGeracao: "2024-02-01",
-        patrimonioTotal: { valorEmCentavos: 10000000, moeda: "BRL" },
-        totalAportado: { valorEmCentavos: 8000000, moeda: "BRL" },
-        rendimentoBrutoTotal: { valorEmCentavos: 123456, moeda: "BRL" },
-        rendimentoLiquidoTotal: { valorEmCentavos: 98765, moeda: "BRL" },
-        ativos: [
+        metadados: {
+          mesReferencia: "2024-01",
+          dataGeracao: "2024-02-01",
+          instituicao: "Inter Prime",
+        },
+        resumo: {
+          patrimonioTotal: { valorEmCentavos: 41533291, moeda: "BRL" },
+          patrimonioMesAnterior: { valorEmCentavos: 40000000, moeda: "BRL" },
+          ganhosFinanceirosNoMes: { valorEmCentavos: 500000, moeda: "BRL" },
+          ganhosFinanceirosMesAnterior: { valorEmCentavos: 450000, moeda: "BRL" },
+          aplicacoesNoMes: { valorEmCentavos: 1000000, moeda: "BRL" },
+          resgatesNoMes: { valorEmCentavos: 0, moeda: "BRL" },
+          eventosFinanceirosNoMes: { valorEmCentavos: 15000, moeda: "BRL" },
+          eventosFinanceirosMesAnterior: { valorEmCentavos: 12000, moeda: "BRL" },
+          rentabilidadeMensal: { valor: 1.23 },
+          rentabilidadeMensalAnterior: { valor: 1.1 },
+          rentabilidadeAnual: { valor: 8.5 },
+          rentabilidadeAnoAnterior: { valor: 7.2 },
+          rentabilidadeDesdeInicio: { valor: 45.6 },
+          dataInicioCarteira: "2020-03-15",
+        },
+        evolucaoAlocacao: [
           {
-            nome: "Tesouro IPCA+ 2035",
-            codigoAtivo: "IPCA35",
-            tipo: "RENDA_FIXA",
-            valorAtual: { valorEmCentavos: 5000000, moeda: "BRL" },
-            rendimentoMes: { valorEmCentavos: 50000, moeda: "BRL" },
-            percentualCarteira: { valor: 50.0 },
-            estrategia: "APOSENTADORIA",
+            mesAno: "2024-01",
+            categorias: [
+              { nomeCategoria: "Liquidez", percentualDaCarteira: { valor: 15.0 } },
+              { nomeCategoria: "Pos-fixado", percentualDaCarteira: { valor: 30.0 } },
+              { nomeCategoria: "Inflacao", percentualDaCarteira: { valor: 20.0 } },
+              { nomeCategoria: "Renda Variavel", percentualDaCarteira: { valor: 10.0 } },
+              { nomeCategoria: "Fundos Listados", percentualDaCarteira: { valor: 5.0 } },
+              { nomeCategoria: "Multimercado", percentualDaCarteira: { valor: 10.0 } },
+              { nomeCategoria: "Global", percentualDaCarteira: { valor: 5.0 } },
+              { nomeCategoria: "Alternativos", percentualDaCarteira: { valor: 3.0 } },
+              { nomeCategoria: "Outros", percentualDaCarteira: { valor: 2.0 } },
+            ],
           },
+        ],
+        evolucaoPatrimonial: [
+          {
+            mesAno: "2024-01",
+            patrimonioTotal: { valorEmCentavos: 41533291, moeda: "BRL" },
+            totalAportado: { valorEmCentavos: 35000000, moeda: "BRL" },
+          },
+        ],
+        comparacaoPeriodos: [
+          {
+            periodo: "03 meses",
+            rentabilidadeCarteira: { valor: 3.5 },
+            rentabilidadeCDI: { valor: 3.2 },
+            percentualDoCDI: { valor: 109.4 },
+            volatilidade: { valor: 0.5 },
+          },
+        ],
+        analiseRiscoRetorno: {
+          mesesAcimaBenchmark: 30,
+          mesesAbaixoBenchmark: 15,
+          maiorRentabilidade: { valor: { valor: 3.2 }, mesAno: "2023-06" },
+          menorRentabilidade: { valor: { valor: -0.5 }, mesAno: "2022-03" },
+        },
+        retornosMensais: [
+          {
+            ano: 2024,
+            meses: [
+              { mes: 1, rentabilidadeCarteira: { valor: 1.23 }, percentualDoCDI: { valor: 112.0 } },
+            ],
+            rentabilidadeAnual: { valor: 1.23 },
+            rentabilidadeAcumulada: { valor: 45.6 },
+          },
+        ],
+        comparacaoBenchmarks: [
+          {
+            periodo: "No mes",
+            carteira: { valor: 1.23 },
+            cdi: { valor: 1.1 },
+            ibovespa: { valor: -0.5 },
+            ipca: { valor: 0.4 },
+          },
+        ],
+        rentabilidadePorCategoria: [
+          { nomeCategoria: "Pos-fixado", rentabilidade12Meses: { valor: 12.5 } },
         ],
         eventosFinanceiros: [
           {
-            tipo: "DIVIDENDO",
-            descricao: "Dividendos PETR4",
+            tipoEvento: "Dividendo",
+            nomeAtivo: "PETR4",
+            codigoAtivo: "PETR4",
             valor: { valorEmCentavos: 5000, moeda: "BRL" },
-            data: "2024-01-15",
+            dataEvento: "2024-01-15",
+          },
+        ],
+        ganhosPorEstrategia: [
+          {
+            nomeEstrategia: "Liquidez",
+            ganhoNoMes: { valorEmCentavos: 50000, moeda: "BRL" },
+            ganhoNoAno: { valorEmCentavos: 50000, moeda: "BRL" },
+            ganho3Meses: { valorEmCentavos: 150000, moeda: "BRL" },
+            ganho6Meses: { valorEmCentavos: 300000, moeda: "BRL" },
+            ganho12Meses: { valorEmCentavos: 600000, moeda: "BRL" },
+            ganhoDesdeInicio: { valorEmCentavos: 2000000, moeda: "BRL" },
+          },
+        ],
+        faixasLiquidez: [
+          {
+            descricaoPeriodo: "0 a 1",
+            diasMinimo: 0,
+            diasMaximo: 1,
+            percentualDaCarteira: { valor: 15.0 },
+            valor: { valorEmCentavos: 6229994, moeda: "BRL" },
+            valorAcumulado: { valorEmCentavos: 6229994, moeda: "BRL" },
+            percentualAcumulado: { valor: 15.0 },
+          },
+        ],
+        posicoesDetalhadas: [
+          {
+            nomeAtivo: "Tesouro IPCA+ 2035",
+            codigoAtivo: "IPCA35",
+            estrategia: "Inflacao",
+            saldoAnterior: { valorEmCentavos: 4800000, moeda: "BRL" },
+            aplicacoes: { valorEmCentavos: 100000, moeda: "BRL" },
+            resgates: { valorEmCentavos: 0, moeda: "BRL" },
+            eventosFinanceiros: { valorEmCentavos: 0, moeda: "BRL" },
+            saldoBruto: { valorEmCentavos: 5000000, moeda: "BRL" },
+            rentabilidadeMes: { valor: 1.5 },
+            rentabilidade12Meses: { valor: 12.0 },
+            rentabilidadeDesdeInicio: { valor: 35.0 },
+            participacaoNaCarteira: { valor: 12.0 },
           },
         ],
         movimentacoes: [
@@ -213,27 +269,31 @@ export class GeminiPdfExtractionService implements ExtractionService {
             nomeAtivo: "Tesouro IPCA+ 2035",
             codigoAtivo: "IPCA35",
             valor: { valorEmCentavos: 100000, moeda: "BRL" },
+            descricao: "Aplicação mensal",
           },
         ],
-        resumoPorCategoria: [],
-        resumoPorEstrategia: [],
-        resumoPorTipoAtivo: [],
-        metricasConsolidadas: {
-          rentabilidadeMes: { valor: 1.2 },
-          rentabilidadeAno: { valor: 8.5 },
-        },
       },
       null,
       2,
     );
     prompt += "\n```\n\n";
 
+    prompt += "⚠️  ENUMS VÁLIDOS (use EXATAMENTE estes valores):\n\n";
+
+    prompt += "Categorias de Alocação (nomeCategoria):\n";
+    prompt += "  Liquidez, Fundos Listados, Renda Variavel, Global, Outros, Alternativos, Pos-fixado, Inflacao, Multimercado\n\n";
+
+    prompt += "Tipos de Evento Financeiro (tipoEvento):\n";
+    prompt += "  Dividendo, JCP, Rendimento, Amortizacao, Aluguel, Outro\n\n";
+
+    prompt += "Tipos de Movimentação (tipoMovimentacao):\n";
+    prompt += "  Aplicacao, Resgate, Dividendo, JCP, Rendimento, Amortizacao, Aluguel, Outro\n\n";
+
     prompt += "⚠️  ATENÇÃO FINAL:\n";
     prompt += "- Retorne APENAS o JSON válido, sem texto adicional antes ou depois\n";
-    prompt += "- NÃO use markdown (```json) ao redor do JSON final\n";
+    prompt += "- NÃO use markdown ao redor do JSON final\n";
     prompt += "- Todos os valores monetários DEVEM ser em centavos (números inteiros)\n";
     prompt += "- Todos os enums devem usar EXATAMENTE os valores listados acima\n";
-    prompt += "- Se um campo obrigatório não estiver no PDF, use valores padrão sensatos\n";
 
     return prompt;
   }

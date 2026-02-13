@@ -91,7 +91,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <PieChartIcon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <PieChartIcon className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
           Alocacao por Estrategia
           <InfoTooltip conteudo={GLOSSARIO_ALOCACAO_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
