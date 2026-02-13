@@ -57,7 +57,7 @@ export function SidebarNavigation() {
           sidebarCompactada ? "justify-center px-2" : "justify-between px-6",
         )}
       >
-        {!sidebarCompactada && <h1 className="text-lg font-bold">Investimentos</h1>}
+        {!sidebarCompactada && <h1 className="text-lg font-semibold">Investimentos</h1>}
         <div className="flex items-center gap-2">
           <AlternarTema />
           <Button

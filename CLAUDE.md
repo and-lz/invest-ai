@@ -189,9 +189,119 @@ All tests use realistic data factories that create valid domain objects:
 ## 80/20 Color Rule
 - Cor reservada para apenas 20% dos elementos: indicadores, CTAs, alertas urgentes
 - Os outros 80% usam `text-muted-foreground` e tons neutros
-- TakeawayBox usa texto `text-muted-foreground` com apenas um pequeno dot colorido (`h-2 w-2 rounded-full`) como indicador
-- Valores negativos usam `text-red-600`, positivos `text-green-600` — apenas onde necessario
+- TakeawayBox usa texto `text-muted-foreground` com icone colorido (`text-success`, `text-warning`) como indicador
+- Valores negativos usam `text-destructive`, positivos `text-success` — apenas onde necessario
 - Evitar cor em elementos decorativos ou informativos que nao exigem atencao imediata
+- NUNCA usar cores Tailwind hardcoded (`text-green-600`, `bg-red-50`, etc.) — sempre usar variaveis semanticas
+
+## Design System: Paleta Financeira OkLCH
+
+### Filosofia
+Paleta inspirada em private banking e wealth management: **luxo, sobriedade, estabilidade**.
+Cores usam formato OkLCH (perceptualmente uniforme) — mesma lightness percebida independente do hue.
+
+### Arquivo central: `src/app/globals.css`
+Todas as cores sao definidas como CSS custom properties em `:root` (light) e `.dark` (dark).
+
+### Paleta Dark Mode (navy-charcoal)
+- Backgrounds: hue 250 (azul-marinho/charcoal), nao cinza puro
+  - `--background: oklch(0.28 0.015 250)` — fundo principal
+  - `--card: oklch(0.35 0.015 250)` — cards elevados (7% mais claro que bg)
+  - `--sidebar: oklch(0.25 0.015 250)` — sidebar (mais escuro que bg)
+  - `--secondary/muted: oklch(0.42 0.015 250)` — elementos secundarios
+- Foreground: hue 80 (off-white quente, leve tom dourado)
+  - `--foreground: oklch(0.92 0.01 80)` — texto principal
+  - `--muted-foreground: oklch(0.65 0.015 250)` — texto secundario (slate)
+- Borders: branco com tint azulado, 16-20% opacity
+
+### Paleta Light Mode (branco com undertone azul)
+- Backgrounds: hue 250 com lightness alta (branco quente com tint azulado sutil)
+  - `--background: oklch(0.985 0.005 250)` — fundo principal
+  - `--card: oklch(1 0 0)` — cards em branco puro
+- Foreground: navy profundo (hue 250, 18% lightness)
+  - `--foreground: oklch(0.18 0.015 250)` — texto principal
+
+### Cores Semanticas
+Registradas no `@theme inline` do Tailwind v4 — suporte nativo a `text-success`, `bg-destructive/10`, etc.
+
+| Variavel | Light Mode | Dark Mode | Uso |
+|----------|-----------|-----------|-----|
+| `--success` | `oklch(0.42 0.12 165)` esmeralda | `oklch(0.65 0.10 165)` teal | Valores positivos, confirmacoes |
+| `--destructive` | `oklch(0.50 0.16 20)` bordo | `oklch(0.65 0.12 20)` vinho suave | Valores negativos, erros, alertas |
+| `--warning` | `oklch(0.52 0.12 75)` ouro | `oklch(0.70 0.10 75)` champagne | Alertas de atencao, pendencias |
+
+### Regras de Uso de Cores
+- NUNCA usar cores Tailwind hardcoded (`text-green-600`, `bg-red-50`, `border-red-200`)
+- Sempre usar variaveis semanticas: `text-success`, `text-destructive`, `text-warning`
+- Para backgrounds com opacidade: `bg-success/10`, `bg-destructive/5`, `border-warning/30`
+- Cores de chart usam paleta dedicada (`--chart-1` a `--chart-5`) com hues complementares
+- Saturacao (chroma) baixa nos elementos base (0.01-0.015), moderada nas semanticas (0.10-0.16)
+
+### Charts
+- Paleta de 5 cores com hues espacados: navy (250), teal (165), ouro (75), purpura (310), vinho (20)
+- Dark mode: lightness 55-72%, chroma 0.10-0.14
+- Light mode: lightness 45-60%, chroma 0.10-0.14
+
+### Header Navigation
+- Backdrop-blur com efeito frosted glass (`backdrop-blur-md backdrop-saturate-150`)
+- Titulo em `font-serif` (Lora) para sensacao editorial/premium
+- Navegacao ativa: underline sutil (`bg-foreground/60`) em vez de background preenchido
+- Auto-hide no scroll para maximizar area de conteudo
+
+## Typography System
+
+### Font Families
+- **Geist Sans** (`font-sans`) - Body text, UI elements, labels (default)
+- **Inter** (base layer h1-h6) - All headings throughout the app
+- **Lora** (`font-serif`) - Brand logo only (intentional distinction)
+- **Geist Mono** (`font-mono`) - Code blocks, error messages, technical content
+
+### Visual Hierarchy
+
+#### Headings (Inter font family)
+- **H1 - Page Titles**: `text-2xl font-bold tracking-tight`
+  - Uso: Titulos principais de paginas (via componente `Header`)
+  - Exemplo: "Dashboard", "Insights", "Importar Relatorio"
+
+- **H2 - Section Titles**: `text-xl font-semibold tracking-tight`
+  - Uso: Titulos de secoes principais dentro de uma pagina
+  - Exemplo: Titulos de dialogs, titulos de stepper steps
+
+- **H3 - Card/Component Titles**: `text-lg font-semibold`
+  - Uso: Titulos de cards, titulos de tabelas (via `CardTitle`)
+  - Exemplo: "Evolucao Patrimonial", "Top 5 Ativos"
+
+#### Body Text (Geist Sans font family)
+- **Labels/Navigation**: `text-sm font-medium`
+  - Uso: Labels de formularios, links de navegacao, botoes, table headers
+  - Consistencia: Sempre `font-medium` para elementos interativos ou de controle
+
+- **Body/Descriptions**: `text-sm` (font-weight normal/400)
+  - Uso: Descricoes de cards, paragrafos, conteudo de tabelas
+  - Consistencia: Peso normal para conteudo de leitura
+
+- **Helper Text**: `text-xs text-muted-foreground`
+  - Uso: Tooltips, hints, badges, timestamps, footnotes
+  - Consistencia: Sempre usar `text-muted-foreground` para reduzir hierarquia visual
+
+#### Monospace (Geist Mono font family)
+- **Code/Technical**: `text-xs font-mono`
+  - Uso: Mensagens de erro, blocos de codigo, IDs tecnicos
+  - Exemplo: Stack traces, JSON display
+
+### Typography Principles
+1. **Consistencia de peso por tamanho**: Elementos do mesmo tamanho devem usar o mesmo peso em contextos similares
+2. **Tracking tight para headings**: `tracking-tight` em h1 e h2 melhora legibilidade em titulos grandes
+3. **Evitar tracking em body text**: Texto corrido nao deve ter letter-spacing customizado
+4. **Font-medium para controles**: Botoes, labels, navigation sempre usam `font-medium` para destaque
+5. **Brand exception**: Logo usa `font-serif` como elemento de identidade visual (unica excecao a regra de headings)
+
+### Usage Guidelines
+- NUNCA misturar diferentes pesos para o mesmo tamanho de texto em contextos similares
+- NUNCA usar `font-bold` em elementos de UI pequenos (text-sm ou menor)
+- SEMPRE usar `tracking-tight` em h1 e h2 para melhor legibilidade
+- SEMPRE usar `text-muted-foreground` em helper text para hierarquia visual
+- O logo `font-serif` e a UNICA excecao permitida ao sistema de headings
 
 # Reports
 

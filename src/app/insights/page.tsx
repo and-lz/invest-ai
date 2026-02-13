@@ -492,7 +492,7 @@ export default function InsightsPage() {
             <p className="text-muted-foreground text-sm font-medium tracking-widest uppercase">
               {ehConsolidado ? "Análise Consolidada" : "Análise de Carteira"}
             </p>
-            <h1 className="mt-2 text-3xl font-bold">
+            <h1 className="mt-2 text-2xl font-bold tracking-tight">
               {ehConsolidado
                 ? "Todos os meses"
                 : formatarMesAno(insights.mesReferencia, "extenso")}
