@@ -194,7 +194,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="h-3 w-3 rounded-sm bg-linear-to-b from-orange-300/30 to-blue-400/30" />
+            <div className="h-3 w-3 rounded-sm bg-linear-to-b from-chart-3/30 to-chart-1/30" />
             <span className="text-muted-foreground flex items-center gap-1">
               Rendimentos (diferença)
               <InfoTooltip conteudo={GLOSSARIO_RENDIMENTOS.explicacao} tamanhoIcone="h-3 w-3" />
