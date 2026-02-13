@@ -77,7 +77,10 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Header titulo="Relatorios" descricao="Historico de relatorios importados" />
+        <div className="flex items-center gap-3">
+          <FileText className="text-muted-foreground h-6 w-6" aria-hidden="true" />
+          <Header titulo="Relatorios" descricao="Historico de relatorios importados" />
+        </div>
         <Button onClick={abrirDialog} className="gap-2">
           <Upload className="h-4 w-4" />
           Importar Novo Relatorio

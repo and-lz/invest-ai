@@ -54,17 +54,13 @@ export function HeaderNavigation() {
         estaVisivel ? "h-16" : "h-0"
       )}
     >
-      <header className="relative h-16 border-b border-border/30 bg-linear-to-b from-background via-background to-card/30 backdrop-blur-xl backdrop-saturate-150 shadow-sm">
-        {/* Subtle top border glow */}
-        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-border/50 to-transparent" />
+      <header className="relative h-16 border-b border-border/20">
 
         <div className="flex h-16 items-center justify-between gap-8 px-6">
-          {/* Logo with subtle accent */}
+          {/* Logo */}
           <div className="flex items-center gap-2">
-            <h1 className="relative font-serif text-lg font-semibold tracking-tight">
-              <span className="bg-linear-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Investimentos
-              </span>
+            <h1 className="font-serif text-lg font-semibold tracking-tight">
+              Investimentos
             </h1>
           </div>
 
@@ -91,8 +87,8 @@ export function HeaderNavigation() {
                   {item.rotulo}
                   {estaAtivo && (
                     <>
-                      {/* Enhanced active indicator with glow */}
-                      <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-foreground/70 shadow-[0_0_8px_rgba(255,255,255,0.3)]" />
+                      {/* Active indicator */}
+                      <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-foreground/60" />
                       {/* Subtle background for active item */}
                       <span className="absolute inset-0 rounded-lg bg-secondary/30" />
                     </>

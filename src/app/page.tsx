@@ -21,7 +21,7 @@ import { PeriodComparisonDetail } from "@/components/dashboard/period-comparison
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload } from "lucide-react";
+import { Upload, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -69,7 +69,10 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <Header titulo="Dashboard" descricao="Visao geral dos seus investimentos" />
+        <div className="flex items-center gap-3">
+          <LayoutDashboard className="text-muted-foreground h-6 w-6" aria-hidden="true" />
+          <Header titulo="Dashboard" descricao="Visao geral dos seus investimentos" />
+        </div>
         {dadosDashboard && dadosDashboard.periodosDisponiveis.length > 0 && (
           <PeriodSelector
             periodosDisponiveis={dadosDashboard.periodosDisponiveis}

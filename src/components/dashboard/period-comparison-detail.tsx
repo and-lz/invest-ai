@@ -19,6 +19,7 @@ import {
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { ComparacaoPeriodo } from "@/schemas/report-extraction.schema";
+import { Scale } from "lucide-react";
 
 interface PeriodComparisonDetailProps {
   comparacaoPeriodos: ComparacaoPeriodo[];
@@ -67,7 +68,8 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-1">
+        <CardTitle className="flex items-center gap-2">
+          <Scale className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Comparação por Período
           <InfoTooltip conteudo={GLOSSARIO_COMPARACAO_PERIODOS.explicacao} />
         </CardTitle>

@@ -392,10 +392,13 @@ export default function InsightsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <Header
-          titulo="Insights IA"
-          descricao="Analise inteligente da sua carteira de investimentos"
-        />
+        <div className="flex items-center gap-3">
+          <Lightbulb className="text-muted-foreground h-6 w-6" aria-hidden="true" />
+          <Header
+            titulo="Insights IA"
+            descricao="Analise inteligente da sua carteira de investimentos"
+          />
+        </div>
         {!carregandoRelatorios && periodosDisponiveis.length > 0 && periodoSelecionado && (
           <PeriodSelector
             periodosDisponiveis={periodosDisponiveis}

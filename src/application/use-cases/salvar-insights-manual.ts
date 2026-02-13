@@ -3,6 +3,8 @@ import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
 import { ReportNotFoundError, ValidationError } from "@/domain/errors/app-errors";
 
+const IDENTIFICADOR_CONSOLIDADO = "consolidado";
+
 interface SalvarInsightsManualInput {
   identificadorRelatorio: string;
   jsonBruto: string;
@@ -12,9 +14,13 @@ export class SalvarInsightsManualUseCase {
   constructor(private readonly repository: ReportRepository) {}
 
   async executar(input: SalvarInsightsManualInput): Promise<InsightsResponse> {
-    const metadados = await this.repository.obterMetadados(input.identificadorRelatorio);
-    if (!metadados) {
-      throw new ReportNotFoundError(input.identificadorRelatorio);
+    const ehConsolidado = input.identificadorRelatorio === IDENTIFICADOR_CONSOLIDADO;
+
+    if (!ehConsolidado) {
+      const metadados = await this.repository.obterMetadados(input.identificadorRelatorio);
+      if (!metadados) {
+        throw new ReportNotFoundError(input.identificadorRelatorio);
+      }
     }
 
     let dadosBrutos: unknown;
