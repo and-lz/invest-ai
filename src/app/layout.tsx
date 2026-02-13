@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter, Lora } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
+import { AuthProvider } from "@/contexts/auth-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -42,18 +43,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${inter.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex h-screen flex-col">
-            <HeaderNavigation />
-            <main className="flex-1 overflow-y-auto p-8">{children}</main>
-          </div>
-          <Toaster />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="flex h-screen flex-col">
+              <HeaderNavigation />
+              <main className="flex-1 overflow-y-auto p-8">{children}</main>
+            </div>
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

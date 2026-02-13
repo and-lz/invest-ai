@@ -9,6 +9,7 @@ import {
   gerarPromptInsightsConsolidadoManual,
 } from "@/lib/prompt-insights-manual";
 import { AppError } from "@/domain/errors/app-errors";
+import { requireAuth } from "@/lib/auth-utils";
 import { z } from "zod/v4";
 
 const GerarPromptRequestSchema = z.object({
@@ -30,6 +31,9 @@ const RequestSchema = z.discriminatedUnion("acao", [
 ]);
 
 export async function POST(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const corpo: unknown = await request.json();
     const resultado = RequestSchema.safeParse(corpo);
@@ -46,8 +50,8 @@ export async function POST(request: Request) {
     if (dados.acao === "gerar-prompt") {
       // Modo consolidado: gerar prompt com todos os relatórios
       if (dados.consolidado) {
-        const detailUseCase = obterGetReportDetailUseCase();
-        const listUseCase = obterListReportsUseCase();
+        const detailUseCase = await obterGetReportDetailUseCase();
+        const listUseCase = await obterListReportsUseCase();
         const todosMetadados = await listUseCase.executar();
 
         const todosRelatorios = await Promise.all(
@@ -67,7 +71,7 @@ export async function POST(request: Request) {
       }
 
       // Modo mensal: gerar prompt com relatório atual + anterior
-      const detailUseCase = obterGetReportDetailUseCase();
+      const detailUseCase = await obterGetReportDetailUseCase();
       const relatorioAtual = await detailUseCase.executar(dados.identificadorRelatorio);
 
       let dadosRelatorioAnterior = null;
@@ -77,7 +81,7 @@ export async function POST(request: Request) {
         );
         dadosRelatorioAnterior = relatorioAnterior.dados;
       } else {
-        const listUseCase = obterListReportsUseCase();
+        const listUseCase = await obterListReportsUseCase();
         const todosRelatorios = await listUseCase.executar();
         const indiceAtual = todosRelatorios.findIndex(
           (relatorio) => relatorio.identificador === dados.identificadorRelatorio,
@@ -102,7 +106,7 @@ export async function POST(request: Request) {
     }
 
     // acao === "salvar"
-    const useCase = obterSalvarInsightsManualUseCase();
+    const useCase = await obterSalvarInsightsManualUseCase();
     const insights = await useCase.executar({
       identificadorRelatorio: dados.identificadorRelatorio,
       jsonBruto: dados.json,

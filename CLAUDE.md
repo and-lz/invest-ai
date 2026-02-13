@@ -32,10 +32,24 @@
 - `npm run lint` - verificar lint
 - `npm run format` - formatar codigo
 
+## Autenticacao
+- Auth.js v5 (NextAuth) com Google OAuth
+- Sessoes JWT stateless (sem database)
+- Middleware em `src/middleware.ts` protege todas as rotas
+- Helper `requireAuth()` em `src/lib/auth-utils.ts` para API routes
+- Configuracao em `src/auth.ts`
+- Tipos estendidos em `src/types/next-auth.d.ts`
+- User ID formato: `google_{sub}` (ex: `google_123456789`)
+
 ## Storage
-- PDFs em `data/reports/`
-- JSON extraido em `data/extracted/`
-- Insights em `data/insights/`
+- **Desenvolvimento**: Filesystem (`data/` directory) via `FilesystemReportRepository`
+- **Producao (Vercel)**: Vercel Blob via `VercelBlobReportRepository`
+- Switching automatico via `NODE_ENV` no container
+- Isolamento por usuario: `{userId}/` prefix em todos os paths
+- Interface abstrata: `FileManager` em `src/domain/interfaces/file-manager.ts`
+- PDFs em `data/reports/` (local) ou `{userId}/reports/` (blob)
+- JSON extraido em `data/extracted/` (local) ou `{userId}/extracted/` (blob)
+- Insights em `data/insights/` (local) ou `{userId}/insights/` (blob)
 - Tarefas em background em `data/tasks/`
 
 # Testing Strategy

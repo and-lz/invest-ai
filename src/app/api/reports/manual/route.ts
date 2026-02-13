@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { obterSalvarRelatorioManualUseCase } from "@/lib/container";
 import { gerarPromptCompletoParaExtracaoManual } from "@/lib/prompt-extracao-manual";
 import { AppError } from "@/domain/errors/app-errors";
+import { requireAuth } from "@/lib/auth-utils";
 
 export async function GET() {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const promptCompleto = gerarPromptCompletoParaExtracaoManual();
     return NextResponse.json({ prompt: promptCompleto });
@@ -18,6 +22,9 @@ interface CorpoRequisicaoManual {
 }
 
 export async function POST(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const corpo = (await request.json()) as CorpoRequisicaoManual;
 
@@ -25,7 +32,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ erro: "Nenhum JSON fornecido" }, { status: 400 });
     }
 
-    const useCase = obterSalvarRelatorioManualUseCase();
+    const useCase = await obterSalvarRelatorioManualUseCase();
     const resultado = await useCase.executar({ jsonBruto: corpo.json });
 
     return NextResponse.json({

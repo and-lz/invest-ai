@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { AlternarTema } from "@/components/layout/alternar-tema";
+import { UserProfileMenu } from "@/components/auth/user-profile-menu";
 
 const itensNavegacao = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
@@ -98,6 +99,14 @@ export function SidebarNavigation() {
           );
         })}
       </nav>
+      <div
+        className={cn(
+          "border-t p-4",
+          sidebarCompactada && "flex justify-center",
+        )}
+      >
+        <UserProfileMenu />
+      </div>
     </aside>
   );
 }

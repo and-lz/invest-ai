@@ -1,8 +1,9 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { FileStorageError } from "@/domain/errors/app-errors";
+import type { FileManager } from "@/domain/interfaces/file-manager";
 
-export class LocalFileManager {
+export class LocalFileManager implements FileManager {
   constructor(private readonly diretorioBase: string) {}
 
   async salvarArquivo(caminhoRelativo: string, conteudo: Buffer | string): Promise<string> {

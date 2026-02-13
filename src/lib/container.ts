@@ -1,4 +1,5 @@
 import { FilesystemReportRepository } from "@/infrastructure/repositories/filesystem-report-repository";
+import { VercelBlobReportRepository } from "@/infrastructure/repositories/vercel-blob-report-repository";
 import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
 import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
@@ -20,11 +21,22 @@ import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-ass
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
 import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
+import { auth } from "@/auth";
 import path from "path";
 
 const diretorioDados = path.resolve(process.env.DATA_DIRECTORY ?? "./data");
 
-function criarRepositorio() {
+const isProduction = process.env.NODE_ENV === "production";
+
+async function criarRepositorio() {
+  if (isProduction) {
+    const session = await auth();
+    if (!session?.user?.userId) {
+      throw new Error("Usuario nao autenticado. Sessao necessaria para acessar dados.");
+    }
+    return new VercelBlobReportRepository(session.user.userId);
+  }
+
   return new FilesystemReportRepository(diretorioDados);
 }
 
@@ -50,47 +62,57 @@ function criarServicoInsights(): InsightsService {
   return new GeminiInsightsService(criarProvedorAi());
 }
 
-export function obterUploadReportUseCase() {
-  return new UploadReportUseCase(criarRepositorio(), criarServicoExtracao());
+export async function obterUploadReportUseCase() {
+  const repository = await criarRepositorio();
+  return new UploadReportUseCase(repository, criarServicoExtracao());
 }
 
-export function obterListReportsUseCase() {
-  return new ListReportsUseCase(criarRepositorio());
+export async function obterListReportsUseCase() {
+  const repository = await criarRepositorio();
+  return new ListReportsUseCase(repository);
 }
 
-export function obterGetReportDetailUseCase() {
-  return new GetReportDetailUseCase(criarRepositorio());
+export async function obterGetReportDetailUseCase() {
+  const repository = await criarRepositorio();
+  return new GetReportDetailUseCase(repository);
 }
 
-export function obterGetDashboardDataUseCase() {
-  return new GetDashboardDataUseCase(criarRepositorio());
+export async function obterGetDashboardDataUseCase() {
+  const repository = await criarRepositorio();
+  return new GetDashboardDataUseCase(repository);
 }
 
-export function obterGenerateInsightsUseCase() {
-  return new GenerateInsightsUseCase(criarRepositorio(), criarServicoInsights());
+export async function obterGenerateInsightsUseCase() {
+  const repository = await criarRepositorio();
+  return new GenerateInsightsUseCase(repository, criarServicoInsights());
 }
 
-export function obterDeleteReportUseCase() {
-  return new DeleteReportUseCase(criarRepositorio());
+export async function obterDeleteReportUseCase() {
+  const repository = await criarRepositorio();
+  return new DeleteReportUseCase(repository);
 }
 
-export function obterSalvarRelatorioManualUseCase() {
-  return new SalvarRelatorioManualUseCase(criarRepositorio());
+export async function obterSalvarRelatorioManualUseCase() {
+  const repository = await criarRepositorio();
+  return new SalvarRelatorioManualUseCase(repository);
 }
 
-export function obterSalvarInsightsManualUseCase() {
-  return new SalvarInsightsManualUseCase(criarRepositorio());
+export async function obterSalvarInsightsManualUseCase() {
+  const repository = await criarRepositorio();
+  return new SalvarInsightsManualUseCase(repository);
 }
 
-export function obterAtualizarConclusaoInsightUseCase() {
-  return new AtualizarConclusaoInsightUseCase(criarRepositorio());
+export async function obterAtualizarConclusaoInsightUseCase() {
+  const repository = await criarRepositorio();
+  return new AtualizarConclusaoInsightUseCase(repository);
 }
 
-export function obterGenerateInsightsConsolidadosUseCase() {
-  return new GenerateInsightsConsolidadosUseCase(criarRepositorio(), criarServicoInsights());
+export async function obterGenerateInsightsConsolidadosUseCase() {
+  const repository = await criarRepositorio();
+  return new GenerateInsightsConsolidadosUseCase(repository, criarServicoInsights());
 }
 
-export function obterFilesystemReportRepository() {
+export async function obterFilesystemReportRepository() {
   return criarRepositorio();
 }
 
@@ -116,9 +138,10 @@ export function obterBrapiAssetDetailService(): BrapiAssetDetailService {
   return new BrapiAssetDetailService(obterBrapiToken());
 }
 
-export function obterAnalyzeAssetPerformanceUseCase() {
+export async function obterAnalyzeAssetPerformanceUseCase() {
+  const repository = await criarRepositorio();
   return new AnalyzeAssetPerformanceUseCase(
-    criarRepositorio(),
+    repository,
     new GeminiAssetAnalysisService(criarProvedorAi()),
     obterBrapiAssetDetailService(),
     obterBcbMacroDataService(),

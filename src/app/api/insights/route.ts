@@ -7,6 +7,7 @@ import {
   obterAtualizarConclusaoInsightUseCase,
 } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
+import { requireAuth } from "@/lib/auth-utils";
 import { z } from "zod/v4";
 import { StatusAcaoEnum } from "@/schemas/insights.schema";
 import { salvarTarefa } from "@/lib/tarefa-background";
@@ -20,13 +21,16 @@ const InsightsRequestSchema = z.object({
 });
 
 export async function GET(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const mesAnoParam = searchParams.get("mesAno");
 
     // Busca direta para insights consolidados
     if (mesAnoParam === "consolidado") {
-      const repository = obterFilesystemReportRepository();
+      const repository = await obterFilesystemReportRepository();
       const insights = await repository.obterInsights("consolidado");
       return NextResponse.json({
         insights,
@@ -35,7 +39,7 @@ export async function GET(request: Request) {
       });
     }
 
-    const listUseCase = obterListReportsUseCase();
+    const listUseCase = await obterListReportsUseCase();
     const relatorios = await listUseCase.executar();
 
     if (relatorios.length === 0) {
@@ -58,7 +62,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ insights: null, identificadorRelatorio: null });
     }
 
-    const repository = obterFilesystemReportRepository();
+    const repository = await obterFilesystemReportRepository();
     const insights = await repository.obterInsights(relatorioSelecionado.identificador);
 
     return NextResponse.json({
@@ -73,6 +77,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const corpo: unknown = await request.json();
     const resultado = InsightsRequestSchema.safeParse(corpo);
@@ -109,7 +116,7 @@ export async function POST(request: Request) {
         tarefa,
         rotuloLog: "Insights Consolidados",
         executarOperacao: async () => {
-          const useCase = obterGenerateInsightsConsolidadosUseCase();
+          const useCase = await obterGenerateInsightsConsolidadosUseCase();
           await useCase.executar();
           return {
             descricaoResultado: "Insights consolidados gerados",
@@ -125,7 +132,7 @@ export async function POST(request: Request) {
         tarefa,
         rotuloLog: "Insights",
         executarOperacao: async () => {
-          const useCase = obterGenerateInsightsUseCase();
+          const useCase = await obterGenerateInsightsUseCase();
           await useCase.executar({
             identificadorRelatorio,
             identificadorRelatorioAnterior,
@@ -162,6 +169,9 @@ const AtualizarConclusaoRequestSchema = z.object({
 });
 
 export async function PATCH(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const corpo: unknown = await request.json();
     const resultado = AtualizarConclusaoRequestSchema.safeParse(corpo);
@@ -173,7 +183,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const useCase = obterAtualizarConclusaoInsightUseCase();
+    const useCase = await obterAtualizarConclusaoInsightUseCase();
     const insights = await useCase.executar({
       identificadorRelatorio: resultado.data.identificadorRelatorio,
       indiceInsight: resultado.data.indiceInsight,

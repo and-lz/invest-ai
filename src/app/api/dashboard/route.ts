@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { obterGetDashboardDataUseCase } from "@/lib/container";
 import { validarMesAno } from "@/lib/format-date";
+import { requireAuth } from "@/lib/auth-utils";
 
 export async function GET(request: NextRequest) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     // Extrair query param mesAno se fornecido
     const { searchParams } = new URL(request.url);
@@ -16,7 +20,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const useCase = obterGetDashboardDataUseCase();
+    const useCase = await obterGetDashboardDataUseCase();
     const dadosDashboard = await useCase.executar(mesAnoParam ?? undefined);
 
     if (!dadosDashboard) {

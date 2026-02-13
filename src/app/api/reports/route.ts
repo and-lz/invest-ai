@@ -5,12 +5,16 @@ import { descriptografarPdf } from "@/lib/pdf-decrypt";
 import { salvarTarefa } from "@/lib/tarefa-background";
 import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
 import type { TarefaBackground } from "@/lib/tarefa-background";
+import { requireAuth } from "@/lib/auth-utils";
 
 const TAMANHO_MAXIMO_PDF_BYTES = 32 * 1024 * 1024; // 32MB
 
 export async function GET() {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
-    const useCase = obterListReportsUseCase();
+    const useCase = await obterListReportsUseCase();
     const relatorios = await useCase.executar();
     return NextResponse.json({ relatorios });
   } catch (erro) {
@@ -20,6 +24,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const formData = await request.formData();
     const arquivo = formData.get("file");
@@ -73,7 +80,7 @@ export async function POST(request: Request) {
       tarefa,
       rotuloLog: "Upload",
       executarOperacao: async () => {
-        const useCase = obterUploadReportUseCase();
+        const useCase = await obterUploadReportUseCase();
         const resultado = await useCase.executar({ nomeArquivoOriginal, pdfBuffer });
         return {
           descricaoResultado: `Relatorio ${resultado.metadados.mesReferencia} processado`,
