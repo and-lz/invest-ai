@@ -11,6 +11,10 @@ import {
   SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
   INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO,
 } from "@/lib/prompt-insights-manual";
+import {
+  serializarRelatorioMarkdown,
+  serializarRelatoriosConsolidadoMarkdown,
+} from "@/lib/serializar-relatorio-markdown";
 
 /**
  * Serviço de geração de insights usando Google Gemini 2.5 Flash
@@ -37,12 +41,7 @@ export class GeminiInsightsService implements InsightsService {
         },
       });
 
-      const dadosParaAnalise = {
-        relatorioAtual,
-        relatorioAnterior: relatorioAnterior ?? "Não disponível (primeiro relatório)",
-      };
-
-      const prompt = this.construirPrompt(dadosParaAnalise);
+      const prompt = this.construirPrompt(relatorioAtual, relatorioAnterior);
 
       const resultado = await model.generateContent(prompt);
       const resposta = resultado.response;
@@ -92,12 +91,7 @@ export class GeminiInsightsService implements InsightsService {
         },
       });
 
-      const dadosParaAnalise = {
-        quantidadeMeses: todosRelatorios.length,
-        relatorios: todosRelatorios,
-      };
-
-      const prompt = this.construirPromptConsolidado(dadosParaAnalise);
+      const prompt = this.construirPromptConsolidado(todosRelatorios);
 
       const resultado = await model.generateContent(prompt);
       const resposta = resultado.response;
@@ -133,8 +127,16 @@ export class GeminiInsightsService implements InsightsService {
     }
   }
 
-  private construirPrompt(dadosParaAnalise: Record<string, unknown>): string {
+  private construirPrompt(
+    relatorioAtual: RelatorioExtraido,
+    relatorioAnterior: RelatorioExtraido | null,
+  ): string {
     const esquemaJson = toJSONSchema(InsightsResponseSchema);
+
+    const dadosAtualMarkdown = serializarRelatorioMarkdown(relatorioAtual);
+    const dadosAnteriorMarkdown = relatorioAnterior
+      ? serializarRelatorioMarkdown(relatorioAnterior)
+      : "Não disponível (primeiro relatório)";
 
     let prompt = INSTRUCAO_USUARIO_INSIGHTS;
 
@@ -143,10 +145,12 @@ export class GeminiInsightsService implements InsightsService {
     prompt += JSON.stringify(esquemaJson, null, 2);
     prompt += "\n```\n\n";
 
-    prompt += "📊 DADOS DA CARTEIRA:\n";
-    prompt += "```json\n";
-    prompt += JSON.stringify(dadosParaAnalise, null, 2);
-    prompt += "\n```\n\n";
+    prompt += "📊 DADOS DA CARTEIRA:\n\n";
+    prompt += "### Relatório Atual:\n\n";
+    prompt += dadosAtualMarkdown;
+    prompt += "\n\n### Relatório Anterior:\n\n";
+    prompt += dadosAnteriorMarkdown;
+    prompt += "\n\n";
 
     prompt += "⚠️  REGRAS CRÍTICAS:\n";
     prompt += "- Retorne APENAS o JSON válido, sem texto adicional ou markdown\n";
@@ -155,13 +159,16 @@ export class GeminiInsightsService implements InsightsService {
     prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
     prompt += "- Compare com o mês anterior quando disponível para identificar tendências\n";
     prompt += "- Destaque riscos de concentração e oportunidades de diversificação\n";
-    prompt += "- Os campos concluida e statusAcao são controle do usuário: SEMPRE use concluida=false e statusAcao='pendente'\n";
+    prompt +=
+      "- Os campos concluida e statusAcao são controle do usuário: SEMPRE use concluida=false e statusAcao='pendente'\n";
 
     return prompt;
   }
 
-  private construirPromptConsolidado(dadosParaAnalise: Record<string, unknown>): string {
+  private construirPromptConsolidado(todosRelatorios: RelatorioExtraido[]): string {
     const esquemaJson = toJSONSchema(InsightsResponseSchema);
+
+    const dadosMarkdown = serializarRelatoriosConsolidadoMarkdown(todosRelatorios);
 
     let prompt = INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO;
 
@@ -170,10 +177,9 @@ export class GeminiInsightsService implements InsightsService {
     prompt += JSON.stringify(esquemaJson, null, 2);
     prompt += "\n```\n\n";
 
-    prompt += "📊 DADOS HISTÓRICOS DA CARTEIRA:\n";
-    prompt += "```json\n";
-    prompt += JSON.stringify(dadosParaAnalise, null, 2);
-    prompt += "\n```\n\n";
+    prompt += "📊 DADOS HISTÓRICOS DA CARTEIRA:\n\n";
+    prompt += dadosMarkdown;
+    prompt += "\n\n";
 
     prompt += "⚠️  REGRAS CRÍTICAS:\n";
     prompt += "- Retorne APENAS o JSON válido, sem texto adicional ou markdown\n";
@@ -182,7 +188,8 @@ export class GeminiInsightsService implements InsightsService {
     prompt += "- Identifique tendências, padrões e decisões passadas boas/ruins\n";
     prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
     prompt += "- No campo mesReferencia, use 'consolidado' como valor\n";
-    prompt += "- Os campos concluida e statusAcao são controle do usuário: SEMPRE use concluida=false e statusAcao='pendente'\n";
+    prompt +=
+      "- Os campos concluida e statusAcao são controle do usuário: SEMPRE use concluida=false e statusAcao='pendente'\n";
 
     return prompt;
   }

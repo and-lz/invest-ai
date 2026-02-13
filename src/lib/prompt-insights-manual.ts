@@ -1,11 +1,75 @@
 import { toJSONSchema } from "zod/v4";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
+import {
+  serializarRelatorioMarkdown,
+  serializarRelatoriosConsolidadoMarkdown,
+} from "@/lib/serializar-relatorio-markdown";
 
 // ============================================================
 // Prompts compartilhados entre geracao de insights via API e manual.
 // Fonte unica de verdade para instrucoes de insights.
 // ============================================================
+
+// ---- Constante de exemplo de saida ----
+
+const EXEMPLO_SAIDA_INSIGHTS = `EXEMPLO MINIMO DE RESPOSTA VALIDA:
+
+\`\`\`json
+{
+  "mesReferencia": "2026-01",
+  "dataGeracao": "2026-02-12",
+  "resumoExecutivo": "Carteira de R$ 445.700 apresentou rentabilidade de 3,14% no mes, superando CDI (1,16%). Diversificacao adequada entre renda fixa e variavel.",
+  "insights": [
+    {
+      "titulo": "Rentabilidade acima do CDI no mes",
+      "descricao": "A carteira rendeu 3,14% contra 1,16% do CDI, impulsionada por fundos de acoes.",
+      "categoria": "performance_positiva",
+      "prioridade": "alta",
+      "ativosRelacionados": ["FUNDO ABC FIC FIA"],
+      "acaoSugerida": "Manter alocacao atual em fundos de acoes.",
+      "impactoEstimado": "Potencial de ganho adicional de R$ 12.000 em 12 meses.",
+      "concluida": false,
+      "statusAcao": "pendente"
+    },
+    {
+      "titulo": "Ativo com performance negativa persistente",
+      "descricao": "Fundo XYZ caiu -5,24% em 12 meses.",
+      "categoria": "performance_negativa",
+      "prioridade": "media",
+      "ativosRelacionados": ["FUNDO XYZ FIA BDR"],
+      "acaoSugerida": null,
+      "impactoEstimado": null,
+      "concluida": false,
+      "statusAcao": "pendente"
+    }
+  ],
+  "alertas": [
+    {
+      "tipo": "atencao",
+      "mensagem": "Concentracao de 33% em FIIs com rendimento abaixo do CDI."
+    },
+    {
+      "tipo": "informativo",
+      "mensagem": "Rentabilidade mensal foi a melhor dos ultimos 6 meses."
+    }
+  ],
+  "recomendacoesLongoPrazo": [
+    "Aumentar gradualmente exposicao a renda variavel para 30-35% nos proximos 12 meses.",
+    "Reduzir posicoes em FIIs enquanto Selic permanecer acima de 10%."
+  ]
+}
+\`\`\`
+
+VALORES VALIDOS PARA ENUMS:
+- "categoria": "performance_positiva" | "performance_negativa" | "acao_recomendada" | "risco" | "oportunidade" | "diversificacao" | "custos"
+- "prioridade": "alta" | "media" | "baixa"
+- "tipo" (alertas): "urgente" | "atencao" | "informativo"
+- "acaoSugerida" e "impactoEstimado" podem ser null quando nao aplicavel
+- "concluida" DEVE ser false e "statusAcao" DEVE ser "pendente" para TODOS os insights
+- "ativosRelacionados" pode ser array vazio [] quando o insight e sobre a carteira em geral`;
+
+// ---- System prompts ----
 
 export const SYSTEM_PROMPT_INSIGHTS = `Voce e um consultor financeiro especializado em investimentos brasileiros, com profundo conhecimento do mercado de capitais brasileiro, renda fixa, fundos imobiliarios e fundos de investimento.
 
@@ -26,6 +90,8 @@ DIRETRIZES:
 12. Responda em portugues brasileiro.
 13. IMPORTANTE: Os campos "concluida" e "statusAcao" sao de controle do usuario. SEMPRE retorne concluida=false e statusAcao="pendente" para TODOS os insights.
 
+Os dados da carteira estao em markdown com valores monetarios em BRL e percentuais ja formatados.
+
 Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 
 export const INSTRUCAO_USUARIO_INSIGHTS =
@@ -38,11 +104,10 @@ export function gerarPromptInsightsManual(
   const jsonSchema = toJSONSchema(InsightsResponseSchema);
   const schemaFormatado = JSON.stringify(jsonSchema, null, 2);
 
-  const dadosParaAnalise = {
-    relatorioAtual,
-    relatorioAnterior: relatorioAnterior ?? "Nao disponivel (primeiro relatorio)",
-  };
-  const dadosFormatados = JSON.stringify(dadosParaAnalise, null, 2);
+  const dadosAtualMarkdown = serializarRelatorioMarkdown(relatorioAtual);
+  const dadosAnteriorMarkdown = relatorioAnterior
+    ? serializarRelatorioMarkdown(relatorioAnterior)
+    : "Nao disponivel (primeiro relatorio)";
 
   return `${SYSTEM_PROMPT_INSIGHTS}
 
@@ -56,11 +121,19 @@ ${schemaFormatado}
 
 ---
 
+${EXEMPLO_SAIDA_INSIGHTS}
+
+---
+
 ${INSTRUCAO_USUARIO_INSIGHTS}
 
-\`\`\`json
-${dadosFormatados}
-\`\`\``;
+## Relatorio Atual:
+
+${dadosAtualMarkdown}
+
+## Relatorio Anterior:
+
+${dadosAnteriorMarkdown}`;
 }
 
 // ============================================================
@@ -89,6 +162,8 @@ DIRETRIZES PARA ANALISE CONSOLIDADA:
 14. No campo mesReferencia, use "consolidado" como valor.
 15. IMPORTANTE: Os campos "concluida" e "statusAcao" sao de controle do usuario. SEMPRE retorne concluida=false e statusAcao="pendente" para TODOS os insights.
 
+Os dados da carteira estao em markdown com valores monetarios em BRL e percentuais ja formatados.
+
 Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 
 export const INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO =
@@ -100,11 +175,7 @@ export function gerarPromptInsightsConsolidadoManual(
   const jsonSchema = toJSONSchema(InsightsResponseSchema);
   const schemaFormatado = JSON.stringify(jsonSchema, null, 2);
 
-  const dadosParaAnalise = {
-    quantidadeMeses: todosRelatorios.length,
-    relatorios: todosRelatorios,
-  };
-  const dadosFormatados = JSON.stringify(dadosParaAnalise, null, 2);
+  const dadosMarkdown = serializarRelatoriosConsolidadoMarkdown(todosRelatorios);
 
   return `${SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO}
 
@@ -118,9 +189,11 @@ ${schemaFormatado}
 
 ---
 
+${EXEMPLO_SAIDA_INSIGHTS}
+
+---
+
 ${INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO}
 
-\`\`\`json
-${dadosFormatados}
-\`\`\``;
+${dadosMarkdown}`;
 }
