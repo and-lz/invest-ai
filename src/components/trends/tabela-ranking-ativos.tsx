@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
@@ -10,11 +11,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+} from "lucide-react";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import type { Conclusao } from "@/components/ui/takeaway-box";
+import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
 import { cn } from "@/lib/utils";
 import type { AtivoRanking } from "@/schemas/trends.schema";
+
+type ColunaRanking = "ticker" | "nome" | "preco" | "variacao" | "volume";
 
 interface TabelaRankingAtivosProps {
   maioresAltas: AtivoRanking[];
@@ -47,6 +58,58 @@ function formatarPreco(preco: number): string {
   });
 }
 
+function obterValorColunaRanking(ativo: AtivoRanking, coluna: ColunaRanking): string | number {
+  switch (coluna) {
+    case "ticker":
+      return ativo.ticker;
+    case "nome":
+      return ativo.nome;
+    case "preco":
+      return ativo.preco;
+    case "variacao":
+      return ativo.variacao;
+    case "volume":
+      return ativo.volume;
+  }
+}
+
+interface CabecalhoOrderavelRankingProps {
+  coluna: ColunaRanking;
+  colunaAtiva: ColunaRanking | null;
+  direcao: "asc" | "desc";
+  onClick: (coluna: ColunaRanking) => void;
+  className?: string;
+  children: React.ReactNode;
+}
+
+function CabecalhoOrderavelRanking({
+  coluna,
+  colunaAtiva,
+  direcao,
+  onClick,
+  className,
+  children,
+}: CabecalhoOrderavelRankingProps) {
+  const eAtiva = colunaAtiva === coluna;
+  const Icone = eAtiva ? (direcao === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+
+  return (
+    <TableHead
+      className={`group cursor-pointer select-none hover:text-foreground ${className ?? ""}`}
+      onClick={() => onClick(coluna)}
+    >
+      <div
+        className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}
+      >
+        {children}
+        <Icone
+          className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`}
+        />
+      </div>
+    </TableHead>
+  );
+}
+
 function TabelaAtivos({
   ativos,
   mostrarVolume,
@@ -54,10 +117,18 @@ function TabelaAtivos({
   ativos: AtivoRanking[];
   mostrarVolume?: boolean;
 }) {
+  const obterValor = useCallback(
+    (ativo: AtivoRanking, coluna: ColunaRanking) => obterValorColunaRanking(ativo, coluna),
+    [],
+  );
+
+  const { itensOrdenados, colunaOrdenacao, direcaoOrdenacao, alternarOrdenacao } =
+    useOrdenacaoTabela<AtivoRanking, ColunaRanking>(ativos, obterValor);
+
   if (ativos.length === 0) {
     return (
       <p className="text-muted-foreground py-8 text-center text-sm">
-        Nenhum dado disponivel
+        Nenhum dado disponível
       </p>
     );
   }
@@ -66,17 +137,55 @@ function TabelaAtivos({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[80px]">Ticker</TableHead>
-          <TableHead>Nome</TableHead>
-          <TableHead className="text-right">Preco</TableHead>
-          <TableHead className="text-right">Variacao</TableHead>
+          <CabecalhoOrderavelRanking
+            coluna="ticker"
+            colunaAtiva={colunaOrdenacao}
+            direcao={direcaoOrdenacao}
+            onClick={alternarOrdenacao}
+          >
+            Ticker
+          </CabecalhoOrderavelRanking>
+          <CabecalhoOrderavelRanking
+            coluna="nome"
+            colunaAtiva={colunaOrdenacao}
+            direcao={direcaoOrdenacao}
+            onClick={alternarOrdenacao}
+          >
+            Nome
+          </CabecalhoOrderavelRanking>
+          <CabecalhoOrderavelRanking
+            coluna="preco"
+            colunaAtiva={colunaOrdenacao}
+            direcao={direcaoOrdenacao}
+            onClick={alternarOrdenacao}
+            className="text-right"
+          >
+            Preço
+          </CabecalhoOrderavelRanking>
+          <CabecalhoOrderavelRanking
+            coluna="variacao"
+            colunaAtiva={colunaOrdenacao}
+            direcao={direcaoOrdenacao}
+            onClick={alternarOrdenacao}
+            className="text-right"
+          >
+            Variação
+          </CabecalhoOrderavelRanking>
           {mostrarVolume && (
-            <TableHead className="text-right">Volume</TableHead>
+            <CabecalhoOrderavelRanking
+              coluna="volume"
+              colunaAtiva={colunaOrdenacao}
+              direcao={direcaoOrdenacao}
+              onClick={alternarOrdenacao}
+              className="text-right"
+            >
+              Volume
+            </CabecalhoOrderavelRanking>
           )}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {ativos.map((ativo) => (
+        {itensOrdenados.map((ativo) => (
           <TableRow key={ativo.ticker}>
             <TableCell className="font-mono text-sm font-medium">
               {ativo.ticker}
@@ -144,10 +253,10 @@ export function TabelaRankingAtivos({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-          Ranking de Acoes
+          Ranking de Ações
         </CardTitle>
         <CardDescription>
-          Acoes da B3 ordenadas por variacao e volume de negociacao
+          Ações da B3 ordenadas por variação e volume de negociação
         </CardDescription>
       </CardHeader>
       <CardContent>

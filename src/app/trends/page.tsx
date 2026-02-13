@@ -73,17 +73,18 @@ export default function TrendsPage() {
             indicadoresMacro={dadosTendencias.indicadoresMacro}
           />
 
-          {/* Stock Rankings */}
-          <TabelaRankingAtivos
-            maioresAltas={dadosTendencias.maioresAltas}
-            maioresBaixas={dadosTendencias.maioresBaixas}
-            maisNegociados={dadosTendencias.maisNegociados}
-          />
+          {/* Stock Rankings + Macro Indicators side by side */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <TabelaRankingAtivos
+              maioresAltas={dadosTendencias.maioresAltas}
+              maioresBaixas={dadosTendencias.maioresBaixas}
+              maisNegociados={dadosTendencias.maisNegociados}
+            />
 
-          {/* Macro Indicators Chart */}
-          <GraficoIndicadoresMacro
-            indicadoresMacro={dadosTendencias.indicadoresMacro}
-          />
+            <GraficoIndicadoresMacro
+              indicadoresMacro={dadosTendencias.indicadoresMacro}
+            />
+          </div>
 
           {/* Sector Heatmap */}
           <MapaCalorSetores

@@ -35,7 +35,6 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
   return (
     <div className={cn("mt-4 space-y-2 rounded-lg p-3", className)}>
       <hr className="mb-5 opacity-50"/>
-      <p className="text-muted-foreground text-xs font-medium">Resumo para você:</p>
       {conclusoes.map((conclusao) => {
         const IconeConclusao = ICONES_INDICADOR[conclusao.tipo];
         return (

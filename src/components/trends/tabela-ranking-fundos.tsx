@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
@@ -9,11 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Building2 } from "lucide-react";
+import { Building2, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_FUNDOS_EM_ALTA } from "@/lib/glossario-financeiro";
+import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
 import { cn } from "@/lib/utils";
 import type { AtivoRanking } from "@/schemas/trends.schema";
+
+type ColunaFundos = "ticker" | "nome" | "preco" | "variacao" | "volume";
 
 interface TabelaRankingFundosProps {
   fundosEmAlta: AtivoRanking[];
@@ -41,7 +45,67 @@ function formatarVolume(volume: number): string {
   return String(volume);
 }
 
+function obterValorColunaFundos(fundo: AtivoRanking, coluna: ColunaFundos): string | number {
+  switch (coluna) {
+    case "ticker":
+      return fundo.ticker;
+    case "nome":
+      return fundo.nome;
+    case "preco":
+      return fundo.preco;
+    case "variacao":
+      return fundo.variacao;
+    case "volume":
+      return fundo.volume;
+  }
+}
+
+interface CabecalhoOrderavelFundosProps {
+  coluna: ColunaFundos;
+  colunaAtiva: ColunaFundos | null;
+  direcao: "asc" | "desc";
+  onClick: (coluna: ColunaFundos) => void;
+  className?: string;
+  children: React.ReactNode;
+}
+
+function CabecalhoOrderavelFundos({
+  coluna,
+  colunaAtiva,
+  direcao,
+  onClick,
+  className,
+  children,
+}: CabecalhoOrderavelFundosProps) {
+  const eAtiva = colunaAtiva === coluna;
+  const Icone = eAtiva ? (direcao === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+
+  return (
+    <TableHead
+      className={`group cursor-pointer select-none hover:text-foreground ${className ?? ""}`}
+      onClick={() => onClick(coluna)}
+    >
+      <div
+        className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}
+      >
+        {children}
+        <Icone
+          className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`}
+        />
+      </div>
+    </TableHead>
+  );
+}
+
 export function TabelaRankingFundos({ fundosEmAlta }: TabelaRankingFundosProps) {
+  const obterValor = useCallback(
+    (fundo: AtivoRanking, coluna: ColunaFundos) => obterValorColunaFundos(fundo, coluna),
+    [],
+  );
+
+  const { itensOrdenados, colunaOrdenacao, direcaoOrdenacao, alternarOrdenacao } =
+    useOrdenacaoTabela<AtivoRanking, ColunaFundos>(fundosEmAlta, obterValor);
+
   if (fundosEmAlta.length === 0) return null;
 
   return (
@@ -53,22 +117,60 @@ export function TabelaRankingFundos({ fundosEmAlta }: TabelaRankingFundosProps) 
           <InfoTooltip conteudo={GLOSSARIO_FUNDOS_EM_ALTA.explicacao} />
         </CardTitle>
         <CardDescription>
-          Fundos imobiliarios e ETFs com maiores valorizacoes
+          Fundos imobiliários e ETFs com maiores valorizações
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Ticker</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead className="text-right">Preco</TableHead>
-              <TableHead className="text-right">Variacao</TableHead>
-              <TableHead className="text-right">Volume</TableHead>
+              <CabecalhoOrderavelFundos
+                coluna="ticker"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+              >
+                Ticker
+              </CabecalhoOrderavelFundos>
+              <CabecalhoOrderavelFundos
+                coluna="nome"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+              >
+                Nome
+              </CabecalhoOrderavelFundos>
+              <CabecalhoOrderavelFundos
+                coluna="preco"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
+                Preço
+              </CabecalhoOrderavelFundos>
+              <CabecalhoOrderavelFundos
+                coluna="variacao"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
+                Variação
+              </CabecalhoOrderavelFundos>
+              <CabecalhoOrderavelFundos
+                coluna="volume"
+                colunaAtiva={colunaOrdenacao}
+                direcao={direcaoOrdenacao}
+                onClick={alternarOrdenacao}
+                className="text-right"
+              >
+                Volume
+              </CabecalhoOrderavelFundos>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {fundosEmAlta.map((fundo) => (
+            {itensOrdenados.map((fundo) => (
               <TableRow key={fundo.ticker}>
                 <TableCell className="font-mono text-sm font-medium">
                   {fundo.ticker}

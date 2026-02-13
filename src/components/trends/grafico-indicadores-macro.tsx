@@ -118,10 +118,10 @@ export function GraficoIndicadoresMacro({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-          Indicadores Macro
+          Indicadores Macroeconômicos
         </CardTitle>
         <CardDescription>
-          SELIC, IPCA e IGP-M dos ultimos 12 meses
+          SELIC, IPCA e IGP-M dos últimos 12 meses
         </CardDescription>
       </CardHeader>
       <CardContent>
