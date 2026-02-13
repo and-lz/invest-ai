@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,14 @@ import {
 
 export function AlternarTema() {
   const { theme: temaSelecionado, setTheme: definirTema } = useTheme();
+  const [montado, definirMontado] = useState(false);
+
+  useEffect(() => {
+    definirMontado(true);
+  }, []);
 
   const obterIconeTema = () => {
+    if (!montado) return <Sun className="h-4 w-4" />;
     if (temaSelecionado === "light") return <Sun className="h-4 w-4" />;
     if (temaSelecionado === "dark") return <Moon className="h-4 w-4" />;
     return <Monitor className="h-4 w-4" />;
