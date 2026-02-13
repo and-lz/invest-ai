@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { BarChart3, Brain, RefreshCw, AlertTriangle, Loader2 } from "lucide-react";
 import { useDadosAtivo, useListaAtivosCarteira } from "@/hooks/use-dados-ativo";
 import { useAnaliseIaAtivo, dispararAnaliseIaAtivo } from "@/hooks/use-analise-ia-ativo";
-import { SeletorAtivo } from "@/components/desempenho/seletor-ativo";
+import { GridAtivosCarteira } from "@/components/desempenho/grid-ativos-carteira";
 import { CardsResumoAtivo } from "@/components/desempenho/cards-resumo-ativo";
 import { GraficoEvolucaoAtivo } from "@/components/desempenho/grafico-evolucao-ativo";
 import { GraficoRendimentos } from "@/components/desempenho/grafico-rendimentos";
@@ -88,55 +88,46 @@ function DesempenhoConteudo() {
         />
       </div>
 
-      {/* Seletor de Ativo */}
-      <div className="flex flex-wrap items-center gap-3">
-        <SeletorAtivo
-          ativosCarteira={ativosCarteira}
-          tickerSelecionado={tickerSelecionado}
-          aoSelecionarTicker={handleSelecionarTicker}
-          estaCarregando={carregandoLista}
-        />
+      {/* Grid de Ativos */}
+      <GridAtivosCarteira
+        ativosCarteira={ativosCarteira}
+        tickerSelecionado={tickerSelecionado}
+        aoSelecionarTicker={handleSelecionarTicker}
+        estaCarregando={carregandoLista}
+      />
 
-        {tickerSelecionado && dadosAtivo && !analise && (
-          <Button
-            onClick={() => void handleAnalisarComIa()}
-            disabled={analisandoComIa}
-            variant="outline"
-            className="gap-2"
-          >
-            {analisandoComIa ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Brain className="h-4 w-4" />
-            )}
-            {analisandoComIa ? "Analisando..." : "Analisar com IA"}
-          </Button>
-        )}
+      {/* Botões de Ação */}
+      {tickerSelecionado && dadosAtivo && (
+        <div className="flex flex-wrap items-center gap-3">
+          {!analise && (
+            <Button
+              onClick={() => void handleAnalisarComIa()}
+              disabled={analisandoComIa}
+              variant="outline"
+              className="gap-2"
+            >
+              {analisandoComIa ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Brain className="h-4 w-4" />
+              )}
+              {analisandoComIa ? "Analisando..." : "Analisar com IA"}
+            </Button>
+          )}
 
-        {analise && (
-          <Button
-            onClick={() => void handleAnalisarComIa()}
-            disabled={analisandoComIa}
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground gap-1.5 text-xs"
-          >
-            <RefreshCw className={`h-3 w-3 ${analisandoComIa ? "animate-spin" : ""}`} />
-            Re-analisar
-          </Button>
-        )}
-      </div>
-
-      {/* Estado vazio */}
-      {!tickerSelecionado && !carregandoLista && (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-4 py-12">
-            <BarChart3 className="h-12 w-12 text-muted-foreground" />
-            <p className="text-muted-foreground text-center">
-              Selecione um ativo da sua carteira ou busque por ticker para ver a analise de desempenho.
-            </p>
-          </CardContent>
-        </Card>
+          {analise && (
+            <Button
+              onClick={() => void handleAnalisarComIa()}
+              disabled={analisandoComIa}
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground gap-1.5 text-xs"
+            >
+              <RefreshCw className={`h-3 w-3 ${analisandoComIa ? "animate-spin" : ""}`} />
+              Re-analisar
+            </Button>
+          )}
+        </div>
       )}
 
       {/* Loading state */}
