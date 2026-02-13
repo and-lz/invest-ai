@@ -1,11 +1,13 @@
 import type { ReportRepository } from "@/domain/interfaces/report-repository";
-import type { InsightsResponse } from "@/schemas/insights.schema";
+import type { InsightsResponse, StatusAcao } from "@/schemas/insights.schema";
 import { ReportNotFoundError } from "@/domain/errors/app-errors";
 
 interface AtualizarConclusaoInsightInput {
   identificadorRelatorio: string;
   indiceInsight: number;
-  concluida: boolean;
+  // @deprecated - usar statusAcao
+  concluida?: boolean;
+  statusAcao?: StatusAcao;
 }
 
 export class AtualizarConclusaoInsightUseCase {
@@ -28,10 +30,19 @@ export class AtualizarConclusaoInsightUseCase {
       throw new Error(`Índice de insight inválido: ${input.indiceInsight}`);
     }
 
+    // Determinar novo status: preferir statusAcao, caso contrário derivar de concluida
+    const novoStatus: StatusAcao =
+      input.statusAcao ?? (input.concluida ? "concluida" : "pendente");
+
+    // Manter campo concluida para backward compatibility
+    const novaConcluida = novoStatus === "concluida";
+
     const insightsAtualizados: InsightsResponse = {
       ...insightsAtuais,
       insights: insightsAtuais.insights.map((insight, indice) =>
-        indice === input.indiceInsight ? { ...insight, concluida: input.concluida } : insight,
+        indice === input.indiceInsight
+          ? { ...insight, statusAcao: novoStatus, concluida: novaConcluida }
+          : insight,
       ),
     };
 

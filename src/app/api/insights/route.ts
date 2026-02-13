@@ -7,6 +7,7 @@ import {
 } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
 import { z } from "zod/v4";
+import { StatusAcaoEnum } from "@/schemas/insights.schema";
 
 const InsightsRequestSchema = z.object({
   identificadorRelatorio: z.string().min(1),
@@ -88,7 +89,9 @@ export async function POST(request: Request) {
 const AtualizarConclusaoRequestSchema = z.object({
   identificadorRelatorio: z.string().min(1),
   indiceInsight: z.number().int().nonnegative(),
-  concluida: z.boolean(),
+  // @deprecated - usar statusAcao
+  concluida: z.boolean().optional(),
+  statusAcao: StatusAcaoEnum.optional(),
 });
 
 export async function PATCH(request: Request) {
@@ -108,6 +111,7 @@ export async function PATCH(request: Request) {
       identificadorRelatorio: resultado.data.identificadorRelatorio,
       indiceInsight: resultado.data.indiceInsight,
       concluida: resultado.data.concluida,
+      statusAcao: resultado.data.statusAcao,
     });
 
     return NextResponse.json({ insights });

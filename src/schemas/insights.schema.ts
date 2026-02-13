@@ -16,6 +16,8 @@ export const InsightCategoriaEnum = z.enum([
 
 export const InsightPrioridadeEnum = z.enum(["alta", "media", "baixa"]);
 
+export const StatusAcaoEnum = z.enum(["pendente", "concluida", "ignorada"]);
+
 export const InsightSchema = z.object({
   titulo: z.string(),
   descricao: z.string(),
@@ -24,7 +26,9 @@ export const InsightSchema = z.object({
   ativosRelacionados: z.array(z.string()),
   acaoSugerida: z.string().nullable(),
   impactoEstimado: z.string().nullable(),
+  // @deprecated - usar statusAcao ao invés de concluida
   concluida: z.boolean().optional().default(false),
+  statusAcao: StatusAcaoEnum.optional().default("pendente"),
 });
 
 export const AlertaSchema = z.object({
@@ -46,3 +50,4 @@ export const InsightsResponseSchema = z.object({
 export type InsightsResponse = z.infer<typeof InsightsResponseSchema>;
 export type Insight = z.infer<typeof InsightSchema>;
 export type Alerta = z.infer<typeof AlertaSchema>;
+export type StatusAcao = z.infer<typeof StatusAcaoEnum>;

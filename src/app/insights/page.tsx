@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { InsightsManualStepper } from "@/components/insights/insights-manual-stepper";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
@@ -21,10 +20,12 @@ import {
   Loader2,
   MessageSquare,
   CheckCircle2,
+  X,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatarMesAno } from "@/lib/format-date";
-import type { InsightsResponse, Insight } from "@/schemas/insights.schema";
+import type { InsightsResponse, Insight, StatusAcao } from "@/schemas/insights.schema";
 
 const ICONES_CATEGORIA: Record<string, typeof TrendingUp> = {
   performance_positiva: TrendingUp,
@@ -56,45 +57,63 @@ interface InsightCardProps {
   insight: Insight;
   indiceInsight: number;
   identificadorRelatorio: string;
-  onConclusaoAlterada: (indiceInsight: number, concluida: boolean) => void;
+  onStatusAlterado: (indiceInsight: number, statusAcao: StatusAcao) => void;
 }
 
 function InsightCard({
   insight,
   indiceInsight,
   identificadorRelatorio,
-  onConclusaoAlterada,
+  onStatusAlterado,
 }: InsightCardProps) {
   const Icone = ICONES_CATEGORIA[insight.categoria] ?? Lightbulb;
-  const estaConcluido = insight.concluida ?? false;
+  const statusAtual = insight.statusAcao ?? "pendente";
   const [estaAtualizando, setEstaAtualizando] = useState(false);
 
-  const handleToggleConcluido = useCallback(async () => {
-    setEstaAtualizando(true);
-    try {
-      const resposta = await fetch("/api/insights", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          identificadorRelatorio,
-          indiceInsight,
-          concluida: !estaConcluido,
-        }),
-      });
+  const handleAlterarStatus = useCallback(
+    async (novoStatus: StatusAcao) => {
+      setEstaAtualizando(true);
+      try {
+        const resposta = await fetch("/api/insights", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            identificadorRelatorio,
+            indiceInsight,
+            statusAcao: novoStatus,
+          }),
+        });
 
-      if (resposta.ok) {
-        await resposta.json();
-        onConclusaoAlterada(indiceInsight, !estaConcluido);
+        if (resposta.ok) {
+          await resposta.json();
+          onStatusAlterado(indiceInsight, novoStatus);
+        }
+      } catch (erro) {
+        console.error("Erro ao atualizar status do insight:", erro);
+      } finally {
+        setEstaAtualizando(false);
       }
-    } catch (erro) {
-      console.error("Erro ao atualizar conclusao do insight:", erro);
-    } finally {
-      setEstaAtualizando(false);
-    }
-  }, [identificadorRelatorio, indiceInsight, estaConcluido, onConclusaoAlterada]);
+    },
+    [identificadorRelatorio, indiceInsight, onStatusAlterado],
+  );
+
+  // Estilos diferentes para cada status
+  const estilosBloco = {
+    pendente: "border border-transparent rounded-lg p-4",
+    concluida:
+      "bg-green-50/50 dark:bg-green-950/10 border border-green-200/50 dark:border-green-900/30 rounded-lg p-4",
+    ignorada:
+      "bg-muted/30 dark:bg-muted/10 border border-muted-foreground/20 dark:border-muted-foreground/10 rounded-lg p-4",
+  };
+
+  const estiloTexto = {
+    pendente: "",
+    concluida: "opacity-70 line-through",
+    ignorada: "opacity-60 line-through",
+  };
 
   return (
-    <article className={`transition-all ${estaConcluido ? "opacity-60" : ""}`}>
+    <article className={cn("transition-all", estilosBloco[statusAtual])}>
       {/* Categoria + Prioridade */}
       <div className="mb-2 flex items-center gap-3">
         <Icone className="text-muted-foreground h-5 w-5" />
@@ -105,21 +124,28 @@ function InsightCard({
       </div>
 
       {/* Título */}
-      <h3 className={`text-xl leading-snug font-bold ${estaConcluido ? "line-through" : ""}`}>
+      <h3 className={cn("text-xl leading-snug font-bold", estiloTexto[statusAtual])}>
         {insight.titulo}
       </h3>
 
       {/* Descrição */}
-      <p
-        className={`mt-2 text-lg leading-relaxed ${estaConcluido ? "text-muted-foreground/60 line-through" : "text-muted-foreground"}`}
-      >
+      <p className={cn("mt-2 text-lg leading-relaxed text-muted-foreground", estiloTexto[statusAtual])}>
         {insight.descricao}
       </p>
 
       {/* Ação Sugerida */}
       {insight.acaoSugerida && (
-        <div className="border-muted-foreground/20 bg-muted/50 mt-4 rounded-lg border-l-4 px-5 py-4">
-          <p className="text-base leading-relaxed">
+        <div
+          className={cn(
+            "mt-4 rounded-lg border-l-4 px-5 py-4",
+            statusAtual === "concluida"
+              ? "border-green-300 dark:border-green-800 bg-green-50/30 dark:bg-green-950/20"
+              : statusAtual === "ignorada"
+                ? "border-muted-foreground/30 bg-muted/30"
+                : "border-muted-foreground/20 bg-muted/50",
+          )}
+        >
+          <p className={cn("text-base leading-relaxed", estiloTexto[statusAtual])}>
             <span className="font-bold">Acao sugerida:</span>{" "}
             <span className="italic">{insight.acaoSugerida}</span>
           </p>
@@ -138,22 +164,64 @@ function InsightCard({
         </div>
       )}
 
-      {/* Checkbox de conclusão */}
+      {/* Ações sutis - somente se houver acaoSugerida */}
       {insight.acaoSugerida && (
-        <label className="hover:bg-muted/50 mt-4 flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors">
-          <Checkbox
-            checked={estaConcluido}
-            onCheckedChange={handleToggleConcluido}
-            disabled={estaAtualizando}
-            aria-label={`Marcar "${insight.titulo}" como concluído`}
-          />
-          <span
-            className={`text-sm ${estaConcluido ? "text-muted-foreground line-through" : "font-medium"}`}
-          >
-            {estaConcluido ? "Ação concluída" : "Marcar ação como concluída"}
-          </span>
-          {estaConcluido && <CheckCircle2 className="ml-auto h-4 w-4 text-green-600" />}
-        </label>
+        <div className="mt-4 flex items-center gap-2">
+          {statusAtual === "pendente" && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleAlterarStatus("concluida")}
+                disabled={estaAtualizando}
+                className="text-muted-foreground hover:text-green-600 h-8 gap-1.5 text-xs"
+              >
+                <Check className="h-3.5 w-3.5" />
+                Concluir
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleAlterarStatus("ignorada")}
+                disabled={estaAtualizando}
+                className="text-muted-foreground hover:text-amber-600 h-8 gap-1.5 text-xs"
+              >
+                <X className="h-3.5 w-3.5" />
+                Ignorar
+              </Button>
+            </>
+          )}
+          {statusAtual === "concluida" && (
+            <div className="flex items-center gap-2 text-sm text-green-600">
+              <CheckCircle2 className="h-4 w-4" />
+              <span>Ação concluída</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleAlterarStatus("pendente")}
+                disabled={estaAtualizando}
+                className="text-muted-foreground ml-2 h-7 text-xs"
+              >
+                Desfazer
+              </Button>
+            </div>
+          )}
+          {statusAtual === "ignorada" && (
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <X className="h-4 w-4" />
+              <span>Ação ignorada</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleAlterarStatus("pendente")}
+                disabled={estaAtualizando}
+                className="text-muted-foreground ml-2 h-7 text-xs"
+              >
+                Desfazer
+              </Button>
+            </div>
+          )}
+        </div>
       )}
     </article>
   );
@@ -280,13 +348,15 @@ export default function InsightsPage() {
     setModoVisualizacao("inicial");
   }, []);
 
-  const handleConclusaoAlterada = useCallback(
-    (indiceInsight: number, concluida: boolean) => {
+  const handleStatusAlterado = useCallback(
+    (indiceInsight: number, statusAcao: StatusAcao) => {
       if (insights) {
         const insightsAtualizados: InsightsResponse = {
           ...insights,
           insights: insights.insights.map((insight, indice) =>
-            indice === indiceInsight ? { ...insight, concluida } : insight,
+            indice === indiceInsight
+              ? { ...insight, statusAcao, concluida: statusAcao === "concluida" }
+              : insight,
           ),
         };
         setInsights(insightsAtualizados);
@@ -443,7 +513,7 @@ export default function InsightsPage() {
                   insight={insight}
                   indiceInsight={indice}
                   identificadorRelatorio={relatorioSelecionado.identificador}
-                  onConclusaoAlterada={handleConclusaoAlterada}
+                  onStatusAlterado={handleStatusAlterado}
                 />
               ))}
             </div>
