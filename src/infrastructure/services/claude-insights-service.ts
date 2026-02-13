@@ -1,11 +1,12 @@
 import type Anthropic from "@anthropic-ai/sdk";
+import { toJSONSchema } from "zod/v4";
 import type { InsightsService } from "@/domain/interfaces/extraction-service";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
 import { ClaudeApiError } from "@/domain/errors/app-errors";
 import { SYSTEM_PROMPT_INSIGHTS, INSTRUCAO_USUARIO_INSIGHTS } from "@/lib/prompt-insights-manual";
-import { CLAUDE_MODEL, CLAUDE_MAX_TOKENS_INSIGHTS } from "@/lib/claude-config";
+import { CLAUDE_MODEL_INSIGHTS, CLAUDE_MAX_TOKENS_INSIGHTS } from "@/lib/claude-config";
 
 export class ClaudeInsightsService implements InsightsService {
   constructor(private readonly anthropicClient: Anthropic) {}
@@ -20,14 +21,21 @@ export class ClaudeInsightsService implements InsightsService {
         relatorioAnterior: relatorioAnterior ?? "Nao disponivel (primeiro relatorio)",
       };
 
+      const esquemaJson = toJSONSchema(InsightsResponseSchema);
+      const promptComSchema = this.construirPromptComSchema(
+        INSTRUCAO_USUARIO_INSIGHTS,
+        esquemaJson as Record<string, unknown>,
+        dadosParaAnalise,
+      );
+
       const resposta = await this.anthropicClient.messages.create({
-        model: CLAUDE_MODEL,
+        model: CLAUDE_MODEL_INSIGHTS,
         max_tokens: CLAUDE_MAX_TOKENS_INSIGHTS,
         system: SYSTEM_PROMPT_INSIGHTS,
         messages: [
           {
             role: "user",
-            content: `${INSTRUCAO_USUARIO_INSIGHTS}\n\n${JSON.stringify(dadosParaAnalise, null, 2)}`,
+            content: promptComSchema,
           },
         ],
       });
@@ -55,6 +63,26 @@ export class ClaudeInsightsService implements InsightsService {
         `Falha na geracao de insights via Claude API: ${erro instanceof Error ? erro.message : String(erro)}`,
       );
     }
+  }
+
+  private construirPromptComSchema(
+    instrucaoOriginal: string,
+    esquemaJson: Record<string, unknown>,
+    dadosParaAnalise: Record<string, unknown>,
+  ): string {
+    let prompt = instrucaoOriginal;
+
+    prompt += `\n\n📋 SCHEMA JSON DA RESPOSTA (OBRIGATÓRIO - SIGA EXATAMENTE):\n`;
+    prompt += "```json\n";
+    prompt += JSON.stringify(esquemaJson, null, 2);
+    prompt += "\n```\n\n";
+
+    prompt += "📊 DADOS DA CARTEIRA:\n";
+    prompt += "```json\n";
+    prompt += JSON.stringify(dadosParaAnalise, null, 2);
+    prompt += "\n```";
+
+    return prompt;
   }
 
   private extrairJsonDaResposta(texto: string): string {

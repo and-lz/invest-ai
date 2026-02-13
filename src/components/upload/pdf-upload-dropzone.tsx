@@ -146,10 +146,25 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button onClick={confirmarUpload} className="flex-1">
-                  Processar relatório
+                <Button
+                  onClick={confirmarUpload}
+                  className="flex-1"
+                  disabled={estaProcessando}
+                >
+                  {estaProcessando ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    "Processar relatório"
+                  )}
                 </Button>
-                <Button variant="outline" onClick={handleNovoUpload}>
+                <Button
+                  variant="outline"
+                  onClick={handleNovoUpload}
+                  disabled={estaProcessando}
+                >
                   Cancelar
                 </Button>
               </div>
@@ -175,14 +190,19 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
                   </h3>
                   <p className="text-muted-foreground text-sm">{arquivoSelecionado?.name}</p>
                   {statusUpload === "processing" && (
-                    <p className="text-muted-foreground text-xs">
-                      Extraindo dados de todas as páginas do relatório.
-                      <br />
-                      Isso pode levar alguns minutos. Aguarde...
-                    </p>
+                    <div className="text-muted-foreground text-xs space-y-1">
+                      <p>Extraindo dados do relatório com IA...</p>
+                      <p>Extraindo dados de todas as páginas do relatório.</p>
+                      <p className="text-xs text-gray-500">
+                        Isso pode levar alguns minutos. Aguarde...
+                      </p>
+                    </div>
                   )}
                 </div>
-                <Progress value={statusUpload === "uploading" ? 30 : 70} className="w-64" />
+                <Progress
+                  value={statusUpload === "uploading" ? 30 : 70}
+                  className="w-64"
+                />
               </>
             ) : (
               <>
