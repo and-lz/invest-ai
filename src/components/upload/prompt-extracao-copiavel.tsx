@@ -64,7 +64,7 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
         <div>
           <h3 className="text-lg font-semibold">Copiar o prompt</h3>
           <p className="text-muted-foreground text-sm">
-            Copie o prompt abaixo e cole no Claude Chat junto com o PDF do relatorio.
+            Copie o prompt abaixo e cole no chat de IA junto com o PDF do relatorio.
           </p>
         </div>
 

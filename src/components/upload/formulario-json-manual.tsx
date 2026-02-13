@@ -57,9 +57,9 @@ export function FormularioJsonManual({ onImportacaoSucesso, onVoltar }: Formular
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className="text-lg font-semibold">Colar a resposta do Claude</h3>
+          <h3 className="text-lg font-semibold">Colar a resposta da IA</h3>
           <p className="text-muted-foreground text-sm">
-            Cole abaixo o JSON que o Claude Chat retornou apos processar seu relatorio.
+            Cole abaixo o JSON que o chat de IA retornou apos processar seu relatorio.
           </p>
         </div>
 

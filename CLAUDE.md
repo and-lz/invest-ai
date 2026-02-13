@@ -5,12 +5,12 @@
 - shadcn/ui + Tailwind CSS v4 + Recharts
 - Zod para validacao + types inferidos
 - Vitest + Testing Library para testes
-- Claude API (Anthropic SDK) para parsing PDF e insights
+- Gemini API (Google AI SDK) para parsing PDF e insights
 
 ## Arquitetura (DDD Simplificado)
 - `src/schemas/` - Zod schemas (fonte unica dos tipos)
 - `src/domain/` - Value objects, interfaces, erros
-- `src/infrastructure/` - Implementacoes (filesystem, Claude API)
+- `src/infrastructure/` - Implementacoes (filesystem, Gemini API)
 - `src/application/use-cases/` - Orquestracao de logica
 - `src/app/api/` - API Routes
 - `src/components/` - UI (dashboard, layout, upload, insights)

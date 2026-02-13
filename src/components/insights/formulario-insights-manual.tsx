@@ -85,9 +85,9 @@ export function FormularioInsightsManual({
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className="text-lg font-semibold">Passo 2: Colar a resposta do Claude</h3>
+          <h3 className="text-lg font-semibold">Passo 2: Colar a resposta da IA</h3>
           <p className="text-muted-foreground text-sm">
-            Cole abaixo o JSON que o Claude Chat retornou com os insights da sua carteira.
+            Cole abaixo o JSON que o chat de IA retornou com os insights da sua carteira.
           </p>
         </div>
 

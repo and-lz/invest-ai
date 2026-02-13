@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 
 // ============================================================
-// Zod schemas para insights gerados pela Claude API.
+// Zod schemas para insights gerados pela Gemini API.
 // ============================================================
 
 export const InsightCategoriaEnum = z.enum([

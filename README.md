@@ -1,6 +1,6 @@
 # Investimentos Dashboard
 
-Dashboard de acompanhamento de investimentos com análise via IA (Claude API) de relatórios PDF.
+Dashboard de acompanhamento de investimentos com análise via IA (Gemini API) de relatórios PDF.
 
 ## Requisitos do Sistema
 
@@ -30,7 +30,7 @@ npm install
 Configure environment variables in `.env.local`:
 
 ```bash
-ANTHROPIC_API_KEY=your_api_key_here
+GOOGLE_API_KEY=your_api_key_here
 ```
 
 Then, run the development server:

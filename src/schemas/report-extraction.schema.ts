@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 
 // ============================================================
-// Zod schemas para extracao estruturada do PDF via Claude API.
+// Zod schemas para extracao estruturada do PDF via Gemini API.
 // Fonte unica de verdade para os tipos TypeScript do relatorio.
 // ============================================================
 

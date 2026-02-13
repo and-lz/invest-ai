@@ -22,7 +22,7 @@ export class SalvarInsightsManualUseCase {
       dadosBrutos = JSON.parse(input.jsonBruto);
     } catch {
       throw new ValidationError(
-        "JSON invalido. Verifique se voce copiou o JSON completo da resposta do Claude.",
+        "JSON invalido. Verifique se voce copiou o JSON completo da resposta da IA.",
       );
     }
 

@@ -29,10 +29,10 @@ export class FileStorageError extends AppError {
   }
 }
 
-export class ClaudeApiError extends AppError {
+export class AiApiError extends AppError {
   constructor(message: string) {
-    super(message, "CLAUDE_API_ERROR");
-    this.name = "ClaudeApiError";
+    super(message, "AI_API_ERROR");
+    this.name = "AiApiError";
   }
 }
 

@@ -8,17 +8,6 @@ import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/prompt
 
 /**
  * Serviço de extração de PDFs usando Google Gemini 2.5 Flash
- *
- * Vantagens sobre Claude:
- * - Rate limits generosos: 1500 requests/dia (gratuito)
- * - Custo: GRATUITO no tier gratuito, depois $0.075/1M input tokens
- * - Suporte nativo a PDFs
- * - Velocidade similar ao Claude Haiku
- *
- * Rate limits (tier gratuito):
- * - 1500 requests por dia
- * - 15 requests por minuto
- * - 4M tokens por minuto
  */
 export class GeminiPdfExtractionService implements ExtractionService {
   private readonly modelo: string = "models/gemini-2.5-flash";

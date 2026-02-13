@@ -4,7 +4,7 @@ import type { InsightsService } from "@/domain/interfaces/extraction-service";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
-import { ClaudeApiError } from "@/domain/errors/app-errors";
+import { AiApiError } from "@/domain/errors/app-errors";
 import {
   SYSTEM_PROMPT_INSIGHTS,
   INSTRUCAO_USUARIO_INSIGHTS,
@@ -14,17 +14,6 @@ import {
 
 /**
  * Serviço de geração de insights usando Google Gemini 2.5 Flash
- *
- * Vantagens sobre Claude:
- * - Rate limits generosos: 1500 requests/dia (gratuito)
- * - Custo: GRATUITO no tier gratuito, depois $0.30/1M output tokens
- * - Qualidade de análise comparável ao Claude Haiku
- * - Velocidade superior
- *
- * Rate limits (tier gratuito):
- * - 1500 requests por dia
- * - 15 requests por minuto
- * - 4M tokens por minuto
  */
 export class GeminiInsightsService implements InsightsService {
   private readonly modelo: string = "models/gemini-2.5-flash";
@@ -60,14 +49,14 @@ export class GeminiInsightsService implements InsightsService {
       const textoResposta = resposta.text();
 
       if (!textoResposta) {
-        throw new ClaudeApiError("Resposta do Gemini API não contém texto");
+        throw new AiApiError("Resposta do Gemini API não contém texto");
       }
 
       const dadosBrutos: unknown = JSON.parse(textoResposta);
       const validacao = InsightsResponseSchema.safeParse(dadosBrutos);
 
       if (!validacao.success) {
-        throw new ClaudeApiError(
+        throw new AiApiError(
           `Insights não correspondem ao schema: ${JSON.stringify(validacao.error.issues.slice(0, 5))}`,
         );
       }
@@ -82,9 +71,9 @@ export class GeminiInsightsService implements InsightsService {
 
       return validacao.data;
     } catch (erro) {
-      if (erro instanceof ClaudeApiError) throw erro;
+      if (erro instanceof AiApiError) throw erro;
 
-      throw new ClaudeApiError(
+      throw new AiApiError(
         `Falha na geração de insights via Gemini API: ${erro instanceof Error ? erro.message : String(erro)}`,
       );
     }
@@ -115,14 +104,14 @@ export class GeminiInsightsService implements InsightsService {
       const textoResposta = resposta.text();
 
       if (!textoResposta) {
-        throw new ClaudeApiError("Resposta do Gemini API não contém texto");
+        throw new AiApiError("Resposta do Gemini API não contém texto");
       }
 
       const dadosBrutos: unknown = JSON.parse(textoResposta);
       const validacao = InsightsResponseSchema.safeParse(dadosBrutos);
 
       if (!validacao.success) {
-        throw new ClaudeApiError(
+        throw new AiApiError(
           `Insights consolidados não correspondem ao schema: ${JSON.stringify(validacao.error.issues.slice(0, 5))}`,
         );
       }
@@ -136,9 +125,9 @@ export class GeminiInsightsService implements InsightsService {
 
       return validacao.data;
     } catch (erro) {
-      if (erro instanceof ClaudeApiError) throw erro;
+      if (erro instanceof AiApiError) throw erro;
 
-      throw new ClaudeApiError(
+      throw new AiApiError(
         `Falha na geração de insights consolidados via Gemini API: ${erro instanceof Error ? erro.message : String(erro)}`,
       );
     }

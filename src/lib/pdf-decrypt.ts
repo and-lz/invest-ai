@@ -15,7 +15,7 @@ import type { Readable } from "stream";
  */
 export async function descriptografarPdf(pdfBuffer: Buffer, senha?: string): Promise<Buffer> {
   // Se não tem senha, retorna o buffer original
-  // (assume que não está protegido ou que a Claude API vai lidar com isso)
+  // (assume que não está protegido ou que a API de IA vai lidar com isso)
   if (!senha) {
     return pdfBuffer;
   }

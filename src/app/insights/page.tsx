@@ -460,7 +460,7 @@ export default function InsightsPage() {
                   disabled={estaGerando}
                 >
                   <MessageSquare className="mr-2 h-4 w-4" />
-                  Gerar via Claude Chat
+                  Gerar via Chat
                 </Button>
               </div>
               {erroInsights && <p className="text-sm text-destructive">{erroInsights}</p>}

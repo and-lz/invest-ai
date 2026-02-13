@@ -36,7 +36,7 @@ export default function UploadPage() {
             </span>
           </TabsTrigger>
           <TabsTrigger value="manual" className="shrink-0">
-            Via Claude Chat
+            Via Chat
           </TabsTrigger>
         </TabsList>
         <TabsContent value="automatico" className="mt-4">
@@ -49,7 +49,7 @@ export default function UploadPage() {
         </TabsContent>
         <TabsContent value="manual" className="mt-4">
           <p className="text-muted-foreground text-sm">
-            Copie um prompt, cole no Claude Chat junto com o PDF e retorne o resultado aqui.
+            Copie um prompt, cole no chat de IA junto com o PDF e retorne o resultado aqui.
           </p>
           <div className="mt-8">
             <ImportacaoManualStepper onImportacaoSucesso={handleSucesso} />
