@@ -402,3 +402,96 @@ export const GLOSSARIO_COMPARACAO_PERIODOS: EntradaGlossario = {
     "(3 meses, 6 meses, 12 meses, etc.) comparado ao CDI. " +
     "Ajuda a entender se a carteira melhora ou piora no longo prazo.",
 };
+
+// ---------- Tendências de Mercado (trends page) ----------
+
+export const GLOSSARIO_IBOVESPA_INDICE: EntradaGlossario = {
+  termo: "Ibovespa",
+  explicacao:
+    "Principal índice da bolsa brasileira (B3). Mede o desempenho médio das ações " +
+    "mais negociadas do mercado. Se o Ibovespa subiu, em média as ações subiram.",
+};
+
+export const GLOSSARIO_SELIC_META: EntradaGlossario = {
+  termo: "SELIC Meta",
+  explicacao:
+    "Taxa básica de juros definida pelo Banco Central a cada 45 dias. " +
+    "É a referência para todas as outras taxas de juros no Brasil. " +
+    "Quando a SELIC sobe, investimentos de renda fixa rendem mais.",
+};
+
+export const GLOSSARIO_IPCA_INDICE: EntradaGlossario = {
+  termo: "IPCA",
+  explicacao:
+    "Índice oficial de inflação do Brasil, calculado pelo IBGE. " +
+    "Mede o aumento médio dos preços de produtos e serviços. " +
+    "Se o IPCA está alto, seu dinheiro está perdendo poder de compra mais rápido.",
+};
+
+export const GLOSSARIO_CDI_TAXA: EntradaGlossario = {
+  termo: "CDI",
+  explicacao:
+    "Taxa de referência para investimentos de renda fixa. " +
+    "Quando dizem que um CDB rende '100% do CDI', ele acompanha essa taxa. " +
+    "O CDI anda muito próximo da SELIC.",
+};
+
+export const GLOSSARIO_IGPM: EntradaGlossario = {
+  termo: "IGP-M",
+  explicacao:
+    "Índice Geral de Preços do Mercado, calculado pela FGV. " +
+    "Muito usado para reajuste de aluguéis e contratos. " +
+    "Diferente do IPCA, inclui preços no atacado e construção civil.",
+};
+
+export const GLOSSARIO_DOLAR: EntradaGlossario = {
+  termo: "Dólar (PTAX)",
+  explicacao:
+    "Cotação oficial do dólar americano em reais, calculada pelo Banco Central. " +
+    "Quando o dólar sobe, importações ficam mais caras e investimentos " +
+    "internacionais valem mais em reais.",
+};
+
+export const GLOSSARIO_VOLUME_NEGOCIACAO: EntradaGlossario = {
+  termo: "Volume de Negociação",
+  explicacao:
+    "Quantidade de dinheiro movimentada na compra e venda de um ativo no dia. " +
+    "Volume alto indica que muita gente está negociando, o que geralmente " +
+    "significa maior liquidez e interesse do mercado.",
+};
+
+export const GLOSSARIO_HEATMAP_SETORES: EntradaGlossario = {
+  termo: "Performance por Setor",
+  explicacao:
+    "Mostra como cada setor da economia está se comportando na bolsa hoje. " +
+    "Setores em alta aparecem em verde e em queda aparecem em vermelho. " +
+    "Ajuda a identificar quais áreas da economia estão aquecidas.",
+};
+
+export const GLOSSARIO_MAIORES_ALTAS: EntradaGlossario = {
+  termo: "Maiores Altas",
+  explicacao:
+    "Ações que mais subiram de preço hoje na bolsa. " +
+    "Aparecem ordenadas pela variação percentual, da maior para a menor.",
+};
+
+export const GLOSSARIO_MAIORES_BAIXAS: EntradaGlossario = {
+  termo: "Maiores Baixas",
+  explicacao:
+    "Ações que mais caíram de preço hoje na bolsa. " +
+    "Aparecem ordenadas pela variação percentual, da mais negativa para a menos negativa.",
+};
+
+export const GLOSSARIO_MAIS_NEGOCIADAS: EntradaGlossario = {
+  termo: "Mais Negociadas",
+  explicacao:
+    "Ações com maior volume de negociação hoje. " +
+    "São os ativos que mais estão chamando a atenção do mercado.",
+};
+
+export const GLOSSARIO_FUNDOS_EM_ALTA: EntradaGlossario = {
+  termo: "Fundos em Alta",
+  explicacao:
+    "Fundos imobiliários (FIIs) e ETFs que mais subiram de preço hoje. " +
+    "FIIs são fundos que investem em imóveis e distribuem aluguéis aos cotistas.",
+};

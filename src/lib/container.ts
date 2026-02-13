@@ -12,6 +12,9 @@ import { SalvarInsightsManualUseCase } from "@/application/use-cases/salvar-insi
 import { AtualizarConclusaoInsightUseCase } from "@/application/use-cases/atualizar-conclusao-insight";
 import { GenerateInsightsConsolidadosUseCase } from "@/application/use-cases/generate-insights-consolidados";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
+import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
+import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
+import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
 import path from "path";
 
 const diretorioDados = path.resolve(process.env.DATA_DIRECTORY ?? "./data");
@@ -80,4 +83,22 @@ export function obterGenerateInsightsConsolidadosUseCase() {
 
 export function obterFilesystemReportRepository() {
   return criarRepositorio();
+}
+
+function obterBrapiToken(): string {
+  const token = process.env.BRAPI_TOKEN;
+  if (!token) {
+    throw new Error(
+      "BRAPI_TOKEN não configurado. Obtenha em https://brapi.dev/dashboard",
+    );
+  }
+  return token;
+}
+
+export function obterBrapiMarketDataService(): MarketDataService {
+  return new BrapiMarketDataService(obterBrapiToken());
+}
+
+export function obterBcbMacroDataService(): MacroDataService {
+  return new BcbMacroDataService();
 }
