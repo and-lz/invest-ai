@@ -23,6 +23,7 @@ interface AtivoDaCarteira {
   codigoAtivo: string;
   nomeAtivo: string;
   estrategia: string;
+  rentabilidade12Meses: number | null;
 }
 
 interface SeletorAtivoProps {
@@ -30,6 +31,53 @@ interface SeletorAtivoProps {
   readonly tickerSelecionado: string | null;
   readonly aoSelecionarTicker: (ticker: string) => void;
   readonly estaCarregando?: boolean;
+}
+
+interface GrupoAtivos {
+  rotulo: string;
+  ativos: AtivoDaCarteira[];
+}
+
+function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
+  const excelentes: AtivoDaCarteira[] = [];
+  const bons: AtivoDaCarteira[] = [];
+  const moderados: AtivoDaCarteira[] = [];
+  const negativos: AtivoDaCarteira[] = [];
+  const semDados: AtivoDaCarteira[] = [];
+
+  for (const ativo of ativos) {
+    if (ativo.rentabilidade12Meses === null) {
+      semDados.push(ativo);
+    } else if (ativo.rentabilidade12Meses >= 15) {
+      excelentes.push(ativo);
+    } else if (ativo.rentabilidade12Meses >= 5) {
+      bons.push(ativo);
+    } else if (ativo.rentabilidade12Meses >= 0) {
+      moderados.push(ativo);
+    } else {
+      negativos.push(ativo);
+    }
+  }
+
+  const grupos: GrupoAtivos[] = [];
+
+  if (excelentes.length > 0) {
+    grupos.push({ rotulo: "🔥 Excelentes (12m ≥ +15%)", ativos: excelentes });
+  }
+  if (bons.length > 0) {
+    grupos.push({ rotulo: "📈 Bons (12m +5% a +15%)", ativos: bons });
+  }
+  if (moderados.length > 0) {
+    grupos.push({ rotulo: "📊 Moderados (12m 0% a +5%)", ativos: moderados });
+  }
+  if (negativos.length > 0) {
+    grupos.push({ rotulo: "📉 Negativos (12m < 0%)", ativos: negativos });
+  }
+  if (semDados.length > 0) {
+    grupos.push({ rotulo: "❓ Sem Dados (12m)", ativos: semDados });
+  }
+
+  return grupos;
 }
 
 export function SeletorAtivo({
@@ -47,6 +95,11 @@ export function SeletorAtivo({
         (ativo) => ativo.codigoAtivo.toUpperCase() === tickerSelecionado?.toUpperCase(),
       ),
     [ativosCarteira, tickerSelecionado],
+  );
+
+  const gruposAtivos = useMemo(
+    () => agruparAtivosPorPerformance(ativosCarteira),
+    [ativosCarteira],
   );
 
   const rotuloSelecionado = ativoSelecionado
@@ -105,32 +158,59 @@ export function SeletorAtivo({
               )}
             </CommandEmpty>
 
-            {ativosCarteira.length > 0 && (
-              <CommandGroup heading="Meus Ativos">
-                {ativosCarteira.map((ativo) => (
-                  <CommandItem
-                    key={ativo.codigoAtivo}
-                    value={`${ativo.codigoAtivo} ${ativo.nomeAtivo}`}
-                    onSelect={() => handleSelecionarAtivo(ativo.codigoAtivo)}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        tickerSelecionado?.toUpperCase() === ativo.codigoAtivo.toUpperCase()
-                          ? "opacity-100"
-                          : "opacity-0",
-                      )}
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{ativo.codigoAtivo}</span>
-                      <span className="text-muted-foreground text-xs">
-                        {ativo.nomeAtivo} · {ativo.estrategia}
-                      </span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
+            {ativosCarteira.length > 0 &&
+              gruposAtivos.map((grupo, indiceGrupo) => (
+                <CommandGroup key={grupo.rotulo} heading={grupo.rotulo}>
+                  {grupo.ativos.map((ativo) => {
+                    const ativoTemTicker = ativo.codigoAtivo !== ativo.nomeAtivo;
+                    const rentabilidadeTexto =
+                      ativo.rentabilidade12Meses !== null
+                        ? `${ativo.rentabilidade12Meses > 0 ? "+" : ""}${ativo.rentabilidade12Meses.toFixed(1)}%`
+                        : null;
+
+                    return (
+                      <CommandItem
+                        key={ativo.codigoAtivo}
+                        value={`${ativo.codigoAtivo} ${ativo.nomeAtivo}`}
+                        onSelect={() => handleSelecionarAtivo(ativo.codigoAtivo)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            tickerSelecionado?.toUpperCase() === ativo.codigoAtivo.toUpperCase()
+                              ? "opacity-100"
+                              : "opacity-0",
+                          )}
+                        />
+                        <div className="flex flex-1 items-center justify-between gap-2">
+                          <div className="flex min-w-0 flex-col">
+                            <span className="truncate text-sm font-medium">
+                              {ativo.codigoAtivo}
+                            </span>
+                            <span className="text-muted-foreground truncate text-xs">
+                              {ativoTemTicker ? `${ativo.nomeAtivo} · ` : ""}
+                              {ativo.estrategia}
+                            </span>
+                          </div>
+                          {rentabilidadeTexto && (
+                            <span
+                              className={cn(
+                                "text-xs font-medium",
+                                ativo.rentabilidade12Meses! >= 0
+                                  ? "text-success"
+                                  : "text-destructive",
+                              )}
+                            >
+                              {rentabilidadeTexto}
+                            </span>
+                          )}
+                        </div>
+                      </CommandItem>
+                    );
+                  })}
+                  {indiceGrupo < gruposAtivos.length - 1 && <CommandSeparator />}
+                </CommandGroup>
+              ))}
 
             {termoBusca.trim().length >= 2 && (
               <>

@@ -141,31 +141,49 @@ export function agregarDadosDoAtivo(
 
 /**
  * Lista todos os ativos unicos presentes nos relatorios.
- * Retorna ticker + nome + estrategia para o seletor de ativos.
+ * Retorna ticker + nome + estrategia + rentabilidade12Meses para o seletor de ativos.
  */
 export function listarAtivosUnicos(
   relatorios: RelatorioExtraido[],
-): Array<{ codigoAtivo: string; nomeAtivo: string; estrategia: string }> {
-  const ativosMap = new Map<string, { nomeAtivo: string; estrategia: string }>();
+): Array<{
+  codigoAtivo: string;
+  nomeAtivo: string;
+  estrategia: string;
+  rentabilidade12Meses: number | null;
+}> {
+  const ativosMap = new Map<
+    string,
+    {
+      codigoAtivo: string;
+      nomeAtivo: string;
+      estrategia: string;
+      rentabilidade12Meses: number | null;
+    }
+  >();
 
-  for (const relatorio of relatorios) {
+  // Ordenar relatorios por data (mais recente primeiro para pegar dados atuais)
+  const relatoriosOrdenados = [...relatorios].sort((relatorioA, relatorioB) =>
+    relatorioB.metadados.mesReferencia.localeCompare(relatorioA.metadados.mesReferencia),
+  );
+
+  for (const relatorio of relatoriosOrdenados) {
     for (const posicao of relatorio.posicoesDetalhadas) {
-      const chave = (posicao.codigoAtivo ?? posicao.nomeAtivo).toUpperCase();
-      // Sobrescreve com o mais recente (ultimo relatorio ganha)
-      ativosMap.set(chave, {
-        nomeAtivo: posicao.nomeAtivo,
-        estrategia: posicao.estrategia,
-      });
+      const chaveUnica = (posicao.codigoAtivo ?? posicao.nomeAtivo).toUpperCase();
+      // Apenas adiciona se ainda nao existe (primeiro = mais recente)
+      if (!ativosMap.has(chaveUnica)) {
+        ativosMap.set(chaveUnica, {
+          codigoAtivo: posicao.codigoAtivo ?? posicao.nomeAtivo,
+          nomeAtivo: posicao.nomeAtivo,
+          estrategia: posicao.estrategia,
+          rentabilidade12Meses: posicao.rentabilidade12Meses?.valor ?? null,
+        });
+      }
     }
   }
 
-  return [...ativosMap.entries()]
-    .map(([codigoAtivo, dados]) => ({
-      codigoAtivo,
-      nomeAtivo: dados.nomeAtivo,
-      estrategia: dados.estrategia,
-    }))
-    .sort((ativoA, ativoB) => ativoA.nomeAtivo.localeCompare(ativoB.nomeAtivo));
+  return [...ativosMap.values()].sort((ativoA, ativoB) =>
+    ativoA.nomeAtivo.localeCompare(ativoB.nomeAtivo),
+  );
 }
 
 // ---- Helpers de deduplicacao ----

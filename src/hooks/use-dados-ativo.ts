@@ -11,6 +11,7 @@ interface AtivoDaCarteira {
   codigoAtivo: string;
   nomeAtivo: string;
   estrategia: string;
+  rentabilidade12Meses: number | null;
 }
 
 interface ListaAtivosResponse {
