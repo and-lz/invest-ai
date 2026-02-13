@@ -14,6 +14,7 @@ import {
   GLOSSARIO_RENDIMENTOS,
 } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { TrendingUp } from "lucide-react";
 import type { DashboardData } from "@/application/use-cases/get-dashboard-data";
 
 interface WealthEvolutionChartProps {
@@ -134,6 +135,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <TrendingUp className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Evolucao Patrimonial
           <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_PATRIMONIAL.explicacao} />
         </CardTitle>

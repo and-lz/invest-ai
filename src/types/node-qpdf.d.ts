@@ -13,10 +13,7 @@ declare module "node-qpdf" {
     };
   }
 
-  export function encrypt(
-    inputFile: string,
-    options: EncryptOptions,
-  ): Promise<{ info: string }>;
+  export function encrypt(inputFile: string, options: EncryptOptions): Promise<{ info: string }>;
 
   export function decrypt(inputFile: string, password: string): Readable;
 }

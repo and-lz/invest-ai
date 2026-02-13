@@ -119,7 +119,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
         ) : mostrarCampoSenha && arquivoSelecionado ? (
           <div className="flex flex-col items-center gap-6 py-8">
             <FileText className="text-primary h-12 w-12" />
-            <div className="text-center space-y-2">
+            <div className="space-y-2 text-center">
               <h3 className="text-lg font-semibold">Arquivo selecionado</h3>
               <p className="text-muted-foreground text-sm">{arquivoSelecionado.name}</p>
             </div>
@@ -146,11 +146,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
                 </p>
               </div>
               <div className="flex gap-2">
-                <Button
-                  onClick={confirmarUpload}
-                  className="flex-1"
-                  disabled={estaProcessando}
-                >
+                <Button onClick={confirmarUpload} className="flex-1" disabled={estaProcessando}>
                   {estaProcessando ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -160,11 +156,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
                     "Processar relatório"
                   )}
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleNovoUpload}
-                  disabled={estaProcessando}
-                >
+                <Button variant="outline" onClick={handleNovoUpload} disabled={estaProcessando}>
                   Cancelar
                 </Button>
               </div>
@@ -184,13 +176,13 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
             {estaProcessando ? (
               <>
                 <Loader2 className="text-primary h-12 w-12 animate-spin" />
-                <div className="text-center space-y-2">
+                <div className="space-y-2 text-center">
                   <h3 className="text-lg font-semibold">
                     {statusUpload === "uploading" ? "Enviando arquivo..." : "Processando com IA..."}
                   </h3>
                   <p className="text-muted-foreground text-sm">{arquivoSelecionado?.name}</p>
                   {statusUpload === "processing" && (
-                    <div className="text-muted-foreground text-xs space-y-1">
+                    <div className="text-muted-foreground space-y-1 text-xs">
                       <p>Extraindo dados do relatório com IA...</p>
                       <p>Extraindo dados de todas as páginas do relatório.</p>
                       <p className="text-xs text-gray-500">
@@ -199,10 +191,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
                     </div>
                   )}
                 </div>
-                <Progress
-                  value={statusUpload === "uploading" ? 30 : 70}
-                  className="w-64"
-                />
+                <Progress value={statusUpload === "uploading" ? 30 : 70} className="w-64" />
               </>
             ) : (
               <>

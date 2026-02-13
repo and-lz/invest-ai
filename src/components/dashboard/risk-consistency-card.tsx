@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_RISCO_CONSISTENCIA } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { Shield } from "lucide-react";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { AnaliseRiscoRetorno } from "@/schemas/report-extraction.schema";
 
@@ -59,6 +60,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Shield className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Risco e Consistência
           <InfoTooltip conteudo={GLOSSARIO_RISCO_CONSISTENCIA.explicacao} />
         </CardTitle>

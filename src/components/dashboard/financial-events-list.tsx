@@ -10,7 +10,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  Coins,
+  BadgeDollarSign,
+  TrendingUp,
+  ArrowDownCircle,
+  Building2,
+  Circle,
+  type LucideIcon,
+} from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarDataBrasileira } from "@/lib/format-date";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
@@ -18,6 +29,15 @@ import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_EVENTO_FINANCEIRO, GLOSSARIO_TIPOS_EVENTO } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { EventoFinanceiro } from "@/schemas/report-extraction.schema";
+
+const ICONES_TIPO_EVENTO: Record<string, LucideIcon> = {
+  Dividendo: Coins,
+  JCP: BadgeDollarSign,
+  Rendimento: TrendingUp,
+  "Amortização": ArrowDownCircle,
+  Aluguel: Building2,
+  Outro: Circle,
+};
 
 type ColunaEventos = "tipo" | "ativo" | "data" | "valor";
 
@@ -172,6 +192,13 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                 <TableRow key={`${evento.codigoAtivo ?? evento.nomeAtivo}-${indice}`}>
                   <TableCell className="text-muted-foreground">
                     <span className="flex items-center gap-1">
+                      {(() => {
+                        const IconComponent = ICONES_TIPO_EVENTO[evento.tipoEvento];
+                        if (IconComponent) {
+                          return <IconComponent className="h-3.5 w-3.5" aria-hidden="true" />;
+                        }
+                        return null;
+                      })()}
                       {evento.tipoEvento}
                       {GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento] != null && (
                         <InfoTooltip

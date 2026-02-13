@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, ReferenceLine } from 
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_RENTABILIDADE_POR_CATEGORIA } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { BarChart3 } from "lucide-react";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { RentabilidadePorCategoria } from "@/schemas/report-extraction.schema";
 import type { ChartConfig } from "@/components/ui/chart";
@@ -113,6 +114,7 @@ export function CategoryPerformanceChart({ categorias, cdiAnual }: CategoryPerfo
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <BarChart3 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Rentabilidade por Categoria
           <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_POR_CATEGORIA.explicacao} />
         </CardTitle>

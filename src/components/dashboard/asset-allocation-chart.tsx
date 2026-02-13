@@ -11,7 +11,28 @@ import {
   GLOSSARIO_ESTRATEGIAS,
 } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import {
+  PieChart as PieChartIcon,
+  Landmark,
+  TrendingUp,
+  Building2,
+  Globe,
+  BarChart3,
+  Bitcoin,
+  Package,
+  type LucideIcon,
+} from "lucide-react";
 import type { AlocacaoMensal } from "@/schemas/report-extraction.schema";
+
+const ICONES_ESTRATEGIA: Record<string, LucideIcon> = {
+  "Renda Fixa": Landmark,
+  "Ações Brasil": TrendingUp,
+  "Fundos Imobiliários": Building2,
+  "Ações Global": Globe,
+  "Renda Variável": BarChart3,
+  Criptomoedas: Bitcoin,
+  Outros: Package,
+};
 
 interface AssetAllocationChartProps {
   alocacaoMensal: AlocacaoMensal[];
@@ -70,6 +91,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <PieChartIcon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Alocacao por Estrategia
           <InfoTooltip conteudo={GLOSSARIO_ALOCACAO_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
@@ -99,6 +121,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
         <div className="mt-4 grid grid-cols-2 gap-2">
           {dadosGrafico.map((item) => {
             const explicacaoEstrategia = GLOSSARIO_ESTRATEGIAS[item.nome];
+            const IconeEstrategia = ICONES_ESTRATEGIA[item.nome];
             return (
               <div key={item.nome} className="flex items-center gap-2 text-sm">
                 <div
@@ -106,6 +129,9 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
                   style={{ backgroundColor: item.fill }}
                 />
                 <span className="text-muted-foreground flex items-center gap-1">
+                  {IconeEstrategia && (
+                    <IconeEstrategia className="h-3 w-3" aria-hidden="true" />
+                  )}
                   {item.nome}
                   {explicacaoEstrategia && (
                     <InfoTooltip

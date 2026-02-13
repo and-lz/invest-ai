@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LayoutDashboard, Upload, FileText, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlternarTema } from "@/components/layout/alternar-tema";
+import { useState, useEffect } from "react";
 
 const itensNavegacao = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
@@ -15,9 +16,33 @@ const itensNavegacao = [
 
 export function HeaderNavigation() {
   const pathname = usePathname();
+  const [estaVisivel, setEstaVisivel] = useState(true);
+  const [scrollAnterior, setScrollAnterior] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollAtual = window.scrollY;
+
+      if (scrollAtual < 50) {
+        setEstaVisivel(true);
+      } else if (scrollAtual > scrollAnterior) {
+        setEstaVisivel(false);
+      } else {
+        setEstaVisivel(true);
+      }
+
+      setScrollAnterior(scrollAtual);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [scrollAnterior]);
 
   return (
-    <header className="bg-background border-border sticky top-0 z-50 h-16 border-b">
+    <header className={cn(
+      "bg-background border-border sticky top-0 z-50 h-16 border-b transition-transform duration-300",
+      estaVisivel ? "translate-y-0" : "-translate-y-full"
+    )}>
       <div className="flex h-16 items-center justify-between px-6">
         <h1 className="text-lg font-bold">Investimentos</h1>
 

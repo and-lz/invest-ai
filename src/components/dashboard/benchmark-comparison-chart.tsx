@@ -12,6 +12,7 @@ import {
   GLOSSARIO_IPCA,
 } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { Scale, Wallet, Landmark, TrendingUp, ShoppingCart } from "lucide-react";
 import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
 
 interface DadosComparacao {
@@ -110,6 +111,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Scale className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Carteira vs Benchmarks
           <InfoTooltip conteudo={GLOSSARIO_CARTEIRA_VS_BENCHMARKS.explicacao} />
         </CardTitle>
@@ -142,10 +144,12 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: "var(--color-carteira)" }}
             />
+            <Wallet className="h-3 w-3" aria-hidden="true" />
             Sua Carteira
           </div>
           <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
             <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-cdi)" }} />
+            <Landmark className="h-3 w-3" aria-hidden="true" />
             CDI
             <InfoTooltip conteudo={GLOSSARIO_CDI.explicacao} tamanhoIcone="h-3 w-3" />
           </div>
@@ -154,6 +158,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: "var(--color-ibovespa)" }}
             />
+            <TrendingUp className="h-3 w-3" aria-hidden="true" />
             Ibovespa
             <InfoTooltip conteudo={GLOSSARIO_IBOVESPA.explicacao} tamanhoIcone="h-3 w-3" />
           </div>
@@ -162,6 +167,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: "var(--color-ipca)" }}
             />
+            <ShoppingCart className="h-3 w-3" aria-hidden="true" />
             IPCA
             <InfoTooltip conteudo={GLOSSARIO_IPCA.explicacao} tamanhoIcone="h-3 w-3" />
           </div>

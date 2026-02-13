@@ -8,6 +8,7 @@ import { formatarMesAno } from "@/lib/format-date";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_EVOLUCAO_ALOCACAO, GLOSSARIO_ESTRATEGIAS } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { Layers } from "lucide-react";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { AlocacaoMensal } from "@/schemas/report-extraction.schema";
 import type { ChartConfig } from "@/components/ui/chart";
@@ -114,6 +115,7 @@ export function AllocationEvolutionChart({ evolucaoAlocacao }: AllocationEvoluti
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Layers className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Evolução da Alocação
           <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_ALOCACAO.explicacao} />
         </CardTitle>

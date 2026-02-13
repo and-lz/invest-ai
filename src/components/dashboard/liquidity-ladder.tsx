@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_LIQUIDEZ } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { Droplets } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { FaixaLiquidez } from "@/schemas/report-extraction.schema";
@@ -131,6 +132,7 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Droplets className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Escada de Liquidez
           <InfoTooltip conteudo={GLOSSARIO_LIQUIDEZ.explicacao} />
         </CardTitle>

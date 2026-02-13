@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_RETORNOS_MENSAIS, GLOSSARIO_PERCENTUAL_CDI } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { Calendar } from "lucide-react";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { RetornoAnual } from "@/schemas/report-extraction.schema";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -123,6 +124,7 @@ export function MonthlyReturnsHeatmap({ retornosMensais }: MonthlyReturnsHeatmap
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
+          <Calendar className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
           Retornos Mensais
           <InfoTooltip conteudo={GLOSSARIO_RETORNOS_MENSAIS.explicacao} />
         </CardTitle>

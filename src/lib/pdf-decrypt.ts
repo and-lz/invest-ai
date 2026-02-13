@@ -13,10 +13,7 @@ import type { Readable } from "stream";
  * @param senha - Senha do PDF (opcional)
  * @returns Buffer do PDF descriptografado
  */
-export async function descriptografarPdf(
-  pdfBuffer: Buffer,
-  senha?: string,
-): Promise<Buffer> {
+export async function descriptografarPdf(pdfBuffer: Buffer, senha?: string): Promise<Buffer> {
   // Se não tem senha, retorna o buffer original
   // (assume que não está protegido ou que a Claude API vai lidar com isso)
   if (!senha) {
@@ -82,9 +79,7 @@ export async function descriptografarPdf(
       mensagemErro.toLowerCase().includes("command not found") ||
       mensagemErro.toLowerCase().includes("no such file")
     ) {
-      throw new Error(
-        "qpdf não está instalado no sistema. Instale com: brew install qpdf",
-      );
+      throw new Error("qpdf não está instalado no sistema. Instale com: brew install qpdf");
     }
 
     // Verifica se o erro é de senha incorreta

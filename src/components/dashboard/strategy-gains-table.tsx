@@ -10,7 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  Landmark,
+  TrendingUp,
+  Building2,
+  Globe,
+  BarChart3,
+  Bitcoin,
+  Package,
+  type LucideIcon,
+} from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -23,6 +35,16 @@ import {
 } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { GanhosPorEstrategia } from "@/schemas/report-extraction.schema";
+
+const ICONES_ESTRATEGIA: Record<string, LucideIcon> = {
+  "Renda Fixa": Landmark,
+  "Ações Brasil": TrendingUp,
+  "Fundos Imobiliários": Building2,
+  "Ações Global": Globe,
+  "Renda Variável": BarChart3,
+  Criptomoedas: Bitcoin,
+  Outros: Package,
+};
 
 type ColunaGanhos =
   | "estrategia"
@@ -218,9 +240,16 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {itensOrdenados.map((ganho) => (
+            {itensOrdenados.map((ganho) => {
+              const IconeEstrategia = ICONES_ESTRATEGIA[ganho.nomeEstrategia];
+              return (
               <TableRow key={ganho.nomeEstrategia}>
-                <TableCell className="font-medium">{ganho.nomeEstrategia}</TableCell>
+                <TableCell className="font-medium">
+                  <span className="flex items-center gap-2">
+                    {IconeEstrategia && <IconeEstrategia className="h-4 w-4" aria-hidden="true" />}
+                    {ganho.nomeEstrategia}
+                  </span>
+                </TableCell>
                 <TableCell className="text-right">
                   {formatarCelulaMoeda(ganho.ganhoNoMes.valorEmCentavos)}
                 </TableCell>
@@ -234,7 +263,9 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                   {formatarCelulaMoeda(ganho.ganhoDesdeInicio.valorEmCentavos)}
                 </TableCell>
               </TableRow>
-            ))}
+            );
+            })}
+
           </TableBody>
         </Table>
         <TakeawayBox conclusoes={conclusaoGanhos} />

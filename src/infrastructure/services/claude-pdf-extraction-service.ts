@@ -5,27 +5,17 @@ import type { ExtractionService } from "@/domain/interfaces/extraction-service";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import { RelatorioExtraidoSchema } from "@/schemas/report-extraction.schema";
 import { ClaudeApiError, PdfParsingError } from "@/domain/errors/app-errors";
-import {
-  SYSTEM_PROMPT_EXTRACAO,
-  INSTRUCAO_USUARIO_EXTRACAO,
-} from "@/lib/prompt-extracao-manual";
-import {
-  CLAUDE_MODEL_EXTRACTION,
-  CLAUDE_MAX_TOKENS_EXTRACTION,
-} from "@/lib/claude-config";
+import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/prompt-extracao-manual";
+import { CLAUDE_MODEL_EXTRACTION, CLAUDE_MAX_TOKENS_EXTRACTION } from "@/lib/claude-config";
 
 export class ClaudePdfExtractionService implements ExtractionService {
   constructor(private readonly anthropicClient: Anthropic) {}
 
-  async extrairDadosDoRelatorio(
-    pdfBase64: string,
-  ): Promise<RelatorioExtraido> {
+  async extrairDadosDoRelatorio(pdfBase64: string): Promise<RelatorioExtraido> {
     const tempoInicio = Date.now();
 
     try {
-      console.info(
-        `[PDF Extraction] Iniciando extração com ${CLAUDE_MODEL_EXTRACTION}`,
-      );
+      console.info(`[PDF Extraction] Iniciando extração com ${CLAUDE_MODEL_EXTRACTION}`);
 
       const esquemaJson = toJSONSchema(RelatorioExtraidoSchema) as Record<string, unknown>;
       const promptComSchema = this.construirPromptComSchema(
@@ -67,9 +57,7 @@ export class ClaudePdfExtractionService implements ExtractionService {
         !Array.isArray(resposta.content) ||
         resposta.content.length === 0
       ) {
-        throw new PdfParsingError(
-          "Resposta da Claude API nao contem conteudo",
-        );
+        throw new PdfParsingError("Resposta da Claude API nao contem conteudo");
       }
 
       const conteudoResposta = resposta.content[0];
@@ -122,13 +110,11 @@ export class ClaudePdfExtractionService implements ExtractionService {
     prompt += "\n```\n\n";
 
     prompt += "⚠️  REGRAS CRÍTICAS:\n";
-    prompt +=
-      '- Valores monetários DEVEM ser objetos: { valorEmCentavos: number, moeda: "BRL" }\n';
+    prompt += '- Valores monetários DEVEM ser objetos: { valorEmCentavos: number, moeda: "BRL" }\n';
     prompt += "- Percentuais DEVEM ser objetos: { valor: number }\n";
     prompt += "- Datas no formato YYYY-MM-DD\n";
     prompt += "- Mês de referência no formato YYYY-MM\n";
-    prompt +=
-      "- NÃO retorne valores como primitivos (números/strings simples)\n";
+    prompt += "- NÃO retorne valores como primitivos (números/strings simples)\n";
 
     return prompt;
   }

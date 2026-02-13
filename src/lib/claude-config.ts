@@ -20,21 +20,24 @@
  * Padrão: Sonnet 4.6 (capaz para JSON estruturado complexo, rate limits maiores que Opus)
  * Pode ser sobrescrito pela variável de ambiente CLAUDE_MODEL_EXTRACTION
  */
-export const CLAUDE_MODEL_EXTRACTION = (process.env.CLAUDE_MODEL_EXTRACTION || "claude-sonnet-4-20250514") as string;
+export const CLAUDE_MODEL_EXTRACTION = (process.env.CLAUDE_MODEL_EXTRACTION ||
+  "claude-sonnet-4-20250514") as string;
 
 /**
  * Modelo Claude para geração de insights
  * Padrão: Opus 4.6 (raciocínio complexo, análises profundas)
  * Pode ser sobrescrito pela variável de ambiente CLAUDE_MODEL_INSIGHTS
  */
-export const CLAUDE_MODEL_INSIGHTS = (process.env.CLAUDE_MODEL_INSIGHTS || "claude-opus-4-6") as string;
+export const CLAUDE_MODEL_INSIGHTS = (process.env.CLAUDE_MODEL_INSIGHTS ||
+  "claude-opus-4-6") as string;
 
 /**
  * Modelo Claude para fallback
  * Padrão: Sonnet 4 (meio termo entre velocidade e capacidade)
  * Pode ser sobrescrito pela variável de ambiente CLAUDE_MODEL_FALLBACK
  */
-export const CLAUDE_MODEL_FALLBACK = (process.env.CLAUDE_MODEL_FALLBACK || "claude-sonnet-4-20250514") as string;
+export const CLAUDE_MODEL_FALLBACK = (process.env.CLAUDE_MODEL_FALLBACK ||
+  "claude-sonnet-4-20250514") as string;
 
 /**
  * @deprecated Usar CLAUDE_MODEL_EXTRACTION ou CLAUDE_MODEL_INSIGHTS em vez disso
