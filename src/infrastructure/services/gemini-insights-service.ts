@@ -166,6 +166,7 @@ export class GeminiInsightsService implements InsightsService {
     prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
     prompt += "- Compare com o mês anterior quando disponível para identificar tendências\n";
     prompt += "- Destaque riscos de concentração e oportunidades de diversificação\n";
+    prompt += "- Os campos concluida e statusAcao são controle do usuário: SEMPRE use concluida=false e statusAcao='pendente'\n";
 
     return prompt;
   }
@@ -192,6 +193,7 @@ export class GeminiInsightsService implements InsightsService {
     prompt += "- Identifique tendências, padrões e decisões passadas boas/ruins\n";
     prompt += "- Use linguagem acessível, evite jargões técnicos excessivos\n";
     prompt += "- No campo mesReferencia, use 'consolidado' como valor\n";
+    prompt += "- Os campos concluida e statusAcao são controle do usuário: SEMPRE use concluida=false e statusAcao='pendente'\n";
 
     return prompt;
   }

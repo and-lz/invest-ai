@@ -231,34 +231,30 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   }
 
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          className={cn(
-            "flex flex-col items-center gap-4 rounded-lg border-2 border-dashed p-6 transition-colors md:p-12",
-            estaSobreDropzone ? "border-primary bg-primary/5" : "border-muted-foreground/25",
-          )}
-        >
-          <Upload className="text-muted-foreground h-12 w-12" />
-          <div className="text-center">
-            <h3 className="text-lg font-semibold">Arraste seu relatorio PDF aqui</h3>
-            <p className="text-muted-foreground text-sm">ou clique para selecionar (max 32MB)</p>
-          </div>
-          <input
-            ref={inputArquivoRef}
-            type="file"
-            accept=".pdf"
-            className="hidden"
-            onChange={handleSelecionarArquivo}
-          />
-          <Button variant="outline" onClick={() => inputArquivoRef.current?.click()}>
-            Selecionar arquivo
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+    <div
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      className={cn(
+        "flex flex-col items-center gap-4 rounded-lg border-2 border-dashed p-6 transition-colors md:p-12",
+        estaSobreDropzone ? "border-primary bg-primary/5" : "border-muted-foreground/25",
+      )}
+    >
+      <Upload className="text-muted-foreground h-12 w-12" />
+      <div className="text-center">
+        <h3 className="text-lg font-semibold">Arraste seu relatorio PDF aqui</h3>
+        <p className="text-muted-foreground text-sm">ou clique para selecionar (max 32MB)</p>
+      </div>
+      <input
+        ref={inputArquivoRef}
+        type="file"
+        accept=".pdf"
+        className="hidden"
+        onChange={handleSelecionarArquivo}
+      />
+      <Button variant="outline" onClick={() => inputArquivoRef.current?.click()}>
+        Selecionar arquivo
+      </Button>
+    </div>
   );
 }

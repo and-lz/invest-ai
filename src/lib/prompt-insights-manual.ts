@@ -24,6 +24,7 @@ DIRETRIZES:
 10. Seja direto e pratico. Evite jargao excessivo.
 11. Priorize insights por impacto financeiro potencial.
 12. Responda em portugues brasileiro.
+13. IMPORTANTE: Os campos "concluida" e "statusAcao" sao de controle do usuario. SEMPRE retorne concluida=false e statusAcao="pendente" para TODOS os insights.
 
 Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 
@@ -86,6 +87,7 @@ DIRETRIZES PARA ANALISE CONSOLIDADA:
 12. Priorize insights por impacto financeiro potencial.
 13. Responda em portugues brasileiro.
 14. No campo mesReferencia, use "consolidado" como valor.
+15. IMPORTANTE: Os campos "concluida" e "statusAcao" sao de controle do usuario. SEMPRE retorne concluida=false e statusAcao="pendente" para TODOS os insights.
 
 Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 
