@@ -4,7 +4,9 @@ import { useCallback, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Upload, FileText, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Upload, FileText, CheckCircle, XCircle, Loader2, Lock } from "lucide-react";
 import { useUploadReport } from "@/hooks/use-upload-report";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +17,8 @@ interface PdfUploadDropzoneProps {
 export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   const [estaSobreDropzone, setEstaSobreDropzone] = useState(false);
   const [arquivoSelecionado, setArquivoSelecionado] = useState<File | null>(null);
+  const [senhaPdf, setSenhaPdf] = useState<string>("");
+  const [mostrarCampoSenha, setMostrarCampoSenha] = useState(false);
   const inputArquivoRef = useRef<HTMLInputElement>(null);
   const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando } = useUploadReport();
 
@@ -28,17 +32,23 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
     return true;
   }, []);
 
-  const processarArquivo = useCallback(
-    async (arquivo: File) => {
+  const selecionarArquivo = useCallback(
+    (arquivo: File) => {
       if (!validarArquivo(arquivo)) return;
       setArquivoSelecionado(arquivo);
-      const resultado = await fazerUpload(arquivo);
-      if (resultado.sucesso && resultado.metadados) {
-        onUploadSucesso?.(resultado.metadados.identificador);
-      }
+      setMostrarCampoSenha(true);
+      setSenhaPdf("");
     },
-    [validarArquivo, fazerUpload, onUploadSucesso],
+    [validarArquivo],
   );
+
+  const confirmarUpload = useCallback(async () => {
+    if (!arquivoSelecionado) return;
+    const resultado = await fazerUpload(arquivoSelecionado, senhaPdf || undefined);
+    if (resultado.sucesso && resultado.metadados) {
+      onUploadSucesso?.(resultado.metadados.identificador);
+    }
+  }, [arquivoSelecionado, senhaPdf, fazerUpload, onUploadSucesso]);
 
   const handleDrop = useCallback(
     (evento: React.DragEvent) => {
@@ -46,10 +56,10 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
       setEstaSobreDropzone(false);
       const arquivo = evento.dataTransfer.files[0];
       if (arquivo) {
-        void processarArquivo(arquivo);
+        selecionarArquivo(arquivo);
       }
     },
-    [processarArquivo],
+    [selecionarArquivo],
   );
 
   const handleDragOver = useCallback((evento: React.DragEvent) => {
@@ -65,15 +75,17 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
     (evento: React.ChangeEvent<HTMLInputElement>) => {
       const arquivo = evento.target.files?.[0];
       if (arquivo) {
-        void processarArquivo(arquivo);
+        selecionarArquivo(arquivo);
       }
     },
-    [processarArquivo],
+    [selecionarArquivo],
   );
 
   const handleNovoUpload = useCallback(() => {
     resetar();
     setArquivoSelecionado(null);
+    setSenhaPdf("");
+    setMostrarCampoSenha(false);
     if (inputArquivoRef.current) {
       inputArquivoRef.current.value = "";
     }
@@ -104,6 +116,45 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
               Tentar novamente
             </Button>
           </div>
+        ) : mostrarCampoSenha && arquivoSelecionado ? (
+          <div className="flex flex-col items-center gap-6 py-8">
+            <FileText className="text-primary h-12 w-12" />
+            <div className="text-center space-y-2">
+              <h3 className="text-lg font-semibold">Arquivo selecionado</h3>
+              <p className="text-muted-foreground text-sm">{arquivoSelecionado.name}</p>
+            </div>
+            <div className="w-full max-w-sm space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="senha-pdf" className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  Senha do PDF (opcional)
+                </Label>
+                <Input
+                  id="senha-pdf"
+                  type="password"
+                  placeholder="Deixe em branco se não tiver senha"
+                  value={senhaPdf}
+                  onChange={(e) => setSenhaPdf(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      void confirmarUpload();
+                    }
+                  }}
+                />
+                <p className="text-muted-foreground text-xs">
+                  Se o PDF estiver protegido por senha, informe acima.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={confirmarUpload} className="flex-1">
+                  Processar relatório
+                </Button>
+                <Button variant="outline" onClick={handleNovoUpload}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
         ) : (
           <div
             onDrop={handleDrop}
@@ -118,11 +169,18 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
             {estaProcessando ? (
               <>
                 <Loader2 className="text-primary h-12 w-12 animate-spin" />
-                <div className="text-center">
+                <div className="text-center space-y-2">
                   <h3 className="text-lg font-semibold">
                     {statusUpload === "uploading" ? "Enviando arquivo..." : "Processando com IA..."}
                   </h3>
                   <p className="text-muted-foreground text-sm">{arquivoSelecionado?.name}</p>
+                  {statusUpload === "processing" && (
+                    <p className="text-muted-foreground text-xs">
+                      Extraindo dados de todas as páginas do relatório.
+                      <br />
+                      Isso pode levar alguns minutos. Aguarde...
+                    </p>
+                  )}
                 </div>
                 <Progress value={statusUpload === "uploading" ? 30 : 70} className="w-64" />
               </>

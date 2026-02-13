@@ -294,3 +294,111 @@ export const GLOSSARIO_TIPOS_EVENTO: Record<string, EntradaGlossario> = {
     explicacao: "Outros tipos de eventos financeiros não classificados nas categorias anteriores.",
   },
 };
+
+// ---------- Retornos Mensais / Heatmap (monthly-returns-heatmap.tsx) ----------
+
+export const GLOSSARIO_RETORNOS_MENSAIS: EntradaGlossario = {
+  termo: "Retornos Mensais",
+  explicacao:
+    "Mapa de calor mostrando o retorno da sua carteira em cada mês, ao longo dos anos. " +
+    "Células verdes indicam meses positivos e vermelhas meses negativos. " +
+    "Quanto mais intensa a cor, maior foi o ganho ou a perda.",
+};
+
+export const GLOSSARIO_PERCENTUAL_CDI: EntradaGlossario = {
+  termo: "% do CDI",
+  explicacao:
+    "Mostra quanto por cento do CDI sua carteira rendeu naquele período. " +
+    "Se está acima de 100%, você superou a renda fixa. Abaixo de 100%, ficou atrás.",
+};
+
+// ---------- Risco e Consistência (risk-consistency-card.tsx) ----------
+
+export const GLOSSARIO_RISCO_CONSISTENCIA: EntradaGlossario = {
+  termo: "Risco e Consistência",
+  explicacao:
+    "Mostra com que frequência seus investimentos batem o CDI (referência de renda fixa). " +
+    "Quanto maior a taxa de acerto, mais consistente é sua carteira. " +
+    "Também mostra o melhor e o pior mês da história da carteira.",
+};
+
+export const GLOSSARIO_VOLATILIDADE: EntradaGlossario = {
+  termo: "Volatilidade",
+  explicacao:
+    "Mede quanto seus investimentos sobem e descem ao longo do tempo. " +
+    "Volatilidade alta significa variações grandes (pode ganhar muito ou perder muito). " +
+    "Volatilidade baixa significa retornos mais estáveis e previsíveis.",
+};
+
+// ---------- Liquidez (liquidity-ladder.tsx) ----------
+
+export const GLOSSARIO_LIQUIDEZ: EntradaGlossario = {
+  termo: "Escada de Liquidez",
+  explicacao:
+    "Mostra quanto tempo leva para você resgatar seu dinheiro. " +
+    "Investimentos com liquidez de 0-1 dia podem ser resgatados imediatamente. " +
+    "É importante ter parte do dinheiro acessível para emergências.",
+};
+
+// ---------- Todas as Posições (all-positions-table.tsx) ----------
+
+export const GLOSSARIO_TODAS_POSICOES: EntradaGlossario = {
+  termo: "Todas as Posições",
+  explicacao:
+    "Lista completa de todos os seus investimentos, com detalhes de rentabilidade " +
+    "no mês, em 12 meses e desde o início. Permite ver o panorama completo da carteira.",
+};
+
+export const GLOSSARIO_RENTABILIDADE_12M: EntradaGlossario = {
+  termo: "Rentabilidade 12 Meses",
+  explicacao:
+    "Retorno acumulado nos últimos 12 meses (1 ano). " +
+    "É uma boa medida para avaliar o desempenho de médio prazo de um investimento.",
+};
+
+export const GLOSSARIO_RENTABILIDADE_DESDE_INICIO_ATIVO: EntradaGlossario = {
+  termo: "Rentabilidade Desde o Início",
+  explicacao:
+    "Retorno total desde que você comprou aquele investimento. " +
+    "Mostra o resultado completo da sua decisão de investir naquele ativo.",
+};
+
+// ---------- Rentabilidade por Categoria (category-performance-chart.tsx) ----------
+
+export const GLOSSARIO_RENTABILIDADE_POR_CATEGORIA: EntradaGlossario = {
+  termo: "Rentabilidade por Categoria",
+  explicacao:
+    "Compara o desempenho de cada tipo de investimento nos últimos 12 meses. " +
+    "Ajuda a entender quais categorias estão gerando mais retorno " +
+    "e quais estão ficando atrás do CDI.",
+};
+
+// ---------- Movimentações (transactions-table.tsx) ----------
+
+export const GLOSSARIO_MOVIMENTACOES: EntradaGlossario = {
+  termo: "Movimentações",
+  explicacao:
+    "Histórico de todas as operações de compra (aplicação), venda (resgate) " +
+    "e eventos financeiros do mês. Mostra para onde seu dinheiro foi " +
+    "e de onde veio.",
+};
+
+// ---------- Evolução da Alocação (allocation-evolution-chart.tsx) ----------
+
+export const GLOSSARIO_EVOLUCAO_ALOCACAO: EntradaGlossario = {
+  termo: "Evolução da Alocação",
+  explicacao:
+    "Mostra como a distribuição da sua carteira mudou ao longo dos meses. " +
+    "Permite visualizar se você está concentrando mais em um tipo de investimento " +
+    "ou diversificando ao longo do tempo.",
+};
+
+// ---------- Comparação por Período (period-comparison-detail.tsx) ----------
+
+export const GLOSSARIO_COMPARACAO_PERIODOS: EntradaGlossario = {
+  termo: "Comparação por Período",
+  explicacao:
+    "Mostra o retorno da sua carteira em diferentes janelas de tempo " +
+    "(3 meses, 6 meses, 12 meses, etc.) comparado ao CDI. " +
+    "Ajuda a entender se a carteira melhora ou piora no longo prazo.",
+};

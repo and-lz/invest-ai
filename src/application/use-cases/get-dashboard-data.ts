@@ -7,6 +7,12 @@ import type {
   ComparacaoBenchmarks,
   GanhosPorEstrategia,
   EventoFinanceiro,
+  AnaliseRiscoRetorno,
+  RetornoAnual,
+  FaixaLiquidez,
+  RentabilidadePorCategoria,
+  Movimentacao,
+  ComparacaoPeriodo,
 } from "@/schemas/report-extraction.schema";
 
 export interface DashboardData {
@@ -26,6 +32,14 @@ export interface DashboardData {
   eventosRecentes: EventoFinanceiro[];
   variacaoPatrimonialCentavos: number | null;
   quantidadeRelatorios: number;
+  analiseRiscoRetorno: AnaliseRiscoRetorno;
+  retornosMensais: RetornoAnual[];
+  faixasLiquidez: FaixaLiquidez[];
+  rentabilidadePorCategoria: RentabilidadePorCategoria[];
+  movimentacoes: Movimentacao[];
+  todasPosicoes: PosicaoAtivo[];
+  comparacaoPeriodos: ComparacaoPeriodo[];
+  evolucaoAlocacaoHistorica: AlocacaoMensal[];
 }
 
 const QUANTIDADE_TOP_PERFORMERS = 5;
@@ -113,6 +127,14 @@ export class GetDashboardDataUseCase {
       eventosRecentes: relatorioMaisRecente.dados.eventosFinanceiros,
       variacaoPatrimonialCentavos,
       quantidadeRelatorios: relatoriosExtraidos.length,
+      analiseRiscoRetorno: relatorioMaisRecente.dados.analiseRiscoRetorno,
+      retornosMensais: relatorioMaisRecente.dados.retornosMensais,
+      faixasLiquidez: relatorioMaisRecente.dados.faixasLiquidez,
+      rentabilidadePorCategoria: relatorioMaisRecente.dados.rentabilidadePorCategoria,
+      movimentacoes: relatorioMaisRecente.dados.movimentacoes,
+      todasPosicoes: relatorioMaisRecente.dados.posicoesDetalhadas,
+      comparacaoPeriodos: relatorioMaisRecente.dados.comparacaoPeriodos,
+      evolucaoAlocacaoHistorica: relatorioMaisRecente.dados.evolucaoAlocacao,
     };
   }
 

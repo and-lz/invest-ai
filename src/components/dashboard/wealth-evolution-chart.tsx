@@ -3,7 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
-import { configGraficoPatrimonio } from "@/lib/chart-config";
+import { getConfigGraficoPatrimonio } from "@/lib/chart-config";
+import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
 import { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { formatarMesAno } from "@/lib/format-date";
@@ -93,6 +94,7 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
   if (evolucao.length >= 3) {
     const penultimo = evolucao[evolucao.length - 2];
     const antepenultimo = evolucao[evolucao.length - 3];
+    if (!penultimo || !antepenultimo) return conclusoes;
     const cresceu2Meses =
       pontoAtual.patrimonioTotalCentavos > penultimo.patrimonioTotalCentavos &&
       penultimo.patrimonioTotalCentavos > antepenultimo.patrimonioTotalCentavos;
@@ -118,6 +120,8 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
 }
 
 export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionChartProps) {
+  const { palette } = useCyberpunkPalette();
+
   if (evolucaoPatrimonial.length < 2) return null;
 
   const dadosGrafico = evolucaoPatrimonial.map((ponto) => ({
@@ -127,6 +131,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
   }));
 
   const conclusoesEvolucao = gerarConclusaoEvolucao(evolucaoPatrimonial);
+  const configGrafico = getConfigGraficoPatrimonio(palette);
 
   return (
     <Card>
@@ -142,7 +147,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={configGraficoPatrimonio} className="h-75 w-full">
+        <ChartContainer config={configGrafico} className="h-75 w-full">
           <AreaChart data={dadosGrafico}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="mesAno" tickLine={false} axisLine={false} tickMargin={8} />

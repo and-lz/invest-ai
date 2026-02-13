@@ -94,6 +94,7 @@ function gerarConclusaoPerformers(
   if (ativos.length === 0) return [];
 
   const primeiroAtivo = ativos[0];
+  if (!primeiroAtivo) return [];
   const nomeAtivo = primeiroAtivo.codigoAtivo ?? primeiroAtivo.nomeAtivo;
   const rentabilidade = formatarPercentualSimples(primeiroAtivo.rentabilidadeMes.valor);
 

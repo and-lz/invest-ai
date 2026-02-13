@@ -14,7 +14,7 @@ export function useUploadReport() {
   const [erroUpload, setErroUpload] = useState<string | null>(null);
   const [metadadosResultado, setMetadadosResultado] = useState<ReportMetadata | null>(null);
 
-  const fazerUpload = useCallback(async (arquivo: File): Promise<UploadResult> => {
+  const fazerUpload = useCallback(async (arquivo: File, senha?: string): Promise<UploadResult> => {
     setStatusUpload("uploading");
     setErroUpload(null);
     setMetadadosResultado(null);
@@ -22,6 +22,9 @@ export function useUploadReport() {
     try {
       const formData = new FormData();
       formData.append("file", arquivo);
+      if (senha) {
+        formData.append("password", senha);
+      }
 
       setStatusUpload("processing");
 

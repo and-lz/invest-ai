@@ -3,7 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell } from "recharts";
-import { CORES_ESTRATEGIA } from "@/lib/chart-config";
+import { getCoresEstrategia } from "@/lib/chart-config";
+import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
@@ -23,6 +24,7 @@ function gerarConclusaoAlocacao(dadosGrafico: Array<{ nome: string; valor: numbe
 
   const ordenadosPorValor = [...dadosGrafico].sort((valorA, valorB) => valorB.valor - valorA.valor);
   const maiorCategoria = ordenadosPorValor[0];
+  if (!maiorCategoria) return conclusoes;
   const quantidadeCategorias = dadosGrafico.length;
 
   if (maiorCategoria.valor > 50) {
@@ -46,6 +48,9 @@ function gerarConclusaoAlocacao(dadosGrafico: Array<{ nome: string; valor: numbe
 }
 
 export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartProps) {
+  const { palette } = useCyberpunkPalette();
+  const cores = getCoresEstrategia(palette);
+
   const alocacaoRecente = alocacaoMensal[alocacaoMensal.length - 1];
   if (!alocacaoRecente) return null;
 
@@ -54,7 +59,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
     .map((categoria) => ({
       nome: categoria.nomeCategoria,
       valor: categoria.percentualDaCarteira.valor,
-      fill: CORES_ESTRATEGIA[categoria.nomeCategoria] ?? "hsl(0, 0%, 70%)",
+      fill: cores[categoria.nomeCategoria] ?? "hsl(0, 0%, 70%)",
     }));
 
   const conclusoesAlocacao = gerarConclusaoAlocacao(dadosGrafico);

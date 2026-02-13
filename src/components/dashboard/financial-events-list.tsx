@@ -173,9 +173,9 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                   <TableCell className="text-muted-foreground">
                     <span className="flex items-center gap-1">
                       {evento.tipoEvento}
-                      {GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento] && (
+                      {GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento] != null && (
                         <InfoTooltip
-                          conteudo={GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento].explicacao}
+                          conteudo={GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento]!.explicacao}
                           tamanhoIcone="h-3 w-3"
                         />
                       )}

@@ -2,7 +2,8 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { GetDashboardDataUseCase } from "@/application/use-cases/get-dashboard-data";
 import type { ReportRepository } from "@/domain/interfaces/report-repository";
 import type { RelatorioExtraido, PosicaoAtivo } from "@/schemas/report-extraction.schema";
-import type { Relatoriometadados } from "@/schemas/report.schema";
+import type { ReportMetadata } from "@/schemas/report-metadata.schema";
+import type { InsightsResponse } from "@/schemas/insights.schema";
 
 // ========== Test Data Factories ==========
 
@@ -142,11 +143,26 @@ const criarRelatorioExtraido = (mesAno: string, patrimonioTotal: number, patrimo
 
 // ========== Mock Repository ==========
 
+function criarMetadados(identificador: string, mesReferencia: string): ReportMetadata {
+  return {
+    identificador,
+    mesReferencia,
+    nomeArquivoOriginal: `relatorio-${mesReferencia}.pdf`,
+    caminhoArquivoPdf: `data/reports/${identificador}.pdf`,
+    caminhoArquivoExtraido: `data/extracted/${identificador}.json`,
+    caminhoArquivoInsights: null,
+    dataUpload: new Date().toISOString(),
+    statusExtracao: "concluido",
+    origemDados: "upload-automatico",
+    erroExtracao: null,
+  };
+}
+
 class MockReportRepository implements ReportRepository {
-  metadados: Relatoriometadados[] = [];
+  metadados: ReportMetadata[] = [];
   dados: Map<string, RelatorioExtraido> = new Map();
 
-  async listarTodosMetadados(): Promise<Relatoriometadados[]> {
+  async listarTodosMetadados(): Promise<ReportMetadata[]> {
     return this.metadados;
   }
 
@@ -154,17 +170,44 @@ class MockReportRepository implements ReportRepository {
     return this.dados.get(identificador) ?? null;
   }
 
+  async obterMetadados(identificador: string): Promise<ReportMetadata | null> {
+    return this.metadados.find((m) => m.identificador === identificador) ?? null;
+  }
+
+  async obterInsights(): Promise<InsightsResponse | null> {
+    return null;
+  }
+
+  async obterPdfComoBase64(): Promise<string> {
+    return "";
+  }
+
+  async salvarPdf(): Promise<string> {
+    return "";
+  }
+
+  async salvarDadosExtraidos(): Promise<string> {
+    return "";
+  }
+
+  async salvarMetadados(): Promise<void> {
+    return;
+  }
+
+  async salvarInsights(): Promise<void> {
+    return;
+  }
+
+  async removerRelatorio(): Promise<void> {
+    return;
+  }
+
   adicionarRelatorio(
     identificador: string,
     mesReferencia: string,
-    dados: RelatorioExtraido
+    dados: RelatorioExtraido,
   ): void {
-    this.metadados.push({
-      identificador,
-      mesReferencia,
-      dataCriacao: new Date().toISOString(),
-      tamanhoBytes: 1000,
-    });
+    this.metadados.push(criarMetadados(identificador, mesReferencia));
     this.dados.set(identificador, dados);
   }
 
@@ -192,12 +235,7 @@ describe("GetDashboardDataUseCase", () => {
     });
 
     it("deve retornar null quando há metadados mas sem dados extraídos", async () => {
-      repository.metadados.push({
-        identificador: "rel-1",
-        mesReferencia: "2024-12",
-        dataCriacao: new Date().toISOString(),
-        tamanhoBytes: 1000,
-      });
+      repository.metadados.push(criarMetadados("rel-1", "2024-12"));
 
       const resultado = await useCase.executar();
       expect(resultado).toBeNull();
@@ -271,8 +309,8 @@ describe("GetDashboardDataUseCase", () => {
       const resultado = await useCase.executar();
 
       expect(resultado?.evolucaoPatrimonial).toHaveLength(3);
-      expect(resultado?.evolucaoPatrimonial[0].mesAno).toBe("2024-10");
-      expect(resultado?.evolucaoPatrimonial[2].mesAno).toBe("2024-12");
+      expect(resultado!.evolucaoPatrimonial[0]!.mesAno).toBe("2024-10");
+      expect(resultado!.evolucaoPatrimonial[2]!.mesAno).toBe("2024-12");
     });
 
     it("deve calcular variação como diferença entre últimos dois relatórios", async () => {
@@ -322,8 +360,8 @@ describe("GetDashboardDataUseCase", () => {
       const resultado = await useCase.executar();
 
       expect(resultado?.melhoresPerformers).toHaveLength(5);
-      expect(resultado?.melhoresPerformers[0].nomeAtivo).toBe("Ativo com Melhor Performance");
-      expect(resultado?.melhoresPerformers[0].rentabilidadeMes.valor).toBe(5.5);
+      expect(resultado!.melhoresPerformers[0]!.nomeAtivo).toBe("Ativo com Melhor Performance");
+      expect(resultado!.melhoresPerformers[0]!.rentabilidadeMes.valor).toBe(5.5);
     });
 
     it("deve ordenar melhores performers por rentabilidade descendente", async () => {
@@ -343,8 +381,8 @@ describe("GetDashboardDataUseCase", () => {
       const resultado = await useCase.executar();
 
       expect(resultado?.pioresPerformers).toHaveLength(5);
-      expect(resultado?.pioresPerformers[0].nomeAtivo).toBe("Ativo com Pior Performance");
-      expect(resultado?.pioresPerformers[0].rentabilidadeMes.valor).toBe(-4.5);
+      expect(resultado!.pioresPerformers[0]!.nomeAtivo).toBe("Ativo com Pior Performance");
+      expect(resultado!.pioresPerformers[0]!.rentabilidadeMes.valor).toBe(-4.5);
     });
 
     it("deve ordenar piores performers com pior primeiro (reversed)", async () => {
@@ -379,20 +417,59 @@ describe("GetDashboardDataUseCase", () => {
       expect(resultado).toHaveProperty("eventosRecentes");
       expect(resultado).toHaveProperty("variacaoPatrimonialCentavos");
       expect(resultado).toHaveProperty("quantidadeRelatorios");
+      expect(resultado).toHaveProperty("analiseRiscoRetorno");
+      expect(resultado).toHaveProperty("retornosMensais");
+      expect(resultado).toHaveProperty("faixasLiquidez");
+      expect(resultado).toHaveProperty("rentabilidadePorCategoria");
+      expect(resultado).toHaveProperty("movimentacoes");
+      expect(resultado).toHaveProperty("todasPosicoes");
+      expect(resultado).toHaveProperty("comparacaoPeriodos");
+      expect(resultado).toHaveProperty("evolucaoAlocacaoHistorica");
     });
 
     it("deve incluir eventos financeiros do relatório", async () => {
       const resultado = await useCase.executar();
 
       expect(resultado?.eventosRecentes).toHaveLength(1);
-      expect(resultado?.eventosRecentes[0].tipoEvento).toBe("Dividendo");
+      expect(resultado!.eventosRecentes[0]!.tipoEvento).toBe("Dividendo");
     });
 
     it("deve incluir ganhos por estratégia", async () => {
       const resultado = await useCase.executar();
 
       expect(resultado?.ganhosPorEstrategia).toHaveLength(1);
-      expect(resultado?.ganhosPorEstrategia[0].nomeEstrategia).toBe("Estrategia 1");
+      expect(resultado!.ganhosPorEstrategia[0]!.nomeEstrategia).toBe("Estrategia 1");
+    });
+
+    it("deve incluir análise de risco e retorno", async () => {
+      const resultado = await useCase.executar();
+
+      expect(resultado?.analiseRiscoRetorno).toBeDefined();
+      expect(resultado!.analiseRiscoRetorno.mesesAcimaBenchmark).toBe(8);
+      expect(resultado!.analiseRiscoRetorno.mesesAbaixoBenchmark).toBe(2);
+    });
+
+    it("deve incluir todas as posições (não apenas top 5)", async () => {
+      const resultado = await useCase.executar();
+
+      expect(resultado?.todasPosicoes).toHaveLength(10);
+    });
+
+    it("deve fazer passthrough direto dos novos campos do relatório", async () => {
+      const resultado = await useCase.executar();
+
+      expect(resultado?.retornosMensais).toEqual([]);
+      expect(resultado?.faixasLiquidez).toEqual([]);
+      expect(resultado?.rentabilidadePorCategoria).toEqual([]);
+      expect(resultado?.movimentacoes).toEqual([]);
+      expect(resultado?.comparacaoPeriodos).toEqual([]);
+    });
+
+    it("deve usar evolucaoAlocacao como evolucaoAlocacaoHistorica", async () => {
+      const resultado = await useCase.executar();
+
+      expect(resultado?.evolucaoAlocacaoHistorica).toHaveLength(1);
+      expect(resultado!.evolucaoAlocacaoHistorica[0]!.mesAno).toBe("2024-12");
     });
   });
 });

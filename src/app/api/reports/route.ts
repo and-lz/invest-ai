@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { obterUploadReportUseCase, obterListReportsUseCase } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
+import { descriptografarPdf } from "@/lib/pdf-decrypt";
 
 const TAMANHO_MAXIMO_PDF_BYTES = 32 * 1024 * 1024; // 32MB
 
@@ -19,6 +20,7 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const arquivo = formData.get("file");
+    const senhaPdf = formData.get("password");
 
     if (!arquivo || !(arquivo instanceof File)) {
       return NextResponse.json({ erro: "Nenhum arquivo PDF enviado" }, { status: 400 });
@@ -36,7 +38,20 @@ export async function POST(request: Request) {
     }
 
     const arrayBuffer = await arquivo.arrayBuffer();
-    const pdfBuffer = Buffer.from(arrayBuffer);
+    let pdfBuffer = Buffer.from(arrayBuffer);
+
+    // Descriptografa o PDF se estiver protegido por senha
+    try {
+      const senha = senhaPdf && typeof senhaPdf === "string" ? senhaPdf : undefined;
+      const pdfDescriptografado = await descriptografarPdf(pdfBuffer, senha);
+      pdfBuffer = Buffer.from(pdfDescriptografado);
+    } catch (erroDescriptografia) {
+      const mensagem =
+        erroDescriptografia instanceof Error
+          ? erroDescriptografia.message
+          : "Falha ao processar PDF protegido";
+      return NextResponse.json({ erro: mensagem }, { status: 400 });
+    }
 
     const useCase = obterUploadReportUseCase();
     const resultado = await useCase.executar({

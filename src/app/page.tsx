@@ -10,6 +10,14 @@ import { StrategyGainsTable } from "@/components/dashboard/strategy-gains-table"
 import { FinancialEventsList } from "@/components/dashboard/financial-events-list";
 import { WealthEvolutionChart } from "@/components/dashboard/wealth-evolution-chart";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
+import { MonthlyReturnsHeatmap } from "@/components/dashboard/monthly-returns-heatmap";
+import { RiskConsistencyCard } from "@/components/dashboard/risk-consistency-card";
+import { LiquidityLadder } from "@/components/dashboard/liquidity-ladder";
+import { AllPositionsTable } from "@/components/dashboard/all-positions-table";
+import { CategoryPerformanceChart } from "@/components/dashboard/category-performance-chart";
+import { TransactionsTable } from "@/components/dashboard/transactions-table";
+import { AllocationEvolutionChart } from "@/components/dashboard/allocation-evolution-chart";
+import { PeriodComparisonDetail } from "@/components/dashboard/period-comparison-detail";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -84,9 +92,23 @@ export default function DashboardPage() {
 
           <WealthEvolutionChart evolucaoPatrimonial={dadosDashboard.evolucaoPatrimonial} />
 
+          <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
+
           <div className="grid gap-6 lg:grid-cols-2">
             <AssetAllocationChart alocacaoMensal={dadosDashboard.alocacaoAtual} />
             <BenchmarkComparisonChart comparacoes={dadosDashboard.comparacaoBenchmarksAtual} />
+          </div>
+
+          <MonthlyReturnsHeatmap retornosMensais={dadosDashboard.retornosMensais} />
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <AllocationEvolutionChart evolucaoAlocacao={dadosDashboard.evolucaoAlocacaoHistorica} />
+            <CategoryPerformanceChart categorias={dadosDashboard.rentabilidadePorCategoria} />
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <PeriodComparisonDetail comparacaoPeriodos={dadosDashboard.comparacaoPeriodos} />
+            <LiquidityLadder faixasLiquidez={dadosDashboard.faixasLiquidez} />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
@@ -102,9 +124,14 @@ export default function DashboardPage() {
             />
           </div>
 
+          <AllPositionsTable posicoes={dadosDashboard.todasPosicoes} />
+
           <StrategyGainsTable ganhos={dadosDashboard.ganhosPorEstrategia} />
 
-          <FinancialEventsList eventos={dadosDashboard.eventosRecentes} />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <FinancialEventsList eventos={dadosDashboard.eventosRecentes} />
+            <TransactionsTable movimentacoes={dadosDashboard.movimentacoes} />
+          </div>
         </>
       )}
     </div>

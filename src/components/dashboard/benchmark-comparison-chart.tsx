@@ -3,7 +3,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { configGraficoBenchmarks } from "@/lib/chart-config";
+import { getConfigGraficoBenchmarks } from "@/lib/chart-config";
+import { useCyberpunkPalette } from "@/contexts/cyberpunk-palette-context";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
   GLOSSARIO_CARTEIRA_VS_BENCHMARKS,
@@ -95,6 +96,8 @@ interface BenchmarkComparisonChartProps {
 }
 
 export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonChartProps) {
+  const { palette } = useCyberpunkPalette();
+
   const dadosGrafico = comparacoes.map((comparacao) => ({
     periodo: comparacao.periodo,
     carteira: comparacao.carteira.valor,
@@ -104,6 +107,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
   }));
 
   const conclusoes = gerarConclusoes(dadosGrafico);
+  const configGrafico = getConfigGraficoBenchmarks(palette);
 
   return (
     <Card>
@@ -119,7 +123,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={configGraficoBenchmarks} className="h-75 w-full">
+        <ChartContainer config={configGrafico} className="h-75 w-full">
           <BarChart data={dadosGrafico}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="periodo" tickLine={false} axisLine={false} />

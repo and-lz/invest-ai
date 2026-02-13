@@ -4,6 +4,7 @@ import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import { RelatorioExtraidoSchema } from "@/schemas/report-extraction.schema";
 import { ClaudeApiError, PdfParsingError } from "@/domain/errors/app-errors";
 import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/prompt-extracao-manual";
+import { CLAUDE_MODEL, CLAUDE_MAX_TOKENS_EXTRACTION } from "@/lib/claude-config";
 
 export class ClaudePdfExtractionService implements ExtractionService {
   constructor(private readonly anthropicClient: Anthropic) {}
@@ -11,8 +12,8 @@ export class ClaudePdfExtractionService implements ExtractionService {
   async extrairDadosDoRelatorio(pdfBase64: string): Promise<RelatorioExtraido> {
     try {
       const resposta = await this.anthropicClient.messages.create({
-        model: "claude-sonnet-4-5-20250514",
-        max_tokens: 16384,
+        model: CLAUDE_MODEL,
+        max_tokens: CLAUDE_MAX_TOKENS_EXTRACTION,
         system: SYSTEM_PROMPT_EXTRACAO,
         messages: [
           {

@@ -1,8 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Investimentos Dashboard
+
+Dashboard de acompanhamento de investimentos com análise via IA (Claude API) de relatórios PDF.
+
+## Requisitos do Sistema
+
+### Dependências externas
+
+- **qpdf** - Necessário para descriptografar PDFs protegidos por senha
+
+```bash
+# macOS
+brew install qpdf
+
+# Ubuntu/Debian
+sudo apt-get install qpdf
+
+# Verificar instalação
+qpdf --version
+```
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+```bash
+npm install
+```
+
+Configure environment variables in `.env.local`:
+
+```bash
+ANTHROPIC_API_KEY=your_api_key_here
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev

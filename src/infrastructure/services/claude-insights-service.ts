@@ -5,6 +5,7 @@ import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
 import { ClaudeApiError } from "@/domain/errors/app-errors";
 import { SYSTEM_PROMPT_INSIGHTS, INSTRUCAO_USUARIO_INSIGHTS } from "@/lib/prompt-insights-manual";
+import { CLAUDE_MODEL, CLAUDE_MAX_TOKENS_INSIGHTS } from "@/lib/claude-config";
 
 export class ClaudeInsightsService implements InsightsService {
   constructor(private readonly anthropicClient: Anthropic) {}
@@ -20,8 +21,8 @@ export class ClaudeInsightsService implements InsightsService {
       };
 
       const resposta = await this.anthropicClient.messages.create({
-        model: "claude-sonnet-4-5-20250514",
-        max_tokens: 8192,
+        model: CLAUDE_MODEL,
+        max_tokens: CLAUDE_MAX_TOKENS_INSIGHTS,
         system: SYSTEM_PROMPT_INSIGHTS,
         messages: [
           {
