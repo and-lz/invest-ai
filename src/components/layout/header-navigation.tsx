@@ -6,6 +6,7 @@ import { LayoutDashboard, FileText, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlternarTema } from "@/components/layout/alternar-tema";
 import { IndicadorTarefaAtiva } from "@/components/layout/indicador-tarefa-ativa";
+import { CentralNotificacoes } from "@/components/layout/central-notificacoes";
 import { useState, useEffect } from "react";
 
 const itensNavegacao = [
@@ -101,6 +102,7 @@ export function HeaderNavigation() {
           {/* Actions with visual separator */}
           <div className="flex items-center gap-4">
             <IndicadorTarefaAtiva />
+            <CentralNotificacoes />
             <div className="h-6 w-px bg-border/50" />
             <AlternarTema />
           </div>

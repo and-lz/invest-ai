@@ -36,10 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
-# local data (PDFs and extracted data)
+# local data (PDFs, extracted data, runtime state)
 /data/reports/*.pdf
 /data/insights/
 /data/extracted/
+/data/tasks/
+/data/notifications/
 
 # typescript
 *.tsbuildinfo

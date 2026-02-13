@@ -338,6 +338,53 @@ Operacoes longas (upload PDF, geracao de insights via Gemini) usam fire-and-forg
 - Sem cancel: operacoes de 30-60s nao justificam cancelamento
 - `next/after` nao disponivel no Next.js 15.5.12 instalado
 
+## Notification Center Pattern
+
+Central de notificacoes persistente: todos os toasts sao salvos server-side e podem ser revisitados via drawer no header.
+
+### Fluxo
+1. Componente chama `notificar.success()` (wrapper de `toast()`)
+2. Toast exibe normalmente + fire-and-forget `POST /api/notifications`
+3. Notificacao salva em `data/notifications/index.json` (single file, FIFO 50 max)
+4. Hook `useNotificacoes` revalida via evento customizado `notificacao-criada`
+5. Bell icon no header mostra badge com contagem de nao-lidas
+6. Sheet drawer lateral direito lista historico com acoes
+
+### Arquivos-chave
+- `src/lib/notificacao.ts` — Schema Zod + CRUD filesystem (`listarNotificacoes`, `adicionarNotificacao`, etc.)
+  - Exporta `CriarNotificacaoSchema` para validacao na API
+- `src/lib/notificar.ts` — Wrapper: `notificar.success/error/warning/info()` = toast + POST
+- `src/app/api/notifications/route.ts` — GET, POST, DELETE
+- `src/app/api/notifications/[id]/route.ts` — PATCH (marcar como lida)
+- `src/app/api/notifications/mark-all-read/route.ts` — PATCH (marcar todas como lidas)
+- `src/hooks/use-notificacoes.ts` — SWR hook com optimistic updates + evento customizado
+  - Exporta `dispararEventoNotificacaoCriada()` (usado pelo wrapper)
+- `src/components/layout/central-notificacoes.tsx` — Sheet drawer no header com bell icon + badge
+
+### Comunicacao entre componentes
+- Evento `notificacao-criada` — Dispara revalidacao imediata do hook SWR
+- Polling 30s como fallback (se evento nao funcionar)
+- Optimistic updates em `marcarComoLida` e `limparTodas`
+
+### Decisoes de design
+- Storage server-side (filesystem) em vez de localStorage: persist cross-device, sem limite 5MB
+- Single index file em vez de arquivo por notificacao: read-heavy workload, 50 items = ~50KB
+- Wrapper `notificar()` em vez de monkey-patch: type-safe, explicito, migracao gradual
+- Silent fail na persistencia: toast SEMPRE exibe, mesmo se API falhar
+- FIFO queue: notificacao 51 remove a mais antiga automaticamente
+
+### Uso do wrapper notificar
+```typescript
+import { notificar } from "@/lib/notificar";
+
+notificar.success("Titulo", {
+  description: "Descricao opcional",
+  actionUrl: "/rota-destino",      // Botao no drawer
+  actionLabel: "Ver resultado",    // Rotulo do botao
+  action: { label: "...", onClick: () => {} },  // Acao do toast Sonner
+});
+```
+
 # Reports
 
 All changes to the report JSON structure must be backward compatible. New fields should be optional with sensible defaults so that previously generated reports remain valid and functional.

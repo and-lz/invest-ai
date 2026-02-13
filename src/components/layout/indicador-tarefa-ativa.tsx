@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { notificar } from "@/lib/notificar";
 import { useTarefaBackground } from "@/hooks/use-tarefa-background";
 
 const CHAVE_LOCAL_STORAGE = "tarefasAtivas";
@@ -63,8 +63,9 @@ function MonitorTarefa({
 
     if (estaConcluido && tarefa) {
       setJaNotificou(true);
-      toast.success("Tarefa concluída!", {
+      notificar.success("Tarefa concluída!", {
         description: tarefa.descricaoResultado,
+        actionUrl: tarefa.urlRedirecionamento ?? undefined,
         action: tarefa.urlRedirecionamento
           ? {
               label: "Ver resultado",
@@ -78,7 +79,7 @@ function MonitorTarefa({
 
     if (estaComErro && tarefa) {
       setJaNotificou(true);
-      toast.error("Erro no processamento", {
+      notificar.error("Erro no processamento", {
         description: tarefa.erro ?? "Erro desconhecido",
       });
       window.dispatchEvent(new CustomEvent("tarefa-background-concluida"));
@@ -91,7 +92,7 @@ function MonitorTarefa({
         (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
       if (iniciadoHaMinutos > TIMEOUT_MINUTOS) {
         setJaNotificou(true);
-        toast.error("Tarefa parece ter falhado", {
+        notificar.error("Tarefa parece ter falhado", {
           description: "O processamento excedeu o tempo limite. Tente novamente.",
         });
         onConcluida(identificadorTarefa);

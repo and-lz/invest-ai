@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, FileText, Upload, MessageSquare, X } from "lucide-react";
-import { toast } from "sonner";
+import { notificar } from "@/lib/notificar";
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -38,9 +38,11 @@ export default function ReportsPage() {
   }, []);
 
   const handleUploadAceito = useCallback(() => {
-    toast.success("Upload aceito!", {
+    notificar.success("Upload aceito!", {
       description:
         "O relatório está sendo processado em background. Você será notificado quando concluir.",
+      actionUrl: "/",
+      actionLabel: "Ver dashboard",
     });
     fecharDialog();
     router.push("/");
@@ -48,8 +50,10 @@ export default function ReportsPage() {
 
   const handleImportacaoManualSucesso = useCallback(
     (identificador: string) => {
-      toast.success("Relatorio importado com sucesso!", {
+      notificar.success("Relatorio importado com sucesso!", {
         description: `Referencia: ${identificador}`,
+        actionUrl: "/",
+        actionLabel: "Ver dashboard",
       });
       fecharDialog();
       router.push("/");
@@ -64,11 +68,11 @@ export default function ReportsPage() {
           method: "DELETE",
         });
         if (resposta.ok) {
-          toast.success("Relatorio removido");
+          notificar.success("Relatorio removido");
           await revalidar();
         }
       } catch {
-        toast.error("Falha ao remover relatorio");
+        notificar.error("Falha ao remover relatorio");
       }
     },
     [revalidar],
