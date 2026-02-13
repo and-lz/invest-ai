@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, FileText, Loader2, Lock } from "lucide-react";
+import { Upload, FileText, Lock } from "lucide-react";
 import { useUploadReport } from "@/hooks/use-upload-report";
 import { EtapasProcessamento } from "./etapas-processamento";
 import { ResultadoUpload } from "./resultado-upload";

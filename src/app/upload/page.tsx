@@ -6,7 +6,6 @@ import { Header } from "@/components/layout/header";
 import { PdfUploadDropzone } from "@/components/upload/pdf-upload-dropzone";
 import { ImportacaoManualStepper } from "@/components/upload/importacao-manual-stepper";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 export default function UploadPage() {
@@ -29,14 +28,16 @@ export default function UploadPage() {
         descricao="Envie seu relatorio consolidado do Inter Prime"
       />
       <Tabs defaultValue="automatico">
-        <TabsList>
-          <TabsTrigger value="automatico" className="gap-2">
+        <TabsList className="w-auto">
+          <TabsTrigger value="automatico" className="shrink-0 gap-1.5">
             Upload direto
-            <Badge variant="secondary" className="text-[10px] leading-none">
-              Recomendado
-            </Badge>
+            <span className="bg-muted-foreground/10 text-muted-foreground rounded px-1 py-0.5 text-[9px] font-medium leading-none">
+              REC
+            </span>
           </TabsTrigger>
-          <TabsTrigger value="manual">Via Claude Chat</TabsTrigger>
+          <TabsTrigger value="manual" className="shrink-0">
+            Via Claude Chat
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="automatico" className="space-y-2">
           <p className="text-muted-foreground text-sm">
@@ -45,7 +46,7 @@ export default function UploadPage() {
           <PdfUploadDropzone onUploadSucesso={handleSucesso} />
         </TabsContent>
         <TabsContent value="manual" className="space-y-2">
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground mb-2 text-sm">
             Copie um prompt, cole no Claude Chat junto com o PDF e retorne o resultado aqui.
           </p>
           <ImportacaoManualStepper onImportacaoSucesso={handleSucesso} />

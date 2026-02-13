@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Copy, Check, Loader2, ArrowRight } from "lucide-react";
-import { IndicadorPassos } from "./indicador-passos";
 
 interface PromptExtracaoCopiavelProps {
   onProximoPasso: () => void;
@@ -53,7 +52,7 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-sm text-destructive">{erroCarregamento}</p>
+          <p className="text-destructive text-sm">{erroCarregamento}</p>
         </CardContent>
       </Card>
     );
@@ -62,12 +61,6 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
   return (
     <Card>
       <CardContent className="space-y-4 p-6">
-        <IndicadorPassos
-          passos={[
-            { numero: 1, rotulo: "Copiar prompt", status: "ativo" },
-            { numero: 2, rotulo: "Colar resposta", status: "pendente" },
-          ]}
-        />
         <div>
           <h3 className="text-lg font-semibold">Copiar o prompt</h3>
           <p className="text-muted-foreground text-sm">
@@ -76,10 +69,10 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
         </div>
 
         <ScrollArea className="bg-muted/50 h-64 rounded-md border p-4">
-          <pre className="text-xs whitespace-pre-wrap">{promptCompleto}</pre>
+          <pre className="text-sm whitespace-pre-wrap">{promptCompleto}</pre>
         </ScrollArea>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <Button onClick={copiarPrompt} variant="outline">
             {copiado ? (
               <>
