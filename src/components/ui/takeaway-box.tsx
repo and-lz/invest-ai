@@ -33,7 +33,8 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
   if (conclusoes.length === 0) return null;
 
   return (
-    <div className={cn("mt-4 space-y-2 rounded-lg border p-3", className)}>
+    <div className={cn("mt-4 space-y-2 rounded-lg p-3", className)}>
+      <hr/>
       <p className="text-muted-foreground text-xs font-medium">Resumo para você:</p>
       {conclusoes.map((conclusao) => {
         const IconeConclusao = ICONES_INDICADOR[conclusao.tipo];

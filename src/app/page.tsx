@@ -92,9 +92,8 @@ export default function DashboardPage() {
 
           <WealthEvolutionChart evolucaoPatrimonial={dadosDashboard.evolucaoPatrimonial} />
 
-          <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
-
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
             <AssetAllocationChart alocacaoMensal={dadosDashboard.alocacaoAtual} />
             <BenchmarkComparisonChart comparacoes={dadosDashboard.comparacaoBenchmarksAtual} />
           </div>
