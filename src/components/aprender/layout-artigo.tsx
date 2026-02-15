@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BreadcrumbsEducacional } from "./breadcrumbs-educacional";
 import { BarraProgressoLeitura } from "./barra-progresso-leitura";
+import { BotaoLerArtigo } from "./botao-ler-artigo";
 import { cn } from "@/lib/utils";
 import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
 import { INFORMACOES_CATEGORIAS } from "@/schemas/artigo-educacional.schema";
@@ -63,7 +64,10 @@ export function LayoutArtigo({
 
         {/* Header do Artigo */}
         <header className="space-y-4">
-          <h1 className="text-3xl font-bold tracking-tight">{metadata.titulo}</h1>
+          <div className="flex items-start gap-3">
+            <h1 className="flex-1 text-3xl font-bold tracking-tight">{metadata.titulo}</h1>
+            <BotaoLerArtigo className="mt-1" />
+          </div>
 
           <p className="text-muted-foreground text-lg leading-relaxed">{metadata.descricao}</p>
 

@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import type { Content, Part } from "@google/generative-ai";
 import type {
   ProvedorAi,
   ConfiguracaoGeracao,
@@ -39,8 +40,8 @@ export class GeminiProvedorAi implements ProvedorAi {
         },
       });
 
-      const partesGemini = this.converterMensagensParaPartes(configuracao);
-      const resultado = await model.generateContent(partesGemini);
+      const contents = this.converterMensagensParaContents(configuracao);
+      const resultado = await model.generateContent({ contents });
       const resposta = resultado.response;
       const textoResposta = resposta.text();
 
@@ -81,9 +82,9 @@ export class GeminiProvedorAi implements ProvedorAi {
         },
       });
 
-      const partesGemini = this.converterMensagensParaPartes(configuracao);
+      const contents = this.converterMensagensParaContents(configuracao);
       const resultadoStream =
-        await model.generateContentStream(partesGemini);
+        await model.generateContentStream({ contents });
 
       for await (const chunk of resultadoStream.stream) {
         const textoChunk = chunk.text();
@@ -108,31 +109,24 @@ export class GeminiProvedorAi implements ProvedorAi {
   }
 
   /**
-   * Converte as mensagens do formato generico para o formato esperado pelo Gemini SDK.
-   * Suporta conteudo multimodal (texto, PDF, imagem).
+   * Converte as mensagens do formato generico para Content[] do Gemini SDK.
+   * Preserva a distincao de turnos (user/model) para suportar chat multi-turn.
    */
-  private converterMensagensParaPartes(
+  private converterMensagensParaContents(
     configuracao: ConfiguracaoGeracao,
-  ): Array<string | { inlineData: { mimeType: string; data: string } }> {
-    const partesGemini: Array<
-      string | { inlineData: { mimeType: string; data: string } }
-    > = [];
-
-    for (const mensagem of configuracao.mensagens) {
-      for (const parte of mensagem.partes) {
-        partesGemini.push(this.converterParteParaGemini(parte));
-      }
-    }
-
-    return partesGemini;
+  ): Content[] {
+    return configuracao.mensagens.map((mensagem) => ({
+      role: mensagem.papel === "usuario" ? "user" : "model",
+      parts: mensagem.partes.map((parte) =>
+        this.converterParteParaGeminiPart(parte),
+      ),
+    }));
   }
 
-  private converterParteParaGemini(
-    parte: ParteConteudo,
-  ): string | { inlineData: { mimeType: string; data: string } } {
+  private converterParteParaGeminiPart(parte: ParteConteudo): Part {
     switch (parte.tipo) {
       case "texto":
-        return parte.dados;
+        return { text: parte.dados };
       case "pdf":
         return {
           inlineData: { mimeType: "application/pdf", data: parte.dados },

@@ -1,7 +1,9 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
+import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
+import { serializarContextoDesempenho } from "@/lib/serializar-contexto-chat";
 import { Header } from "@/components/layout/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +17,7 @@ import { GraficoEvolucaoAtivo } from "@/components/desempenho/grafico-evolucao-a
 import { GraficoRendimentos } from "@/components/desempenho/grafico-rendimentos";
 import { TabelaMovimentacoes } from "@/components/desempenho/tabela-movimentacoes";
 import { AnaliseIaAtivo } from "@/components/desempenho/analise-ia-ativo";
-import { adicionarTarefaAtivaNoStorage } from "@/components/layout/indicador-tarefa-ativa";
+import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
 import { notificar } from "@/lib/notificar";
 
 function DesempenhoConteudo() {
@@ -29,6 +31,17 @@ function DesempenhoConteudo() {
   const { ativosCarteira, estaCarregando: carregandoLista } = useListaAtivosCarteira();
   const { dadosAtivo, estaCarregando: carregandoDados, revalidar: revalidarDados } = useDadosAtivo(tickerSelecionado);
   const { analise, estaCarregando: carregandoAnalise, revalidar: revalidarAnalise } = useAnaliseIaAtivo(tickerSelecionado);
+
+  // Registrar contexto da pagina para o chat
+  const { definirContexto } = useContextoPaginaChat();
+  const contextoSerializado = useMemo(
+    () =>
+      dadosAtivo ? serializarContextoDesempenho(dadosAtivo) : undefined,
+    [dadosAtivo],
+  );
+  useEffect(() => {
+    definirContexto("desempenho", contextoSerializado);
+  }, [definirContexto, contextoSerializado]);
 
   // Sincronizar ticker da URL com o estado
   useEffect(() => {

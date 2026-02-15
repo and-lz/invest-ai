@@ -4,6 +4,8 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
 import { AuthProvider } from "@/contexts/auth-provider";
+import { ProvedorContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
+import { ChatWidget } from "@/components/chat/chat-widget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -50,11 +52,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="flex h-screen flex-col">
-              <HeaderNavigation />
-              <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
-            </div>
-            <Toaster />
+            <ProvedorContextoPaginaChat>
+              <div className="flex h-screen flex-col">
+                <HeaderNavigation />
+                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
+              </div>
+              <ChatWidget />
+              <Toaster />
+            </ProvedorContextoPaginaChat>
           </ThemeProvider>
         </AuthProvider>
       </body>

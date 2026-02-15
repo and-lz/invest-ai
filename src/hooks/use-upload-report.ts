@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { adicionarTarefaAtivaNoStorage } from "@/components/layout/indicador-tarefa-ativa";
+import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
 
 type StatusUpload = "idle" | "uploading" | "success" | "error";
 

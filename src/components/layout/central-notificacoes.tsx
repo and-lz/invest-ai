@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/hooks/use-notificacoes";
-import { adicionarTarefaAtivaNoStorage } from "@/components/layout/indicador-tarefa-ativa";
+import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";

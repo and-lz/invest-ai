@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
+import { serializarContextoInsights } from "@/lib/serializar-contexto-chat";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
-import { adicionarTarefaAtivaNoStorage } from "@/components/layout/indicador-tarefa-ativa";
+import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -233,6 +235,16 @@ export default function InsightsPage() {
   const [modoVisualizacao, setModoVisualizacao] = useState<ModoVisualizacao>("inicial");
   const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
+
+  // Registrar contexto da pagina para o chat
+  const { definirContexto } = useContextoPaginaChat();
+  const contextoSerializado = useMemo(
+    () => (insights ? serializarContextoInsights(insights) : undefined),
+    [insights],
+  );
+  useEffect(() => {
+    definirContexto("insights", contextoSerializado);
+  }, [definirContexto, contextoSerializado]);
 
   // Criar lista de períodos disponíveis a partir dos relatórios + opção consolidada
   const periodosDisponiveis = [

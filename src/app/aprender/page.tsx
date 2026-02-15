@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { BookOpen, DollarSign, TrendingUp, Building2, BarChart3, Target, Receipt, PiggyBank } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { CardCategoria } from "@/components/aprender/card-categoria";
@@ -21,6 +23,12 @@ const ICONES_CATEGORIAS: Record<CategoriaArtigo, typeof BookOpen> = {
 
 export default function AprenderPage() {
   const contagemPorCategoria = obterContagemPorCategoria();
+
+  // Registrar contexto da pagina para o chat
+  const { definirContexto } = useContextoPaginaChat();
+  useEffect(() => {
+    definirContexto("aprender");
+  }, [definirContexto]);
 
   return (
     <div className="space-y-6">

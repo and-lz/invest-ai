@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
+import { serializarContextoDashboard } from "@/lib/serializar-contexto-chat";
 import { Header } from "@/components/layout/header";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { AssetAllocationChart } from "@/components/dashboard/asset-allocation-chart";
@@ -65,6 +67,19 @@ export default function DashboardPage() {
   const { dadosDashboard, estaVazio, estaCarregando } = useDashboardData(
     periodoSelecionado ? { mesAno: periodoSelecionado } : undefined,
   );
+
+  // Registrar contexto da pagina para o chat
+  const { definirContexto } = useContextoPaginaChat();
+  const contextoSerializado = useMemo(
+    () =>
+      dadosDashboard
+        ? serializarContextoDashboard(dadosDashboard)
+        : undefined,
+    [dadosDashboard],
+  );
+  useEffect(() => {
+    definirContexto("dashboard", contextoSerializado);
+  }, [definirContexto, contextoSerializado]);
 
   return (
     <div className="space-y-6">

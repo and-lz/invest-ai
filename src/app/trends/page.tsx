@@ -1,5 +1,8 @@
 "use client";
 
+import { useMemo, useEffect } from "react";
+import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
+import { serializarContextoTendencias } from "@/lib/serializar-contexto-chat";
 import { Header } from "@/components/layout/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +27,19 @@ function formatarTimestampAtualizacao(isoString: string): string {
 
 export default function TrendsPage() {
   const { dadosTendencias, estaCarregando, erro, revalidar } = useDadosTendencias();
+
+  // Registrar contexto da pagina para o chat
+  const { definirContexto } = useContextoPaginaChat();
+  const contextoSerializado = useMemo(
+    () =>
+      dadosTendencias
+        ? serializarContextoTendencias(dadosTendencias)
+        : undefined,
+    [dadosTendencias],
+  );
+  useEffect(() => {
+    definirContexto("trends", contextoSerializado);
+  }, [definirContexto, contextoSerializado]);
 
   return (
     <div className="space-y-6">

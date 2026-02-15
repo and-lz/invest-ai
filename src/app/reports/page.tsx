@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
+import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
 import { PdfUploadDropzone } from "@/components/upload/pdf-upload-dropzone";
@@ -24,6 +25,12 @@ import { notificar } from "@/lib/notificar";
 export default function ReportsPage() {
   const router = useRouter();
   const { relatorios, estaCarregando, revalidar } = useReports();
+
+  // Registrar contexto da pagina para o chat
+  const { definirContexto } = useContextoPaginaChat();
+  useEffect(() => {
+    definirContexto("reports");
+  }, [definirContexto]);
   const [metodoUploadSelecionado, setMetodoUploadSelecionado] = useState<"automatico" | "manual">(
     "automatico",
   );
