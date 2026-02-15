@@ -152,11 +152,6 @@ function MonitorTarefa({
         <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-muted-foreground" />
         <div className="flex-1 space-y-1">
           <p className="text-sm font-medium leading-snug">{labelTipo}</p>
-          {tarefa.descricao && (
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              {tarefa.descricao}
-            </p>
-          )}
           <p className="text-xs text-muted-foreground">
             Iniciado{" "}
             {new Date(tarefa.iniciadoEm).toLocaleString("pt-BR", {

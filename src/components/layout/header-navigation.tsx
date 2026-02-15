@@ -75,12 +75,12 @@ export function HeaderNavigation() {
     <div
       className={cn(
         "sticky top-0 z-50 overflow-hidden transition-all duration-300",
-        estaVisivel ? "h-16" : "h-0"
+        estaVisivel ? "h-14" : "h-0"
       )}
     >
-      <header className="relative h-16 border-b border-border/20">
+      <header className="relative h-14 border-b border-border/20">
 
-        <div className="flex h-16 items-center justify-between gap-4 px-4 sm:gap-8 sm:px-6">
+        <div className="flex h-14 items-center justify-between gap-2 px-3 sm:gap-4 sm:px-4">
           {/* Mobile menu */}
           <Sheet open={menuMobileAberto} onOpenChange={setMenuMobileAberto}>
             <SheetTrigger asChild>
@@ -121,8 +121,8 @@ export function HeaderNavigation() {
           </Sheet>
 
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <h1 className="font-serif text-lg font-semibold tracking-tight">
+          <div className="hidden items-center gap-2 md:flex">
+            <h1 className="font-serif text-base font-semibold tracking-tight">
               Investimentos
             </h1>
           </div>
@@ -137,24 +137,30 @@ export function HeaderNavigation() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  title={item.rotulo}
                   className={cn(
-                    "group relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                    "group relative flex items-center gap-2 overflow-hidden rounded-lg px-2 py-2 text-sm font-medium transition-all duration-200",
                     estaAtivo
                       ? "text-foreground"
                       : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                   )}
                 >
                   <Icone className={cn(
-                    "h-4 w-4 transition-transform duration-200",
+                    "h-5 w-5 shrink-0 transition-transform duration-200",
                     !estaAtivo && "group-hover:scale-110"
                   )} />
-                  {item.rotulo}
+                  <span className={cn(
+                    "whitespace-nowrap text-sm font-medium transition-all duration-200",
+                    estaAtivo ? "max-w-[100px] opacity-100" : "max-w-0 opacity-0 group-hover:max-w-[100px] group-hover:opacity-100"
+                  )}>
+                    {item.rotulo}
+                  </span>
                   {estaAtivo && (
                     <>
                       {/* Active indicator */}
-                      <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-foreground/60" />
+                      <span className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-foreground/60" />
                       {/* Subtle background for active item */}
-                      <span className="absolute inset-0 rounded-lg bg-secondary/30" />
+                      <span className="absolute inset-0 -z-10 rounded-lg bg-secondary/30" />
                     </>
                   )}
                 </Link>
@@ -209,10 +215,9 @@ export function HeaderNavigation() {
             </DropdownMenu>
           </nav>
 
-          {/* Actions with visual separator */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          {/* Actions */}
+          <div className="flex items-center gap-1">
             <ActivityCenter />
-            <div className="hidden h-6 w-px bg-border/50 sm:block" />
             <AlternarTema />
             <UserProfileMenu />
           </div>
