@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { BookOpen, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
@@ -18,6 +19,35 @@ export async function generateStaticParams() {
   return INFORMACOES_CATEGORIAS.map((cat) => ({
     categoria: cat.slug,
   }));
+}
+
+export async function generateMetadata({ params }: CategoriaPageProps): Promise<Metadata> {
+  const { categoria: categoriaSlug } = await params;
+
+  const parseResultado = CategoriaArtigoEnum.safeParse(categoriaSlug);
+
+  if (!parseResultado.success) {
+    return {};
+  }
+
+  const categoria = parseResultado.data as CategoriaArtigo;
+  const categoriaInfo = INFORMACOES_CATEGORIAS.find((c) => c.slug === categoria);
+
+  if (!categoriaInfo) {
+    return {};
+  }
+
+  const artigos = obterArtigosPorCategoria(categoria);
+
+  return {
+    title: `${categoriaInfo.titulo} | Investimentos`,
+    description: `${categoriaInfo.descricao} - ${artigos.length} ${artigos.length === 1 ? "artigo disponível" : "artigos disponíveis"}`,
+    openGraph: {
+      title: categoriaInfo.titulo,
+      description: categoriaInfo.descricao,
+      type: "website",
+    },
+  };
 }
 
 export default async function CategoriaPage({ params }: CategoriaPageProps) {
