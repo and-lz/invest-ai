@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
@@ -188,7 +189,12 @@ function TabelaAtivos({
         {itensOrdenados.map((ativo) => (
           <TableRow key={ativo.ticker}>
             <TableCell className="font-mono text-sm font-medium">
-              {ativo.ticker}
+              <Link
+                href={`/desempenho?ticker=${encodeURIComponent(ativo.ticker)}`}
+                className="hover:text-primary underline-offset-4 hover:underline"
+              >
+                {ativo.ticker}
+              </Link>
             </TableCell>
             <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
               {ativo.nome}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
@@ -173,7 +174,12 @@ export function TabelaRankingFundos({ fundosEmAlta }: TabelaRankingFundosProps) 
             {itensOrdenados.map((fundo) => (
               <TableRow key={fundo.ticker}>
                 <TableCell className="font-mono text-sm font-medium">
-                  {fundo.ticker}
+                  <Link
+                    href={`/desempenho?ticker=${encodeURIComponent(fundo.ticker)}`}
+                    className="hover:text-primary underline-offset-4 hover:underline"
+                  >
+                    {fundo.ticker}
+                  </Link>
                 </TableCell>
                 <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
                   {fundo.nome}
