@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       tarefa,
       rotuloLog: "Analise Ativo",
       executarOperacao: async () => {
-        const useCase = obterAnalyzeAssetPerformanceUseCase();
+        const useCase = await obterAnalyzeAssetPerformanceUseCase();
         const analise = await useCase.executar({ codigoAtivo });
 
         // Persistir resultado para cache

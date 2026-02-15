@@ -30,11 +30,15 @@ const isProduction = process.env.NODE_ENV === "production";
 
 async function criarRepositorio() {
   if (isProduction) {
-    const session = await auth();
-    if (!session?.user?.userId) {
-      throw new Error("Usuario nao autenticado. Sessao necessaria para acessar dados.");
+    // Tentar obter sessão - se falhar (build time), usar filesystem
+    try {
+      const session = await auth();
+      if (session?.user?.userId) {
+        return new VercelBlobReportRepository(session.user.userId);
+      }
+    } catch {
+      // Build time ou sem contexto - usar filesystem
     }
-    return new VercelBlobReportRepository(session.user.userId);
   }
 
   return new FilesystemReportRepository(diretorioDados);

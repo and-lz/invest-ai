@@ -18,7 +18,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground): boolean {
         tarefa,
         rotuloLog: "Insights Consolidados (retry)",
         executarOperacao: async () => {
-          const useCase = obterGenerateInsightsConsolidadosUseCase();
+          const useCase = await obterGenerateInsightsConsolidadosUseCase();
           await useCase.executar();
           return {
             descricaoResultado: "Insights consolidados gerados",
@@ -46,7 +46,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground): boolean {
         tarefa,
         rotuloLog: "Insights (retry)",
         executarOperacao: async () => {
-          const useCase = obterGenerateInsightsUseCase();
+          const useCase = await obterGenerateInsightsUseCase();
           await useCase.executar({
             identificadorRelatorio,
             identificadorRelatorioAnterior,

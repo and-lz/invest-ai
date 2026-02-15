@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const tickerParam = searchParams.get("ticker");
 
-    const repositorio = obterFilesystemReportRepository();
+    const repositorio = await obterFilesystemReportRepository();
     const todosMetadados = await repositorio.listarTodosMetadados();
 
     // Carregar todos os relatorios extraidos
