@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
+import packageJson from "../../../package.json";
 
 const itensNavegacaoPrincipais = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
@@ -92,7 +93,7 @@ export function HeaderNavigation() {
             <SheetContent side="left" className="w-72 p-0">
               <SheetHeader className="border-b px-6 py-4">
                 <SheetTitle className="font-serif text-lg font-semibold tracking-tight">
-                  Investimentos
+                  Investimentos <span className="text-xs font-normal text-muted-foreground">v{packageJson.version}</span>
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 p-4">
@@ -123,7 +124,7 @@ export function HeaderNavigation() {
           {/* Logo */}
           <div className="hidden items-center gap-2 md:flex">
             <h1 className="font-serif text-base font-semibold tracking-tight">
-              Investimentos
+              Investimentos <span className="text-xs font-normal text-muted-foreground">v{packageJson.version}</span>
             </h1>
           </div>
 

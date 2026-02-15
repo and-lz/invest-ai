@@ -43,6 +43,21 @@
 - Meta tags iOS: `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`
 - Cores tema: `#0d0c14` (dark) para statusbar translucent no iOS
 
+## Metadata (Page Titles)
+Todas as rotas tem titulos dinamicos no formato "[Pagina] | Investimentos":
+- `/` - "Dashboard | Investimentos" (route group `(dashboard)`)
+- `/auth/signin` - "Login | Investimentos"
+- `/reports` - "Relatorios | Investimentos"
+- `/insights` - "Insights | Investimentos"
+- `/trends` - "Tendencias de Mercado | Investimentos"
+- `/desempenho` - "Desempenho de Ativos | Investimentos"
+- `/aprender` - "Centro de Aprendizado | Investimentos"
+- `/aprender/glossario` - "Glossario Financeiro | Investimentos"
+- `/aprender/[categoria]` - "[Titulo Categoria] | Investimentos" (dinamico via generateMetadata)
+- `/aprender/[categoria]/[slug]` - "[Titulo Artigo] | Investimentos" (dinamico via generateMetadata)
+
+Metadata e definida via layouts (Server Components) para permitir Client Components nas pages
+
 ## Autenticacao
 - Auth.js v5 (NextAuth) com Google OAuth
 - Sessoes JWT stateless (sem database)
