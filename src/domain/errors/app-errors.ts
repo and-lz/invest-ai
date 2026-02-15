@@ -44,6 +44,13 @@ export class AiApiTransientError extends AiApiError {
   }
 }
 
+export class PdfDecryptionError extends AppError {
+  constructor(message: string) {
+    super(message, "PDF_DECRYPTION_ERROR");
+    this.name = "PdfDecryptionError";
+  }
+}
+
 export class ReportNotFoundError extends AppError {
   constructor(identificador: string) {
     super(`Relatorio nao encontrado: ${identificador}`, "REPORT_NOT_FOUND");
