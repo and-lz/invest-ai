@@ -24,9 +24,9 @@ export function ResultadoUpload({
       role={tipo === "erro" ? "alert" : undefined}
     >
       {tipo === "sucesso" ? (
-        <CheckCircle className="h-12 w-12 text-green-600" />
+        <CheckCircle className="h-12 w-12 text-success" />
       ) : (
-        <XCircle className="h-12 w-12 text-red-600" />
+        <XCircle className="h-12 w-12 text-destructive" />
       )}
       <div className="text-center">
         <h3 className="text-lg font-semibold">{titulo}</h3>

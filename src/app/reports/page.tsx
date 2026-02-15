@@ -100,6 +100,7 @@ export default function ReportsPage() {
 
       <dialog
         ref={dialogRef}
+        aria-label="Importar relatório"
         className="bg-background fixed left-1/2 top-1/2 m-0 max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border p-0 shadow-lg backdrop:bg-background/80 backdrop:backdrop-blur-sm"
         style={{ maxWidth: "42rem", width: "90vw" }}
       >
@@ -107,6 +108,7 @@ export default function ReportsPage() {
           <h2 className="text-lg font-semibold">Importar Relatorio</h2>
           <Button variant="ghost" size="icon" onClick={fecharDialog}>
             <X className="h-4 w-4" />
+            <span className="sr-only">Fechar</span>
           </Button>
         </div>
 

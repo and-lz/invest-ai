@@ -1,5 +1,6 @@
 import { FilesystemReportRepository } from "@/infrastructure/repositories/filesystem-report-repository";
 import { VercelBlobReportRepository } from "@/infrastructure/repositories/vercel-blob-report-repository";
+import { FilesystemConversaRepository } from "@/infrastructure/repositories/filesystem-conversa-repository";
 import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
 import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
@@ -17,6 +18,7 @@ import type { ExtractionService, InsightsService } from "@/domain/interfaces/ext
 import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
 import type { FileManager } from "@/domain/interfaces/file-manager";
+import type { ConversaRepository } from "@/domain/interfaces/conversa-repository";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-provedor-ai";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
@@ -173,4 +175,13 @@ export async function obterFileManager(): Promise<FileManager> {
   }
 
   return new LocalFileManager(diretorioDados);
+}
+
+/**
+ * Obtem o repository de conversas do chat.
+ * Usa FileManager para switching automatico entre filesystem (dev) e blob (prod).
+ */
+export async function obterConversaRepository(): Promise<ConversaRepository> {
+  const fileManager = await obterFileManager();
+  return new FilesystemConversaRepository(fileManager);
 }

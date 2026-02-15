@@ -247,6 +247,7 @@ export function GridAtivosCarteira({
       {/* Dialog de seleção de ativo */}
       <dialog
         ref={dialogRef}
+        aria-label="Selecionar ativo da carteira"
         className="bg-background fixed inset-0 m-0 h-screen w-screen overflow-y-auto border-0 p-0 backdrop:bg-background/80 backdrop:backdrop-blur-sm"
       >
         <div className="border-b px-6 py-4">
@@ -259,6 +260,7 @@ export function GridAtivosCarteira({
               className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
             >
               <X className="h-4 w-4" />
+              <span className="sr-only">Fechar</span>
             </Button>
           </div>
         </div>

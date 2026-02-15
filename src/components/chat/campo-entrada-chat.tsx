@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Square } from "lucide-react";
 
@@ -9,6 +9,7 @@ interface CampoEntradaChatProps {
   readonly onParar: () => void;
   readonly estaTransmitindo: boolean;
   readonly desabilitado?: boolean;
+  readonly autoFocus?: boolean;
 }
 
 export function CampoEntradaChat({
@@ -16,9 +17,17 @@ export function CampoEntradaChat({
   onParar,
   estaTransmitindo,
   desabilitado,
+  autoFocus = true,
 }: CampoEntradaChatProps) {
   const [valor, setValor] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-focus quando componente monta
+  useEffect(() => {
+    if (autoFocus && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [autoFocus]);
 
   const handleEnviar = useCallback(() => {
     if (valor.trim() && !estaTransmitindo) {

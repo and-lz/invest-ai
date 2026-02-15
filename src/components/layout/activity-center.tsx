@@ -15,10 +15,13 @@ import {
   OctagonX,
   RotateCcw,
   X,
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/hooks/use-notificacoes";
 import { useTarefaBackground } from "@/hooks/use-tarefa-background";
+import { LABELS_TIPO_TAREFA } from "@/lib/tarefa-descricao";
+import type { TipoTarefa } from "@/lib/tarefa-descricao";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -28,12 +31,6 @@ import { useEffect } from "react";
 
 const CHAVE_LOCAL_STORAGE = "tarefasAtivas";
 const TIMEOUT_MINUTOS = 5;
-
-const LABELS_TIPO: Record<string, string> = {
-  "upload-pdf": "Processando PDF",
-  "gerar-insights": "Gerando insights",
-  "gerar-insights-consolidados": "Gerando insights consolidados",
-};
 
 const ICONES_TIPO = {
   success: CheckCircle,
@@ -88,9 +85,10 @@ function MonitorTarefa({
   onConcluida: (identificador: string) => void;
 }) {
   const router = useRouter();
-  const { tarefa, estaConcluido, estaComErro, estaProcessando } =
+  const { tarefa, estaConcluido, estaComErro, estaProcessando, estaCancelada } =
     useTarefaBackground(identificadorTarefa);
   const [jaNotificou, setJaNotificou] = useState(false);
+  const [cancelando, setCancelando] = useState(false);
   const onConcluidaChamadaRef = useRef(false);
 
   // Função helper para notificar e remover tarefa (garante chamada única)
@@ -139,6 +137,11 @@ function MonitorTarefa({
       notificarERemover("erro");
     }
 
+    if (estaCancelada) {
+      setJaNotificou(true);
+      onConcluida(identificadorTarefa);
+    }
+
     // Timeout: se "processando" por mais de 5 minutos, considerar como erro
     if (estaProcessando && tarefa) {
       const iniciadoHaMinutos =
@@ -148,19 +151,56 @@ function MonitorTarefa({
         notificarERemover("timeout");
       }
     }
-  }, [estaConcluido, estaComErro, estaProcessando, tarefa, jaNotificou, notificarERemover]);
+  }, [
+    estaConcluido,
+    estaComErro,
+    estaCancelada,
+    estaProcessando,
+    tarefa,
+    jaNotificou,
+    notificarERemover,
+    identificadorTarefa,
+    onConcluida,
+  ]);
 
   // Cleanup no unmount: se tarefa estiver concluída/erro mas não foi removida, remove silenciosamente
   useEffect(() => {
     return () => {
-      if ((estaConcluido || estaComErro) && !onConcluidaChamadaRef.current) {
+      if ((estaConcluido || estaComErro || estaCancelada) && !onConcluidaChamadaRef.current) {
         // Remove silenciosamente (sem notificação pois componente já foi desmontado)
         onConcluida(identificadorTarefa);
       }
     };
-  }, [estaConcluido, estaComErro, identificadorTarefa, onConcluida]);
+  }, [estaConcluido, estaComErro, estaCancelada, identificadorTarefa, onConcluida]);
 
-  // Antes de renderizar null, garante que tarefa concluída/erro seja removida
+  const handleCancelar = useCallback(async () => {
+    if (!tarefa) return;
+
+    setCancelando(true);
+    try {
+      const resposta = await fetch(`/api/tasks/${identificadorTarefa}/cancel`, {
+        method: "POST",
+      });
+
+      if (resposta.ok) {
+        toast.info("Tarefa cancelada");
+        onConcluida(identificadorTarefa);
+      } else {
+        const corpo = (await resposta.json()) as { erro?: string };
+        toast.error("Falha ao cancelar", {
+          description: corpo.erro ?? "Erro desconhecido",
+        });
+      }
+    } catch {
+      toast.error("Falha ao cancelar", {
+        description: "Erro de conexão",
+      });
+    } finally {
+      setCancelando(false);
+    }
+  }, [tarefa, identificadorTarefa, onConcluida]);
+
+  // Antes de renderizar null, garante que tarefa concluída/erro/cancelada seja removida
   if (!estaProcessando || !tarefa) {
     if ((estaConcluido || estaComErro) && !onConcluidaChamadaRef.current) {
       notificarERemover(estaConcluido ? "sucesso" : "erro");
@@ -168,14 +208,14 @@ function MonitorTarefa({
     return null;
   }
 
-  const labelTipo = LABELS_TIPO[tarefa.tipo] ?? "Processando";
+  const descricao = descreverTarefa(tarefa);
 
   return (
-    <div className="rounded-lg border p-4">
+    <div className="group rounded-lg border p-4">
       <div className="flex items-start gap-3">
         <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-muted-foreground" />
         <div className="flex-1 space-y-1">
-          <p className="text-sm font-medium leading-snug">{labelTipo}</p>
+          <p className="text-sm font-medium leading-snug">{descricao}</p>
           <p className="text-xs text-muted-foreground">
             Iniciado{" "}
             {new Date(tarefa.iniciadoEm).toLocaleString("pt-BR", {
@@ -186,6 +226,16 @@ function MonitorTarefa({
             })}
           </p>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleCancelar}
+          disabled={cancelando}
+          className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+          title="Cancelar tarefa"
+        >
+          <XCircle className="h-4 w-4 text-muted-foreground" />
+        </Button>
       </div>
     </div>
   );
@@ -386,7 +436,7 @@ export function ActivityCenter() {
           <Badge
             className={cn(
               "absolute -right-1 -top-1 flex h-5 min-w-5 items-center gap-0.5 px-1 text-xs leading-none",
-              temTarefasAtivas ? "bg-warning text-warning-foreground" : "bg-destructive text-destructive-foreground"
+              temTarefasAtivas ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"
             )}
           >
             {temTarefasAtivas && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
@@ -400,7 +450,8 @@ export function ActivityCenter() {
       <dialog
         ref={dialogRef}
         onClick={handleClickDialog}
-        className="flex h-full flex-col border-l bg-background p-0 shadow-lg"
+        aria-label="Central de atividades"
+        className="flex h-full flex-col border-l bg-background p-0 shadow-lg backdrop:bg-background/80 backdrop:backdrop-blur-sm"
         style={{
           position: "fixed",
           top: 0,
@@ -467,7 +518,7 @@ export function ActivityCenter() {
               <Loader2 className={cn("h-4 w-4", temTarefasAtivas && "animate-spin")} />
               Tarefas
               {temTarefasAtivas && (
-                <Badge className="h-5 min-w-5 bg-warning px-1 text-xs text-warning-foreground">
+                <Badge className="h-5 min-w-5 bg-primary px-1 text-xs text-primary-foreground">
                   {identificadoresTarefas.length}
                 </Badge>
               )}

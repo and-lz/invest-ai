@@ -6,15 +6,10 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { dispararEventoNotificacaoCriada } from "@/hooks/use-notificacoes";
 import { useTarefaBackground } from "@/hooks/use-tarefa-background";
+import { descreverTarefa } from "@/lib/tarefa-background";
 
 const CHAVE_LOCAL_STORAGE = "tarefasAtivas";
 const TIMEOUT_MINUTOS = 5;
-
-const LABELS_TIPO: Record<string, string> = {
-  "upload-pdf": "Processando PDF",
-  "gerar-insights": "Gerando insights",
-  "gerar-insights-consolidados": "Gerando insights consolidados",
-};
 
 function obterTarefasAtivasDoStorage(): string[] {
   if (typeof window === "undefined") return [];
@@ -115,10 +110,10 @@ function MonitorTarefa({
 
   if (!estaProcessando || !tarefa) return null;
 
-  const labelTipo = LABELS_TIPO[tarefa.tipo] ?? "Processando";
+  const descricao = descreverTarefa(tarefa);
 
   return (
-    <span className="text-muted-foreground text-xs">{labelTipo}...</span>
+    <span className="text-muted-foreground text-xs">{descricao}...</span>
   );
 }
 

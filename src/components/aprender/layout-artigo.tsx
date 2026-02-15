@@ -65,7 +65,7 @@ export function LayoutArtigo({
         {/* Header do Artigo */}
         <header className="space-y-4">
           <div className="flex items-start gap-3">
-            <h1 className="flex-1 text-3xl font-bold tracking-tight">{metadata.titulo}</h1>
+            <h1 className="font-heading flex-1 text-3xl font-bold tracking-tight">{metadata.titulo}</h1>
             <BotaoLerArtigo className="mt-1" />
           </div>
 
@@ -119,7 +119,7 @@ export function LayoutArtigo({
                   <CardContent className="flex items-center gap-3 p-4">
                     <ChevronLeft className="text-muted-foreground h-5 w-5 shrink-0" aria-hidden="true" />
                     <div className="min-w-0">
-                      <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                      <p className="text-muted-foreground text-xs uppercase tracking-wide">
                         Anterior
                       </p>
                       <p className="hover:text-primary mt-1 truncate text-sm font-semibold transition-colors">
@@ -139,7 +139,7 @@ export function LayoutArtigo({
                 <Card className="hover:border-primary/30 h-full transition-colors">
                   <CardContent className="flex items-center justify-end gap-3 p-4">
                     <div className="min-w-0 text-right">
-                      <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                      <p className="text-muted-foreground text-xs uppercase tracking-wide">
                         Próximo
                       </p>
                       <p className="hover:text-primary mt-1 truncate text-sm font-semibold transition-colors">

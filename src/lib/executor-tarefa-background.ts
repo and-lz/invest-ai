@@ -1,4 +1,9 @@
-import { salvarTarefa, type TarefaBackground } from "@/lib/tarefa-background";
+import {
+  salvarTarefa,
+  lerTarefa,
+  descreverTarefa,
+  type TarefaBackground,
+} from "@/lib/tarefa-background";
 import { adicionarNotificacao } from "@/lib/notificacao";
 import type { CriarNotificacao } from "@/lib/notificacao";
 import { AppError } from "@/domain/errors/app-errors";
@@ -34,6 +39,15 @@ function aguardar(milissegundos: number): Promise<void> {
 }
 
 /**
+ * Verifica se a tarefa foi cancelada pelo usuário.
+ * Lê do storage para pegar o status mais recente.
+ */
+async function tarefaFoiCancelada(identificadorTarefa: string): Promise<boolean> {
+  const tarefaAtual = await lerTarefa(identificadorTarefa);
+  return tarefaAtual?.status === "cancelada";
+}
+
+/**
  * Executa uma tarefa em background com retry automatico para erros transientes.
  *
  * - Sucesso: salva tarefa como "concluido" + cria notificacao server-side
@@ -48,6 +62,15 @@ export async function executarTarefaEmBackground(
   let tentativaAtual = tarefa.tentativaAtual ?? 0;
 
   for (;;) {
+    // Verificar se a tarefa foi cancelada antes de executar
+    const cancelada = await tarefaFoiCancelada(tarefa.identificador);
+    if (cancelada) {
+      console.info(
+        `[${rotuloLog}] Tarefa ${tarefa.identificador} foi cancelada pelo usuario`,
+      );
+      return;
+    }
+
     try {
       const resultado = await executarOperacao();
 
@@ -60,9 +83,10 @@ export async function executarTarefaEmBackground(
         tentativaAtual,
       });
 
+      const descricaoTarefa = descreverTarefa(tarefa);
       await criarNotificacaoSilenciosa({
         tipo: "success",
-        titulo: "Tarefa concluida!",
+        titulo: `${descricaoTarefa} — concluida!`,
         descricao: resultado.descricaoResultado,
         acao: resultado.urlRedirecionamento
           ? { rotulo: "Ver resultado", url: resultado.urlRedirecionamento }
@@ -117,9 +141,10 @@ export async function executarTarefaEmBackground(
         erroRecuperavel: ehRecuperavel,
       });
 
+      const descricaoTarefa = descreverTarefa(tarefa);
       await criarNotificacaoSilenciosa({
         tipo: "error",
-        titulo: "Erro no processamento",
+        titulo: `${descricaoTarefa} — erro`,
         descricao: mensagemErro,
         acao: urlRetry
           ? { rotulo: "Tentar novamente", url: urlRetry }

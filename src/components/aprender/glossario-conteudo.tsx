@@ -105,7 +105,7 @@ export function GlossarioConteudo() {
             <Card key={termo.slug} id={termo.slug} className="scroll-mt-20">
               <CardHeader>
                 <div className="flex items-start justify-between gap-2">
-                  <CardTitle className="text-base">{termo.termo}</CardTitle>
+                  <CardTitle>{termo.termo}</CardTitle>
                   <Badge variant="secondary" className="text-xs shrink-0">
                     {NOMES_CATEGORIAS[termo.categoria]}
                   </Badge>

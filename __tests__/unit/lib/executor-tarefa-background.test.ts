@@ -2,22 +2,23 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { TarefaBackground } from "@/lib/tarefa-background";
 import { AppError, AiApiTransientError } from "@/domain/errors/app-errors";
 
-// Mock salvarTarefa e adicionarNotificacao
-vi.mock("@/lib/tarefa-background", async (importOriginal) => {
-  const modulo = await importOriginal<typeof import("@/lib/tarefa-background")>();
-  return {
-    ...modulo,
-    salvarTarefa: vi.fn(),
-  };
-});
+// Mock tarefa-background
+vi.mock("@/lib/tarefa-background", () => ({
+  salvarTarefa: vi.fn(),
+  lerTarefa: vi.fn().mockResolvedValue(null), // Retorna null por padrão (tarefa não cancelada)
+  descreverTarefa: vi.fn((tarefa: TarefaBackground) => `Mock: ${tarefa.tipo}`),
+  TarefaBackgroundSchema: {},
+  StatusTarefaEnum: {},
+  TipoTarefaEnum: {},
+  LABELS_TIPO_TAREFA: {},
+}));
 
-vi.mock("@/lib/notificacao", async (importOriginal) => {
-  const modulo = await importOriginal<typeof import("@/lib/notificacao")>();
-  return {
-    ...modulo,
-    adicionarNotificacao: vi.fn(),
-  };
-});
+// Mock notificacao
+vi.mock("@/lib/notificacao", () => ({
+  adicionarNotificacao: vi.fn(),
+  NotificacaoSchema: {},
+  TipoNotificacaoEnum: {},
+}));
 
 // Importar apos os mocks
 import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
@@ -66,7 +67,7 @@ describe("executarTarefaEmBackground", () => {
     expect(mockAdicionarNotificacao).toHaveBeenCalledWith(
       expect.objectContaining({
         tipo: "success",
-        titulo: "Tarefa concluida!",
+        titulo: expect.stringContaining("concluida"),
         descricao: "Operacao concluida",
         acao: { rotulo: "Ver resultado", url: "/resultado" },
       }),
@@ -95,7 +96,7 @@ describe("executarTarefaEmBackground", () => {
     expect(mockAdicionarNotificacao).toHaveBeenCalledWith(
       expect.objectContaining({
         tipo: "error",
-        titulo: "Erro no processamento",
+        titulo: expect.stringContaining("erro"),
         descricao: "API key invalida",
       }),
     );

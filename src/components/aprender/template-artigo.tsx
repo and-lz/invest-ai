@@ -16,7 +16,7 @@ interface SecaoArtigoProps {
 export function SecaoArtigo({ titulo, children, className }: SecaoArtigoProps) {
   return (
     <section className={cn("mb-12", className)}>
-      <h2 className="mb-4 text-xl font-semibold tracking-tight">{titulo}</h2>
+      <h2 className="font-heading mb-4 text-xl font-semibold tracking-tight">{titulo}</h2>
       <div className="space-y-4 text-base leading-relaxed">{children}</div>
     </section>
   );

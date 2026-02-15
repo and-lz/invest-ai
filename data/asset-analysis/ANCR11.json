@@ -1,0 +1,74 @@
+{
+  "codigoAtivo": "ANCR11",
+  "nomeAtivo": "Fundo de Investimento Imobiliario Ancar I C Cotas",
+  "dataAnalise": "2026-02-15",
+  "resumoGeral": "ANCR11 é um FII que exibe extrema volatilidade e baixíssima liquidez, com uma valorização significativa no ano (assumindo 40.31% YTD). Contudo, a ausência de dados de proventos e informações fundamentalistas, somada ao cenário macro desafiador para FIIs de tijolo, indica um investimento de alto risco e pouca visibilidade. Recomenda-se aguardar.",
+  "analisePerformance": {
+    "comparacoes": [
+      {
+        "periodo": "No mês",
+        "retornoAtivo": 0,
+        "retornoCDI": 1.16,
+        "retornoIbovespa": 1.29,
+        "retornoIPCA": 0.33,
+        "veredictoPeriodo": "Dados de performance de ANCR11 para este período não foram fornecidos para comparação direta. Os valores de retorno ativo são placeholders."
+      },
+      {
+        "periodo": "No ano",
+        "retornoAtivo": 40.31,
+        "retornoCDI": 14.26,
+        "retornoIbovespa": 33.95,
+        "retornoIPCA": 4.36,
+        "veredictoPeriodo": "Assumindo a variação de 40.31% como a performance no ano, ANCR11 superou significativamente o CDI (14.26%), o Ibovespa (33.95%) e o IPCA (4.36%), demonstrando forte valorização em 2024."
+      },
+      {
+        "periodo": "Desde o início",
+        "retornoAtivo": 0,
+        "retornoCDI": 60.03,
+        "retornoIbovespa": 47.68,
+        "retornoIPCA": 20.43,
+        "veredictoPeriodo": "Dados de performance de ANCR11 para este período não foram fornecidos para comparação direta. Os valores de retorno ativo são placeholders."
+      }
+    ],
+    "tendenciaRecente": "A cotação atual de R$ 449,00, após uma mínima de R$ 65,00 e uma máxima de R$ 1.000,00 nas últimas 52 semanas, indica extrema volatilidade. A variação de 40.31% (assumindo ser a performance no ano) sugere um forte movimento de alta recente, mas dentro de um histórico de oscilações selvagens e imprevisíveis.",
+    "posicaoNaCarteira": "O ativo ANCR11 não está presente na carteira do usuário."
+  },
+  "analiseRendaPassiva": null,
+  "fatoresRisco": [
+    {
+      "descricao": "Extrema Volatilidade de Preço",
+      "severidade": "alta",
+      "impactoPotencial": "O histórico de preço (min R$65,00, max R$1.000,00 em 52 semanas) demonstra oscilações violentas, indicando alto risco de grandes perdas ou ganhos em curtos períodos, sem fundamentos claros para justificar tais movimentos."
+    },
+    {
+      "descricao": "Baixíssima Liquidez",
+      "severidade": "alta",
+      "impactoPotencial": "Com um volume de apenas 7 cotas transacionadas, a liquidez é praticamente inexistente. Isso significa uma enorme dificuldade para comprar ou vender o ativo sem impactar drasticamente seu preço, além de um alto risco de manipulação de preço."
+    },
+    {
+      "descricao": "Foco no Setor de Shopping Centers",
+      "severidade": "media",
+      "impactoPotencial": "FIIs de shopping centers são sensíveis ao consumo, taxas de juros (que afetam o endividamento para expansão) e concorrência do e-commerce. Desafios econômicos podem reduzir o fluxo de caixa, o valor dos aluguéis e, consequentemente, o valor dos imóveis e das cotas."
+    },
+    {
+      "descricao": "Falta de Transparência e Dados Fundamentalistas",
+      "severidade": "alta",
+      "impactoPotencial": "A ausência de dados de proventos e informações fundamentalistas específicas para o FII (como vacância, alavancagem, composição do portfólio, etc.) impede uma análise completa e informada, forçando o investidor a operar no escuro e aumentar o risco da operação."
+    }
+  ],
+  "avaliacaoFundamentalista": null,
+  "avaliacaoTimingUsuario": null,
+  "cenarioMacroImpacto": "A taxa SELIC em 15.00% a.a. cria um ambiente desafiador para FIIs de tijolo como os de shopping centers. Juros altos aumentam o custo de capital para o fundo e tornam a renda fixa muito mais atrativa, desviando o capital dos investimentos imobiliários. Isso pode pressionar o valor das cotas e dificultar o repasse de custos. Embora o IPCA mensal esteja baixo (0.33%), a inflação anual de 4.36% (considerando o benchmark) é um fator a ser monitorado para reajustes de aluguéis, mas o principal entrave é o custo de oportunidade da renda fixa e o impacto dos juros altos no consumo.",
+  "veredicto": {
+    "recomendacao": "aguardar",
+    "justificativa": "Devido à extrema volatilidade e baixíssima liquidez do ANCR11, aliadas à completa ausência de dados de proventos e fundamentalistas cruciais para uma análise sólida, não é possível recomendar a entrada neste ativo. O cenário macroeconômico atual de juros altos também desfavorece FIIs de tijolo. O risco de operar sem informações adequadas é inaceitavelmente alto.",
+    "horizonteTemporal": "Nenhum, devido à alta incerteza e falta de dados fundamentais para avaliação.",
+    "condicoesRevisao": "A recomendação pode ser revista se houver uma melhora substancial na liquidez do ativo (volume de negociação consistente e significativo), se dados de proventos regulares e informações fundamentalistas detalhadas (vacância, inadimplência, alavancagem, composição dos ativos) se tornarem públicos e positivos, e se o cenário de juros se tornar mais favorável ao setor imobiliário."
+  },
+  "pontosDeAtencao": [
+    "Monitorar a liquidez e o volume de negociação do ativo. Volumes de negociação muito baixos representam um risco elevado.",
+    "Buscar e analisar informações sobre os proventos pagos pelo fundo e sua consistência ao longo do tempo.",
+    "Investigar os fundamentos específicos do FII, como a qualidade e localização dos shoppings, taxas de vacância e inadimplência, e a estrutura de alavancagem do fundo.",
+    "Acompanhar de perto o desempenho do setor de shopping centers e as expectativas para a taxa de juros no Brasil, pois ambos impactam diretamente a performance do FII."
+  ]
+}

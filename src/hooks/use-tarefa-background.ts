@@ -22,9 +22,14 @@ export function useTarefaBackground(identificadorTarefa: string | null) {
           return 2000;
         }
 
-        // Se concluído/erro, continua polling por mais 10 segundos
+        // Se concluído/erro/cancelada, continua polling por mais 10 segundos
         // para garantir que o estado seja propagado corretamente
-        if (dados && (dados.status === "concluido" || dados.status === "erro")) {
+        if (
+          dados &&
+          (dados.status === "concluido" ||
+            dados.status === "erro" ||
+            dados.status === "cancelada")
+        ) {
           const agora = Date.now();
 
           // Primeira vez que detecta conclusão
@@ -62,5 +67,6 @@ export function useTarefaBackground(identificadorTarefa: string | null) {
     estaProcessando: data?.status === "processando",
     estaConcluido: data?.status === "concluido",
     estaComErro: data?.status === "erro",
+    estaCancelada: data?.status === "cancelada",
   };
 }

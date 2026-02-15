@@ -1,4 +1,3 @@
-import { z } from "zod/v4";
 import { obterFileManager } from "@/lib/container";
 
 // ============================================================
@@ -6,36 +5,21 @@ import { obterFileManager } from "@/lib/container";
 // Persiste status em data/tasks/{uuid}.json (dev) ou Vercel Blob (prod).
 // ============================================================
 
-export const TipoTarefaEnum = z.enum([
-  "upload-pdf",
-  "gerar-insights",
-  "gerar-insights-consolidados",
-  "analisar-ativo",
-]);
+// Re-exportar tipos e funções compartilhadas do arquivo tarefa-descricao.ts
+// (separado para permitir uso em componentes cliente sem importar filesystem)
+export {
+  TipoTarefaEnum,
+  StatusTarefaEnum,
+  TarefaBackgroundSchema,
+  LABELS_TIPO_TAREFA,
+  descreverTarefa,
+  type TarefaBackground,
+  type TipoTarefa,
+  type StatusTarefa,
+} from "@/lib/tarefa-descricao";
 
-export const StatusTarefaEnum = z.enum(["processando", "concluido", "erro"]);
-
-export const TarefaBackgroundSchema = z.object({
-  identificador: z.string().uuid(),
-  tipo: TipoTarefaEnum,
-  status: StatusTarefaEnum,
-  iniciadoEm: z.string().datetime(),
-  concluidoEm: z.string().datetime().optional(),
-  erro: z.string().optional(),
-  descricaoResultado: z.string().optional(),
-  urlRedirecionamento: z.string().optional(),
-  // Campos de retry (todos opcionais para retrocompatibilidade com tarefas existentes)
-  tentativaAtual: z.number().int().nonnegative().optional(),
-  maximoTentativas: z.number().int().nonnegative().optional(),
-  erroRecuperavel: z.boolean().optional(),
-  proximaTentativaEm: z.string().datetime().optional(),
-  // Contexto generico para re-despacho (ex: identificadorRelatorio para retry de insights)
-  parametros: z.record(z.string(), z.string()).optional(),
-});
-
-export type TarefaBackground = z.infer<typeof TarefaBackgroundSchema>;
-export type TipoTarefa = z.infer<typeof TipoTarefaEnum>;
-export type StatusTarefa = z.infer<typeof StatusTarefaEnum>;
+import type { TarefaBackground } from "@/lib/tarefa-descricao";
+import { TarefaBackgroundSchema } from "@/lib/tarefa-descricao";
 
 // ---- Funções públicas ----
 
@@ -65,4 +49,31 @@ export async function lerTarefa(identificador: string): Promise<TarefaBackground
   }
 
   return resultado.data;
+}
+
+/**
+ * Cancela uma tarefa em andamento.
+ * Marca como "cancelada" no storage para que o executor detecte e aborte.
+ */
+export async function cancelarTarefa(
+  identificador: string,
+  canceladaPor: "usuario" | "timeout" = "usuario",
+): Promise<boolean> {
+  const tarefaAtual = await lerTarefa(identificador);
+
+  // Não existe ou já finalizou
+  if (!tarefaAtual || tarefaAtual.status !== "processando") {
+    return false;
+  }
+
+  const tarefaCancelada: TarefaBackground = {
+    ...tarefaAtual,
+    status: "cancelada",
+    concluidoEm: new Date().toISOString(),
+    canceladaEm: new Date().toISOString(),
+    canceladaPor,
+  };
+
+  await salvarTarefa(tarefaCancelada);
+  return true;
 }

@@ -1,0 +1,69 @@
+{
+  "codigoAtivo": "ALASKA BLACK II FIC FIA BDR NIVEL I",
+  "nomeAtivo": "ALASKA BLACK II FIC FIA BDR NIVEL I",
+  "dataAnalise": "2026-02-13",
+  "resumoGeral": "O ALASKA BLACK II FIC FIA BDR NIVEL I demonstrou uma performance espetacular em janeiro de 2026, superando amplamente os principais benchmarks. Apesar da alta volatilidade esperada para um fundo de ações focado em BDRs, sua entrada na carteira do usuário foi muito oportuna, justificando a manutenção da posição com acompanhamento constante.",
+  "analisePerformance": {
+    "comparacoes": [
+      {
+        "periodo": "No mês (Jan/2026)",
+        "retornoAtivo": 23.49,
+        "retornoCDI": 1.16,
+        "retornoIbovespa": 1.29,
+        "retornoIPCA": 0.33,
+        "veredictoPeriodo": "O fundo superou significativamente todos os benchmarks, com um retorno de 23.49% contra 1.16% do CDI, 1.29% do Ibovespa e 0.33% do IPCA."
+      },
+      {
+        "periodo": "Desde o início na carteira",
+        "retornoAtivo": 27.01,
+        "retornoCDI": null,
+        "retornoIbovespa": null,
+        "retornoIPCA": null,
+        "veredictoPeriodo": "Desde sua entrada na carteira há dois meses, o ativo acumula um retorno impressionante de 27.01%. Não há dados de benchmarks comparáveis para este período específico com os dados fornecidos."
+      }
+    ],
+    "tendenciaRecente": "A tendência recente é de forte valorização, impulsionada pelo desempenho excepcional de janeiro de 2026, que reverteu a modesta rentabilidade inicial de dezembro de 2025.",
+    "posicaoNaCarteira": "A participação do ativo na carteira cresceu de 2.69% em dezembro para 3.64% em janeiro, ainda representando uma porção gerenciável do total da carteira."
+  },
+  "analiseRendaPassiva": null,
+  "fatoresRisco": [
+    {
+      "descricao": "Volatilidade do mercado de ações estrangeiras",
+      "severidade": "alta",
+      "impactoPotencial": "Fundos de ações, especialmente aqueles com exposição a mercados internacionais via BDRs, são inerentemente voláteis e podem sofrer quedas significativas em momentos de aversão ao risco global."
+    },
+    {
+      "descricao": "Risco cambial (dólar vs. real)",
+      "severidade": "media",
+      "impactoPotencial": "A performance em BRL do fundo é afetada pela variação do câmbio. Uma forte valorização do Real frente ao Dólar pode corroer parte dos ganhos obtidos nos ativos estrangeiros."
+    },
+    {
+      "descricao": "Risco de liquidez dos BDRs",
+      "severidade": "baixa",
+      "impactoPotencial": "Embora o fundo seja gerido ativamente, a liquidez de alguns BDRs pode ser menor que a de ações diretas no Brasil, o que pode dificultar a compra ou venda de posições em momentos de estresse."
+    }
+  ],
+  "avaliacaoFundamentalista": null,
+  "avaliacaoTimingUsuario": {
+    "resumo": "A decisão de incluir o ALASKA BLACK II na carteira em dezembro de 2025 e de realizar um aporte em janeiro de 2026 demonstrou ser extremamente oportuna, capitalizando sobre a forte valorização do ativo. O desempenho inicial justifica a confiança na estratégia do fundo.",
+    "precoMedioEstimadoCentavos": null,
+    "momentosFavoraveis": [
+      "Entrada em dezembro de 2025, posicionando a carteira para o forte rali de janeiro de 2026.",
+      "Aporte em janeiro de 2026, aproveitando o momento de alta e aumentando a exposição a um ativo de alta performance."
+    ],
+    "momentosDesfavoraveis": []
+  },
+  "cenarioMacroImpacto": "Com a taxa SELIC em 15.00% a.a., a renda fixa no Brasil permanece extremamente atrativa, o que geralmente desvia o capital da renda variável local. No entanto, o ALASKA BLACK II, por investir em BDRs (ativos estrangeiros), é menos sensível à SELIC e mais influenciado pelo desempenho dos mercados globais e pelo câmbio. A alta SELIC pode levar a um Real mais forte, o que, em tese, poderia impactar negativamente o retorno do fundo em BRL. Apesar disso, a performance de janeiro indica que a valorização dos ativos subjacentes superou qualquer efeito cambial adverso ou a concorrência da renda fixa local.",
+  "veredicto": {
+    "recomendacao": "manter",
+    "justificativa": "O fundo demonstrou uma capacidade impressionante de gerar alfa em um curto período, superando amplamente os benchmarks. Embora a volatilidade seja inerente a este tipo de ativo, a performance recente e o timing favorável da entrada na carteira sugerem a manutenção da posição para colher potenciais ganhos futuros, desde que o perfil de risco do usuário seja adequado para tal exposição.",
+    "horizonteTemporal": "Médio a longo prazo (12+ meses)",
+    "condicoesRevisao": "A recomendação deve ser revista em caso de deterioração significativa do cenário macroeconômico global, mudança na estratégia do fundo, ou uma sequência de meses com desempenho muito abaixo dos pares e benchmarks, indicando perda de eficiência do gestor ou problemas nos ativos subjacentes."
+  },
+  "pontosDeAtencao": [
+    "Monitorar a volatilidade do fundo e sua participação na carteira para garantir que esteja alinhada ao seu perfil de risco.",
+    "Acompanhar o desempenho dos mercados globais, especialmente os americanos, que tendem a ter grande peso nos BDRs.",
+    "Observar a variação cambial do dólar frente ao real, pois impacta diretamente os retornos do fundo em moeda nacional.",
+    "Verificar a consistência do desempenho do fundo em relação a outros fundos de ações globais ou BDRs."
+  ]
+}

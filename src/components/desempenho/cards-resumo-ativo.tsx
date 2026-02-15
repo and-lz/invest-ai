@@ -29,7 +29,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
           <CardTitle className="text-sm font-medium">
             {cotacao ? "Cotacao" : "Saldo na Carteira"}
           </CardTitle>
-          <DollarSign className="text-muted-foreground h-4 w-4" />
+          <DollarSign className="text-muted-foreground h-5 w-5" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -55,9 +55,9 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Rent. no Mes</CardTitle>
           {rentabilidadeMes !== null && rentabilidadeMes >= 0 ? (
-            <TrendingUp className="text-success h-4 w-4" />
+            <TrendingUp className="text-success h-5 w-5" />
           ) : (
-            <TrendingDown className="text-destructive h-4 w-4" />
+            <TrendingDown className="text-destructive h-5 w-5" />
           )}
         </CardHeader>
         <CardContent>
@@ -80,7 +80,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">% da Carteira</CardTitle>
-          <PieChart className="text-muted-foreground h-4 w-4" />
+          <PieChart className="text-muted-foreground h-5 w-5" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -100,7 +100,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Proventos</CardTitle>
-          <BarChart3 className="text-muted-foreground h-4 w-4" />
+          <BarChart3 className="text-muted-foreground h-5 w-5" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">

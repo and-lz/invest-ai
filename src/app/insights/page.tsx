@@ -228,13 +228,18 @@ function InsightCard({
 type ModoVisualizacao = "inicial" | "manual" | "insights";
 
 export default function InsightsPage() {
-  const { relatorios, estaCarregando: carregandoRelatorios } = useReports();
+  const { relatorios, estaCarregando: carregandoRelatorios, erro: erroRelatorios } = useReports();
   const [insights, setInsights] = useState<InsightsResponse | null>(null);
   const [estaGerando, setEstaGerando] = useState(false);
   const [erroInsights, setErroInsights] = useState<string | null>(null);
   const [modoVisualizacao, setModoVisualizacao] = useState<ModoVisualizacao>("inicial");
   const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
+
+  // Se houver erro ao carregar relatórios, lançar para o Error Boundary com mensagem clara
+  if (erroRelatorios) {
+    throw new Error(`Erro ao carregar relatórios: ${erroRelatorios.message || "Erro desconhecido"}`);
+  }
 
   // Registrar contexto da pagina para o chat
   const { definirContexto } = useContextoPaginaChat();
