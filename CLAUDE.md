@@ -218,24 +218,24 @@ Cores usam formato OkLCH (perceptualmente uniforme) — mesma lightness percebid
 ### Arquivo central: `src/app/globals.css`
 Todas as cores sao definidas como CSS custom properties em `:root` (light) e `.dark` (dark).
 
-### Paleta Dark Mode (Refined Luxury - Deep Navy Charcoal)
-**Filosofia:** Dramatico, profundo, premium — como private banking apps de alta qualidade
+### Paleta Dark Mode (Deep Backgrounds + Ultra Bright Colors)
+**Filosofia:** Contraste maximo com backgrounds profundos e cores ultra vibrantes — legibilidade perfeita
 
-- **Backgrounds:** Hue 250 (navy), chroma enriquecido para tons mais luxuosos
-  - `--background: oklch(0.20 0.025 250)` — fundo principal (profundo, dramatico)
-  - `--card: oklch(0.28 0.025 250)` — cards elevados (8% mais claro que bg - hierarquia correta)
-  - `--popover: oklch(0.32 0.025 250)` — popovers flutuantes (12% mais claro que bg)
-  - `--sidebar: oklch(0.18 0.025 250)` — sidebar (mais escuro que bg para separacao)
-  - `--secondary/muted: oklch(0.38 0.025 250)` — elementos secundarios
+- **Backgrounds:** Hue 250 (navy), quase preto para maxima profundidade
+  - `--background: oklch(0.10 0.035 250)` — fundo principal (quase preto puro, dramatico)
+  - `--card: oklch(0.18 0.035 250)` — cards elevados (8% mais claro, hierarquia clara)
+  - `--popover: oklch(0.22 0.035 250)` — popovers flutuantes (12% mais claro)
+  - `--sidebar: oklch(0.12 0.035 250)` — sidebar (ligeiramente mais escuro que bg)
+  - `--secondary/muted: oklch(0.28 0.035 250)` — elementos secundarios
 
-- **Foreground:** Hue 75 (off-white com undertone dourado)
-  - `--foreground: oklch(0.94 0.015 75)` — texto principal (brilhante, quente)
-  - `--muted-foreground: oklch(0.68 0.02 250)` — texto secundario (slate)
-  - `--primary: oklch(0.88 0.02 75)` — elementos interativos (gold accent)
+- **Foreground:** Branco puro + cores ultra brilhantes
+  - `--foreground: oklch(1 0 0)` — texto principal (branco absoluto, contraste maximo)
+  - `--muted-foreground: oklch(0.88 0.015 250)` — texto secundario (ultra claro)
+  - `--primary: oklch(0.95 0.04 75)` — elementos interativos (gold radiante)
 
-- **Borders:** Branco com tint navy, 18% opacity para efeito frosted glass
-  - `--border: oklch(1 0.01 250 / 18%)`
-  - `--ring: oklch(0.60 0.10 75)` — focus ring em ouro
+- **Borders:** Branco com tint navy, 40% opacity para maxima visibilidade
+  - `--border: oklch(1 0.01 250 / 40%)`
+  - `--ring: oklch(0.82 0.18 75)` — focus ring em ouro brilhante
 
 ### Paleta Light Mode (Warm White com Navy Accents)
 **Filosofia:** Limpo, elegante, profissional — com sutis undertones quentes
@@ -250,19 +250,19 @@ Todas as cores sao definidas como CSS custom properties em `:root` (light) e `.d
   - `--muted-foreground: oklch(0.48 0.025 250)` — texto secundario
   - `--primary: oklch(0.20 0.025 250)` — elementos interativos (navy)
 
-### Cores Semanticas (Enriched)
+### Cores Semanticas (Ultra Bright Maximum Contrast)
 Registradas no `@theme inline` do Tailwind v4 — suporte nativo a `text-success`, `bg-destructive/10`, etc.
 
 | Variavel | Light Mode | Dark Mode | Uso |
 |----------|-----------|-----------|-----|
-| `--success` | `oklch(0.40 0.14 165)` esmeralda rico | `oklch(0.68 0.12 165)` teal brilhante | Valores positivos, confirmacoes |
-| `--destructive` | `oklch(0.45 0.18 15)` burgundy profundo | `oklch(0.60 0.15 15)` wine rico | Valores negativos, erros, alertas |
-| `--warning` | `oklch(0.50 0.14 75)` gold rico | `oklch(0.75 0.12 75)` champagne | Alertas de atencao, pendencias |
+| `--success` | `oklch(0.40 0.14 165)` esmeralda rico | `oklch(0.82 0.20 165)` teal ultra vibrante | Valores positivos, confirmacoes |
+| `--destructive` | `oklch(0.45 0.18 15)` burgundy profundo | `oklch(0.78 0.22 15)` wine neon | Valores negativos, erros, alertas |
+| `--warning` | `oklch(0.50 0.14 75)` gold rico | `oklch(0.88 0.20 75)` gold radiante | Alertas de atencao, pendencias |
 
 ### Mesh Gradients (Background Depth)
 - **Light mode:** Sutis gradientes navy + gold + teal (chroma 0.045-0.05, opacity 35-70%)
-- **Dark mode:** Dramaticos gradientes navy + gold + teal (chroma 0.05-0.06, opacity 30-60%)
-- **Efeito:** Layered depth, premium feel, subtle movement
+- **Dark mode:** Sutis gradientes sobre fundo profundo (chroma 0.07-0.08, opacity 20-40%, lightness 16-20%)
+- **Efeito:** Layered depth, premium feel, subtle movement — contraste maximo mantido
 
 ### Regras de Uso de Cores
 - NUNCA usar cores Tailwind hardcoded (`text-green-600`, `bg-red-50`, `border-red-200`)
@@ -271,15 +271,15 @@ Registradas no `@theme inline` do Tailwind v4 — suporte nativo a `text-success
 - Cores de chart usam paleta dedicada (`--chart-1` a `--chart-5`) com hues complementares
 - **Chroma strategy:** Base (0.02-0.025), Semantics (0.12-0.18), Charts (0.12-0.16)
 
-### Charts (Refined)
+### Charts (Ultra Bright)
 Paleta de 5 cores com hues espacados: navy (250), teal (165), gold (75), purple (310), wine (15)
 
-**Dark mode:** Lightness 58-75%, chroma 0.12-0.16 (brilhantes, saturados)
-- `--chart-1: oklch(0.58 0.14 250)` navy rico
-- `--chart-2: oklch(0.68 0.12 165)` teal vibrante
-- `--chart-3: oklch(0.75 0.12 75)` gold luxuoso
-- `--chart-4: oklch(0.62 0.16 310)` purple sofisticado
-- `--chart-5: oklch(0.62 0.14 15)` wine elegante
+**Dark mode:** Lightness 80-88%, chroma 0.20-0.22 (ultra vibrantes, maxima visibilidade)
+- `--chart-1: oklch(0.80 0.20 250)` navy radiante
+- `--chart-2: oklch(0.84 0.20 165)` teal neon
+- `--chart-3: oklch(0.88 0.20 75)` gold brilhante
+- `--chart-4: oklch(0.82 0.22 310)` purple vibrante
+- `--chart-5: oklch(0.80 0.20 15)` wine intenso
 
 **Light mode:** Lightness 42-58%, chroma 0.12-0.16 (profundos, ricos)
 - `--chart-1: oklch(0.42 0.14 250)` navy profundo
