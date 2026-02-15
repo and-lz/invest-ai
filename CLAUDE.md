@@ -31,6 +31,17 @@
 - `npm run test` - rodar testes
 - `npm run lint` - verificar lint
 - `npm run format` - formatar codigo
+- `npm run generate:icons` - gerar icones PWA a partir do SVG
+
+## PWA (Progressive Web App)
+- App instalavel no iOS/Android com `display: standalone` (sem UI do browser)
+- `public/manifest.json` - Configuracao PWA (nome, icones, cores, orientacao)
+- `public/sw.js` - Service Worker com cache Network-First
+- `public/icon.svg` - Icone base vetorial (512x512)
+- `scripts/gerar-icones-pwa.mjs` - Script para gerar PNGs (192, 512, 180 para Apple)
+- `PwaRegistration` component - Registra Service Worker em producao
+- Meta tags iOS: `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`
+- Cores tema: `#0d0c14` (dark) para statusbar translucent no iOS
 
 ## Autenticacao
 - Auth.js v5 (NextAuth) com Google OAuth
