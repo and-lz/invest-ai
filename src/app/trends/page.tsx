@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { serializarContextoTendencias } from "@/lib/serializar-contexto-chat";
 import { Header } from "@/components/layout/header";
@@ -11,9 +12,14 @@ import { TrendingUp, RefreshCw, AlertTriangle } from "lucide-react";
 import { useDadosTendencias } from "@/hooks/use-dados-tendencias";
 import { IndicadoresResumo } from "@/components/trends/indicadores-resumo";
 import { TabelaRankingAtivos } from "@/components/trends/tabela-ranking-ativos";
-import { GraficoIndicadoresMacro } from "@/components/trends/grafico-indicadores-macro";
 import { MapaCalorSetores } from "@/components/trends/mapa-calor-setores";
 import { TabelaRankingFundos } from "@/components/trends/tabela-ranking-fundos";
+
+// Lazy-load chart component que usa Recharts
+const GraficoIndicadoresMacro = dynamic(
+  () => import("@/components/trends/grafico-indicadores-macro").then((mod) => mod.GraficoIndicadoresMacro),
+  { ssr: false, loading: () => <Skeleton className="h-96" /> },
+);
 
 function formatarTimestampAtualizacao(isoString: string): string {
   return new Date(isoString).toLocaleString("pt-BR", {

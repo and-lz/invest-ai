@@ -8,20 +8,11 @@ interface NotificacoesApiResponse {
 
 const EVENTO_NOTIFICACAO_CRIADA = "notificacao-criada";
 
-const fetcher = async (url: string): Promise<NotificacoesApiResponse> => {
-  const resposta = await fetch(url);
-  if (!resposta.ok) {
-    throw new Error(`Erro ao buscar notificacoes: ${resposta.status}`);
-  }
-  return resposta.json() as Promise<NotificacoesApiResponse>;
-};
-
 export function useNotificacoes() {
   const { data, error, isLoading, mutate } = useSWR<NotificacoesApiResponse>(
     "/api/notifications",
-    fetcher,
     {
-      refreshInterval: 30000, // Polling lento como fallback (30s)
+      refreshInterval: 30_000, // Polling lento como fallback (30s)
       revalidateOnFocus: true,
     },
   );

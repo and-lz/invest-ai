@@ -6,6 +6,7 @@ import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
 import { salvarAnaliseAtivo } from "@/lib/analise-ativo-storage";
 import type { TarefaBackground } from "@/lib/tarefa-background";
 import { AppError } from "@/domain/errors/app-errors";
+import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
 const AnalisarAtivoRequestSchema = z.object({
   codigoAtivo: z.string().min(1),
@@ -59,7 +60,10 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ identificadorTarefa, status: "processando" }, { status: 202 });
+    return NextResponse.json(
+      { identificadorTarefa, status: "processando" },
+      { status: 202, ...cabecalhosSemCache() },
+    );
   } catch (erro) {
     console.error("Erro ao iniciar analise de ativo:", erro);
 

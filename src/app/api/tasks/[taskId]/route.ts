@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { lerTarefa } from "@/lib/tarefa-background";
+import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ taskId: string }> }) {
   try {
@@ -10,7 +11,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tas
       return NextResponse.json({ erro: "Tarefa nao encontrada" }, { status: 404 });
     }
 
-    return NextResponse.json(tarefa);
+    return NextResponse.json(tarefa, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao buscar status da tarefa:", erro);
     return NextResponse.json({ erro: "Falha ao buscar status da tarefa" }, { status: 500 });

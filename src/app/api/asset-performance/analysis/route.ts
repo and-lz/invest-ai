@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { lerAnaliseAtivo } from "@/lib/analise-ativo-storage";
+import { cabecalhosCachePrivado } from "@/lib/cabecalhos-cache";
 
 /**
  * GET /api/asset-performance/analysis?ticker=PETR4
@@ -18,10 +19,10 @@ export async function GET(request: Request) {
     const analise = await lerAnaliseAtivo(tickerParam);
 
     if (!analise) {
-      return NextResponse.json({ analise: null }, { status: 200 });
+      return NextResponse.json({ analise: null }, cabecalhosCachePrivado(300, 600));
     }
 
-    return NextResponse.json({ analise });
+    return NextResponse.json({ analise }, cabecalhosCachePrivado(300, 600));
   } catch (erro) {
     console.error("Erro ao buscar analise de ativo:", erro);
     return NextResponse.json({ erro: "Falha ao buscar analise de ativo" }, { status: 500 });

@@ -6,6 +6,8 @@ import { salvarTarefa } from "@/lib/tarefa-background";
 import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
 import type { TarefaBackground } from "@/lib/tarefa-background";
 import { requireAuth } from "@/lib/auth-utils";
+import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { cacheGlobal } from "@/lib/cache-em-memoria";
 
 const TAMANHO_MAXIMO_PDF_BYTES = 32 * 1024 * 1024; // 32MB
 
@@ -16,7 +18,7 @@ export async function GET() {
   try {
     const useCase = await obterListReportsUseCase();
     const relatorios = await useCase.executar();
-    return NextResponse.json({ relatorios });
+    return NextResponse.json({ relatorios }, cabecalhosCachePrivado(30, 120));
   } catch (erro) {
     console.error("Erro ao listar relatorios:", erro);
     return NextResponse.json({ erro: "Falha ao listar relatorios" }, { status: 500 });
@@ -76,6 +78,9 @@ export async function POST(request: Request) {
 
     await salvarTarefa(tarefa);
 
+    // Invalidar cache do dashboard para o usuario (dados serao atualizados apos processamento)
+    cacheGlobal.invalidarPorPrefixo(`dashboard:${authCheck.session.user.userId}`);
+
     void executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Upload",
@@ -89,7 +94,10 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ identificadorTarefa, status: "processando" }, { status: 202 });
+    return NextResponse.json(
+      { identificadorTarefa, status: "processando" },
+      { status: 202, ...cabecalhosSemCache() },
+    );
   } catch (erro) {
     console.error("Erro ao processar upload:", erro);
 

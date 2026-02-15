@@ -49,7 +49,7 @@ export function ChatWidget() {
 
       {/* Painel de chat */}
       {estaAberto && (
-        <div className="fixed right-6 bottom-6 z-40 flex h-[520px] w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border bg-background shadow-xl">
+        <div className="fixed inset-0 z-40 flex flex-col overflow-hidden border bg-background shadow-xl md:inset-auto md:right-6 md:bottom-6 md:h-[70vh] md:max-h-[calc(100vh-6rem)] md:w-[400px] md:rounded-2xl">
           {/* Cabecalho */}
           <div className="flex items-center justify-between border-b px-4 py-3">
             <div className="flex items-center gap-2">

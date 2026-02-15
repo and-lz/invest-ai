@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { obterFilesystemReportRepository, obterBrapiAssetDetailService } from "@/lib/container";
 import { agregarDadosDoAtivo, listarAtivosUnicos } from "@/lib/agregar-dados-ativo";
 import { verificarCacheAnalise } from "@/lib/analise-ativo-storage";
+import { cabecalhosCachePrivado } from "@/lib/cabecalhos-cache";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 
 /**
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
     // Se nenhum ticker: retorna lista de ativos unicos da carteira
     if (!tickerParam) {
       const ativosUnicos = listarAtivosUnicos(relatorios);
-      return NextResponse.json({ ativos: ativosUnicos });
+      return NextResponse.json({ ativos: ativosUnicos }, cabecalhosCachePrivado(60, 300));
     }
 
     // Agregar dados do ativo nos relatorios
@@ -43,21 +44,25 @@ export async function GET(request: Request) {
 
     const estaNaCarteira = dadosAgregados !== null;
 
-    return NextResponse.json({
-      codigoAtivo: tickerParam.toUpperCase(),
-      nomeAtivo: dadosAgregados?.nomeAtivo ?? detalhesBrapi?.nomeAtivo ?? tickerParam.toUpperCase(),
-      estrategia: dadosAgregados?.estrategia ?? null,
-      estaNaCarteira,
-      historicoNaCarteira: dadosAgregados?.historicoNaCarteira ?? [],
-      movimentacoesDoAtivo: dadosAgregados?.movimentacoesDoAtivo ?? [],
-      eventosFinanceirosDoAtivo: dadosAgregados?.eventosFinanceirosDoAtivo ?? [],
-      cotacaoAtual: detalhesBrapi?.cotacaoAtual ?? null,
-      dadosFundamentalistas: detalhesBrapi?.dadosFundamentalistas ?? null,
-      historicoDividendos: detalhesBrapi?.historicoDividendos ?? [],
-      saldoAtualCentavos: dadosAgregados?.saldoAtualCentavos ?? 0,
-      participacaoAtualCarteira: dadosAgregados?.participacaoAtualCarteira ?? 0,
-      analiseCacheada: cacheAnalise,
-    });
+    return NextResponse.json(
+      {
+        codigoAtivo: tickerParam.toUpperCase(),
+        nomeAtivo:
+          dadosAgregados?.nomeAtivo ?? detalhesBrapi?.nomeAtivo ?? tickerParam.toUpperCase(),
+        estrategia: dadosAgregados?.estrategia ?? null,
+        estaNaCarteira,
+        historicoNaCarteira: dadosAgregados?.historicoNaCarteira ?? [],
+        movimentacoesDoAtivo: dadosAgregados?.movimentacoesDoAtivo ?? [],
+        eventosFinanceirosDoAtivo: dadosAgregados?.eventosFinanceirosDoAtivo ?? [],
+        cotacaoAtual: detalhesBrapi?.cotacaoAtual ?? null,
+        dadosFundamentalistas: detalhesBrapi?.dadosFundamentalistas ?? null,
+        historicoDividendos: detalhesBrapi?.historicoDividendos ?? [],
+        saldoAtualCentavos: dadosAgregados?.saldoAtualCentavos ?? 0,
+        participacaoAtualCarteira: dadosAgregados?.participacaoAtualCarteira ?? 0,
+        analiseCacheada: cacheAnalise,
+      },
+      cabecalhosCachePrivado(60, 300),
+    );
   } catch (erro) {
     console.error("Erro ao buscar dados do ativo:", erro);
     return NextResponse.json({ erro: "Falha ao buscar dados do ativo" }, { status: 500 });

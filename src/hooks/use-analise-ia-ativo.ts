@@ -5,12 +5,6 @@ interface AnaliseApiResponse {
   analise: AnaliseAtivoResponse | null;
 }
 
-const fetcher = (url: string) =>
-  fetch(url).then((resposta) => {
-    if (!resposta.ok) throw new Error("Erro ao buscar analise do ativo");
-    return resposta.json() as Promise<AnaliseApiResponse>;
-  });
-
 /**
  * Hook SWR para buscar analise IA cacheada de um ativo.
  * Nao faz fetch se ticker for null/undefined.
@@ -18,9 +12,7 @@ const fetcher = (url: string) =>
 export function useAnaliseIaAtivo(ticker: string | null) {
   const { data, error, isLoading, mutate } = useSWR<AnaliseApiResponse>(
     ticker ? `/api/asset-performance/analysis?ticker=${encodeURIComponent(ticker)}` : null,
-    fetcher,
     {
-      revalidateOnFocus: false,
       dedupingInterval: 10_000,
     },
   );

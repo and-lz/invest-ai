@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { lerTarefa, salvarTarefa } from "@/lib/tarefa-background";
 import { despacharTarefaPorTipo } from "@/lib/despachar-tarefa";
+import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
 export async function POST(_request: Request, { params }: { params: Promise<{ taskId: string }> }) {
   const { taskId } = await params;
@@ -49,5 +50,8 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ta
     return NextResponse.json({ erro: "Este tipo de tarefa nao suporta retry" }, { status: 400 });
   }
 
-  return NextResponse.json({ identificadorTarefa: taskId, status: "processando" }, { status: 202 });
+  return NextResponse.json(
+    { identificadorTarefa: taskId, status: "processando" },
+    { status: 202, ...cabecalhosSemCache() },
+  );
 }

@@ -5,11 +5,8 @@ interface ReportsApiResponse {
   relatorios: ReportMetadata[];
 }
 
-const fetcher = (url: string) =>
-  fetch(url).then((res) => res.json() as Promise<ReportsApiResponse>);
-
 export function useReports() {
-  const { data, error, isLoading, mutate } = useSWR<ReportsApiResponse>("/api/reports", fetcher);
+  const { data, error, isLoading, mutate } = useSWR<ReportsApiResponse>("/api/reports");
 
   return {
     relatorios: data?.relatorios ?? [],

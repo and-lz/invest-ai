@@ -1,24 +1,19 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { serializarContextoDashboard } from "@/lib/serializar-contexto-chat";
 import { Header } from "@/components/layout/header";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
-import { AssetAllocationChart } from "@/components/dashboard/asset-allocation-chart";
-import { BenchmarkComparisonChart } from "@/components/dashboard/benchmark-comparison-chart";
 import { TopPerformersTable } from "@/components/dashboard/top-performers-table";
 import { StrategyGainsTable } from "@/components/dashboard/strategy-gains-table";
 import { FinancialEventsList } from "@/components/dashboard/financial-events-list";
-import { WealthEvolutionChart } from "@/components/dashboard/wealth-evolution-chart";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
 import { MonthlyReturnsHeatmap } from "@/components/dashboard/monthly-returns-heatmap";
 import { RiskConsistencyCard } from "@/components/dashboard/risk-consistency-card";
-import { LiquidityLadder } from "@/components/dashboard/liquidity-ladder";
 import { AllPositionsTable } from "@/components/dashboard/all-positions-table";
-import { CategoryPerformanceChart } from "@/components/dashboard/category-performance-chart";
 import { TransactionsTable } from "@/components/dashboard/transactions-table";
-import { AllocationEvolutionChart } from "@/components/dashboard/allocation-evolution-chart";
 import { PeriodComparisonDetail } from "@/components/dashboard/period-comparison-detail";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +21,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Upload, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+
+// Lazy-load chart components que usam Recharts (~150KB)
+const WealthEvolutionChart = dynamic(
+  () => import("@/components/dashboard/wealth-evolution-chart").then((mod) => mod.WealthEvolutionChart),
+  { ssr: false, loading: () => <Skeleton className="h-96" /> },
+);
+
+const AssetAllocationChart = dynamic(
+  () => import("@/components/dashboard/asset-allocation-chart").then((mod) => mod.AssetAllocationChart),
+  { ssr: false, loading: () => <Skeleton className="h-64" /> },
+);
+
+const BenchmarkComparisonChart = dynamic(
+  () => import("@/components/dashboard/benchmark-comparison-chart").then((mod) => mod.BenchmarkComparisonChart),
+  { ssr: false, loading: () => <Skeleton className="h-64" /> },
+);
+
+const AllocationEvolutionChart = dynamic(
+  () => import("@/components/dashboard/allocation-evolution-chart").then((mod) => mod.AllocationEvolutionChart),
+  { ssr: false, loading: () => <Skeleton className="h-96" /> },
+);
+
+const CategoryPerformanceChart = dynamic(
+  () => import("@/components/dashboard/category-performance-chart").then((mod) => mod.CategoryPerformanceChart),
+  { ssr: false, loading: () => <Skeleton className="h-96" /> },
+);
+
+const LiquidityLadder = dynamic(
+  () => import("@/components/dashboard/liquidity-ladder").then((mod) => mod.LiquidityLadder),
+  { ssr: false, loading: () => <Skeleton className="h-96" /> },
+);
 
 function DashboardSkeleton() {
   return (

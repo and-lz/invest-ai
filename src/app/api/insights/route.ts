@@ -13,6 +13,7 @@ import { StatusAcaoEnum } from "@/schemas/insights.schema";
 import { salvarTarefa } from "@/lib/tarefa-background";
 import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
 import type { TarefaBackground } from "@/lib/tarefa-background";
+import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
 const InsightsRequestSchema = z.object({
   identificadorRelatorio: z.string().min(1),
@@ -32,18 +33,24 @@ export async function GET(request: Request) {
     if (mesAnoParam === "consolidado") {
       const repository = await obterFilesystemReportRepository();
       const insights = await repository.obterInsights("consolidado");
-      return NextResponse.json({
-        insights,
-        identificadorRelatorio: "consolidado",
-        mesReferencia: "consolidado",
-      });
+      return NextResponse.json(
+        {
+          insights,
+          identificadorRelatorio: "consolidado",
+          mesReferencia: "consolidado",
+        },
+        cabecalhosCachePrivado(300, 600),
+      );
     }
 
     const listUseCase = await obterListReportsUseCase();
     const relatorios = await listUseCase.executar();
 
     if (relatorios.length === 0) {
-      return NextResponse.json({ insights: null, identificadorRelatorio: null });
+      return NextResponse.json(
+        { insights: null, identificadorRelatorio: null },
+        cabecalhosCachePrivado(300, 600),
+      );
     }
 
     let relatorioSelecionado = relatorios[0];
@@ -59,17 +66,23 @@ export async function GET(request: Request) {
     }
 
     if (!relatorioSelecionado) {
-      return NextResponse.json({ insights: null, identificadorRelatorio: null });
+      return NextResponse.json(
+        { insights: null, identificadorRelatorio: null },
+        cabecalhosCachePrivado(300, 600),
+      );
     }
 
     const repository = await obterFilesystemReportRepository();
     const insights = await repository.obterInsights(relatorioSelecionado.identificador);
 
-    return NextResponse.json({
-      insights,
-      identificadorRelatorio: relatorioSelecionado.identificador,
-      mesReferencia: relatorioSelecionado.mesReferencia,
-    });
+    return NextResponse.json(
+      {
+        insights,
+        identificadorRelatorio: relatorioSelecionado.identificador,
+        mesReferencia: relatorioSelecionado.mesReferencia,
+      },
+      cabecalhosCachePrivado(300, 600),
+    );
   } catch (erro) {
     console.error("Erro ao buscar insights:", erro);
     return NextResponse.json({ erro: "Falha ao buscar insights" }, { status: 500 });
@@ -145,7 +158,10 @@ export async function POST(request: Request) {
       });
     }
 
-    return NextResponse.json({ identificadorTarefa, status: "processando" }, { status: 202 });
+    return NextResponse.json(
+      { identificadorTarefa, status: "processando" },
+      { status: 202, ...cabecalhosSemCache() },
+    );
   } catch (erro) {
     console.error("Erro ao gerar insights:", erro);
 
@@ -188,7 +204,7 @@ export async function PATCH(request: Request) {
       statusAcao: resultado.data.statusAcao,
     });
 
-    return NextResponse.json({ insights });
+    return NextResponse.json({ insights }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao atualizar conclusao de insight:", erro);
 

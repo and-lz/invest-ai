@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { obterBrapiMarketDataService, obterBcbMacroDataService } from "@/lib/container";
 import { cacheGlobal } from "@/lib/cache-em-memoria";
+import { cabecalhosCachePublico } from "@/lib/cabecalhos-cache";
 import type { DadosTendencias } from "@/schemas/trends.schema";
 
 const CHAVE_CACHE_TENDENCIAS = "tendencias-mercado";
@@ -9,7 +10,7 @@ export async function GET() {
   // Verificar cache
   const dadosEmCache = cacheGlobal.obter<DadosTendencias>(CHAVE_CACHE_TENDENCIAS);
   if (dadosEmCache) {
-    return NextResponse.json({ tendencias: dadosEmCache });
+    return NextResponse.json({ tendencias: dadosEmCache }, cabecalhosCachePublico(1800, 3600));
   }
 
   // Verificar configuracao
@@ -69,5 +70,5 @@ export async function GET() {
   // Salvar no cache (TTL padrao: 30 minutos)
   cacheGlobal.definir(CHAVE_CACHE_TENDENCIAS, tendencias);
 
-  return NextResponse.json({ tendencias });
+  return NextResponse.json({ tendencias }, cabecalhosCachePublico(1800, 3600));
 }

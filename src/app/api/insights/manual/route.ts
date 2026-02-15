@@ -11,6 +11,7 @@ import {
 import { AppError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
 import { z } from "zod/v4";
+import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
 const GerarPromptRequestSchema = z.object({
   acao: z.literal("gerar-prompt"),
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
         );
 
         const promptCompleto = gerarPromptInsightsConsolidadoManual(relatoriosOrdenados);
-        return NextResponse.json({ prompt: promptCompleto });
+        return NextResponse.json({ prompt: promptCompleto }, cabecalhosSemCache());
       }
 
       // Modo mensal: gerar prompt com relatório atual + anterior
@@ -102,7 +103,7 @@ export async function POST(request: Request) {
         dadosRelatorioAnterior,
       );
 
-      return NextResponse.json({ prompt: promptCompleto });
+      return NextResponse.json({ prompt: promptCompleto }, cabecalhosSemCache());
     }
 
     // acao === "salvar"
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
       jsonBruto: dados.json,
     });
 
-    return NextResponse.json({ sucesso: true, insights });
+    return NextResponse.json({ sucesso: true, insights }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao processar insights manual:", erro);
 

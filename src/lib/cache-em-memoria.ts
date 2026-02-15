@@ -31,6 +31,14 @@ class CacheEmMemoria {
     this.entradas.delete(chave);
   }
 
+  invalidarPorPrefixo(prefixo: string): void {
+    for (const chave of this.entradas.keys()) {
+      if (chave.startsWith(prefixo)) {
+        this.entradas.delete(chave);
+      }
+    }
+  }
+
   limpar(): void {
     this.entradas.clear();
   }

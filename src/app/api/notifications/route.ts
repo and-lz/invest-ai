@@ -5,11 +5,12 @@ import {
   limparTodasNotificacoes,
   CriarNotificacaoSchema,
 } from "@/lib/notificacao";
+import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
 export async function GET() {
   try {
     const notificacoes = await listarNotificacoes();
-    return NextResponse.json({ notificacoes });
+    return NextResponse.json({ notificacoes }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao listar notificacoes:", erro);
     return NextResponse.json({ erro: "Falha ao listar notificacoes" }, { status: 500 });
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const notificacao = await adicionarNotificacao(validacao.data);
-    return NextResponse.json({ notificacao }, { status: 201 });
+    return NextResponse.json({ notificacao }, { status: 201, ...cabecalhosSemCache() });
   } catch (erro) {
     console.error("Erro ao criar notificacao:", erro);
     return NextResponse.json({ erro: "Falha ao criar notificacao" }, { status: 500 });
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
 export async function DELETE() {
   try {
     await limparTodasNotificacoes();
-    return NextResponse.json({ sucesso: true });
+    return NextResponse.json({ sucesso: true }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao limpar notificacoes:", erro);
     return NextResponse.json({ erro: "Falha ao limpar notificacoes" }, { status: 500 });
