@@ -20,8 +20,7 @@ import {
 import { toast } from "sonner";
 import { useNotificacoes } from "@/hooks/use-notificacoes";
 import { useTarefaBackground } from "@/hooks/use-tarefa-background";
-import { LABELS_TIPO_TAREFA } from "@/lib/tarefa-descricao";
-import type { TipoTarefa } from "@/lib/tarefa-descricao";
+import { descreverTarefa } from "@/lib/tarefa-descricao";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";

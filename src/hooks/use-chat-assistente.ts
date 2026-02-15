@@ -42,6 +42,55 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
     };
   }, []);
 
+  // Auto-save debounced (declarado ANTES de enviarMensagem para evitar erro de ordem)
+  const salvarConversaAutomaticamente = useCallback(
+    async (mensagensAtualizadas: MensagemChat[]) => {
+      if (mensagensAtualizadas.length === 0) return;
+
+      // Gerar titulo a partir da primeira mensagem do usuario
+      const primeiraMensagemUsuario = mensagensAtualizadas.find(
+        (mensagem) => mensagem.papel === "usuario",
+      );
+      const titulo =
+        primeiraMensagemUsuario?.conteudo.slice(0, 50) ?? "Nova conversa";
+
+      try {
+        if (!conversaAtualId) {
+          // Criar nova conversa
+          const resposta = await fetch("/api/conversations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              titulo,
+              identificadorPagina,
+              mensagens: mensagensAtualizadas,
+            }),
+          });
+
+          if (!resposta.ok) {
+            throw new Error("Erro ao criar conversa");
+          }
+
+          const dados = (await resposta.json()) as {
+            conversa: { identificador: string };
+          };
+          setConversaAtualId(dados.conversa.identificador);
+        } else {
+          // Atualizar conversa existente
+          await fetch(`/api/conversations/${conversaAtualId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mensagens: mensagensAtualizadas }),
+          });
+        }
+      } catch (erroCatch) {
+        console.error("Erro ao salvar conversa:", erroCatch);
+        // Silent fail: nao interrompe fluxo do chat
+      }
+    },
+    [conversaAtualId, identificadorPagina],
+  );
+
   const enviarMensagem = useCallback(
     async (conteudo: string) => {
       if (estaTransmitindo || !conteudo.trim()) return;
@@ -207,55 +256,6 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
     setConversaAtualId(null);
     setErro(null);
   }, []);
-
-  // Auto-save debounced
-  const salvarConversaAutomaticamente = useCallback(
-    async (mensagensAtualizadas: MensagemChat[]) => {
-      if (mensagensAtualizadas.length === 0) return;
-
-      // Gerar titulo a partir da primeira mensagem do usuario
-      const primeiraMensagemUsuario = mensagensAtualizadas.find(
-        (mensagem) => mensagem.papel === "usuario",
-      );
-      const titulo =
-        primeiraMensagemUsuario?.conteudo.slice(0, 50) ?? "Nova conversa";
-
-      try {
-        if (!conversaAtualId) {
-          // Criar nova conversa
-          const resposta = await fetch("/api/conversations", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              titulo,
-              identificadorPagina,
-              mensagens: mensagensAtualizadas,
-            }),
-          });
-
-          if (!resposta.ok) {
-            throw new Error("Erro ao criar conversa");
-          }
-
-          const dados = (await resposta.json()) as {
-            conversa: { identificador: string };
-          };
-          setConversaAtualId(dados.conversa.identificador);
-        } else {
-          // Atualizar conversa existente
-          await fetch(`/api/conversations/${conversaAtualId}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mensagens: mensagensAtualizadas }),
-          });
-        }
-      } catch (erroCatch) {
-        console.error("Erro ao salvar conversa:", erroCatch);
-        // Silent fail: nao interrompe fluxo do chat
-      }
-    },
-    [conversaAtualId, identificadorPagina],
-  );
 
   return {
     mensagens,
