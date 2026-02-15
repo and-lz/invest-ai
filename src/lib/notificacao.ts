@@ -1,6 +1,5 @@
 import { z } from "zod/v4";
-import { LocalFileManager } from "@/infrastructure/storage/local-file-manager";
-import path from "path";
+import { obterFileManager } from "@/lib/container";
 
 export const TipoNotificacaoEnum = z.enum(["success", "error", "warning", "info"]);
 
@@ -39,13 +38,8 @@ const SUBDIRETORIO_NOTIFICACOES = "notifications";
 const NOME_ARQUIVO_INDICE = "index.json";
 const LIMITE_NOTIFICACOES = 50;
 
-function obterFileManager(): LocalFileManager {
-  const diretorioDados = path.resolve(process.env.DATA_DIRECTORY ?? "./data");
-  return new LocalFileManager(diretorioDados);
-}
-
 export async function listarNotificacoes(): Promise<Notificacao[]> {
-  const fileManager = obterFileManager();
+  const fileManager = await obterFileManager();
   const caminhoRelativo = `${SUBDIRETORIO_NOTIFICACOES}/${NOME_ARQUIVO_INDICE}`;
   const existe = await fileManager.arquivoExiste(caminhoRelativo);
 
@@ -123,7 +117,7 @@ export async function limparTodasNotificacoes(): Promise<void> {
 }
 
 async function salvarIndice(indice: IndiceNotificacoes): Promise<void> {
-  const fileManager = obterFileManager();
+  const fileManager = await obterFileManager();
   const caminhoRelativo = `${SUBDIRETORIO_NOTIFICACOES}/${NOME_ARQUIVO_INDICE}`;
   await fileManager.salvarJson(caminhoRelativo, indice);
 }

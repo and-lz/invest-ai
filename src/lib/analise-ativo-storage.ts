@@ -1,20 +1,15 @@
-import { LocalFileManager } from "@/infrastructure/storage/local-file-manager";
+import { obterFileManager } from "@/lib/container";
 import { AnaliseAtivoResponseSchema } from "@/schemas/analise-ativo.schema";
 import type { AnaliseAtivoResponse } from "@/schemas/analise-ativo.schema";
-import path from "path";
 
 // ============================================================
 // Storage para analises de ativo individual.
-// Persiste em data/asset-analysis/{ticker}.json com cache de 24h.
+// Persiste em data/asset-analysis/{ticker}.json (dev) ou Vercel Blob (prod).
+// Cache de 24h.
 // ============================================================
 
 const SUBDIRETORIO_ANALISES = "asset-analysis";
 const CACHE_DURACAO_HORAS = 24;
-
-function obterFileManager(): LocalFileManager {
-  const diretorioDados = path.resolve(process.env.DATA_DIRECTORY ?? "./data");
-  return new LocalFileManager(diretorioDados);
-}
 
 function obterCaminhoArquivo(codigoAtivo: string): string {
   const tickerNormalizado = codigoAtivo.toUpperCase().replace(/[^A-Z0-9]/g, "_");
@@ -25,7 +20,7 @@ function obterCaminhoArquivo(codigoAtivo: string): string {
  * Salva analise de ativo no filesystem.
  */
 export async function salvarAnaliseAtivo(analise: AnaliseAtivoResponse): Promise<void> {
-  const fileManager = obterFileManager();
+  const fileManager = await obterFileManager();
   const caminhoRelativo = obterCaminhoArquivo(analise.codigoAtivo);
   await fileManager.salvarJson(caminhoRelativo, analise);
 }
@@ -37,7 +32,7 @@ export async function salvarAnaliseAtivo(analise: AnaliseAtivoResponse): Promise
 export async function lerAnaliseAtivo(
   codigoAtivo: string,
 ): Promise<AnaliseAtivoResponse | null> {
-  const fileManager = obterFileManager();
+  const fileManager = await obterFileManager();
   const caminhoRelativo = obterCaminhoArquivo(codigoAtivo);
 
   const existe = await fileManager.arquivoExiste(caminhoRelativo);
@@ -74,7 +69,7 @@ export async function lerAnaliseAtivo(
 export async function verificarCacheAnalise(
   codigoAtivo: string,
 ): Promise<{ existe: boolean; dataAnalise: string | null }> {
-  const fileManager = obterFileManager();
+  const fileManager = await obterFileManager();
   const caminhoRelativo = obterCaminhoArquivo(codigoAtivo);
 
   const existe = await fileManager.arquivoExiste(caminhoRelativo);

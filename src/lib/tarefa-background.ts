@@ -1,10 +1,9 @@
 import { z } from "zod/v4";
-import { LocalFileManager } from "@/infrastructure/storage/local-file-manager";
-import path from "path";
+import { obterFileManager } from "@/lib/container";
 
 // ============================================================
 // Schema e utilitários para tarefas de processamento em background.
-// Persiste status em data/tasks/{uuid}.json para tracking entre páginas.
+// Persiste status em data/tasks/{uuid}.json (dev) ou Vercel Blob (prod).
 // ============================================================
 
 export const TipoTarefaEnum = z.enum([
@@ -38,19 +37,12 @@ export type TarefaBackground = z.infer<typeof TarefaBackgroundSchema>;
 export type TipoTarefa = z.infer<typeof TipoTarefaEnum>;
 export type StatusTarefa = z.infer<typeof StatusTarefaEnum>;
 
-// ---- File Manager (singleton lazy) ----
+// ---- Funções públicas ----
 
 const SUBDIRETORIO_TAREFAS = "tasks";
 
-function obterFileManager(): LocalFileManager {
-  const diretorioDados = path.resolve(process.env.DATA_DIRECTORY ?? "./data");
-  return new LocalFileManager(diretorioDados);
-}
-
-// ---- Funções públicas ----
-
 export async function salvarTarefa(tarefa: TarefaBackground): Promise<void> {
-  const fileManager = obterFileManager();
+  const fileManager = await obterFileManager();
   await fileManager.salvarJson(
     `${SUBDIRETORIO_TAREFAS}/${tarefa.identificador}.json`,
     tarefa,
@@ -58,7 +50,7 @@ export async function salvarTarefa(tarefa: TarefaBackground): Promise<void> {
 }
 
 export async function lerTarefa(identificador: string): Promise<TarefaBackground | null> {
-  const fileManager = obterFileManager();
+  const fileManager = await obterFileManager();
   const caminhoRelativo = `${SUBDIRETORIO_TAREFAS}/${identificador}.json`;
   const existe = await fileManager.arquivoExiste(caminhoRelativo);
 

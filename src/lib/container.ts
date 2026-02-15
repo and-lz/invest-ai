@@ -16,11 +16,14 @@ import { AnalyzeAssetPerformanceUseCase } from "@/application/use-cases/analyze-
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
+import type { FileManager } from "@/domain/interfaces/file-manager";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-provedor-ai";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
 import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
+import { LocalFileManager } from "@/infrastructure/storage/local-file-manager";
+import { VercelBlobFileManager } from "@/infrastructure/storage/vercel-blob-file-manager";
 import { auth } from "@/auth";
 import path from "path";
 
@@ -150,4 +153,24 @@ export async function obterAnalyzeAssetPerformanceUseCase() {
     obterBrapiAssetDetailService(),
     obterBcbMacroDataService(),
   );
+}
+
+/**
+ * Obtem o FileManager apropriado baseado no ambiente:
+ * - Producao com sessao autenticada: VercelBlobFileManager
+ * - Desenvolvimento ou sem sessao: LocalFileManager
+ */
+export async function obterFileManager(): Promise<FileManager> {
+  if (isProduction) {
+    try {
+      const session = await auth();
+      if (session?.user?.userId) {
+        return new VercelBlobFileManager(session.user.userId);
+      }
+    } catch {
+      // Build time ou sem contexto de sessao - usar filesystem
+    }
+  }
+
+  return new LocalFileManager(diretorioDados);
 }
