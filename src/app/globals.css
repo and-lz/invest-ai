@@ -183,3 +183,45 @@
     font-weight: 600;
   }
 }
+
+/* Dialog HTML5 - Reset e estilização */
+dialog {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  max-width: none;
+  max-height: none;
+  inset: auto; /* Reset posicionamento padrão */
+}
+
+dialog:not([open]) {
+  display: none !important; /* Force hide quando fechado */
+}
+
+/* Animação slide da direita */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+dialog[open] {
+  animation: slideInFromRight 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
