@@ -122,7 +122,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={configGrafico} className="h-75 w-full">
+        <ChartContainer config={configGrafico} className="h-52 w-full sm:h-64 lg:h-75">
           <BarChart data={dadosGrafico}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="periodo" tickLine={false} axisLine={false} />

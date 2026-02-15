@@ -142,7 +142,7 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={configGrafico} className="h-64 w-full">
+        <ChartContainer config={configGrafico} className="h-48 w-full sm:h-64">
           <BarChart data={dadosGrafico} layout="vertical">
             <CartesianGrid horizontal={false} />
             <XAxis

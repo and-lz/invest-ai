@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Lightbulb, TrendingUp, BarChart3 } from "lucide-react";
+import { LayoutDashboard, FileText, Lightbulb, TrendingUp, BarChart3, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlternarTema } from "@/components/layout/alternar-tema";
 import { IndicadorTarefaAtiva } from "@/components/layout/indicador-tarefa-ativa";
 import { CentralNotificacoes } from "@/components/layout/central-notificacoes";
 import { UserProfileMenu } from "@/components/auth/user-profile-menu";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 
 const itensNavegacao = [
@@ -21,6 +29,7 @@ const itensNavegacao = [
 export function HeaderNavigation() {
   const pathname = usePathname();
   const [estaVisivel, setEstaVisivel] = useState(true);
+  const [menuMobileAberto, setMenuMobileAberto] = useState(false);
 
   useEffect(() => {
     let scrollAnteriorLocal = 0;
@@ -60,7 +69,46 @@ export function HeaderNavigation() {
     >
       <header className="relative h-16 border-b border-border/20">
 
-        <div className="flex h-16 items-center justify-between gap-8 px-6">
+        <div className="flex h-16 items-center justify-between gap-4 px-4 sm:gap-8 sm:px-6">
+          {/* Mobile menu */}
+          <Sheet open={menuMobileAberto} onOpenChange={setMenuMobileAberto}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-72 p-0">
+              <SheetHeader className="border-b px-6 py-4">
+                <SheetTitle className="font-serif text-lg font-semibold tracking-tight">
+                  Investimentos
+                </SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col gap-1 p-4">
+                {itensNavegacao.map((item) => {
+                  const estaAtivo = pathname === item.href;
+                  const Icone = item.icone;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMenuMobileAberto(false)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                        estaAtivo
+                          ? "bg-secondary/50 text-foreground"
+                          : "text-muted-foreground hover:bg-secondary/30 hover:text-foreground",
+                      )}
+                    >
+                      <Icone className="h-4 w-4" />
+                      {item.rotulo}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
+
           {/* Logo */}
           <div className="flex items-center gap-2">
             <h1 className="font-serif text-lg font-semibold tracking-tight">
@@ -68,8 +116,8 @@ export function HeaderNavigation() {
             </h1>
           </div>
 
-          {/* Navigation with enhanced hover states */}
-          <nav className="flex items-center gap-1">
+          {/* Desktop navigation */}
+          <nav className="hidden items-center gap-1 md:flex">
             {itensNavegacao.map((item) => {
               const estaAtivo = pathname === item.href;
               const Icone = item.icone;
@@ -103,10 +151,10 @@ export function HeaderNavigation() {
           </nav>
 
           {/* Actions with visual separator */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <IndicadorTarefaAtiva />
             <CentralNotificacoes />
-            <div className="h-6 w-px bg-border/50" />
+            <div className="hidden h-6 w-px bg-border/50 sm:block" />
             <AlternarTema />
             <UserProfileMenu />
           </div>

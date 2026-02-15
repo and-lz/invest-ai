@@ -68,7 +68,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-center gap-3">
           <LayoutDashboard className="text-muted-foreground h-6 w-6" aria-hidden="true" />
           <Header titulo="Dashboard" descricao="Visao geral dos seus investimentos" />

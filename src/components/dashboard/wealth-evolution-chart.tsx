@@ -146,7 +146,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={configGrafico} className="h-75 w-full">
+        <ChartContainer config={configGrafico} className="h-52 w-full sm:h-64 lg:h-75">
           <AreaChart data={dadosGrafico}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="mesAno" tickLine={false} axisLine={false} tickMargin={8} />
@@ -175,7 +175,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
             />
           </AreaChart>
         </ChartContainer>
-        <div className="mt-4 flex items-center justify-center gap-6">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-6">
           <div className="flex items-center gap-2 text-sm">
             <div
               className="h-3 w-3 rounded-full"

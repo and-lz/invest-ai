@@ -152,6 +152,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
         {eventos.length === 0 ? (
           <p className="text-muted-foreground text-sm">Nenhum evento financeiro neste mes.</p>
         ) : (
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -176,6 +177,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                   colunaAtiva={colunaOrdenacao}
                   direcao={direcaoOrdenacao}
                   onClick={alternarOrdenacao}
+                  className="hidden sm:table-cell"
                 >
                   Data
                 </CabecalhoOrdenavel>
@@ -219,7 +221,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                       {evento.codigoAtivo ?? evento.nomeAtivo}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground hidden sm:table-cell">
                     {evento.dataEvento ? formatarDataBrasileira(evento.dataEvento) : "—"}
                   </TableCell>
                   <TableCell className="text-right font-medium">
@@ -229,6 +231,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
               ))}
             </TableBody>
           </Table>
+          </div>
         )}
         <TakeawayBox conclusoes={conclusaoEventos} />
       </CardContent>

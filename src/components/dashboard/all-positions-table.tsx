@@ -171,6 +171,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     colunaAtiva={colunaOrdenacao}
                     direcao={direcaoOrdenacao}
                     onClick={alternarOrdenacao}
+                    className="hidden sm:table-cell"
                   >
                     Estratégia
                   </CabecalhoOrdenavel>
@@ -197,7 +198,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     colunaAtiva={colunaOrdenacao}
                     direcao={direcaoOrdenacao}
                     onClick={alternarOrdenacao}
-                    className="text-right"
+                    className="hidden text-right sm:table-cell"
                   >
                     <span className="flex items-center gap-1">
                       12M
@@ -212,7 +213,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     colunaAtiva={colunaOrdenacao}
                     direcao={direcaoOrdenacao}
                     onClick={alternarOrdenacao}
-                    className="text-right"
+                    className="hidden text-right md:table-cell"
                   >
                     <span className="flex items-center gap-1">
                       Início
@@ -244,7 +245,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                         {posicao.codigoAtivo ?? posicao.nomeAtivo}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <Badge variant="outline" className="text-xs">
                         {posicao.estrategia}
                       </Badge>
@@ -263,7 +264,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     </TableCell>
                     <TableCell
                       className={cn(
-                        "text-right tabular-nums",
+                        "hidden text-right tabular-nums sm:table-cell",
                         posicao.rentabilidade12Meses &&
                           posicao.rentabilidade12Meses.valor > 0 &&
                           "text-success",
@@ -278,7 +279,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     </TableCell>
                     <TableCell
                       className={cn(
-                        "text-right tabular-nums",
+                        "hidden text-right tabular-nums md:table-cell",
                         posicao.rentabilidadeDesdeInicio &&
                           posicao.rentabilidadeDesdeInicio.valor > 0 &&
                           "text-success",

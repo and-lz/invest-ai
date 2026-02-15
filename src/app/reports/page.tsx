@@ -80,7 +80,7 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <FileText className="text-muted-foreground h-6 w-6" aria-hidden="true" />
           <Header titulo="Relatorios" descricao="Historico de relatorios importados" />
@@ -155,12 +155,13 @@ export default function ReportsPage() {
         {!estaCarregando && relatorios.length > 0 && (
           <Card>
             <CardContent className="pt-6">
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Referencia</TableHead>
-                    <TableHead>Arquivo</TableHead>
-                    <TableHead>Data Upload</TableHead>
+                    <TableHead className="hidden sm:table-cell">Arquivo</TableHead>
+                    <TableHead className="hidden md:table-cell">Data Upload</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Acoes</TableHead>
                   </TableRow>
@@ -169,8 +170,8 @@ export default function ReportsPage() {
                   {relatorios.map((relatorio) => (
                     <TableRow key={relatorio.identificador}>
                       <TableCell className="font-medium">{relatorio.mesReferencia}</TableCell>
-                      <TableCell>{relatorio.nomeArquivoOriginal}</TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">{relatorio.nomeArquivoOriginal}</TableCell>
+                      <TableCell className="hidden md:table-cell">
                         {new Date(relatorio.dataUpload).toLocaleDateString("pt-BR")}
                       </TableCell>
                       <TableCell>
@@ -199,6 +200,7 @@ export default function ReportsPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </CardContent>
           </Card>
         )}

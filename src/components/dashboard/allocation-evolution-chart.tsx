@@ -125,7 +125,7 @@ export function AllocationEvolutionChart({ evolucaoAlocacao }: AllocationEvoluti
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={configGrafico} className="h-75 w-full">
+        <ChartContainer config={configGrafico} className="h-52 w-full sm:h-64 lg:h-75">
           <AreaChart data={dadosGrafico} stackOffset="expand">
             <CartesianGrid vertical={false} />
             <XAxis dataKey="mesAno" tickLine={false} axisLine={false} />

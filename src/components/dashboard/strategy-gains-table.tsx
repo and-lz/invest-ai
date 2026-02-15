@@ -168,6 +168,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -214,7 +215,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                 colunaAtiva={colunaOrdenacao}
                 direcao={direcaoOrdenacao}
                 onClick={alternarOrdenacao}
-                className="text-right"
+                className="hidden text-right sm:table-cell"
               >
                 <span className="flex items-center gap-1">
                   12 Meses
@@ -229,7 +230,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                 colunaAtiva={colunaOrdenacao}
                 direcao={direcaoOrdenacao}
                 onClick={alternarOrdenacao}
-                className="text-right"
+                className="hidden text-right md:table-cell"
               >
                 <span className="flex items-center gap-1">
                   Desde Inicio
@@ -258,10 +259,10 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                 <TableCell className="text-right">
                   {formatarCelulaMoeda(ganho.ganhoNoAno.valorEmCentavos)}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="hidden text-right sm:table-cell">
                   {formatarCelulaMoeda(ganho.ganho12Meses.valorEmCentavos)}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="hidden text-right md:table-cell">
                   {formatarCelulaMoeda(ganho.ganhoDesdeInicio.valorEmCentavos)}
                 </TableCell>
               </TableRow>
@@ -270,6 +271,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
 
           </TableBody>
         </Table>
+        </div>
         <TakeawayBox conclusoes={conclusaoGanhos} />
       </CardContent>
     </Card>

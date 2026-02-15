@@ -135,7 +135,7 @@ export function MonthlyReturnsHeatmap({ retornosMensais }: MonthlyReturnsHeatmap
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <Table>
+          <Table className="min-w-175">
             <TableHeader>
               <TableRow>
                 <TableHead className="w-16">Ano</TableHead>

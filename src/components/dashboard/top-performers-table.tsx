@@ -158,6 +158,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -177,6 +178,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                 colunaAtiva={colunaOrdenacao}
                 direcao={direcaoOrdenacao}
                 onClick={alternarOrdenacao}
+                className="hidden sm:table-cell"
               >
                 Estrategia
               </CabecalhoOrdenavel>
@@ -212,7 +214,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                 colunaAtiva={colunaOrdenacao}
                 direcao={direcaoOrdenacao}
                 onClick={alternarOrdenacao}
-                className="text-right"
+                className="hidden text-right sm:table-cell"
               >
                 <span className="flex items-center gap-1">
                   Part.
@@ -235,7 +237,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                     {ativo.codigoAtivo ?? ativo.nomeAtivo}
                   </Link>
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden sm:table-cell">
                   <Badge variant="outline" className="text-xs">
                     {ativo.estrategia}
                   </Badge>
@@ -248,13 +250,14 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                 >
                   {formatarPercentualSimples(ativo.rentabilidadeMes.valor)}
                 </TableCell>
-                <TableCell className="text-muted-foreground text-right">
+                <TableCell className="text-muted-foreground hidden text-right sm:table-cell">
                   {formatarPercentualSimples(ativo.participacaoNaCarteira.valor)}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        </div>
         <TakeawayBox conclusoes={conclusoesPerformer} />
       </CardContent>
     </Card>
