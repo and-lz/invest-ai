@@ -217,8 +217,7 @@ export function CentralNotificacoes() {
           top: 0,
           right: 0,
           bottom: 0,
-          width: "448px",
-          maxWidth: "90vw",
+          width: "min(448px, 100vw)",
           margin: 0,
           padding: 0,
         }}

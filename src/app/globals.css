@@ -239,3 +239,127 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Markdown Content - Chat Messages */
+.markdown-content {
+  @apply text-sm leading-relaxed;
+}
+
+.markdown-content p {
+  @apply mb-3 last:mb-0;
+}
+
+.markdown-content p:first-child {
+  @apply mt-0;
+}
+
+/* Headings in markdown (rare, but supported) */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  @apply font-semibold mb-2 mt-4 first:mt-0;
+}
+
+.markdown-content h1 {
+  @apply text-base;
+}
+
+.markdown-content h2 {
+  @apply text-sm;
+}
+
+.markdown-content h3,
+.markdown-content h4 {
+  @apply text-sm;
+}
+
+/* Lists */
+.markdown-content ul,
+.markdown-content ol {
+  @apply mb-3 pl-5 space-y-1;
+}
+
+.markdown-content ul {
+  @apply list-disc;
+}
+
+.markdown-content ol {
+  @apply list-decimal;
+}
+
+.markdown-content li {
+  @apply pl-1;
+}
+
+.markdown-content li > p {
+  @apply mb-1;
+}
+
+/* Nested lists */
+.markdown-content ul ul,
+.markdown-content ol ul,
+.markdown-content ul ol,
+.markdown-content ol ol {
+  @apply mt-1 mb-1;
+}
+
+/* Text formatting */
+.markdown-content strong {
+  @apply font-semibold;
+}
+
+.markdown-content em {
+  @apply italic;
+}
+
+.markdown-content del {
+  @apply line-through opacity-70;
+}
+
+/* Links - inherit color from message bubble */
+.markdown-content a {
+  @apply underline underline-offset-2 hover:opacity-80 transition-opacity;
+}
+
+/* Code inline - fallback (custom component handles primary styling) */
+.markdown-content code {
+  @apply font-mono text-xs;
+}
+
+.markdown-content :not(pre) > code {
+  @apply px-1 py-0.5 rounded;
+}
+
+/* Horizontal rule */
+.markdown-content hr {
+  @apply my-3;
+}
+
+/* Blockquotes (if AI uses them) */
+.markdown-content blockquote {
+  @apply border-l-2 pl-3 italic opacity-90 my-3;
+}
+
+/* Tables - spacing (components handle structure) */
+.markdown-content table {
+  @apply my-3;
+}
+
+/* Prevent overflow in chat bubble */
+.markdown-content {
+  @apply overflow-hidden;
+}
+
+.markdown-content pre {
+  @apply overflow-x-auto;
+}
+
+/* Ensure consistent spacing */
+.markdown-content > *:first-child {
+  @apply mt-0;
+}
+
+.markdown-content > *:last-child {
+  @apply mb-0;
+}

@@ -91,32 +91,52 @@ function MonitorTarefa({
   const { tarefa, estaConcluido, estaComErro, estaProcessando } =
     useTarefaBackground(identificadorTarefa);
   const [jaNotificou, setJaNotificou] = useState(false);
+  const onConcluidaChamadaRef = useRef(false);
+
+  // Função helper para notificar e remover tarefa (garante chamada única)
+  const notificarERemover = useCallback(
+    (tipoNotificacao: "sucesso" | "erro" | "timeout", mensagem?: string) => {
+      if (onConcluidaChamadaRef.current) return;
+      onConcluidaChamadaRef.current = true;
+
+      if (tipoNotificacao === "sucesso" && tarefa) {
+        toast.success("Tarefa concluída!", {
+          description: tarefa.descricaoResultado,
+          action: tarefa.urlRedirecionamento
+            ? {
+                label: "Ver resultado",
+                onClick: () => router.push(tarefa.urlRedirecionamento!),
+              }
+            : undefined,
+        });
+      } else if (tipoNotificacao === "erro" && tarefa) {
+        toast.error("Erro no processamento", {
+          description: tarefa.erro ?? mensagem ?? "Erro desconhecido",
+        });
+      } else if (tipoNotificacao === "timeout") {
+        toast.error("Tarefa parece ter falhado", {
+          description:
+            mensagem ?? "O processamento excedeu o tempo limite. Tente novamente.",
+        });
+      }
+
+      window.dispatchEvent(new CustomEvent("tarefa-background-concluida"));
+      onConcluida(identificadorTarefa);
+    },
+    [tarefa, identificadorTarefa, onConcluida, router],
+  );
 
   useEffect(() => {
     if (jaNotificou) return;
 
     if (estaConcluido && tarefa) {
       setJaNotificou(true);
-      toast.success("Tarefa concluída!", {
-        description: tarefa.descricaoResultado,
-        action: tarefa.urlRedirecionamento
-          ? {
-              label: "Ver resultado",
-              onClick: () => router.push(tarefa.urlRedirecionamento!),
-            }
-          : undefined,
-      });
-      window.dispatchEvent(new CustomEvent("tarefa-background-concluida"));
-      onConcluida(identificadorTarefa);
+      notificarERemover("sucesso");
     }
 
     if (estaComErro && tarefa) {
       setJaNotificou(true);
-      toast.error("Erro no processamento", {
-        description: tarefa.erro ?? "Erro desconhecido",
-      });
-      window.dispatchEvent(new CustomEvent("tarefa-background-concluida"));
-      onConcluida(identificadorTarefa);
+      notificarERemover("erro");
     }
 
     // Timeout: se "processando" por mais de 5 minutos, considerar como erro
@@ -125,24 +145,28 @@ function MonitorTarefa({
         (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
       if (iniciadoHaMinutos > TIMEOUT_MINUTOS) {
         setJaNotificou(true);
-        toast.error("Tarefa parece ter falhado", {
-          description: "O processamento excedeu o tempo limite. Tente novamente.",
-        });
-        onConcluida(identificadorTarefa);
+        notificarERemover("timeout");
       }
     }
-  }, [
-    estaConcluido,
-    estaComErro,
-    estaProcessando,
-    tarefa,
-    jaNotificou,
-    identificadorTarefa,
-    onConcluida,
-    router,
-  ]);
+  }, [estaConcluido, estaComErro, estaProcessando, tarefa, jaNotificou, notificarERemover]);
 
-  if (!estaProcessando || !tarefa) return null;
+  // Cleanup no unmount: se tarefa estiver concluída/erro mas não foi removida, remove silenciosamente
+  useEffect(() => {
+    return () => {
+      if ((estaConcluido || estaComErro) && !onConcluidaChamadaRef.current) {
+        // Remove silenciosamente (sem notificação pois componente já foi desmontado)
+        onConcluida(identificadorTarefa);
+      }
+    };
+  }, [estaConcluido, estaComErro, identificadorTarefa, onConcluida]);
+
+  // Antes de renderizar null, garante que tarefa concluída/erro seja removida
+  if (!estaProcessando || !tarefa) {
+    if ((estaConcluido || estaComErro) && !onConcluidaChamadaRef.current) {
+      notificarERemover(estaConcluido ? "sucesso" : "erro");
+    }
+    return null;
+  }
 
   const labelTipo = LABELS_TIPO[tarefa.tipo] ?? "Processando";
 
@@ -382,8 +406,7 @@ export function ActivityCenter() {
           top: 0,
           right: 0,
           bottom: 0,
-          width: "448px",
-          maxWidth: "90vw",
+          width: "min(448px, 100vw)",
           margin: 0,
           padding: 0,
         }}
