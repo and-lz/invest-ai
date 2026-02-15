@@ -59,23 +59,14 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(
-      { identificadorTarefa, status: "processando" },
-      { status: 202 },
-    );
+    return NextResponse.json({ identificadorTarefa, status: "processando" }, { status: 202 });
   } catch (erro) {
     console.error("Erro ao iniciar analise de ativo:", erro);
 
     if (erro instanceof AppError) {
-      return NextResponse.json(
-        { erro: erro.message, codigo: erro.code },
-        { status: 422 },
-      );
+      return NextResponse.json({ erro: erro.message, codigo: erro.code }, { status: 422 });
     }
 
-    return NextResponse.json(
-      { erro: "Falha ao iniciar analise de ativo" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao iniciar analise de ativo" }, { status: 500 });
   }
 }

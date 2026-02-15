@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  obterFilesystemReportRepository,
-  obterBrapiAssetDetailService,
-} from "@/lib/container";
+import { obterFilesystemReportRepository, obterBrapiAssetDetailService } from "@/lib/container";
 import { agregarDadosDoAtivo, listarAtivosUnicos } from "@/lib/agregar-dados-ativo";
 import { verificarCacheAnalise } from "@/lib/analise-ativo-storage";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
@@ -48,8 +45,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       codigoAtivo: tickerParam.toUpperCase(),
-      nomeAtivo:
-        dadosAgregados?.nomeAtivo ?? detalhesBrapi?.nomeAtivo ?? tickerParam.toUpperCase(),
+      nomeAtivo: dadosAgregados?.nomeAtivo ?? detalhesBrapi?.nomeAtivo ?? tickerParam.toUpperCase(),
       estrategia: dadosAgregados?.estrategia ?? null,
       estaNaCarteira,
       historicoNaCarteira: dadosAgregados?.historicoNaCarteira ?? [],
@@ -64,9 +60,6 @@ export async function GET(request: Request) {
     });
   } catch (erro) {
     console.error("Erro ao buscar dados do ativo:", erro);
-    return NextResponse.json(
-      { erro: "Falha ao buscar dados do ativo" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao buscar dados do ativo" }, { status: 500 });
   }
 }

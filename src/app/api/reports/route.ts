@@ -89,10 +89,7 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json(
-      { identificadorTarefa, status: "processando" },
-      { status: 202 },
-    );
+    return NextResponse.json({ identificadorTarefa, status: "processando" }, { status: 202 });
   } catch (erro) {
     console.error("Erro ao processar upload:", erro);
 

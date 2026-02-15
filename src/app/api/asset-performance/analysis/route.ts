@@ -12,27 +12,18 @@ export async function GET(request: Request) {
     const tickerParam = searchParams.get("ticker");
 
     if (!tickerParam) {
-      return NextResponse.json(
-        { erro: "Parametro 'ticker' obrigatorio" },
-        { status: 400 },
-      );
+      return NextResponse.json({ erro: "Parametro 'ticker' obrigatorio" }, { status: 400 });
     }
 
     const analise = await lerAnaliseAtivo(tickerParam);
 
     if (!analise) {
-      return NextResponse.json(
-        { analise: null },
-        { status: 200 },
-      );
+      return NextResponse.json({ analise: null }, { status: 200 });
     }
 
     return NextResponse.json({ analise });
   } catch (erro) {
     console.error("Erro ao buscar analise de ativo:", erro);
-    return NextResponse.json(
-      { erro: "Falha ao buscar analise de ativo" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Falha ao buscar analise de ativo" }, { status: 500 });
   }
 }

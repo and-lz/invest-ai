@@ -14,10 +14,7 @@ export async function GET() {
 
   // Verificar configuracao
   if (!process.env.BRAPI_TOKEN) {
-    return NextResponse.json(
-      { erro: "BRAPI_TOKEN nao configurado" },
-      { status: 503 },
-    );
+    return NextResponse.json({ erro: "BRAPI_TOKEN nao configurado" }, { status: 503 });
   }
 
   const servicoMercado = obterBrapiMarketDataService();
@@ -47,8 +44,7 @@ export async function GET() {
     maioresBaixas: resultadoBaixas.status === "fulfilled" ? resultadoBaixas.value : [],
     maisNegociados: resultadoVolume.status === "fulfilled" ? resultadoVolume.value : [],
     maioresAltasFundos: resultadoFundos.status === "fulfilled" ? resultadoFundos.value : [],
-    indicesMercado:
-      resultadoIbovespa.status === "fulfilled" ? [resultadoIbovespa.value] : [],
+    indicesMercado: resultadoIbovespa.status === "fulfilled" ? [resultadoIbovespa.value] : [],
     indicadoresMacro: resultadoMacro.status === "fulfilled" ? resultadoMacro.value : [],
     setoresPerformance: resultadoSetores.status === "fulfilled" ? resultadoSetores.value : [],
     atualizadoEm: new Date().toISOString(),

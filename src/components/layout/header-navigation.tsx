@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Lightbulb, TrendingUp, BarChart3, Menu } from "lucide-react";
+import { LayoutDashboard, FileText, Lightbulb, TrendingUp, BarChart3, BookOpen, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlternarTema } from "@/components/layout/alternar-tema";
 import { IndicadorTarefaAtiva } from "@/components/layout/indicador-tarefa-ativa";
@@ -24,6 +24,7 @@ const itensNavegacao = [
   { href: "/insights", rotulo: "Insights", icone: Lightbulb },
   { href: "/trends", rotulo: "Tendencias", icone: TrendingUp },
   { href: "/desempenho", rotulo: "Desempenho", icone: BarChart3 },
+  { href: "/aprender", rotulo: "Aprender", icone: BookOpen },
 ];
 
 export function HeaderNavigation() {
