@@ -40,14 +40,14 @@ export function ChatWidget() {
   const handleSelecionarConversa = useCallback(
     async (identificador: string) => {
       await carregarConversa(identificador);
-      setMostrarSidebar(false); // Fecha sidebar no mobile
+      setMostrarSidebar(false);
     },
     [carregarConversa],
   );
 
   const handleNovaConversa = useCallback(() => {
     criarNovaConversa();
-    setMostrarSidebar(false); // Fecha sidebar no mobile
+    setMostrarSidebar(false);
   }, [criarNovaConversa]);
 
   return (
@@ -68,11 +68,11 @@ export function ChatWidget() {
       {/* Painel de chat */}
       {estaAberto && (
         <div className="bg-background fixed inset-0 z-40 flex overflow-hidden border shadow-xl md:inset-auto md:right-6 md:bottom-6 md:h-[85vh] md:max-h-[calc(100vh-3rem)] md:w-[85vw] md:max-w-350 md:rounded-2xl">
-          {/* Sidebar de conversas (desktop: sempre visivel, mobile: drawer) */}
+          {/* Sidebar de conversas (overlay, aberta apenas ao clicar) */}
           <div
             className={cn(
-              "bg-background absolute z-10 h-full w-64 border-r transition-transform md:relative md:translate-x-0",
-              mostrarSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+              "bg-background absolute z-10 h-full w-64 border-r transition-transform",
+              mostrarSidebar ? "translate-x-0" : "-translate-x-full",
             )}
           >
             <ListaConversas
@@ -87,12 +87,12 @@ export function ChatWidget() {
             {/* Cabecalho */}
             <div className="flex items-center justify-between border-b px-4 py-3">
               <div className="flex items-center gap-2">
-                {/* Botao toggle sidebar (mobile only) */}
+                {/* Botao toggle sidebar (historico de conversas) */}
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setMostrarSidebar(!mostrarSidebar)}
-                  className="h-8 w-8 md:hidden"
+                  className="h-8 w-8"
                 >
                   <Menu className="h-4 w-4" />
                 </Button>
