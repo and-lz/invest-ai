@@ -14,6 +14,7 @@ export class VercelBlobFileManager implements FileManager {
       const blob = await put(this.getFullPath(caminhoRelativo), conteudo, {
         access: "public",
         addRandomSuffix: false,
+        cacheControlMaxAge: 0,
       });
       return blob.url;
     } catch (erro) {
@@ -32,7 +33,9 @@ export class VercelBlobFileManager implements FileManager {
       const metadata = await head(this.getFullPath(caminhoRelativo));
       if (!metadata.url) throw new FileStorageError("Arquivo nao encontrado");
 
-      const response = await fetch(metadata.url);
+      // Cache-buster para ignorar CDN cache + no-store para ignorar Next.js Data Cache
+      const urlSemCache = `${metadata.url}?t=${Date.now()}`;
+      const response = await fetch(urlSemCache, { cache: "no-store" });
       return Buffer.from(await response.arrayBuffer());
     } catch (erro) {
       throw new FileStorageError(

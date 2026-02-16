@@ -31,19 +31,14 @@ import path from "path";
 
 const diretorioDados = path.resolve(process.env.DATA_DIRECTORY ?? "./data");
 
-const isProduction = process.env.NODE_ENV === "production";
-
 async function criarRepositorio() {
-  if (isProduction) {
-    // Tentar obter sessão - se falhar (build time), usar filesystem
-    try {
-      const session = await auth();
-      if (session?.user?.userId) {
-        return new VercelBlobReportRepository(session.user.userId);
-      }
-    } catch {
-      // Build time ou sem contexto - usar filesystem
+  try {
+    const session = await auth();
+    if (session?.user?.userId) {
+      return new VercelBlobReportRepository(session.user.userId);
     }
+  } catch {
+    // Build time ou sem contexto de sessao
   }
 
   return new FilesystemReportRepository(diretorioDados);
@@ -161,15 +156,13 @@ export async function obterAnalyzeAssetPerformanceUseCase() {
  * - Desenvolvimento ou sem sessao: LocalFileManager
  */
 export async function obterFileManager(): Promise<FileManager> {
-  if (isProduction) {
-    try {
-      const session = await auth();
-      if (session?.user?.userId) {
-        return new VercelBlobFileManager(session.user.userId);
-      }
-    } catch {
-      // Build time ou sem contexto de sessao - usar filesystem
+  try {
+    const session = await auth();
+    if (session?.user?.userId) {
+      return new VercelBlobFileManager(session.user.userId);
     }
+  } catch {
+    // Build time ou sem contexto de sessao
   }
 
   return new LocalFileManager(diretorioDados);
