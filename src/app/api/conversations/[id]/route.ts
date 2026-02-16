@@ -8,10 +8,7 @@ import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
  * GET /api/conversations/[id]
  * Obtem conversa completa (com todas as mensagens).
  */
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const verificacaoAuth = await requireAuth();
   if (!verificacaoAuth.authenticated) {
     return NextResponse.json({ erro: "Nao autenticado" }, { status: 401 });
@@ -40,10 +37,7 @@ export async function GET(
  * PATCH /api/conversations/[id]
  * Atualiza titulo e/ou mensagens da conversa.
  */
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const verificacaoAuth = await requireAuth();
   if (!verificacaoAuth.authenticated) {
     return NextResponse.json({ erro: "Nao autenticado" }, { status: 401 });
@@ -62,11 +56,7 @@ export async function PATCH(
     }
 
     const repository = await obterConversaRepository();
-    await repository.atualizarConversa(
-      verificacaoAuth.session.user.userId,
-      id,
-      validacao.data,
-    );
+    await repository.atualizarConversa(verificacaoAuth.session.user.userId, id, validacao.data);
 
     return NextResponse.json({ sucesso: true }, cabecalhosSemCache());
   } catch (erro) {
@@ -79,10 +69,7 @@ export async function PATCH(
  * DELETE /api/conversations/[id]
  * Deleta conversa permanentemente.
  */
-export async function DELETE(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const verificacaoAuth = await requireAuth();
   if (!verificacaoAuth.authenticated) {
     return NextResponse.json({ erro: "Nao autenticado" }, { status: 401 });

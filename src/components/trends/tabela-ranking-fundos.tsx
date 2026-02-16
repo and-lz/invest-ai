@@ -83,7 +83,7 @@ function CabecalhoOrderavelFundos({
 
   return (
     <TableHead
-      className={`group cursor-pointer select-none hover:text-foreground ${className ?? ""}`}
+      className={`group hover:text-foreground cursor-pointer select-none ${className ?? ""}`}
       onClick={() => onClick(coluna)}
     >
       <div
@@ -113,13 +113,11 @@ export function TabelaRankingFundos({ fundosEmAlta }: TabelaRankingFundosProps) 
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Building2 className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Fundos em Alta
           <InfoTooltip conteudo={GLOSSARIO_FUNDOS_EM_ALTA.explicacao} />
         </CardTitle>
-        <CardDescription>
-          Fundos imobiliários e ETFs com maiores valorizações
-        </CardDescription>
+        <CardDescription>Fundos imobiliários e ETFs com maiores valorizações</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -181,12 +179,10 @@ export function TabelaRankingFundos({ fundosEmAlta }: TabelaRankingFundosProps) 
                     {fundo.ticker}
                   </Link>
                 </TableCell>
-                <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
+                <TableCell className="text-muted-foreground max-w-[200px] truncate text-sm">
                   {fundo.nome}
                 </TableCell>
-                <TableCell className="text-right text-sm">
-                  {formatarPreco(fundo.preco)}
-                </TableCell>
+                <TableCell className="text-right text-sm">{formatarPreco(fundo.preco)}</TableCell>
                 <TableCell
                   className={cn(
                     "text-right text-sm font-medium",
@@ -195,7 +191,7 @@ export function TabelaRankingFundos({ fundosEmAlta }: TabelaRankingFundosProps) 
                 >
                   {formatarVariacao(fundo.variacao)}
                 </TableCell>
-                <TableCell className="text-right text-sm text-muted-foreground">
+                <TableCell className="text-muted-foreground text-right text-sm">
                   {formatarVolume(fundo.volume)}
                 </TableCell>
               </TableRow>

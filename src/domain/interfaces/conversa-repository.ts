@@ -19,10 +19,7 @@ export interface ConversaRepository {
    * Obtem uma conversa especifica por ID.
    * Retorna null se nao encontrada.
    */
-  obterConversaPorUsuario(
-    usuarioId: string,
-    identificador: string,
-  ): Promise<Conversa | null>;
+  obterConversaPorUsuario(usuarioId: string, identificador: string): Promise<Conversa | null>;
 
   /**
    * Lista todas as conversas de um usuario.

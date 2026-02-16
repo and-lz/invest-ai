@@ -27,10 +27,7 @@ const SUBDIRETORIO_TAREFAS = "tasks";
 
 export async function salvarTarefa(tarefa: TarefaBackground): Promise<void> {
   const fileManager = await obterFileManager();
-  await fileManager.salvarJson(
-    `${SUBDIRETORIO_TAREFAS}/${tarefa.identificador}.json`,
-    tarefa,
-  );
+  await fileManager.salvarJson(`${SUBDIRETORIO_TAREFAS}/${tarefa.identificador}.json`, tarefa);
 }
 
 export async function lerTarefa(identificador: string): Promise<TarefaBackground | null> {

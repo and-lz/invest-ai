@@ -60,7 +60,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Shield className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Shield className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Risco e Consistência
           <InfoTooltip conteudo={GLOSSARIO_RISCO_CONSISTENCIA.explicacao} />
         </CardTitle>
@@ -110,9 +110,9 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
           </p>
         </div>
 
-        <div className="w-full overflow-hidden rounded-full bg-destructive/20">
+        <div className="bg-destructive/20 w-full overflow-hidden rounded-full">
           <div
-            className="h-3 rounded-full bg-success/60 transition-all"
+            className="bg-success/60 h-3 rounded-full transition-all"
             style={{ width: `${percentualAcima}%` }}
           />
         </div>
@@ -120,7 +120,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs">Melhor Mês</p>
-            <p className="text-lg font-bold text-success">
+            <p className="text-success text-lg font-bold">
               {formatarPercentualSimples(analiseRiscoRetorno.maiorRentabilidade.valor.valor)}
             </p>
             <p className="text-muted-foreground text-xs">
@@ -129,7 +129,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
           </div>
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs">Pior Mês</p>
-            <p className="text-lg font-bold text-destructive">
+            <p className="text-destructive text-lg font-bold">
               {formatarPercentualSimples(analiseRiscoRetorno.menorRentabilidade.valor.valor)}
             </p>
             <p className="text-muted-foreground text-xs">

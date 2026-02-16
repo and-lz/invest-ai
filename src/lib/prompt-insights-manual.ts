@@ -169,9 +169,7 @@ Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 export const INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO =
   "Analise o HISTORICO COMPLETO da seguinte carteira de investimentos (todos os meses disponiveis) e gere insights detalhados sobre evolucao, tendencias e decisoes. Retorne APENAS JSON valido:";
 
-export function gerarPromptInsightsConsolidadoManual(
-  todosRelatorios: RelatorioExtraido[],
-): string {
+export function gerarPromptInsightsConsolidadoManual(todosRelatorios: RelatorioExtraido[]): string {
   const jsonSchema = toJSONSchema(InsightsResponseSchema);
   const schemaFormatado = JSON.stringify(jsonSchema, null, 2);
 

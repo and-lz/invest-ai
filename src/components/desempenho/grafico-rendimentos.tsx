@@ -39,9 +39,7 @@ function TooltipCustomizado({ active, payload }: TooltipCustomizadoProps) {
       <p className="mb-1 text-sm font-medium">{ponto.payload.dataFormatada}</p>
       <p className="text-muted-foreground text-sm">
         {ponto.payload.tipo}:{" "}
-        <span className="text-success font-medium">
-          {formatarMoeda(ponto.value)}
-        </span>
+        <span className="text-success font-medium">{formatarMoeda(ponto.value)}</span>
       </p>
     </div>
   );
@@ -60,10 +58,7 @@ export function GraficoRendimentos({ eventos, nomeAtivo }: GraficoRendimentosPro
     }))
     .sort((eventoA, eventoB) => eventoA.data.localeCompare(eventoB.data));
 
-  const totalCentavos = eventos.reduce(
-    (soma, evento) => soma + evento.valorCentavos,
-    0,
-  );
+  const totalCentavos = eventos.reduce((soma, evento) => soma + evento.valorCentavos, 0);
 
   return (
     <Card>
@@ -95,11 +90,7 @@ export function GraficoRendimentos({ eventos, nomeAtivo }: GraficoRendimentosPro
               className="text-xs"
             />
             <ChartTooltip content={<TooltipCustomizado />} />
-            <Bar
-              dataKey="valorCentavos"
-              fill="var(--chart-2)"
-              radius={[4, 4, 0, 0]}
-            />
+            <Bar dataKey="valorCentavos" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ChartContainer>
       </CardContent>

@@ -1,10 +1,10 @@
 import type { IdentificadorPagina } from "@/schemas/chat.schema";
+import { obterIdentificadoresDisponiveis } from "./chat-highlight";
 
 const DESCRICOES_PAGINA: Record<IdentificadorPagina, string> = {
   dashboard:
     "Dashboard principal com resumo patrimonial, alocacao por categoria, comparacao com benchmarks (CDI, Ibovespa, IPCA), melhores e piores ativos, e evolucao historica.",
-  reports:
-    "Pagina de gerenciamento de relatorios importados (PDFs da corretora Inter Prime).",
+  reports: "Pagina de gerenciamento de relatorios importados (PDFs da corretora Inter Prime).",
   insights:
     "Insights gerados por IA sobre a carteira do usuario, organizados por categorias como performance, riscos, oportunidades e diversificacao.",
   trends:
@@ -48,6 +48,22 @@ FORMATACAO MARKDOWN:
 - Blocos de codigo para formulas ou calculos com multiplas linhas
 - NUNCA use HTML diretamente (sera removido por seguranca)
 - Mantenha tabelas compactas para caber no espaco do chat
+
+DESTAQUE VISUAL DE ELEMENTOS (HIGHLIGHTING):
+Quando mencionar dados especificos visiveis na tela do usuario, inclua um marcador especial no formato [HIGHLIGHT:identificador].
+Este marcador acionara um destaque visual do card correspondente (ring azul pulsante + scroll automatico).
+
+Identificadores disponiveis na pagina "${identificadorPagina}":
+${obterIdentificadoresDisponiveis(identificadorPagina)}
+
+Exemplo de uso:
+"Vejo que seu patrimonio total [HIGHLIGHT:patrimonio-total] aumentou 15% no ultimo mes, superando o CDI."
+
+IMPORTANTE:
+- Use highlighting apenas quando mencionar dados ESPECIFICOS da tela (valores, graficos, cards)
+- NAO use para conceitos gerais ou perguntas hipoteticas
+- O marcador sera removido antes de exibir ao usuario, mas acionara o efeito visual
+- Use no maximo 1-2 highlights por resposta (evite poluicao visual)
 
 PAGINA ATUAL DO USUARIO: ${descricaoPagina}
 `;

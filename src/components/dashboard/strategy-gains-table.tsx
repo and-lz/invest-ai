@@ -60,7 +60,9 @@ interface StrategyGainsTableProps {
 
 function formatarCelulaMoeda(valorEmCentavos: number) {
   const eNegativo = valorEmCentavos < 0;
-  return <span className={eNegativo ? "text-destructive" : ""}>{formatarMoeda(valorEmCentavos)}</span>;
+  return (
+    <span className={eNegativo ? "text-destructive" : ""}>{formatarMoeda(valorEmCentavos)}</span>
+  );
 }
 
 function obterValorColuna(ganho: GanhosPorEstrategia, coluna: ColunaGanhos): string | number {
@@ -155,10 +157,10 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
     useOrdenacaoTabela<GanhosPorEstrategia, ColunaGanhos>(ganhos, obterValor);
 
   return (
-    <Card>
+    <Card data-chat-highlight="ganhos-estrategia">
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Wallet className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Wallet className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Ganhos por Estrategia
           <InfoTooltip conteudo={GLOSSARIO_GANHOS_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
@@ -169,108 +171,109 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <CabecalhoOrdenavel
-                coluna="estrategia"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-              >
-                Estrategia
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="ganhoNoMes"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="text-right"
-              >
-                <span className="flex items-center gap-1">
-                  No Mes
-                  <InfoTooltip
-                    conteudo={GLOSSARIO_PERIODO_NO_MES.explicacao}
-                    tamanhoIcone="h-3 w-3"
-                  />
-                </span>
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="ganhoNoAno"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="text-right"
-              >
-                <span className="flex items-center gap-1">
-                  No Ano
-                  <InfoTooltip
-                    conteudo={GLOSSARIO_PERIODO_NO_ANO.explicacao}
-                    tamanhoIcone="h-3 w-3"
-                  />
-                </span>
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="ganho12Meses"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="hidden text-right sm:table-cell"
-              >
-                <span className="flex items-center gap-1">
-                  12 Meses
-                  <InfoTooltip
-                    conteudo={GLOSSARIO_PERIODO_12_MESES.explicacao}
-                    tamanhoIcone="h-3 w-3"
-                  />
-                </span>
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="ganhoDesdeInicio"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="hidden text-right md:table-cell"
-              >
-                <span className="flex items-center gap-1">
-                  Desde Inicio
-                  <InfoTooltip
-                    conteudo={GLOSSARIO_PERIODO_DESDE_INICIO.explicacao}
-                    tamanhoIcone="h-3 w-3"
-                  />
-                </span>
-              </CabecalhoOrdenavel>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {itensOrdenados.map((ganho) => {
-              const IconeEstrategia = ICONES_ESTRATEGIA[ganho.nomeEstrategia];
-              return (
-              <TableRow key={ganho.nomeEstrategia}>
-                <TableCell className="font-medium">
-                  <span className="flex items-center gap-2">
-                    {IconeEstrategia && <IconeEstrategia className="h-4 w-4" aria-hidden="true" />}
-                    {ganho.nomeEstrategia}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <CabecalhoOrdenavel
+                  coluna="estrategia"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                >
+                  Estrategia
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="ganhoNoMes"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="text-right"
+                >
+                  <span className="flex items-center gap-1">
+                    No Mes
+                    <InfoTooltip
+                      conteudo={GLOSSARIO_PERIODO_NO_MES.explicacao}
+                      tamanhoIcone="h-3 w-3"
+                    />
                   </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatarCelulaMoeda(ganho.ganhoNoMes.valorEmCentavos)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatarCelulaMoeda(ganho.ganhoNoAno.valorEmCentavos)}
-                </TableCell>
-                <TableCell className="hidden text-right sm:table-cell">
-                  {formatarCelulaMoeda(ganho.ganho12Meses.valorEmCentavos)}
-                </TableCell>
-                <TableCell className="hidden text-right md:table-cell">
-                  {formatarCelulaMoeda(ganho.ganhoDesdeInicio.valorEmCentavos)}
-                </TableCell>
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="ganhoNoAno"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="text-right"
+                >
+                  <span className="flex items-center gap-1">
+                    No Ano
+                    <InfoTooltip
+                      conteudo={GLOSSARIO_PERIODO_NO_ANO.explicacao}
+                      tamanhoIcone="h-3 w-3"
+                    />
+                  </span>
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="ganho12Meses"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="hidden text-right sm:table-cell"
+                >
+                  <span className="flex items-center gap-1">
+                    12 Meses
+                    <InfoTooltip
+                      conteudo={GLOSSARIO_PERIODO_12_MESES.explicacao}
+                      tamanhoIcone="h-3 w-3"
+                    />
+                  </span>
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="ganhoDesdeInicio"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="hidden text-right md:table-cell"
+                >
+                  <span className="flex items-center gap-1">
+                    Desde Inicio
+                    <InfoTooltip
+                      conteudo={GLOSSARIO_PERIODO_DESDE_INICIO.explicacao}
+                      tamanhoIcone="h-3 w-3"
+                    />
+                  </span>
+                </CabecalhoOrdenavel>
               </TableRow>
-            );
-            })}
-
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {itensOrdenados.map((ganho) => {
+                const IconeEstrategia = ICONES_ESTRATEGIA[ganho.nomeEstrategia];
+                return (
+                  <TableRow key={ganho.nomeEstrategia}>
+                    <TableCell className="font-medium">
+                      <span className="flex items-center gap-2">
+                        {IconeEstrategia && (
+                          <IconeEstrategia className="h-4 w-4" aria-hidden="true" />
+                        )}
+                        {ganho.nomeEstrategia}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatarCelulaMoeda(ganho.ganhoNoMes.valorEmCentavos)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatarCelulaMoeda(ganho.ganhoNoAno.valorEmCentavos)}
+                    </TableCell>
+                    <TableCell className="hidden text-right sm:table-cell">
+                      {formatarCelulaMoeda(ganho.ganho12Meses.valorEmCentavos)}
+                    </TableCell>
+                    <TableCell className="hidden text-right md:table-cell">
+                      {formatarCelulaMoeda(ganho.ganhoDesdeInicio.valorEmCentavos)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
         </div>
         <TakeawayBox conclusoes={conclusaoGanhos} />
       </CardContent>

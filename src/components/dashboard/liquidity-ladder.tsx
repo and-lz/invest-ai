@@ -132,7 +132,7 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Droplets className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Droplets className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Escada de Liquidez
           <InfoTooltip conteudo={GLOSSARIO_LIQUIDEZ.explicacao} />
         </CardTitle>

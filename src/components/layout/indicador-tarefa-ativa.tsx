@@ -87,8 +87,7 @@ function MonitorTarefa({
 
     // Timeout: se "processando" por mais de 5 minutos, considerar como erro
     if (estaProcessando && tarefa) {
-      const iniciadoHaMinutos =
-        (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
+      const iniciadoHaMinutos = (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
       if (iniciadoHaMinutos > TIMEOUT_MINUTOS) {
         setJaNotificou(true);
         toast.error("Tarefa parece ter falhado", {
@@ -112,9 +111,7 @@ function MonitorTarefa({
 
   const descricao = descreverTarefa(tarefa);
 
-  return (
-    <span className="text-muted-foreground text-xs">{descricao}...</span>
-  );
+  return <span className="text-muted-foreground text-xs">{descricao}...</span>;
 }
 
 export function IndicadorTarefaAtiva() {
@@ -135,9 +132,7 @@ export function IndicadorTarefaAtiva() {
 
   const handleTarefaConcluida = useCallback((identificador: string) => {
     removerTarefaAtivaDoStorage(identificador);
-    setIdentificadoresTarefas((anteriores) =>
-      anteriores.filter((id) => id !== identificador),
-    );
+    setIdentificadoresTarefas((anteriores) => anteriores.filter((id) => id !== identificador));
   }, []);
 
   if (identificadoresTarefas.length === 0) return null;

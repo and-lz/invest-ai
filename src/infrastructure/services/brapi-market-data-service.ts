@@ -1,8 +1,5 @@
 import type { MarketDataService } from "@/domain/interfaces/market-data-service";
-import {
-  RespostaListaBrapiSchema,
-  RespostaCotacaoBrapiSchema,
-} from "@/schemas/trends.schema";
+import { RespostaListaBrapiSchema, RespostaCotacaoBrapiSchema } from "@/schemas/trends.schema";
 import type {
   AtivoRanking,
   IndiceMercado,

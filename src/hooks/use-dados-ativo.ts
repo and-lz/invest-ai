@@ -33,12 +33,9 @@ export function useDadosAtivo(ticker: string | null) {
  * Hook SWR para buscar lista de ativos unicos da carteira.
  */
 export function useListaAtivosCarteira() {
-  const { data, error, isLoading } = useSWR<ListaAtivosResponse>(
-    "/api/asset-performance",
-    {
-      dedupingInterval: 60_000,
-    },
-  );
+  const { data, error, isLoading } = useSWR<ListaAtivosResponse>("/api/asset-performance", {
+    dedupingInterval: 60_000,
+  });
 
   return {
     ativosCarteira: data?.ativos ?? [],

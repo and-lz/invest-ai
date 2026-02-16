@@ -71,13 +71,11 @@ export function MapaCalorSetores({ setoresPerformance }: MapaCalorSetoresProps) 
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Grid3X3 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Grid3X3 className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Performance por Setor
           <InfoTooltip conteudo={GLOSSARIO_HEATMAP_SETORES.explicacao} />
         </CardTitle>
-        <CardDescription>
-          Variacao media dos 5 ativos mais negociados de cada setor
-        </CardDescription>
+        <CardDescription>Variacao media dos 5 ativos mais negociados de cada setor</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
@@ -89,15 +87,9 @@ export function MapaCalorSetores({ setoresPerformance }: MapaCalorSetoresProps) 
                 obterClasseCor(setor.variacaoMedia),
               )}
             >
-              <p className="text-center text-sm font-medium">
-                {setor.setorTraduzido}
-              </p>
-              <p className="mt-1 text-lg font-bold">
-                {formatarVariacao(setor.variacaoMedia)}
-              </p>
-              <p className="text-xs opacity-60">
-                {setor.quantidadeAtivos} ativos
-              </p>
+              <p className="text-center text-sm font-medium">{setor.setorTraduzido}</p>
+              <p className="mt-1 text-lg font-bold">{formatarVariacao(setor.variacaoMedia)}</p>
+              <p className="text-xs opacity-60">{setor.quantidadeAtivos} ativos</p>
             </div>
           ))}
         </div>

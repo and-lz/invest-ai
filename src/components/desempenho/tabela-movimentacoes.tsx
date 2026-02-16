@@ -35,8 +35,8 @@ function obterVarianteBadge(tipo: string): "default" | "secondary" | "outline" {
 export function TabelaMovimentacoes({ movimentacoes, nomeAtivo }: TabelaMovimentacoesProps) {
   if (movimentacoes.length === 0) return null;
 
-  const movimentacoesOrdenadas = [...movimentacoes].sort(
-    (movA, movB) => movB.data.localeCompare(movA.data),
+  const movimentacoesOrdenadas = [...movimentacoes].sort((movA, movB) =>
+    movB.data.localeCompare(movA.data),
   );
 
   return (
@@ -46,9 +46,7 @@ export function TabelaMovimentacoes({ movimentacoes, nomeAtivo }: TabelaMoviment
           <Receipt className="text-muted-foreground h-5 w-5" />
           <CardTitle className="text-lg">Movimentacoes</CardTitle>
         </div>
-        <CardDescription>
-          Historico de compras, vendas e eventos de {nomeAtivo}
-        </CardDescription>
+        <CardDescription>Historico de compras, vendas e eventos de {nomeAtivo}</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>

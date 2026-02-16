@@ -128,9 +128,7 @@ export async function obterFilesystemReportRepository() {
 function obterBrapiToken(): string {
   const token = process.env.BRAPI_TOKEN;
   if (!token) {
-    throw new Error(
-      "BRAPI_TOKEN não configurado. Obtenha em https://brapi.dev/dashboard",
-    );
+    throw new Error("BRAPI_TOKEN não configurado. Obtenha em https://brapi.dev/dashboard");
   }
   return token;
 }

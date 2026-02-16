@@ -145,9 +145,7 @@ function serializarEvolucaoAlocacao(evolucaoAlocacao: AlocacaoMensal[]): string 
   return linhas.join("\n");
 }
 
-function serializarEvolucaoPatrimonial(
-  evolucaoPatrimonial: PontoEvolucaoPatrimonial[],
-): string {
+function serializarEvolucaoPatrimonial(evolucaoPatrimonial: PontoEvolucaoPatrimonial[]): string {
   if (evolucaoPatrimonial.length === 0) return "";
 
   const linhas = [
@@ -237,9 +235,7 @@ function serializarRetornosMensais(retornosMensais: RetornoAnual[]): string {
   return linhas.join("\n");
 }
 
-function serializarComparacaoBenchmarks(
-  comparacaoBenchmarks: ComparacaoBenchmarks[],
-): string {
+function serializarComparacaoBenchmarks(comparacaoBenchmarks: ComparacaoBenchmarks[]): string {
   if (comparacaoBenchmarks.length === 0) return "";
 
   const linhas = [
@@ -257,9 +253,7 @@ function serializarComparacaoBenchmarks(
   return linhas.join("\n");
 }
 
-function serializarRentabilidadePorCategoria(
-  categorias: RentabilidadePorCategoria[],
-): string {
+function serializarRentabilidadePorCategoria(categorias: RentabilidadePorCategoria[]): string {
   if (categorias.length === 0) return "";
 
   const linhas = [
@@ -287,9 +281,7 @@ function serializarEventosFinanceiros(eventos: EventoFinanceiro[]): string {
   ];
 
   for (const evento of eventos) {
-    const dataFormatada = evento.dataEvento
-      ? formatarDataBrasileira(evento.dataEvento)
-      : "N/D";
+    const dataFormatada = evento.dataEvento ? formatarDataBrasileira(evento.dataEvento) : "N/D";
     linhas.push(
       `| ${dataFormatada} | ${evento.tipoEvento} | ${evento.nomeAtivo} | ${evento.codigoAtivo ?? "-"} | ${formatarDinheiro(evento.valor)} |`,
     );
@@ -379,9 +371,7 @@ function serializarMovimentacoesAgregadas(movimentacoes: Movimentacao[]): string
   ];
 
   for (const [tipo, agregado] of tiposOrdenados) {
-    linhas.push(
-      `| ${tipo} | ${agregado.quantidade} | ${formatarMoeda(agregado.totalCentavos)} |`,
-    );
+    linhas.push(`| ${tipo} | ${agregado.quantidade} | ${formatarMoeda(agregado.totalCentavos)} |`);
   }
 
   return linhas.join("\n");
@@ -410,10 +400,9 @@ export function serializarRelatorioMarkdown(relatorio: RelatorioExtraido): strin
   return secoes.filter((secao) => secao.length > 0).join("\n\n");
 }
 
-export function serializarRelatoriosConsolidadoMarkdown(
-  relatorios: RelatorioExtraido[],
-): string {
-  if (relatorios.length === 0) return "# Historico Consolidado (0 meses)\n\nNenhum relatorio disponivel.";
+export function serializarRelatoriosConsolidadoMarkdown(relatorios: RelatorioExtraido[]): string {
+  if (relatorios.length === 0)
+    return "# Historico Consolidado (0 meses)\n\nNenhum relatorio disponivel.";
 
   const header = `# Historico Consolidado (${relatorios.length} meses)`;
   const relatoriosSerializados = relatorios

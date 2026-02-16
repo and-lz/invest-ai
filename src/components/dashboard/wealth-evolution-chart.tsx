@@ -132,10 +132,10 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
   const configGrafico = configGraficoPatrimonio;
 
   return (
-    <Card>
+    <Card data-chat-highlight="patrimonio-total">
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <TrendingUp className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <TrendingUp className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Evolucao Patrimonial
           <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_PATRIMONIAL.explicacao} />
         </CardTitle>
@@ -194,7 +194,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
-            <div className="h-3 w-3 rounded-sm bg-linear-to-b from-chart-3/30 to-chart-1/30" />
+            <div className="from-chart-3/30 to-chart-1/30 h-3 w-3 rounded-sm bg-linear-to-b" />
             <span className="text-muted-foreground flex items-center gap-1">
               Rendimentos (diferença)
               <InfoTooltip conteudo={GLOSSARIO_RENDIMENTOS.explicacao} tamanhoIcone="h-3 w-3" />

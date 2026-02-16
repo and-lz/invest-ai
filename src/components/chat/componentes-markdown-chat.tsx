@@ -85,7 +85,7 @@ interface CodigoInlineMarkdownProps {
 
 export function CodigoInlineMarkdown({ children }: CodigoInlineMarkdownProps) {
   return (
-    <code className="rounded bg-muted px-1 py-0.5 text-xs font-mono text-foreground">
+    <code className="bg-muted text-foreground rounded px-1 py-0.5 font-mono text-xs">
       {children}
     </code>
   );

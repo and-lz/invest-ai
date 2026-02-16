@@ -23,27 +23,28 @@ export default function ReservaEmergenciaArtigo() {
     <>
       <SecaoArtigo titulo="O que é reserva de emergência?">
         <Paragrafo>
-          Reserva de emergência é um dinheiro separado exclusivamente para imprevistos: perda de emprego, problema de
-          saúde, conserto urgente do carro, reforma emergencial da casa, etc.
+          Reserva de emergência é um dinheiro separado exclusivamente para imprevistos: perda de
+          emprego, problema de saúde, conserto urgente do carro, reforma emergencial da casa, etc.
         </Paragrafo>
 
         <Paragrafo>
-          É seu colchão de segurança financeira. Com ela, você não precisa vender investimentos na hora errada, nem se
-          endividar em cartão de crédito ou empréstimos caros quando algo inesperado acontece.
+          É seu colchão de segurança financeira. Com ela, você não precisa vender investimentos na
+          hora errada, nem se endividar em cartão de crédito ou empréstimos caros quando algo
+          inesperado acontece.
         </Paragrafo>
 
         <Destaque tipo="warning">
           <p className="text-sm">
-            <strong>Regra de ouro:</strong> Construir reserva de emergência é a prioridade número 1 antes de qualquer
-            outro investimento. Não pule esta etapa!
+            <strong>Regra de ouro:</strong> Construir reserva de emergência é a prioridade número 1
+            antes de qualquer outro investimento. Não pule esta etapa!
           </p>
         </Destaque>
       </SecaoArtigo>
 
       <SecaoArtigo titulo="Quanto guardar na reserva de emergência?">
         <Paragrafo>
-          O tamanho ideal da reserva depende da sua situação, mas a regra geral é ter de <strong>6 a 12 meses</strong>{" "}
-          das suas despesas mensais guardadas.
+          O tamanho ideal da reserva depende da sua situação, mas a regra geral é ter de{" "}
+          <strong>6 a 12 meses</strong> das suas despesas mensais guardadas.
         </Paragrafo>
 
         <Lista
@@ -56,14 +57,15 @@ export default function ReservaEmergenciaArtigo() {
         />
 
         <Paragrafo>
-          Para calcular, some todas as suas despesas obrigatórias mensais: aluguel, condomínio, alimentação, contas,
-          transporte, escola, etc. Multiplique por 6 ou 12 meses.
+          Para calcular, some todas as suas despesas obrigatórias mensais: aluguel, condomínio,
+          alimentação, contas, transporte, escola, etc. Multiplique por 6 ou 12 meses.
         </Paragrafo>
 
         <TakeawayBox
           conclusoes={[
             {
-              texto: "Se você gasta R$ 3.000 por mês, sua reserva ideal é entre R$ 18.000 (6 meses) e R$ 36.000 (12 meses).",
+              texto:
+                "Se você gasta R$ 3.000 por mês, sua reserva ideal é entre R$ 18.000 (6 meses) e R$ 36.000 (12 meses).",
               tipo: "neutro",
             },
           ]}
@@ -73,7 +75,8 @@ export default function ReservaEmergenciaArtigo() {
       <SecaoArtigo titulo="Onde investir a reserva de emergência?">
         <Paragrafo>
           A reserva de emergência precisa ter duas características essenciais:{" "}
-          <InfoTooltip conteudo={GLOSSARIO_LIQUIDEZ.explicacao} /> liquidez diária e segurança total.
+          <InfoTooltip conteudo={GLOSSARIO_LIQUIDEZ.explicacao} /> liquidez diária e segurança
+          total.
         </Paragrafo>
 
         <Paragrafo>Melhores opções:</Paragrafo>
@@ -88,16 +91,16 @@ export default function ReservaEmergenciaArtigo() {
 
         <Destaque tipo="atencao">
           <p className="text-sm">
-            <strong>Evite:</strong> Deixar reserva na poupança (rende menos), em ações ou FIIs (podem cair quando você
-            precisar), ou em investimentos de longo prazo (sem liquidez).
+            <strong>Evite:</strong> Deixar reserva na poupança (rende menos), em ações ou FIIs
+            (podem cair quando você precisar), ou em investimentos de longo prazo (sem liquidez).
           </p>
         </Destaque>
       </SecaoArtigo>
 
       <SecaoArtigo titulo="Como montar sua reserva">
         <Paragrafo>
-          Construir uma reserva de 6-12 meses leva tempo. Não desanime se parecer muito dinheiro — você vai chegar lá
-          gradualmente.
+          Construir uma reserva de 6-12 meses leva tempo. Não desanime se parecer muito dinheiro —
+          você vai chegar lá gradualmente.
         </Paragrafo>
 
         <Lista
@@ -111,14 +114,15 @@ export default function ReservaEmergenciaArtigo() {
         />
 
         <Paragrafo>
-          Se você consegue guardar R$ 500 por mês, em 1 ano terá R$ 6.000 guardados. Em 3 anos, R$ 18.000 — uma reserva
-          respeitável!
+          Se você consegue guardar R$ 500 por mês, em 1 ano terá R$ 6.000 guardados. Em 3 anos, R$
+          18.000 — uma reserva respeitável!
         </Paragrafo>
 
         <TakeawayBox
           conclusoes={[
             {
-              texto: "Montar reserva de emergência é chato, mas é o que separa quem tem estabilidade financeira de quem vive no fio da navalha.",
+              texto:
+                "Montar reserva de emergência é chato, mas é o que separa quem tem estabilidade financeira de quem vive no fio da navalha.",
               tipo: "positivo",
             },
           ]}
@@ -127,7 +131,8 @@ export default function ReservaEmergenciaArtigo() {
 
       <SecaoArtigo titulo="Quando usar a reserva de emergência?">
         <Paragrafo>
-          Use a reserva apenas para emergências reais, não para oportunidades ou desejos. Emergências são:
+          Use a reserva apenas para emergências reais, não para oportunidades ou desejos.
+          Emergências são:
         </Paragrafo>
 
         <Lista
@@ -140,26 +145,28 @@ export default function ReservaEmergenciaArtigo() {
         />
 
         <Paragrafo>
-          Não são emergências: Black Friday, promoção de viagem, celular novo, presente caro. Para isso, crie uma
-          poupança separada para objetivos de curto prazo.
+          Não são emergências: Black Friday, promoção de viagem, celular novo, presente caro. Para
+          isso, crie uma poupança separada para objetivos de curto prazo.
         </Paragrafo>
       </SecaoArtigo>
 
       <SecaoArtigo titulo="E depois de montar a reserva?">
         <Paragrafo>
-          Uma vez que sua reserva esteja completa (6-12 meses de despesas), você pode começar a investir o restante do
-          seu dinheiro em ativos de maior rentabilidade: ações, FIIs, Tesouro IPCA+, etc.
+          Uma vez que sua reserva esteja completa (6-12 meses de despesas), você pode começar a
+          investir o restante do seu dinheiro em ativos de maior rentabilidade: ações, FIIs, Tesouro
+          IPCA+, etc.
         </Paragrafo>
 
         <Paragrafo>
-          Lembre-se de reajustar o valor da reserva se suas despesas aumentarem (mudança de casa, nascimento de filho,
-          etc.). Revise anualmente.
+          Lembre-se de reajustar o valor da reserva se suas despesas aumentarem (mudança de casa,
+          nascimento de filho, etc.). Revise anualmente.
         </Paragrafo>
 
         <TakeawayBox
           conclusoes={[
             {
-              texto: "Reserva de emergência é o alicerce da sua vida financeira. Sem ela, você está sempre a um imprevisto de distância do desastre financeiro.",
+              texto:
+                "Reserva de emergência é o alicerce da sua vida financeira. Sem ela, você está sempre a um imprevisto de distância do desastre financeiro.",
               tipo: "atencao",
             },
           ]}

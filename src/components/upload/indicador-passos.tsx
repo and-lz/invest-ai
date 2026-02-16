@@ -34,11 +34,7 @@ export function IndicadorPassos({ passos, className }: IndicadorPassosProps) {
                 )}
                 aria-current={passo.status === "ativo" ? "step" : undefined}
               >
-                {passo.status === "concluido" ? (
-                  <Check className="h-3.5 w-3.5" />
-                ) : (
-                  passo.numero
-                )}
+                {passo.status === "concluido" ? <Check className="h-3.5 w-3.5" /> : passo.numero}
               </div>
               <span
                 className={cn(

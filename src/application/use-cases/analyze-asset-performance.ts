@@ -1,9 +1,15 @@
 import type { ReportRepository } from "@/domain/interfaces/report-repository";
 import type { AssetAnalysisService } from "@/domain/interfaces/asset-analysis-service";
 import type { AnaliseAtivoResponse } from "@/schemas/analise-ativo.schema";
-import type { DadosAtivoParaPrompt, ContextoMacroCondensado } from "@/lib/serializar-dados-ativo-markdown";
+import type {
+  DadosAtivoParaPrompt,
+  ContextoMacroCondensado,
+} from "@/lib/serializar-dados-ativo-markdown";
 import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
-import type { DetalhesAtivoBrapi, BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
+import type {
+  DetalhesAtivoBrapi,
+  BrapiAssetDetailService,
+} from "@/infrastructure/services/brapi-asset-detail-service";
 import type { MacroDataService } from "@/domain/interfaces/market-data-service";
 import { agregarDadosDoAtivo } from "@/lib/agregar-dados-ativo";
 
@@ -76,9 +82,7 @@ export class AnalyzeAssetPerformanceUseCase {
   }
 
   /** Busca detalhes no brapi — falha silenciosa retorna null */
-  private async buscarDetalhesBrapiSilencioso(
-    ticker: string,
-  ): Promise<DetalhesAtivoBrapi | null> {
+  private async buscarDetalhesBrapiSilencioso(ticker: string): Promise<DetalhesAtivoBrapi | null> {
     try {
       return await this.servicoBrapi.obterDetalhesAtivo(ticker);
     } catch (erro) {

@@ -24,12 +24,16 @@ interface UseSpeechSynthesisReturn {
   readonly stop: () => void;
 }
 
-export function useSpeechSynthesis(options: UseSpeechSynthesisOptions = {}): UseSpeechSynthesisReturn {
+export function useSpeechSynthesis(
+  options: UseSpeechSynthesisOptions = {},
+): UseSpeechSynthesisReturn {
   const { rate = 1, pitch = 1, volume = 0.9, lang = "pt-BR" } = options;
 
   const [status, setStatus] = useState<SpeechStatus>("idle");
   const [error, setError] = useState<Error | null>(null);
-  const [isSupported] = useState(() => typeof window !== "undefined" && "speechSynthesis" in window);
+  const [isSupported] = useState(
+    () => typeof window !== "undefined" && "speechSynthesis" in window,
+  );
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
@@ -39,7 +43,7 @@ export function useSpeechSynthesis(options: UseSpeechSynthesisOptions = {}): Use
 
     const voices = window.speechSynthesis.getVoices();
     const vozesPtBr = voices.filter(
-      (voz) => voz.lang.startsWith("pt-BR") || voz.lang.startsWith("pt")
+      (voz) => voz.lang.startsWith("pt-BR") || voz.lang.startsWith("pt"),
     );
 
     // Prioridade: vozes naturais > vozes de rede > qualquer pt-BR > primeira disponível
@@ -104,7 +108,7 @@ export function useSpeechSynthesis(options: UseSpeechSynthesisOptions = {}): Use
         window.speechSynthesis.speak(utterance);
       }, 100);
     },
-    [isSupported, obterMelhorVoz, lang, rate, pitch, volume]
+    [isSupported, obterMelhorVoz, lang, rate, pitch, volume],
   );
 
   const pause = useCallback(() => {

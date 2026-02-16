@@ -29,8 +29,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground): boolean {
       return true;
 
     case "gerar-insights": {
-      const identificadorRelatorio =
-        tarefa.parametros?.identificadorRelatorio;
+      const identificadorRelatorio = tarefa.parametros?.identificadorRelatorio;
 
       if (!identificadorRelatorio) {
         console.warn(

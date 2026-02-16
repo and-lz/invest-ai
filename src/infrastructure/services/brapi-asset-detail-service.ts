@@ -143,9 +143,7 @@ export class BrapiAssetDetailService {
           dividendYield: resultado.dividendYield ?? null,
           dividaPatrimonio: resultado.debtToEquity ?? null,
           margemLiquida: resultado.netMargin ?? null,
-          lucroLiquidoCentavos: resultado.netIncome
-            ? Math.round(resultado.netIncome * 100)
-            : null,
+          lucroLiquidoCentavos: resultado.netIncome ? Math.round(resultado.netIncome * 100) : null,
           receitaLiquidaCentavos: resultado.netRevenue
             ? Math.round(resultado.netRevenue * 100)
             : null,
@@ -162,8 +160,7 @@ export class BrapiAssetDetailService {
         tipo: dividendo.type,
       })) ?? [];
 
-    const nomeAtivo =
-      resultado.longName ?? resultado.shortName ?? resultado.symbol;
+    const nomeAtivo = resultado.longName ?? resultado.shortName ?? resultado.symbol;
 
     return {
       cotacaoAtual,

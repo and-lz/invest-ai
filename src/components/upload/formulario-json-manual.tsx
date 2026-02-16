@@ -83,9 +83,7 @@ export function FormularioJsonManual({ onImportacaoSucesso, onVoltar }: Formular
             </div>
             <div className="flex items-center gap-3">
               <Circle className="text-muted-foreground/40 h-4 w-4" />
-              <span className="text-muted-foreground/60 text-sm">
-                Validando estrutura de dados
-              </span>
+              <span className="text-muted-foreground/60 text-sm">Validando estrutura de dados</span>
             </div>
             <div className="flex items-center gap-3">
               <Circle className="text-muted-foreground/40 h-4 w-4" />

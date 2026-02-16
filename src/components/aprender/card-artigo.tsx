@@ -8,7 +8,13 @@ import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
 interface CardArtigoProps {
   readonly artigo: Pick<
     ArtigoMetadata,
-    "slug" | "titulo" | "descricao" | "categoria" | "tempoLeituraMinutos" | "nivelDificuldade" | "tags"
+    | "slug"
+    | "titulo"
+    | "descricao"
+    | "categoria"
+    | "tempoLeituraMinutos"
+    | "nivelDificuldade"
+    | "tags"
   >;
   readonly className?: string;
 }
@@ -31,13 +37,16 @@ export function CardArtigo({ artigo, className }: CardArtigoProps) {
       <Card
         className={cn(
           "h-full transition-all duration-200",
-          "hover:shadow-md hover:border-primary/30",
+          "hover:border-primary/30 hover:shadow-md",
           className,
         )}
       >
         <CardHeader>
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className={cn("text-xs font-medium", CORES_NIVEL[artigo.nivelDificuldade])}>
+            <Badge
+              variant="outline"
+              className={cn("text-xs font-medium", CORES_NIVEL[artigo.nivelDificuldade])}
+            >
               <GraduationCap className="mr-1 h-3 w-3" aria-hidden="true" />
               {ROTULOS_NIVEL[artigo.nivelDificuldade]}
             </Badge>
@@ -52,7 +61,9 @@ export function CardArtigo({ artigo, className }: CardArtigoProps) {
             {artigo.titulo}
           </CardTitle>
 
-          <CardDescription className="line-clamp-3 leading-relaxed">{artigo.descricao}</CardDescription>
+          <CardDescription className="line-clamp-3 leading-relaxed">
+            {artigo.descricao}
+          </CardDescription>
         </CardHeader>
 
         <CardContent>

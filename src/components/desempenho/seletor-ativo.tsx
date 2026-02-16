@@ -13,11 +13,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface AtivoDaCarteira {
   codigoAtivo: string;
@@ -97,14 +93,11 @@ export function SeletorAtivo({
     [ativosCarteira, tickerSelecionado],
   );
 
-  const gruposAtivos = useMemo(
-    () => agruparAtivosPorPerformance(ativosCarteira),
-    [ativosCarteira],
-  );
+  const gruposAtivos = useMemo(() => agruparAtivosPorPerformance(ativosCarteira), [ativosCarteira]);
 
   const rotuloSelecionado = ativoSelecionado
     ? `${ativoSelecionado.codigoAtivo} - ${ativoSelecionado.nomeAtivo}`
-    : tickerSelecionado ?? "Selecionar ativo...";
+    : (tickerSelecionado ?? "Selecionar ativo...");
 
   const handleSelecionarAtivo = (ticker: string) => {
     aoSelecionarTicker(ticker);
@@ -152,9 +145,7 @@ export function SeletorAtivo({
                   Buscar &quot;{termoBusca.trim().toUpperCase()}&quot; no mercado
                 </button>
               ) : (
-                <span className="text-muted-foreground text-sm">
-                  Nenhum ativo encontrado.
-                </span>
+                <span className="text-muted-foreground text-sm">Nenhum ativo encontrado.</span>
               )}
             </CommandEmpty>
 
@@ -216,10 +207,7 @@ export function SeletorAtivo({
               <>
                 <CommandSeparator />
                 <CommandGroup heading="Buscar no Mercado">
-                  <CommandItem
-                    value={`buscar-${termoBusca}`}
-                    onSelect={handleBuscarExterno}
-                  >
+                  <CommandItem value={`buscar-${termoBusca}`} onSelect={handleBuscarExterno}>
                     <Search className="mr-2 h-4 w-4" />
                     <span className="text-sm">
                       Buscar &quot;{termoBusca.trim().toUpperCase()}&quot; via brapi

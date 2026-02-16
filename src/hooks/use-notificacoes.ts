@@ -9,13 +9,10 @@ interface NotificacoesApiResponse {
 const EVENTO_NOTIFICACAO_CRIADA = "notificacao-criada";
 
 export function useNotificacoes() {
-  const { data, error, isLoading, mutate } = useSWR<NotificacoesApiResponse>(
-    "/api/notifications",
-    {
-      refreshInterval: 30_000, // Polling lento como fallback (30s)
-      revalidateOnFocus: true,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<NotificacoesApiResponse>("/api/notifications", {
+    refreshInterval: 30_000, // Polling lento como fallback (30s)
+    revalidateOnFocus: true,
+  });
 
   // Revalida imediatamente quando uma nova notificação é criada (via notificar.ts)
   useEffect(() => {

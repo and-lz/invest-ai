@@ -34,17 +34,20 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
 
   return (
     <div className={cn("mt-4 space-y-2 rounded-lg p-3", className)}>
-      <hr className="mb-5 opacity-50"/>
+      <hr className="mb-5 opacity-50" />
       {conclusoes.map((conclusao) => {
         const IconeConclusao = ICONES_INDICADOR[conclusao.tipo];
         return (
-        <p
-          key={conclusao.texto}
-          className="text-muted-foreground flex items-start gap-2 text-sm leading-relaxed"
-        >
-          <IconeConclusao className={cn("mt-0.5 h-4 w-4 shrink-0", CORES_ICONE[conclusao.tipo])} aria-hidden="true" />
-          {conclusao.texto}
-        </p>
+          <p
+            key={conclusao.texto}
+            className="text-muted-foreground flex items-start gap-2 text-sm leading-relaxed"
+          >
+            <IconeConclusao
+              className={cn("mt-0.5 h-4 w-4 shrink-0", CORES_ICONE[conclusao.tipo])}
+              aria-hidden="true"
+            />
+            {conclusao.texto}
+          </p>
         );
       })}
     </div>

@@ -2,19 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Lightbulb, TrendingUp, BarChart3, BookOpen, Menu, MoreHorizontal } from "lucide-react";
+import {
+  LayoutDashboard,
+  FileText,
+  Lightbulb,
+  TrendingUp,
+  BarChart3,
+  BookOpen,
+  Menu,
+  MoreHorizontal,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AlternarTema } from "@/components/layout/alternar-tema";
 import { ActivityCenter } from "@/components/layout/activity-center";
 import { UserProfileMenu } from "@/components/auth/user-profile-menu";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -76,11 +79,10 @@ export function HeaderNavigation() {
     <div
       className={cn(
         "sticky top-0 z-50 overflow-hidden transition-all duration-300",
-        estaVisivel ? "h-14" : "h-0"
+        estaVisivel ? "h-14" : "h-0",
       )}
     >
-      <header className="relative h-14 border-b border-border/20">
-
+      <header className="border-border/20 relative h-14 border-b">
         <div className="flex h-14 items-center justify-between gap-2 px-3 sm:gap-4 sm:px-4">
           {/* Mobile menu */}
           <Sheet open={menuMobileAberto} onOpenChange={setMenuMobileAberto}>
@@ -93,7 +95,10 @@ export function HeaderNavigation() {
             <SheetContent side="left" className="w-72 p-0">
               <SheetHeader className="border-b px-6 py-4">
                 <SheetTitle className="font-serif text-lg font-semibold tracking-tight">
-                  Investimentos <span className="text-xs font-normal text-muted-foreground">v{packageJson.version}</span>
+                  Investimentos{" "}
+                  <span className="text-muted-foreground text-xs font-normal">
+                    v{packageJson.version}
+                  </span>
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 p-4">
@@ -124,7 +129,10 @@ export function HeaderNavigation() {
           {/* Logo */}
           <div className="hidden items-center gap-2 md:flex">
             <h1 className="font-serif text-base font-semibold tracking-tight">
-              Investimentos <span className="text-xs font-normal text-muted-foreground">v{packageJson.version}</span>
+              Investimentos{" "}
+              <span className="text-muted-foreground text-xs font-normal">
+                v{packageJson.version}
+              </span>
             </h1>
           </div>
 
@@ -146,22 +154,28 @@ export function HeaderNavigation() {
                       : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                   )}
                 >
-                  <Icone className={cn(
-                    "h-5 w-5 shrink-0 transition-transform duration-200",
-                    !estaAtivo && "group-hover:scale-110"
-                  )} />
-                  <span className={cn(
-                    "whitespace-nowrap text-sm font-medium transition-all duration-200",
-                    estaAtivo ? "max-w-[100px] opacity-100" : "max-w-0 opacity-0 group-hover:max-w-[100px] group-hover:opacity-100"
-                  )}>
+                  <Icone
+                    className={cn(
+                      "h-5 w-5 shrink-0 transition-transform duration-200",
+                      !estaAtivo && "group-hover:scale-110",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "text-sm font-medium whitespace-nowrap transition-all duration-200",
+                      estaAtivo
+                        ? "max-w-[100px] opacity-100"
+                        : "max-w-0 opacity-0 group-hover:max-w-[100px] group-hover:opacity-100",
+                    )}
+                  >
                     {item.rotulo}
                   </span>
                   {estaAtivo && (
                     <>
                       {/* Active indicator */}
-                      <span className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-foreground/60" />
+                      <span className="bg-foreground/60 absolute right-2 bottom-0 left-2 h-0.5 rounded-full" />
                       {/* Subtle background for active item */}
-                      <span className="absolute inset-0 -z-10 rounded-lg bg-secondary/30" />
+                      <span className="bg-secondary/30 absolute inset-0 -z-10 rounded-lg" />
                     </>
                   )}
                 </Link>
@@ -176,19 +190,19 @@ export function HeaderNavigation() {
                   size="sm"
                   className={cn(
                     "group relative gap-2 text-sm font-medium transition-all duration-200",
-                    itensNavegacaoSecundarios.some(item => pathname === item.href)
+                    itensNavegacaoSecundarios.some((item) => pathname === item.href)
                       ? "text-foreground"
-                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                      : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground",
                   )}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                   Mais
-                  {itensNavegacaoSecundarios.some(item => pathname === item.href) && (
+                  {itensNavegacaoSecundarios.some((item) => pathname === item.href) && (
                     <>
                       {/* Active indicator */}
-                      <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-foreground/60" />
+                      <span className="bg-foreground/60 absolute right-3 bottom-0 left-3 h-0.5 rounded-full" />
                       {/* Subtle background for active item */}
-                      <span className="absolute inset-0 rounded-lg bg-secondary/30" />
+                      <span className="bg-secondary/30 absolute inset-0 rounded-lg" />
                     </>
                   )}
                 </Button>
@@ -203,7 +217,7 @@ export function HeaderNavigation() {
                         href={item.href}
                         className={cn(
                           "flex items-center gap-3 px-3 py-2 text-sm font-medium",
-                          estaAtivo && "bg-secondary/50 text-foreground"
+                          estaAtivo && "bg-secondary/50 text-foreground",
                         )}
                       >
                         <Icone className="h-4 w-4" />

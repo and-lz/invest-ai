@@ -86,18 +86,13 @@ function CardIndicador({
             {formatarVariacao(variacao)}
           </p>
         )}
-        {subtitulo && !variacao && (
-          <p className="text-muted-foreground text-xs">{subtitulo}</p>
-        )}
+        {subtitulo && !variacao && <p className="text-muted-foreground text-xs">{subtitulo}</p>}
       </CardContent>
     </Card>
   );
 }
 
-export function IndicadoresResumo({
-  indicesMercado,
-  indicadoresMacro,
-}: IndicadoresResumoProps) {
+export function IndicadoresResumo({ indicesMercado, indicadoresMacro }: IndicadoresResumoProps) {
   const ibovespa = encontrarIndicePorSimbolo(indicesMercado, "^BVSP");
   const selic = encontrarIndicadorPorCodigo(indicadoresMacro, 432);
   const ipca = encontrarIndicadorPorCodigo(indicadoresMacro, 433);
@@ -109,12 +104,7 @@ export function IndicadoresResumo({
         titulo="Ibovespa"
         valor={ibovespa ? formatarNumeroCompacto(ibovespa.valor) : "—"}
         variacao={ibovespa?.variacao}
-        icone={
-          <TrendingUp
-            className="h-5 w-5 text-muted-foreground"
-            aria-hidden="true"
-          />
-        }
+        icone={<TrendingUp className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_IBOVESPA_INDICE.explicacao}
       />
 
@@ -126,12 +116,7 @@ export function IndicadoresResumo({
             : "—"
         }
         subtitulo={dolar?.unidade}
-        icone={
-          <DollarSign
-            className="h-5 w-5 text-muted-foreground"
-            aria-hidden="true"
-          />
-        }
+        icone={<DollarSign className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_DOLAR.explicacao}
       />
 
@@ -139,12 +124,7 @@ export function IndicadoresResumo({
         titulo="SELIC Meta"
         valor={selic ? `${formatarNumeroCompacto(selic.valorAtual)}%` : "—"}
         subtitulo={selic?.unidade}
-        icone={
-          <Percent
-            className="h-5 w-5 text-muted-foreground"
-            aria-hidden="true"
-          />
-        }
+        icone={<Percent className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_SELIC_META.explicacao}
       />
 
@@ -152,12 +132,7 @@ export function IndicadoresResumo({
         titulo="IPCA"
         valor={ipca ? `${formatarNumeroCompacto(ipca.valorAtual)}%` : "—"}
         subtitulo={ipca?.unidade}
-        icone={
-          <Percent
-            className="h-5 w-5 text-muted-foreground"
-            aria-hidden="true"
-          />
-        }
+        icone={<Percent className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_IPCA_INDICE.explicacao}
       />
     </div>

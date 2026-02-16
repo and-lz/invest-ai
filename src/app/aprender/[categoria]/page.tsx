@@ -97,7 +97,7 @@ export default async function CategoriaPage({ params }: CategoriaPageProps) {
 
       {/* Lista de Artigos */}
       {artigos.length === 0 ? (
-        <div className="text-center py-12">
+        <div className="py-12 text-center">
           <BookOpen className="text-muted-foreground mx-auto mb-4 h-12 w-12" aria-hidden="true" />
           <p className="text-muted-foreground">Artigos em breve. Volte em outro momento!</p>
         </div>

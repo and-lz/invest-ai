@@ -39,7 +39,9 @@ export const ArtigoMetadataSchema = z.object({
     .string()
     .min(5)
     .max(100)
-    .describe("Título do artigo exibido na interface. Ex: 'Primeiros passos: por onde começar a investir'"),
+    .describe(
+      "Título do artigo exibido na interface. Ex: 'Primeiros passos: por onde começar a investir'",
+    ),
 
   descricao: z
     .string()
@@ -62,7 +64,9 @@ export const ArtigoMetadataSchema = z.object({
     .max(60)
     .describe("Tempo estimado de leitura em minutos"),
 
-  nivelDificuldade: NivelDificuldadeEnum.describe("Nível de conhecimento necessário para compreender o artigo"),
+  nivelDificuldade: NivelDificuldadeEnum.describe(
+    "Nível de conhecimento necessário para compreender o artigo",
+  ),
 
   requerDadosUsuario: z
     .boolean()

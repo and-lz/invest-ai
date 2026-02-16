@@ -12,14 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
-  ArrowUp,
-  ArrowDown,
-  ArrowUpDown,
-} from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import type { Conclusao } from "@/components/ui/takeaway-box";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
@@ -96,7 +89,7 @@ function CabecalhoOrderavelRanking({
 
   return (
     <TableHead
-      className={`group cursor-pointer select-none hover:text-foreground ${className ?? ""}`}
+      className={`group hover:text-foreground cursor-pointer select-none ${className ?? ""}`}
       onClick={() => onClick(coluna)}
     >
       <div
@@ -127,11 +120,7 @@ function TabelaAtivos({
     useOrdenacaoTabela<AtivoRanking, ColunaRanking>(ativos, obterValor);
 
   if (ativos.length === 0) {
-    return (
-      <p className="text-muted-foreground py-8 text-center text-sm">
-        Nenhum dado disponível
-      </p>
-    );
+    return <p className="text-muted-foreground py-8 text-center text-sm">Nenhum dado disponível</p>;
   }
 
   return (
@@ -196,12 +185,10 @@ function TabelaAtivos({
                 {ativo.ticker}
               </Link>
             </TableCell>
-            <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">
+            <TableCell className="text-muted-foreground max-w-[200px] truncate text-sm">
               {ativo.nome}
             </TableCell>
-            <TableCell className="text-right text-sm">
-              {formatarPreco(ativo.preco)}
-            </TableCell>
+            <TableCell className="text-right text-sm">{formatarPreco(ativo.preco)}</TableCell>
             <TableCell
               className={cn(
                 "text-right text-sm font-medium",
@@ -211,7 +198,7 @@ function TabelaAtivos({
               {formatarVariacao(ativo.variacao)}
             </TableCell>
             {mostrarVolume && (
-              <TableCell className="text-right text-sm text-muted-foreground">
+              <TableCell className="text-muted-foreground text-right text-sm">
                 {formatarVolume(ativo.volume)}
               </TableCell>
             )}
@@ -258,12 +245,10 @@ export function TabelaRankingAtivos({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <BarChart3 className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Ranking de Ações
         </CardTitle>
-        <CardDescription>
-          Ações da B3 ordenadas por variação e volume de negociação
-        </CardDescription>
+        <CardDescription>Ações da B3 ordenadas por variação e volume de negociação</CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="altas">

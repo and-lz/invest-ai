@@ -34,9 +34,7 @@ export class GeminiProvedorAi implements ProvedorAi {
         generationConfig: {
           temperature: configuracao.temperatura,
           responseMimeType:
-            configuracao.formatoResposta === "json"
-              ? "application/json"
-              : undefined,
+            configuracao.formatoResposta === "json" ? "application/json" : undefined,
         },
       });
 
@@ -66,9 +64,7 @@ export class GeminiProvedorAi implements ProvedorAi {
     }
   }
 
-  async *transmitir(
-    configuracao: ConfiguracaoGeracao,
-  ): AsyncGenerator<string, void, unknown> {
+  async *transmitir(configuracao: ConfiguracaoGeracao): AsyncGenerator<string, void, unknown> {
     try {
       const model = this.client.getGenerativeModel({
         model: this.modelo,
@@ -76,15 +72,12 @@ export class GeminiProvedorAi implements ProvedorAi {
         generationConfig: {
           temperature: configuracao.temperatura,
           responseMimeType:
-            configuracao.formatoResposta === "json"
-              ? "application/json"
-              : undefined,
+            configuracao.formatoResposta === "json" ? "application/json" : undefined,
         },
       });
 
       const contents = this.converterMensagensParaContents(configuracao);
-      const resultadoStream =
-        await model.generateContentStream({ contents });
+      const resultadoStream = await model.generateContentStream({ contents });
 
       for await (const chunk of resultadoStream.stream) {
         const textoChunk = chunk.text();
@@ -112,14 +105,10 @@ export class GeminiProvedorAi implements ProvedorAi {
    * Converte as mensagens do formato generico para Content[] do Gemini SDK.
    * Preserva a distincao de turnos (user/model) para suportar chat multi-turn.
    */
-  private converterMensagensParaContents(
-    configuracao: ConfiguracaoGeracao,
-  ): Content[] {
+  private converterMensagensParaContents(configuracao: ConfiguracaoGeracao): Content[] {
     return configuracao.mensagens.map((mensagem) => ({
       role: mensagem.papel === "usuario" ? "user" : "model",
-      parts: mensagem.partes.map((parte) =>
-        this.converterParteParaGeminiPart(parte),
-      ),
+      parts: mensagem.partes.map((parte) => this.converterParteParaGeminiPart(parte)),
     }));
   }
 
@@ -145,13 +134,10 @@ export class GeminiProvedorAi implements ProvedorAi {
   private classificarErro(erro: unknown): AiApiError {
     if (erro instanceof AiApiError) return erro;
 
-    const mensagem =
-      erro instanceof Error ? erro.message : String(erro);
+    const mensagem = erro instanceof Error ? erro.message : String(erro);
 
     if (ehErroTransienteDeAi(mensagem)) {
-      return new AiApiTransientError(
-        `Falha transiente na API Gemini: ${mensagem}`,
-      );
+      return new AiApiTransientError(`Falha transiente na API Gemini: ${mensagem}`);
     }
 
     return new AiApiError(`Falha na API Gemini: ${mensagem}`);

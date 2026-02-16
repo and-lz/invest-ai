@@ -21,12 +21,14 @@ export default function IRRendaFixaArtigo() {
     <>
       <SecaoArtigo titulo="Como funciona o IR em renda fixa?">
         <Paragrafo>
-          A maioria dos investimentos de renda fixa (CDB, Tesouro, LC, etc.) tem desconto de Imposto de Renda sobre os
-          rendimentos. O valor do IR depende de quanto tempo você deixou o dinheiro investido.
+          A maioria dos investimentos de renda fixa (CDB, Tesouro, LC, etc.) tem desconto de Imposto
+          de Renda sobre os rendimentos. O valor do IR depende de quanto tempo você deixou o
+          dinheiro investido.
         </Paragrafo>
 
         <Paragrafo>
-          Existe uma tabela regressiva: quanto mais tempo você mantém o investimento, menos imposto paga.
+          Existe uma tabela regressiva: quanto mais tempo você mantém o investimento, menos imposto
+          paga.
         </Paragrafo>
       </SecaoArtigo>
 
@@ -42,14 +44,15 @@ export default function IRRendaFixaArtigo() {
         />
 
         <Paragrafo>
-          Por exemplo: se você investiu R$ 10.000 e ganhou R$ 1.000 de juros em 1 ano, vai pagar 20% de IR sobre os
-          R$ 1.000 = R$ 200. Seu ganho líquido será R$ 800.
+          Por exemplo: se você investiu R$ 10.000 e ganhou R$ 1.000 de juros em 1 ano, vai pagar 20%
+          de IR sobre os R$ 1.000 = R$ 200. Seu ganho líquido será R$ 800.
         </Paragrafo>
 
         <TakeawayBox
           conclusoes={[
             {
-              texto: "O IR é cobrado automaticamente no resgate ou vencimento. A corretora desconta e repassa para a Receita — você não precisa fazer nada.",
+              texto:
+                "O IR é cobrado automaticamente no resgate ou vencimento. A corretora desconta e repassa para a Receita — você não precisa fazer nada.",
               tipo: "neutro",
             },
           ]}
@@ -72,34 +75,35 @@ export default function IRRendaFixaArtigo() {
         />
 
         <Paragrafo>
-          Mesmo que esses investimentos rendam um pouco menos que um CDB, a isenção de IR pode compensar. Sempre
-          compare a rentabilidade líquida (após impostos).
+          Mesmo que esses investimentos rendam um pouco menos que um CDB, a isenção de IR pode
+          compensar. Sempre compare a rentabilidade líquida (após impostos).
         </Paragrafo>
 
         <Destaque tipo="success">
           <p className="text-sm">
-            <strong>Dica:</strong> LCI e LCA costumam ser boas opções para quem quer rentabilidade de renda fixa sem
-            pagar IR.
+            <strong>Dica:</strong> LCI e LCA costumam ser boas opções para quem quer rentabilidade
+            de renda fixa sem pagar IR.
           </p>
         </Destaque>
       </SecaoArtigo>
 
       <SecaoArtigo titulo="Come-cotas: o IR antecipado dos fundos">
         <Paragrafo>
-          Fundos de renda fixa têm uma particularidade: o come-cotas. É uma cobrança antecipada de IR que acontece
-          duas vezes por ano (maio e novembro), mesmo sem você resgatar.
+          Fundos de renda fixa têm uma particularidade: o come-cotas. É uma cobrança antecipada de
+          IR que acontece duas vezes por ano (maio e novembro), mesmo sem você resgatar.
         </Paragrafo>
 
         <Paragrafo>
-          O come-cotas cobra 15% sobre os rendimentos acumulados. Quando você resgatar, o IR final é acertado
-          conforme a tabela regressiva. Se você ficou menos de 2 anos, pode haver cobrança adicional. Se ficou mais,
-          você já pagou e não paga mais nada.
+          O come-cotas cobra 15% sobre os rendimentos acumulados. Quando você resgatar, o IR final é
+          acertado conforme a tabela regressiva. Se você ficou menos de 2 anos, pode haver cobrança
+          adicional. Se ficou mais, você já pagou e não paga mais nada.
         </Paragrafo>
 
         <TakeawayBox
           conclusoes={[
             {
-              texto: "Come-cotas reduz o efeito dos juros compostos nos fundos. Por isso, para longo prazo, investimentos diretos (Tesouro, CDB) podem ser mais vantajosos.",
+              texto:
+                "Come-cotas reduz o efeito dos juros compostos nos fundos. Por isso, para longo prazo, investimentos diretos (Tesouro, CDB) podem ser mais vantajosos.",
               tipo: "atencao",
             },
           ]}

@@ -38,10 +38,7 @@ function formatarTempoEstimado(segundos: number): string {
   return `~${minutos} min`;
 }
 
-function obterMensagemProgresso(
-  segundosDecorridos: number,
-  tempoEstimado: number,
-): string {
+function obterMensagemProgresso(segundosDecorridos: number, tempoEstimado: number): string {
   const proporcao = segundosDecorridos / tempoEstimado;
   if (proporcao < 0.5) {
     return `Tempo estimado: ${formatarTempoEstimado(tempoEstimado)}`;

@@ -3,12 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Play, Pause, Square, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { cn } from "@/lib/utils";
 
@@ -113,12 +108,12 @@ export function BotaoLerArtigo({ className }: BotaoLerArtigoProps) {
               ) : isPlaying ? (
                 <Pause className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <Play className="h-4 w-4 ml-0.5" aria-hidden="true" />
+                <Play className="ml-0.5 h-4 w-4" aria-hidden="true" />
               )}
               {/* Indicador visual de áudio ativo */}
               {isPlaying && (
                 <span
-                  className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-pulse rounded-full bg-success"
+                  className="bg-success absolute -top-0.5 -right-0.5 h-2 w-2 animate-pulse rounded-full"
                   aria-hidden="true"
                 />
               )}

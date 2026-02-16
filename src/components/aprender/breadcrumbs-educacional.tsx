@@ -28,7 +28,9 @@ export function BreadcrumbsEducacional({ items, className }: BreadcrumbsEducacio
                 {item.rotulo}
               </Link>
             ) : (
-              <span className={cn(ehUltimo ? "text-foreground font-medium" : "text-muted-foreground")}>
+              <span
+                className={cn(ehUltimo ? "text-foreground font-medium" : "text-muted-foreground")}
+              >
                 {item.rotulo}
               </span>
             )}

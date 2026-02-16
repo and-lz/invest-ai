@@ -29,14 +29,21 @@ function DesempenhoConteudo() {
   const [analisandoComIa, setAnalisandoComIa] = useState(false);
 
   const { ativosCarteira, estaCarregando: carregandoLista } = useListaAtivosCarteira();
-  const { dadosAtivo, estaCarregando: carregandoDados, revalidar: revalidarDados } = useDadosAtivo(tickerSelecionado);
-  const { analise, estaCarregando: carregandoAnalise, revalidar: revalidarAnalise } = useAnaliseIaAtivo(tickerSelecionado);
+  const {
+    dadosAtivo,
+    estaCarregando: carregandoDados,
+    revalidar: revalidarDados,
+  } = useDadosAtivo(tickerSelecionado);
+  const {
+    analise,
+    estaCarregando: carregandoAnalise,
+    revalidar: revalidarAnalise,
+  } = useAnaliseIaAtivo(tickerSelecionado);
 
   // Registrar contexto da pagina para o chat
   const { definirContexto } = useContextoPaginaChat();
   const contextoSerializado = useMemo(
-    () =>
-      dadosAtivo ? serializarContextoDesempenho(dadosAtivo) : undefined,
+    () => (dadosAtivo ? serializarContextoDesempenho(dadosAtivo) : undefined),
     [dadosAtivo],
   );
   useEffect(() => {
@@ -94,7 +101,7 @@ function DesempenhoConteudo() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <BarChart3 className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
+        <BarChart3 className="text-muted-foreground h-6 w-6" aria-hidden="true" />
         <Header
           titulo="Desempenho de Ativo"
           descricao="Analise detalhada de ativos da sua carteira ou do mercado"
@@ -181,9 +188,7 @@ function DesempenhoConteudo() {
           />
 
           {/* Analise IA */}
-          {carregandoAnalise && tickerSelecionado && (
-            <Skeleton className="h-96" />
-          )}
+          {carregandoAnalise && tickerSelecionado && <Skeleton className="h-96" />}
 
           {analise && <AnaliseIaAtivo analise={analise} />}
 
@@ -193,9 +198,10 @@ function DesempenhoConteudo() {
             dadosAtivo.historicoNaCarteira.length === 0 && (
               <Card>
                 <CardContent className="flex flex-col items-center gap-4 py-12">
-                  <AlertTriangle className="h-12 w-12 text-muted-foreground" />
+                  <AlertTriangle className="text-muted-foreground h-12 w-12" />
                   <p className="text-muted-foreground text-center">
-                    Nenhum dado encontrado para {tickerSelecionado}. Verifique se o ticker esta correto.
+                    Nenhum dado encontrado para {tickerSelecionado}. Verifique se o ticker esta
+                    correto.
                   </p>
                   <Button variant="outline" onClick={() => void revalidarDados()}>
                     <RefreshCw className="mr-2 h-4 w-4" />

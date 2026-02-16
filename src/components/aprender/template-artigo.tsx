@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { tipografia } from "@/lib/design-system";
 
 // ============================================================
 // Componentes reutilizáveis para estruturar artigos educacionais.
@@ -16,7 +17,7 @@ interface SecaoArtigoProps {
 export function SecaoArtigo({ titulo, children, className }: SecaoArtigoProps) {
   return (
     <section className={cn("mb-12", className)}>
-      <h2 className="font-heading mb-4 text-xl font-semibold tracking-tight">{titulo}</h2>
+      <h2 className={cn(tipografia.h2, "mb-4")}>{titulo}</h2>
       <div className="space-y-4 text-base leading-relaxed">{children}</div>
     </section>
   );
@@ -88,7 +89,7 @@ export function Destaque({ children, tipo = "info", className }: DestaqueProps) 
   };
 
   return (
-    <div className={cn("border-l-4 px-5 py-4 rounded-lg", cores[tipo], className)}>{children}</div>
+    <div className={cn("rounded-lg border-l-4 px-5 py-4", cores[tipo], className)}>{children}</div>
   );
 }
 
@@ -102,9 +103,13 @@ interface CitacaoProps {
 
 export function Citacao({ children, autor, className }: CitacaoProps) {
   return (
-    <blockquote className={cn("border-l-4 border-l-muted-foreground/30 pl-5 py-2 italic", className)}>
+    <blockquote
+      className={cn("border-l-muted-foreground/30 border-l-4 py-2 pl-5 italic", className)}
+    >
       <p className="text-muted-foreground">{children}</p>
-      {autor && <footer className="text-muted-foreground/70 mt-2 text-sm not-italic">— {autor}</footer>}
+      {autor && (
+        <footer className="text-muted-foreground/70 mt-2 text-sm not-italic">— {autor}</footer>
+      )}
     </blockquote>
   );
 }
@@ -118,7 +123,7 @@ interface CodigoProps {
 
 export function Codigo({ children, className }: CodigoProps) {
   return (
-    <code className={cn("rounded bg-secondary px-1.5 py-0.5 font-mono text-sm", className)}>
+    <code className={cn("bg-secondary rounded px-1.5 py-0.5 font-mono text-sm", className)}>
       {children}
     </code>
   );
@@ -152,7 +157,7 @@ interface DivisorProps {
 }
 
 export function Divisor({ className }: DivisorProps) {
-  return <hr className={cn("my-8 border-border", className)} />;
+  return <hr className={cn("border-border my-8", className)} />;
 }
 
 // ---- Tabela Simples ----
@@ -168,7 +173,7 @@ export function TabelaSimples({ cabecalhos, linhas, className }: TabelaSimplesPr
     <div className={cn("overflow-x-auto", className)}>
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-border">
+          <tr className="border-border border-b">
             {cabecalhos.map((cabecalho, index) => (
               <th key={index} className="px-4 py-3 text-left text-sm font-medium">
                 {cabecalho}
@@ -178,7 +183,7 @@ export function TabelaSimples({ cabecalhos, linhas, className }: TabelaSimplesPr
         </thead>
         <tbody>
           {linhas.map((linha, indice) => (
-            <tr key={indice} className="border-b border-border">
+            <tr key={indice} className="border-border border-b">
               {linha.map((celula, indiceCelula) => (
                 <td key={indiceCelula} className="text-muted-foreground px-4 py-3 text-sm">
                   {celula}

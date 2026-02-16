@@ -29,15 +29,13 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           </p>
 
           {isDevelopment && (
-            <div className="w-full space-y-2 rounded-lg border bg-muted/50 p-4 text-left">
-              <p className="text-xs font-semibold text-destructive">Detalhes do erro (desenvolvimento):</p>
-              <pre className="overflow-x-auto text-xs text-muted-foreground">
-                {error.message}
-              </pre>
+            <div className="bg-muted/50 w-full space-y-2 rounded-lg border p-4 text-left">
+              <p className="text-destructive text-xs font-semibold">
+                Detalhes do erro (desenvolvimento):
+              </p>
+              <pre className="text-muted-foreground overflow-x-auto text-xs">{error.message}</pre>
               {error.digest && (
-                <p className="text-xs text-muted-foreground">
-                  Digest: {error.digest}
-                </p>
+                <p className="text-muted-foreground text-xs">Digest: {error.digest}</p>
               )}
             </div>
           )}

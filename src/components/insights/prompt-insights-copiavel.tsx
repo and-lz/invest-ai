@@ -69,7 +69,7 @@ export function PromptInsightsCopiavel({
     return (
       <Card>
         <CardContent className="p-6">
-          <p className="text-sm text-destructive">{erroCarregamento}</p>
+          <p className="text-destructive text-sm">{erroCarregamento}</p>
         </CardContent>
       </Card>
     );

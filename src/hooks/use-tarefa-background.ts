@@ -26,9 +26,7 @@ export function useTarefaBackground(identificadorTarefa: string | null) {
         // para garantir que o estado seja propagado corretamente
         if (
           dados &&
-          (dados.status === "concluido" ||
-            dados.status === "erro" ||
-            dados.status === "cancelada")
+          (dados.status === "concluido" || dados.status === "erro" || dados.status === "cancelada")
         ) {
           const agora = Date.now();
 

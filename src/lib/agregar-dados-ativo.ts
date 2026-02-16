@@ -143,9 +143,7 @@ export function agregarDadosDoAtivo(
  * Lista todos os ativos unicos presentes nos relatorios.
  * Retorna ticker + nome + estrategia + rentabilidade12Meses para o seletor de ativos.
  */
-export function listarAtivosUnicos(
-  relatorios: RelatorioExtraido[],
-): Array<{
+export function listarAtivosUnicos(relatorios: RelatorioExtraido[]): Array<{
   codigoAtivo: string;
   nomeAtivo: string;
   estrategia: string;
@@ -188,9 +186,7 @@ export function listarAtivosUnicos(
 
 // ---- Helpers de deduplicacao ----
 
-function deduplicarMovimentacoes(
-  movimentacoes: MovimentacaoAtivo[],
-): MovimentacaoAtivo[] {
+function deduplicarMovimentacoes(movimentacoes: MovimentacaoAtivo[]): MovimentacaoAtivo[] {
   const chaves = new Set<string>();
   const resultado: MovimentacaoAtivo[] = [];
 
@@ -207,9 +203,7 @@ function deduplicarMovimentacoes(
   );
 }
 
-function deduplicarEventos(
-  eventos: EventoFinanceiroAtivo[],
-): EventoFinanceiroAtivo[] {
+function deduplicarEventos(eventos: EventoFinanceiroAtivo[]): EventoFinanceiroAtivo[] {
   const chaves = new Set<string>();
   const resultado: EventoFinanceiroAtivo[] = [];
 

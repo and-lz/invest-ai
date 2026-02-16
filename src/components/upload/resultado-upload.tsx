@@ -2,6 +2,8 @@
 
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { tipografia } from "@/lib/design-system";
 
 interface ResultadoUploadProps {
   readonly tipo: "sucesso" | "erro";
@@ -24,18 +26,17 @@ export function ResultadoUpload({
       role={tipo === "erro" ? "alert" : undefined}
     >
       {tipo === "sucesso" ? (
-        <CheckCircle className="h-12 w-12 text-success" />
+        <CheckCircle className="text-success h-12 w-12" />
       ) : (
-        <XCircle className="h-12 w-12 text-destructive" />
+        <XCircle className="text-destructive h-12 w-12" />
       )}
       <div className="text-center">
-        <h3 className="text-lg font-semibold">{titulo}</h3>
+        <h3 className={tipografia.h3}>{titulo}</h3>
         <p
-          className={
-            tipo === "erro"
-              ? "text-destructive text-sm"
-              : "text-muted-foreground text-sm"
-          }
+          className={cn(
+            tipografia.corpo,
+            tipo === "erro" ? "text-destructive" : "text-muted-foreground",
+          )}
         >
           {mensagem}
         </p>

@@ -30,7 +30,10 @@ export function UserProfileMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={session.user.image ?? undefined} alt={session.user.name ?? "Usuario"} />
+            <AvatarImage
+              src={session.user.image ?? undefined}
+              alt={session.user.name ?? "Usuario"}
+            />
             <AvatarFallback>{iniciais}</AvatarFallback>
           </Avatar>
         </Button>
@@ -39,7 +42,7 @@ export function UserProfileMenu() {
         <DropdownMenuLabel>
           <div className="flex flex-col gap-1">
             <p className="text-sm font-medium">{session.user.name}</p>
-            <p className="text-xs text-muted-foreground">{session.user.email}</p>
+            <p className="text-muted-foreground text-xs">{session.user.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

@@ -115,7 +115,7 @@ export function AllocationEvolutionChart({ evolucaoAlocacao }: AllocationEvoluti
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Layers className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Layers className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Evolução da Alocação
           <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_ALOCACAO.explicacao} />
         </CardTitle>

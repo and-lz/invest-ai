@@ -131,7 +131,12 @@ function InsightCard({
       </h3>
 
       {/* Descrição */}
-      <p className={cn("mt-2 text-lg leading-relaxed text-muted-foreground", estiloTexto[statusAtual])}>
+      <p
+        className={cn(
+          "text-muted-foreground mt-2 text-lg leading-relaxed",
+          estiloTexto[statusAtual],
+        )}
+      >
         {insight.descricao}
       </p>
 
@@ -190,7 +195,7 @@ function InsightCard({
             </>
           )}
           {statusAtual === "concluida" && (
-            <div className="flex items-center gap-2 text-sm text-success">
+            <div className="text-success flex items-center gap-2 text-sm">
               <CheckCircle2 className="h-4 w-4" />
               <span>Ação concluída</span>
               <Button
@@ -238,7 +243,9 @@ export default function InsightsPage() {
 
   // Se houver erro ao carregar relatórios, lançar para o Error Boundary com mensagem clara
   if (erroRelatorios) {
-    throw new Error(`Erro ao carregar relatórios: ${erroRelatorios.message || "Erro desconhecido"}`);
+    throw new Error(
+      `Erro ao carregar relatórios: ${erroRelatorios.message || "Erro desconhecido"}`,
+    );
   }
 
   // Registrar contexto da pagina para o chat
@@ -472,7 +479,7 @@ export default function InsightsPage() {
                   Gerar via Chat
                 </Button>
               </div>
-              {erroInsights && <p className="text-sm text-destructive">{erroInsights}</p>}
+              {erroInsights && <p className="text-destructive text-sm">{erroInsights}</p>}
             </CardContent>
           </Card>
         )}
@@ -502,14 +509,10 @@ export default function InsightsPage() {
               {ehConsolidado ? "Análise Consolidada" : "Análise de Carteira"}
             </p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight">
-              {ehConsolidado
-                ? "Todos os meses"
-                : formatarMesAno(insights.mesReferencia, "extenso")}
+              {ehConsolidado ? "Todos os meses" : formatarMesAno(insights.mesReferencia, "extenso")}
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              {ehConsolidado && (
-                <span>{relatorios.length} relatórios analisados — </span>
-              )}
+              {ehConsolidado && <span>{relatorios.length} relatórios analisados — </span>}
               Gerado em{" "}
               {new Date(insights.dataGeracao).toLocaleDateString("pt-BR", {
                 day: "2-digit",
@@ -571,9 +574,7 @@ export default function InsightsPage() {
                   insight={insight}
                   indiceInsight={indice}
                   identificadorRelatorio={
-                    ehConsolidado
-                      ? "consolidado"
-                      : (relatorioSelecionado?.identificador ?? "")
+                    ehConsolidado ? "consolidado" : (relatorioSelecionado?.identificador ?? "")
                   }
                   onStatusAlterado={handleStatusAlterado}
                 />

@@ -65,9 +65,7 @@ export async function executarTarefaEmBackground(
     // Verificar se a tarefa foi cancelada antes de executar
     const cancelada = await tarefaFoiCancelada(tarefa.identificador);
     if (cancelada) {
-      console.info(
-        `[${rotuloLog}] Tarefa ${tarefa.identificador} foi cancelada pelo usuario`,
-      );
+      console.info(`[${rotuloLog}] Tarefa ${tarefa.identificador} foi cancelada pelo usuario`);
       return;
     }
 
@@ -98,16 +96,13 @@ export async function executarTarefaEmBackground(
       );
       return;
     } catch (erro) {
-      const mensagemErro =
-        erro instanceof Error ? erro.message : String(erro);
-      const ehRecuperavel =
-        erro instanceof AppError && erro.recuperavel;
+      const mensagemErro = erro instanceof Error ? erro.message : String(erro);
+      const ehRecuperavel = erro instanceof AppError && erro.recuperavel;
       tentativaAtual++;
 
       // Pode retentar?
       if (ehRecuperavel && tentativaAtual < maximoTentativas) {
-        const atrasoMilissegundos =
-          calcularAtrasoExponencial(tentativaAtual);
+        const atrasoMilissegundos = calcularAtrasoExponencial(tentativaAtual);
 
         console.warn(
           `[${rotuloLog}] Tarefa ${tarefa.identificador} falhou (tentativa ${tentativaAtual}/${maximoTentativas}), ` +
@@ -118,9 +113,7 @@ export async function executarTarefaEmBackground(
           ...tarefa,
           tentativaAtual,
           erroRecuperavel: true,
-          proximaTentativaEm: new Date(
-            Date.now() + atrasoMilissegundos,
-          ).toISOString(),
+          proximaTentativaEm: new Date(Date.now() + atrasoMilissegundos).toISOString(),
         });
 
         await aguardar(atrasoMilissegundos);
@@ -128,9 +121,7 @@ export async function executarTarefaEmBackground(
       }
 
       // Falha definitiva
-      const urlRetry = ehRecuperavel
-        ? `/api/tasks/${tarefa.identificador}/retry`
-        : undefined;
+      const urlRetry = ehRecuperavel ? `/api/tasks/${tarefa.identificador}/retry` : undefined;
 
       await salvarTarefa({
         ...tarefa,
@@ -146,9 +137,7 @@ export async function executarTarefaEmBackground(
         tipo: "error",
         titulo: `${descricaoTarefa} — erro`,
         descricao: mensagemErro,
-        acao: urlRetry
-          ? { rotulo: "Tentar novamente", url: urlRetry }
-          : undefined,
+        acao: urlRetry ? { rotulo: "Tentar novamente", url: urlRetry } : undefined,
       });
 
       console.error(
@@ -160,15 +149,10 @@ export async function executarTarefaEmBackground(
 }
 
 /** Cria notificacao server-side. Falha silenciosa - nunca lanca excecao. */
-async function criarNotificacaoSilenciosa(
-  dados: CriarNotificacao,
-): Promise<void> {
+async function criarNotificacaoSilenciosa(dados: CriarNotificacao): Promise<void> {
   try {
     await adicionarNotificacao(dados);
   } catch (erroNotificacao) {
-    console.error(
-      "[ExecutorTarefa] Falha ao criar notificacao:",
-      erroNotificacao,
-    );
+    console.error("[ExecutorTarefa] Falha ao criar notificacao:", erroNotificacao);
   }
 }

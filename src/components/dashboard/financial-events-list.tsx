@@ -36,7 +36,7 @@ const ICONES_TIPO_EVENTO: Record<string, LucideIcon> = {
   Dividendo: Coins,
   JCP: BadgeDollarSign,
   Rendimento: TrendingUp,
-  "Amortização": ArrowDownCircle,
+  Amortização: ArrowDownCircle,
   Aluguel: Building2,
   Outro: Circle,
 };
@@ -135,10 +135,10 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
   const conclusaoEventos = gerarConclusaoEventos(eventos, totalRecebidoCentavos);
 
   return (
-    <Card>
+    <Card data-chat-highlight="eventos-financeiros">
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Zap className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Zap className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Eventos Financeiros
           <InfoTooltip conteudo={GLOSSARIO_EVENTO_FINANCEIRO.explicacao} />
         </CardTitle>
@@ -153,84 +153,84 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
           <p className="text-muted-foreground text-sm">Nenhum evento financeiro neste mes.</p>
         ) : (
           <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <CabecalhoOrdenavel
-                  coluna="tipo"
-                  colunaAtiva={colunaOrdenacao}
-                  direcao={direcaoOrdenacao}
-                  onClick={alternarOrdenacao}
-                >
-                  Tipo
-                </CabecalhoOrdenavel>
-                <CabecalhoOrdenavel
-                  coluna="ativo"
-                  colunaAtiva={colunaOrdenacao}
-                  direcao={direcaoOrdenacao}
-                  onClick={alternarOrdenacao}
-                >
-                  Ativo
-                </CabecalhoOrdenavel>
-                <CabecalhoOrdenavel
-                  coluna="data"
-                  colunaAtiva={colunaOrdenacao}
-                  direcao={direcaoOrdenacao}
-                  onClick={alternarOrdenacao}
-                  className="hidden sm:table-cell"
-                >
-                  Data
-                </CabecalhoOrdenavel>
-                <CabecalhoOrdenavel
-                  coluna="valor"
-                  colunaAtiva={colunaOrdenacao}
-                  direcao={direcaoOrdenacao}
-                  onClick={alternarOrdenacao}
-                  className="text-right"
-                >
-                  Valor
-                </CabecalhoOrdenavel>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {itensOrdenados.map((evento, indice) => (
-                <TableRow key={`${evento.codigoAtivo ?? evento.nomeAtivo}-${indice}`}>
-                  <TableCell className="text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      {(() => {
-                        const IconComponent = ICONES_TIPO_EVENTO[evento.tipoEvento];
-                        if (IconComponent) {
-                          return <IconComponent className="h-3.5 w-3.5" aria-hidden="true" />;
-                        }
-                        return null;
-                      })()}
-                      {evento.tipoEvento}
-                      {GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento] != null && (
-                        <InfoTooltip
-                          conteudo={GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento]!.explicacao}
-                          tamanhoIcone="h-3 w-3"
-                        />
-                      )}
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    <Link
-                      href={`/desempenho?ticker=${encodeURIComponent(evento.codigoAtivo ?? evento.nomeAtivo)}`}
-                      className="hover:text-primary underline-offset-4 hover:underline"
-                    >
-                      {evento.codigoAtivo ?? evento.nomeAtivo}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground hidden sm:table-cell">
-                    {evento.dataEvento ? formatarDataBrasileira(evento.dataEvento) : "—"}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {formatarMoeda(evento.valor.valorEmCentavos)}
-                  </TableCell>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <CabecalhoOrdenavel
+                    coluna="tipo"
+                    colunaAtiva={colunaOrdenacao}
+                    direcao={direcaoOrdenacao}
+                    onClick={alternarOrdenacao}
+                  >
+                    Tipo
+                  </CabecalhoOrdenavel>
+                  <CabecalhoOrdenavel
+                    coluna="ativo"
+                    colunaAtiva={colunaOrdenacao}
+                    direcao={direcaoOrdenacao}
+                    onClick={alternarOrdenacao}
+                  >
+                    Ativo
+                  </CabecalhoOrdenavel>
+                  <CabecalhoOrdenavel
+                    coluna="data"
+                    colunaAtiva={colunaOrdenacao}
+                    direcao={direcaoOrdenacao}
+                    onClick={alternarOrdenacao}
+                    className="hidden sm:table-cell"
+                  >
+                    Data
+                  </CabecalhoOrdenavel>
+                  <CabecalhoOrdenavel
+                    coluna="valor"
+                    colunaAtiva={colunaOrdenacao}
+                    direcao={direcaoOrdenacao}
+                    onClick={alternarOrdenacao}
+                    className="text-right"
+                  >
+                    Valor
+                  </CabecalhoOrdenavel>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {itensOrdenados.map((evento, indice) => (
+                  <TableRow key={`${evento.codigoAtivo ?? evento.nomeAtivo}-${indice}`}>
+                    <TableCell className="text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        {(() => {
+                          const IconComponent = ICONES_TIPO_EVENTO[evento.tipoEvento];
+                          if (IconComponent) {
+                            return <IconComponent className="h-3.5 w-3.5" aria-hidden="true" />;
+                          }
+                          return null;
+                        })()}
+                        {evento.tipoEvento}
+                        {GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento] != null && (
+                          <InfoTooltip
+                            conteudo={GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento]!.explicacao}
+                            tamanhoIcone="h-3 w-3"
+                          />
+                        )}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      <Link
+                        href={`/desempenho?ticker=${encodeURIComponent(evento.codigoAtivo ?? evento.nomeAtivo)}`}
+                        className="hover:text-primary underline-offset-4 hover:underline"
+                      >
+                        {evento.codigoAtivo ?? evento.nomeAtivo}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground hidden sm:table-cell">
+                      {evento.dataEvento ? formatarDataBrasileira(evento.dataEvento) : "—"}
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {formatarMoeda(evento.valor.valorEmCentavos)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
         <TakeawayBox conclusoes={conclusaoEventos} />

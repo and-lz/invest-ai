@@ -21,8 +21,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
   const [mostrarCampoSenha, setMostrarCampoSenha] = useState(false);
   const [mostrarInputSenha, setMostrarInputSenha] = useState(false);
   const inputArquivoRef = useRef<HTMLInputElement>(null);
-  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando } =
-    useUploadReport();
+  const { fazerUpload, resetar, statusUpload, erroUpload, estaProcessando } = useUploadReport();
 
   const validarArquivo = useCallback((arquivo: File): boolean => {
     if (!arquivo.name.toLowerCase().endsWith(".pdf")) {

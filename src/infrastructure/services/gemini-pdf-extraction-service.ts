@@ -67,9 +67,7 @@ export class GeminiPdfExtractionService implements ExtractionService {
     try {
       return JSON.parse(texto);
     } catch {
-      throw new PdfParsingError(
-        `Resposta nao e JSON valido: ${texto.substring(0, 200)}`,
-      );
+      throw new PdfParsingError(`Resposta nao e JSON valido: ${texto.substring(0, 200)}`);
     }
   }
 
@@ -84,8 +82,9 @@ export class GeminiPdfExtractionService implements ExtractionService {
     prompt += "\n```\n\n";
 
     prompt += "⚠️  REGRAS CRÍTICAS DE FORMATAÇÃO:\n";
-    prompt += '- Valores monetários DEVEM ser objetos: { "valorEmCentavos": number, "moeda": "BRL" }\n';
-    prompt += "- Percentuais DEVEM ser objetos: { \"valor\": number }\n";
+    prompt +=
+      '- Valores monetários DEVEM ser objetos: { "valorEmCentavos": number, "moeda": "BRL" }\n';
+    prompt += '- Percentuais DEVEM ser objetos: { "valor": number }\n';
     prompt += "- Datas no formato YYYY-MM-DD\n";
     prompt += "- Mês de referência no formato YYYY-MM\n";
     prompt += "- NÃO retorne valores como primitivos (números/strings simples)\n";
@@ -244,7 +243,8 @@ export class GeminiPdfExtractionService implements ExtractionService {
     prompt += "⚠️  ENUMS VÁLIDOS (use EXATAMENTE estes valores):\n\n";
 
     prompt += "Categorias de Alocação (nomeCategoria):\n";
-    prompt += "  Liquidez, Fundos Listados, Renda Variavel, Global, Outros, Alternativos, Pos-fixado, Inflacao, Multimercado\n\n";
+    prompt +=
+      "  Liquidez, Fundos Listados, Renda Variavel, Global, Outros, Alternativos, Pos-fixado, Inflacao, Multimercado\n\n";
 
     prompt += "Tipos de Evento Financeiro (tipoEvento):\n";
     prompt += "  Dividendo, JCP, Rendimento, Amortizacao, Aluguel, Outro\n\n";

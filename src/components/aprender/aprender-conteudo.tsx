@@ -2,7 +2,16 @@
 
 import { useEffect } from "react";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
-import { BookOpen, DollarSign, TrendingUp, Building2, BarChart3, Target, Receipt, PiggyBank } from "lucide-react";
+import {
+  BookOpen,
+  DollarSign,
+  TrendingUp,
+  Building2,
+  BarChart3,
+  Target,
+  Receipt,
+  PiggyBank,
+} from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { CardCategoria } from "@/components/aprender/card-categoria";
 import { INFORMACOES_CATEGORIAS } from "@/schemas/artigo-educacional.schema";
@@ -53,14 +62,16 @@ export function AprenderConteudo() {
         <div className="flex items-center gap-2">
           <Target className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           <span className="text-sm">
-            <strong className="font-semibold">{ESTATISTICAS_ARTIGOS.totalCategorias}</strong> categorias
+            <strong className="font-semibold">{ESTATISTICAS_ARTIGOS.totalCategorias}</strong>{" "}
+            categorias
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           <BarChart3 className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           <span className="text-sm">
-            Tempo total: <strong className="font-semibold">{ESTATISTICAS_ARTIGOS.tempoLeituraTotal}</strong> min
+            Tempo total:{" "}
+            <strong className="font-semibold">{ESTATISTICAS_ARTIGOS.tempoLeituraTotal}</strong> min
           </span>
         </div>
       </div>

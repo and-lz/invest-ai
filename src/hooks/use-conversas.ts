@@ -20,13 +20,10 @@ interface ConversasApiResponse {
  * Retorna apenas metadata (sem mensagens completas) para performance.
  */
 export function useConversas() {
-  const { data, error, isLoading, mutate } = useSWR<ConversasApiResponse>(
-    "/api/conversations",
-    {
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<ConversasApiResponse>("/api/conversations", {
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+  });
 
   const conversas = useMemo(() => data?.conversas ?? [], [data?.conversas]);
 

@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import type { MensagemChat, MensagemParaServidor } from "@/schemas/chat.schema";
+import { destacarElemento } from "@/lib/chat-highlight";
 
 /** Envia apenas as ultimas N mensagens para a API, controlando uso de tokens */
 const LIMITE_MENSAGENS_PARA_API = 20;
@@ -42,6 +43,25 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
     };
   }, []);
 
+  // Processar marcadores de highlighting e retornar texto limpo
+  const processarHighlights = useCallback((texto: string): string => {
+    const regex = /\[HIGHLIGHT:([a-z-]+)\]/g;
+    let match;
+
+    while ((match = regex.exec(texto)) !== null) {
+      const identificador = match[1];
+      // Aplicar highlight (nao-bloqueante, com delay de 100ms)
+      setTimeout(() => {
+        if (identificador) {
+          destacarElemento(identificador);
+        }
+      }, 100);
+    }
+
+    // Remover marcadores do texto exibido
+    return texto.replace(regex, "");
+  }, []);
+
   // Auto-save debounced (declarado ANTES de enviarMensagem para evitar erro de ordem)
   const salvarConversaAutomaticamente = useCallback(
     async (mensagensAtualizadas: MensagemChat[]) => {
@@ -51,8 +71,7 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
       const primeiraMensagemUsuario = mensagensAtualizadas.find(
         (mensagem) => mensagem.papel === "usuario",
       );
-      const titulo =
-        primeiraMensagemUsuario?.conteudo.slice(0, 50) ?? "Nova conversa";
+      const titulo = primeiraMensagemUsuario?.conteudo.slice(0, 50) ?? "Nova conversa";
 
       try {
         if (!conversaAtualId) {
@@ -113,22 +132,15 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
         criadaEm: new Date().toISOString(),
       };
 
-      setMensagens((anteriores) => [
-        ...anteriores,
-        mensagemUsuario,
-        mensagemAssistentePlaceholder,
-      ]);
+      setMensagens((anteriores) => [...anteriores, mensagemUsuario, mensagemAssistentePlaceholder]);
 
       // Montar mensagens para a API (ultimas N)
       const todasMensagens = [...mensagens, mensagemUsuario];
-      const mensagensRecentes = todasMensagens.slice(
-        -LIMITE_MENSAGENS_PARA_API,
-      );
-      const mensagensParaServidor: MensagemParaServidor[] =
-        mensagensRecentes.map((mensagem) => ({
-          papel: mensagem.papel,
-          conteudo: mensagem.conteudo,
-        }));
+      const mensagensRecentes = todasMensagens.slice(-LIMITE_MENSAGENS_PARA_API);
+      const mensagensParaServidor: MensagemParaServidor[] = mensagensRecentes.map((mensagem) => ({
+        papel: mensagem.papel,
+        conteudo: mensagem.conteudo,
+      }));
 
       const controladorAbort = new AbortController();
       controladorAbortRef.current = controladorAbort;
@@ -146,12 +158,8 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
         });
 
         if (!resposta.ok) {
-          const corpoErro = await resposta
-            .json()
-            .catch(() => ({ erro: "Erro desconhecido" }));
-          throw new Error(
-            (corpoErro as { erro?: string }).erro ?? `Erro ${resposta.status}`,
-          );
+          const corpoErro = await resposta.json().catch(() => ({ erro: "Erro desconhecido" }));
+          throw new Error((corpoErro as { erro?: string }).erro ?? `Erro ${resposta.status}`);
         }
 
         const leitor = resposta.body!.getReader();
@@ -164,12 +172,14 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
 
           textoAcumulado += decodificadorTexto.decode(value, { stream: true });
 
+          // Processar highlights e remover marcadores
+          const textoLimpo = processarHighlights(textoAcumulado);
+
           // Atualizar mensagem do assistente progressivamente
-          const textoAtual = textoAcumulado;
           setMensagens((anteriores) =>
             anteriores.map((mensagem) =>
               mensagem.identificador === identificadorAssistente
-                ? { ...mensagem, conteudo: textoAtual }
+                ? { ...mensagem, conteudo: textoLimpo }
                 : mensagem,
             ),
           );
@@ -181,10 +191,12 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
         }
 
         timeoutAutoSaveRef.current = setTimeout(() => {
+          // Processar highlights uma última vez para garantir texto limpo
+          const textoFinalLimpo = processarHighlights(textoAcumulado);
           const mensagensFinais = [
             ...mensagens,
             mensagemUsuario,
-            { ...mensagemAssistentePlaceholder, conteudo: textoAcumulado },
+            { ...mensagemAssistentePlaceholder, conteudo: textoFinalLimpo },
           ];
           void salvarConversaAutomaticamente(mensagensFinais);
         }, DEBOUNCE_AUTO_SAVE_MS);
@@ -193,17 +205,13 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
           // Usuario cancelou - manter resposta parcial
           return;
         }
-        const mensagemErro =
-          erroCatch instanceof Error
-            ? erroCatch.message
-            : "Erro inesperado";
+        const mensagemErro = erroCatch instanceof Error ? erroCatch.message : "Erro inesperado";
         setErro(mensagemErro);
         // Remover placeholder vazio em caso de erro
         setMensagens((anteriores) =>
           anteriores.filter(
             (mensagem) =>
-              mensagem.identificador !== identificadorAssistente ||
-              mensagem.conteudo.length > 0,
+              mensagem.identificador !== identificadorAssistente || mensagem.conteudo.length > 0,
           ),
         );
       } finally {
@@ -217,13 +225,9 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
       dadosContexto,
       identificadorPagina,
       salvarConversaAutomaticamente,
+      processarHighlights,
     ],
   );
-
-  const limparHistorico = useCallback(() => {
-    setMensagens([]);
-    setErro(null);
-  }, []);
 
   const pararTransmissao = useCallback(() => {
     controladorAbortRef.current?.abort();
@@ -262,7 +266,7 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
     estaTransmitindo: estaTransmitindo || estaCarregando,
     erro,
     enviarMensagem,
-    limparHistorico: criarNovaConversa,
+    limparHistorico: criarNovaConversa, // alias para compatibilidade
     pararTransmissao,
     conversaAtualId,
     criarNovaConversa,

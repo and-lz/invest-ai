@@ -21,10 +21,7 @@ export interface ParteConteudoImagem {
   readonly mimeType: string; // e.g. "image/png"
 }
 
-export type ParteConteudo =
-  | ParteConteudoTexto
-  | ParteConteudoPdf
-  | ParteConteudoImagem;
+export type ParteConteudo = ParteConteudoTexto | ParteConteudoPdf | ParteConteudoImagem;
 
 // ---- Mensagens ----
 
@@ -57,7 +54,5 @@ export interface ProvedorAi {
   gerar(configuracao: ConfiguracaoGeracao): Promise<RespostaAi>;
 
   /** Geracao com streaming (chat) - produz chunks de texto */
-  transmitir(
-    configuracao: ConfiguracaoGeracao,
-  ): AsyncGenerator<string, void, unknown>;
+  transmitir(configuracao: ConfiguracaoGeracao): AsyncGenerator<string, void, unknown>;
 }

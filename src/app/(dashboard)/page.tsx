@@ -24,27 +24,38 @@ import { Button } from "@/components/ui/button";
 
 // Lazy-load chart components que usam Recharts (~150KB)
 const WealthEvolutionChart = dynamic(
-  () => import("@/components/dashboard/wealth-evolution-chart").then((mod) => mod.WealthEvolutionChart),
+  () =>
+    import("@/components/dashboard/wealth-evolution-chart").then((mod) => mod.WealthEvolutionChart),
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
 );
 
 const AssetAllocationChart = dynamic(
-  () => import("@/components/dashboard/asset-allocation-chart").then((mod) => mod.AssetAllocationChart),
+  () =>
+    import("@/components/dashboard/asset-allocation-chart").then((mod) => mod.AssetAllocationChart),
   { ssr: false, loading: () => <Skeleton className="h-64" /> },
 );
 
 const BenchmarkComparisonChart = dynamic(
-  () => import("@/components/dashboard/benchmark-comparison-chart").then((mod) => mod.BenchmarkComparisonChart),
+  () =>
+    import("@/components/dashboard/benchmark-comparison-chart").then(
+      (mod) => mod.BenchmarkComparisonChart,
+    ),
   { ssr: false, loading: () => <Skeleton className="h-64" /> },
 );
 
 const AllocationEvolutionChart = dynamic(
-  () => import("@/components/dashboard/allocation-evolution-chart").then((mod) => mod.AllocationEvolutionChart),
+  () =>
+    import("@/components/dashboard/allocation-evolution-chart").then(
+      (mod) => mod.AllocationEvolutionChart,
+    ),
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
 );
 
 const CategoryPerformanceChart = dynamic(
-  () => import("@/components/dashboard/category-performance-chart").then((mod) => mod.CategoryPerformanceChart),
+  () =>
+    import("@/components/dashboard/category-performance-chart").then(
+      (mod) => mod.CategoryPerformanceChart,
+    ),
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
 );
 
@@ -97,10 +108,7 @@ export default function DashboardPage() {
   // Registrar contexto da pagina para o chat
   const { definirContexto } = useContextoPaginaChat();
   const contextoSerializado = useMemo(
-    () =>
-      dadosDashboard
-        ? serializarContextoDashboard(dadosDashboard)
-        : undefined,
+    () => (dadosDashboard ? serializarContextoDashboard(dadosDashboard) : undefined),
     [dadosDashboard],
   );
   useEffect(() => {

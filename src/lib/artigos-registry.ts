@@ -7,14 +7,30 @@ import type { ArtigoEducacional, CategoriaArtigo } from "@/schemas/artigo-educac
 
 // ---- Imports dos Artigos ----
 
-import PrimeirosPassos, { metadata as PrimeirosPassosMetadata } from "@/components/aprender/artigos/fundamentos/primeiros-passos";
-import TesouroDireto, { metadata as TesouroDiretoMetadata } from "@/components/aprender/artigos/renda-fixa/tesouro-direto";
-import AcoesBasico, { metadata as AcoesBasicoMetadata } from "@/components/aprender/artigos/renda-variavel/acoes-basico";
-import FundosImobiliarios, { metadata as FundosImobiliariosMetadata } from "@/components/aprender/artigos/fundos/fundos-imobiliarios";
-import LerRelatorio, { metadata as LerRelatorioMetadata } from "@/components/aprender/artigos/analise-carteira/ler-relatorio";
-import BuyAndHold, { metadata as BuyAndHoldMetadata } from "@/components/aprender/artigos/estrategias/buy-and-hold";
-import IRRendaFixa, { metadata as IRRendaFixaMetadata } from "@/components/aprender/artigos/impostos/ir-renda-fixa";
-import ReservaEmergencia, { metadata as ReservaEmergenciaMetadata } from "@/components/aprender/artigos/planejamento/reserva-emergencia";
+import PrimeirosPassos, {
+  metadata as PrimeirosPassosMetadata,
+} from "@/components/aprender/artigos/fundamentos/primeiros-passos";
+import TesouroDireto, {
+  metadata as TesouroDiretoMetadata,
+} from "@/components/aprender/artigos/renda-fixa/tesouro-direto";
+import AcoesBasico, {
+  metadata as AcoesBasicoMetadata,
+} from "@/components/aprender/artigos/renda-variavel/acoes-basico";
+import FundosImobiliarios, {
+  metadata as FundosImobiliariosMetadata,
+} from "@/components/aprender/artigos/fundos/fundos-imobiliarios";
+import LerRelatorio, {
+  metadata as LerRelatorioMetadata,
+} from "@/components/aprender/artigos/analise-carteira/ler-relatorio";
+import BuyAndHold, {
+  metadata as BuyAndHoldMetadata,
+} from "@/components/aprender/artigos/estrategias/buy-and-hold";
+import IRRendaFixa, {
+  metadata as IRRendaFixaMetadata,
+} from "@/components/aprender/artigos/impostos/ir-renda-fixa";
+import ReservaEmergencia, {
+  metadata as ReservaEmergenciaMetadata,
+} from "@/components/aprender/artigos/planejamento/reserva-emergencia";
 
 // ---- Registry de Artigos ----
 
@@ -193,7 +209,9 @@ export function validarArtigos(): {
   // Verificar se todos os artigos têm Component válido
   TODOS_ARTIGOS.forEach((artigo) => {
     if (typeof artigo.Component !== "function") {
-      erros.push(`Artigo ${artigo.metadata.categoria}/${artigo.metadata.slug} não tem Component válido`);
+      erros.push(
+        `Artigo ${artigo.metadata.categoria}/${artigo.metadata.slug} não tem Component válido`,
+      );
     }
   });
 

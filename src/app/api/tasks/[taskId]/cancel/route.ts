@@ -3,10 +3,7 @@ import { cancelarTarefa, lerTarefa, descreverTarefa } from "@/lib/tarefa-backgro
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 import { adicionarNotificacao } from "@/lib/notificacao";
 
-export async function POST(
-  _request: Request,
-  { params }: { params: Promise<{ taskId: string }> },
-) {
+export async function POST(_request: Request, { params }: { params: Promise<{ taskId: string }> }) {
   const { taskId } = await params;
   const tarefa = await lerTarefa(taskId);
 
@@ -24,10 +21,7 @@ export async function POST(
   const foiCancelada = await cancelarTarefa(taskId, "usuario");
 
   if (!foiCancelada) {
-    return NextResponse.json(
-      { erro: "Nao foi possivel cancelar a tarefa" },
-      { status: 500 },
-    );
+    return NextResponse.json({ erro: "Nao foi possivel cancelar a tarefa" }, { status: 500 });
   }
 
   // Criar notificação de cancelamento (server-side)

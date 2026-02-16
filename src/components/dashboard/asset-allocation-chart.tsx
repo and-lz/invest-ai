@@ -88,10 +88,10 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
   );
 
   return (
-    <Card>
+    <Card data-chat-highlight="alocacao-ativos">
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <PieChartIcon className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <PieChartIcon className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Alocacao por Estrategia
           <InfoTooltip conteudo={GLOSSARIO_ALOCACAO_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
@@ -129,9 +129,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
                   style={{ backgroundColor: item.fill }}
                 />
                 <span className="text-muted-foreground flex items-center gap-1">
-                  {IconeEstrategia && (
-                    <IconeEstrategia className="h-3 w-3" aria-hidden="true" />
-                  )}
+                  {IconeEstrategia && <IconeEstrategia className="h-3 w-3" aria-hidden="true" />}
                   {item.nome}
                   {explicacaoEstrategia && (
                     <InfoTooltip

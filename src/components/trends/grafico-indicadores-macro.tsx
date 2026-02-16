@@ -40,7 +40,20 @@ const GLOSSARIOS: Record<number, string> = {
 
 function formatarMesAbreviado(dataIso: string): string {
   const [ano, mes] = dataIso.split("-");
-  const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const meses = [
+    "Jan",
+    "Fev",
+    "Mar",
+    "Abr",
+    "Mai",
+    "Jun",
+    "Jul",
+    "Ago",
+    "Set",
+    "Out",
+    "Nov",
+    "Dez",
+  ];
   const indice = parseInt(mes ?? "0", 10) - 1;
   return `${meses[indice] ?? mes}/${ano?.slice(2)}`;
 }
@@ -86,9 +99,7 @@ function gerarConclusoesMacro(indicadores: IndicadorMacro[]): Conclusao[] {
 // Indicadores com historico mensal (excluir USD-BRL e CDI que sao pontuais)
 const INDICADORES_COM_GRAFICO = [432, 433, 189];
 
-export function GraficoIndicadoresMacro({
-  indicadoresMacro,
-}: GraficoIndicadoresMacroProps) {
+export function GraficoIndicadoresMacro({ indicadoresMacro }: GraficoIndicadoresMacroProps) {
   const indicadoresParaGrafico = indicadoresMacro.filter((indicador) =>
     INDICADORES_COM_GRAFICO.includes(indicador.codigo),
   );
@@ -117,12 +128,10 @@ export function GraficoIndicadoresMacro({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <TrendingUp className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Indicadores Macroeconômicos
         </CardTitle>
-        <CardDescription>
-          SELIC, IPCA e IGP-M dos últimos 12 meses
-        </CardDescription>
+        <CardDescription>SELIC, IPCA e IGP-M dos últimos 12 meses</CardDescription>
       </CardHeader>
       <CardContent>
         {/* Cards com valores atuais */}
@@ -158,7 +167,11 @@ export function GraficoIndicadoresMacro({
                 <div
                   className={cn(
                     "flex items-center gap-0.5 text-xs font-medium",
-                    tendencia > 0 ? "text-destructive" : tendencia < 0 ? "text-success" : "text-muted-foreground",
+                    tendencia > 0
+                      ? "text-destructive"
+                      : tendencia < 0
+                        ? "text-success"
+                        : "text-muted-foreground",
                   )}
                 >
                   {tendencia > 0 ? (
@@ -178,18 +191,8 @@ export function GraficoIndicadoresMacro({
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={dadosGrafico}>
               <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-              <XAxis
-                dataKey="data"
-                tick={{ fontSize: 11 }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 11 }}
-                tickLine={false}
-                axisLine={false}
-                width={45}
-              />
+              <XAxis dataKey="data" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={45} />
               <Tooltip
                 contentStyle={{
                   borderRadius: "8px",

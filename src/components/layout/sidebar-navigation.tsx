@@ -3,13 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  FileText,
-  Lightbulb,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { LayoutDashboard, FileText, Lightbulb, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { AlternarTema } from "@/components/layout/alternar-tema";
@@ -99,12 +93,7 @@ export function SidebarNavigation() {
           );
         })}
       </nav>
-      <div
-        className={cn(
-          "border-t p-4",
-          sidebarCompactada && "flex justify-center",
-        )}
-      >
+      <div className={cn("border-t p-4", sidebarCompactada && "flex justify-center")}>
         <UserProfileMenu />
       </div>
     </aside>

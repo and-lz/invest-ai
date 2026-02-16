@@ -13,9 +13,7 @@ export class FilesystemConversaRepository implements ConversaRepository {
   constructor(private readonly fileManager: FileManager) {}
 
   async salvarConversa(criarConversa: CriarConversa): Promise<Conversa> {
-    const conversasExistentes = await this.listarConversasDoUsuario(
-      criarConversa.usuarioId,
-    );
+    const conversasExistentes = await this.listarConversasDoUsuario(criarConversa.usuarioId);
 
     const novaConversa: Conversa = {
       ...criarConversa,
@@ -53,18 +51,14 @@ export class FilesystemConversaRepository implements ConversaRepository {
       const resultado = IndiceConversasSchema.safeParse(dadosBrutos);
 
       if (!resultado.success) {
-        console.warn(
-          `[Conversas] JSON invalido em ${caminhoRelativo}`,
-          resultado.error,
-        );
+        console.warn(`[Conversas] JSON invalido em ${caminhoRelativo}`, resultado.error);
         return [];
       }
 
       // Ordena por atualizadaEm DESC (mais recente primeiro)
       return resultado.data.conversas.sort(
         (conversa1, conversa2) =>
-          new Date(conversa2.atualizadaEm).getTime() -
-          new Date(conversa1.atualizadaEm).getTime(),
+          new Date(conversa2.atualizadaEm).getTime() - new Date(conversa1.atualizadaEm).getTime(),
       );
     } catch (erro) {
       console.error(`[Conversas] Erro ao ler indice de ${usuarioId}:`, erro);

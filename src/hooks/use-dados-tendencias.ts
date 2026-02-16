@@ -6,12 +6,9 @@ interface TendenciasApiResponse {
 }
 
 export function useDadosTendencias() {
-  const { data, error, isLoading, mutate } = useSWR<TendenciasApiResponse>(
-    "/api/trends",
-    {
-      dedupingInterval: 60_000,
-    },
-  );
+  const { data, error, isLoading, mutate } = useSWR<TendenciasApiResponse>("/api/trends", {
+    dedupingInterval: 60_000,
+  });
 
   return {
     dadosTendencias: data?.tendencias ?? null,

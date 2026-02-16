@@ -138,10 +138,10 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
     useOrdenacaoTabela<PosicaoAtivo, ColunaPerformers>(ativos, obterValor);
 
   return (
-    <Card>
+    <Card data-chat-highlight="top-performers">
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Icone className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Icone className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           {titulo}
           <InfoTooltip
             conteudo={
@@ -159,104 +159,104 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <CabecalhoOrdenavel
-                coluna="ativo"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-              >
-                <span className="flex items-center gap-1">
-                  Ativo
-                  <InfoTooltip conteudo={GLOSSARIO_ATIVO.explicacao} tamanhoIcone="h-3 w-3" />
-                </span>
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="estrategia"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="hidden sm:table-cell"
-              >
-                Estrategia
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="saldo"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="text-right"
-              >
-                <span className="flex items-center gap-1">
-                  Saldo
-                  <InfoTooltip conteudo={GLOSSARIO_SALDO.explicacao} tamanhoIcone="h-3 w-3" />
-                </span>
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="rentabilidadeMes"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="text-right"
-              >
-                <span className="flex items-center gap-1">
-                  Rent. Mes
-                  <InfoTooltip
-                    conteudo={GLOSSARIO_RENTABILIDADE_MES.explicacao}
-                    tamanhoIcone="h-3 w-3"
-                  />
-                </span>
-              </CabecalhoOrdenavel>
-              <CabecalhoOrdenavel
-                coluna="participacao"
-                colunaAtiva={colunaOrdenacao}
-                direcao={direcaoOrdenacao}
-                onClick={alternarOrdenacao}
-                className="hidden text-right sm:table-cell"
-              >
-                <span className="flex items-center gap-1">
-                  Part.
-                  <InfoTooltip
-                    conteudo={GLOSSARIO_PARTICIPACAO.explicacao}
-                    tamanhoIcone="h-3 w-3"
-                  />
-                </span>
-              </CabecalhoOrdenavel>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {itensOrdenados.map((ativo) => (
-              <TableRow key={ativo.nomeAtivo}>
-                <TableCell className="font-medium">
-                  <Link
-                    href={`/desempenho?ticker=${encodeURIComponent(ativo.codigoAtivo ?? ativo.nomeAtivo)}`}
-                    className="hover:text-primary underline-offset-4 hover:underline"
-                  >
-                    {ativo.codigoAtivo ?? ativo.nomeAtivo}
-                  </Link>
-                </TableCell>
-                <TableCell className="hidden sm:table-cell">
-                  <Badge variant="outline" className="text-xs">
-                    {ativo.estrategia}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatarMoeda(ativo.saldoBruto.valorEmCentavos)}
-                </TableCell>
-                <TableCell
-                  className={`text-right font-medium ${ativo.rentabilidadeMes.valor >= 0 ? "text-success" : "text-destructive"}`}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <CabecalhoOrdenavel
+                  coluna="ativo"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
                 >
-                  {formatarPercentualSimples(ativo.rentabilidadeMes.valor)}
-                </TableCell>
-                <TableCell className="text-muted-foreground hidden text-right sm:table-cell">
-                  {formatarPercentualSimples(ativo.participacaoNaCarteira.valor)}
-                </TableCell>
+                  <span className="flex items-center gap-1">
+                    Ativo
+                    <InfoTooltip conteudo={GLOSSARIO_ATIVO.explicacao} tamanhoIcone="h-3 w-3" />
+                  </span>
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="estrategia"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="hidden sm:table-cell"
+                >
+                  Estrategia
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="saldo"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="text-right"
+                >
+                  <span className="flex items-center gap-1">
+                    Saldo
+                    <InfoTooltip conteudo={GLOSSARIO_SALDO.explicacao} tamanhoIcone="h-3 w-3" />
+                  </span>
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="rentabilidadeMes"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="text-right"
+                >
+                  <span className="flex items-center gap-1">
+                    Rent. Mes
+                    <InfoTooltip
+                      conteudo={GLOSSARIO_RENTABILIDADE_MES.explicacao}
+                      tamanhoIcone="h-3 w-3"
+                    />
+                  </span>
+                </CabecalhoOrdenavel>
+                <CabecalhoOrdenavel
+                  coluna="participacao"
+                  colunaAtiva={colunaOrdenacao}
+                  direcao={direcaoOrdenacao}
+                  onClick={alternarOrdenacao}
+                  className="hidden text-right sm:table-cell"
+                >
+                  <span className="flex items-center gap-1">
+                    Part.
+                    <InfoTooltip
+                      conteudo={GLOSSARIO_PARTICIPACAO.explicacao}
+                      tamanhoIcone="h-3 w-3"
+                    />
+                  </span>
+                </CabecalhoOrdenavel>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {itensOrdenados.map((ativo) => (
+                <TableRow key={ativo.nomeAtivo}>
+                  <TableCell className="font-medium">
+                    <Link
+                      href={`/desempenho?ticker=${encodeURIComponent(ativo.codigoAtivo ?? ativo.nomeAtivo)}`}
+                      className="hover:text-primary underline-offset-4 hover:underline"
+                    >
+                      {ativo.codigoAtivo ?? ativo.nomeAtivo}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    <Badge variant="outline" className="text-xs">
+                      {ativo.estrategia}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {formatarMoeda(ativo.saldoBruto.valorEmCentavos)}
+                  </TableCell>
+                  <TableCell
+                    className={`text-right font-medium ${ativo.rentabilidadeMes.valor >= 0 ? "text-success" : "text-destructive"}`}
+                  >
+                    {formatarPercentualSimples(ativo.rentabilidadeMes.valor)}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground hidden text-right sm:table-cell">
+                    {formatarPercentualSimples(ativo.participacaoNaCarteira.valor)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
         <TakeawayBox conclusoes={conclusoesPerformer} />
       </CardContent>

@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
+import { tipografia, icone, layout, dialog as dialogDs } from "@/lib/design-system";
 import type { Notificacao } from "@/lib/notificacao";
 import { useEffect } from "react";
 
@@ -112,8 +113,7 @@ function MonitorTarefa({
         });
       } else if (tipoNotificacao === "timeout") {
         toast.error("Tarefa parece ter falhado", {
-          description:
-            mensagem ?? "O processamento excedeu o tempo limite. Tente novamente.",
+          description: mensagem ?? "O processamento excedeu o tempo limite. Tente novamente.",
         });
       }
 
@@ -143,8 +143,7 @@ function MonitorTarefa({
 
     // Timeout: se "processando" por mais de 5 minutos, considerar como erro
     if (estaProcessando && tarefa) {
-      const iniciadoHaMinutos =
-        (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
+      const iniciadoHaMinutos = (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
       if (iniciadoHaMinutos > TIMEOUT_MINUTOS) {
         setJaNotificou(true);
         notificarERemover("timeout");
@@ -212,10 +211,10 @@ function MonitorTarefa({
   return (
     <div className="group rounded-lg border p-4">
       <div className="flex items-start gap-3">
-        <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0 animate-spin" />
         <div className="flex-1 space-y-1">
-          <p className="text-sm font-medium leading-snug">{descricao}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className={cn(tipografia.rotulo, "leading-snug")}>{descricao}</p>
+          <p className={tipografia.auxiliar}>
             Iniciado{" "}
             {new Date(tarefa.iniciadoEm).toLocaleString("pt-BR", {
               day: "2-digit",
@@ -233,7 +232,7 @@ function MonitorTarefa({
           className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
           title="Cancelar tarefa"
         >
-          <XCircle className="h-4 w-4 text-muted-foreground" />
+          <XCircle className={cn(icone.botao, "text-muted-foreground")} />
         </Button>
       </div>
     </div>
@@ -258,11 +257,7 @@ interface ItemNotificacaoProps {
   onFecharDialog: () => void;
 }
 
-function ItemNotificacao({
-  notificacao,
-  onMarcarComoLida,
-  onFecharDialog,
-}: ItemNotificacaoProps) {
+function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: ItemNotificacaoProps) {
   const router = useRouter();
   const [retryEmAndamento, setRetryEmAndamento] = useState(false);
   const Icone = ICONES_TIPO[notificacao.tipo];
@@ -303,9 +298,7 @@ function ItemNotificacao({
     }
   }, [notificacao, onMarcarComoLida, onFecharDialog, router]);
 
-  const ehRetry = notificacao.acao?.url
-    ? ehAcaoDeRetry(notificacao.acao.url)
-    : false;
+  const ehRetry = notificacao.acao?.url ? ehAcaoDeRetry(notificacao.acao.url) : false;
 
   return (
     <div
@@ -317,13 +310,11 @@ function ItemNotificacao({
       <div className="flex items-start gap-3">
         <Icone className={cn("mt-0.5 h-5 w-5 shrink-0", corIcone)} />
         <div className="flex-1 space-y-1">
-          <p className="text-sm font-medium leading-snug">{notificacao.titulo}</p>
+          <p className={cn(tipografia.rotulo, "leading-snug")}>{notificacao.titulo}</p>
           {notificacao.descricao && (
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              {notificacao.descricao}
-            </p>
+            <p className={cn(tipografia.auxiliar, "leading-relaxed")}>{notificacao.descricao}</p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className={tipografia.auxiliar}>
             {new Date(notificacao.criadaEm).toLocaleString("pt-BR", {
               day: "2-digit",
               month: "short",
@@ -339,7 +330,7 @@ function ItemNotificacao({
             onClick={() => onMarcarComoLida(notificacao.identificador)}
             className="opacity-0 transition-opacity group-hover:opacity-100"
           >
-            <Check className="h-3 w-3 text-muted-foreground" />
+            <Check className="text-muted-foreground h-3 w-3" />
           </Button>
         )}
       </div>
@@ -349,7 +340,7 @@ function ItemNotificacao({
           size="sm"
           onClick={handleAcao}
           disabled={retryEmAndamento}
-          className="mt-3 w-full gap-1.5 text-xs text-muted-foreground"
+          className={cn(tipografia.auxiliar, "mt-3 w-full gap-1.5")}
         >
           {ehRetry && <RotateCcw className="h-3 w-3" />}
           {retryEmAndamento ? "Retentando..." : notificacao.acao.rotulo}
@@ -393,9 +384,7 @@ export function ActivityCenter() {
 
   const handleTarefaConcluida = useCallback((identificador: string) => {
     removerTarefaAtivaDoStorage(identificador);
-    setIdentificadoresTarefas((anteriores) =>
-      anteriores.filter((id) => id !== identificador),
-    );
+    setIdentificadoresTarefas((anteriores) => anteriores.filter((id) => id !== identificador));
   }, []);
 
   const abrir = useCallback(() => {
@@ -434,8 +423,10 @@ export function ActivityCenter() {
         {temAtividade && (
           <Badge
             className={cn(
-              "absolute -right-1 -top-1 flex h-5 min-w-5 items-center gap-0.5 px-1 text-xs leading-none",
-              temTarefasAtivas ? "bg-primary text-primary-foreground" : "bg-destructive text-destructive-foreground"
+              "absolute -top-1 -right-1 flex h-5 min-w-5 items-center gap-0.5 px-1 text-xs leading-none",
+              temTarefasAtivas
+                ? "bg-primary text-primary-foreground"
+                : "bg-destructive text-destructive-foreground",
             )}
           >
             {temTarefasAtivas && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
@@ -450,7 +441,10 @@ export function ActivityCenter() {
         ref={dialogRef}
         onClick={handleClickDialog}
         aria-label="Central de atividades"
-        className="flex h-full flex-col border-l bg-background p-0 shadow-lg backdrop:bg-background/80 backdrop:backdrop-blur-sm"
+        className={cn(
+          "bg-background flex h-full flex-col border-l p-0 shadow-lg",
+          dialogDs.backdrop,
+        )}
         style={{
           position: "fixed",
           top: 0,
@@ -464,18 +458,11 @@ export function ActivityCenter() {
         {/* Header */}
         <div className="flex items-center justify-between border-b p-6 pb-4">
           <div className="flex items-center gap-2">
-            <h2 className="font-heading text-xl font-semibold tracking-tight">
-              Atividades
-            </h2>
+            <h2 className={tipografia.h2}>Atividades</h2>
             <InfoTooltip conteudo="Central de atividades: acompanhe tarefas em andamento e histórico de notificações do sistema." />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={fechar}
-            className="text-muted-foreground"
-          >
-            <X className="h-4 w-4" />
+          <Button variant="ghost" size="icon" onClick={fechar} className="text-muted-foreground">
+            <X className={icone.botao} />
             <span className="sr-only">Fechar</span>
           </Button>
         </div>
@@ -488,11 +475,11 @@ export function ActivityCenter() {
               "relative flex-1 px-6 py-3 text-sm font-medium transition-colors",
               abaAtiva === "notificacoes"
                 ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             <div className="flex items-center justify-center gap-2">
-              <Bell className="h-4 w-4" />
+              <Bell className={icone.botao} />
               Notificações
               {contagemNaoVisualizadas > 0 && (
                 <Badge variant="destructive" className="h-5 min-w-5 px-1 text-xs">
@@ -501,7 +488,7 @@ export function ActivityCenter() {
               )}
             </div>
             {abaAtiva === "notificacoes" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+              <span className="bg-foreground absolute right-0 bottom-0 left-0 h-0.5" />
             )}
           </button>
           <button
@@ -510,20 +497,20 @@ export function ActivityCenter() {
               "relative flex-1 px-6 py-3 text-sm font-medium transition-colors",
               abaAtiva === "tarefas"
                 ? "text-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
             <div className="flex items-center justify-center gap-2">
-              <Loader2 className={cn("h-4 w-4", temTarefasAtivas && "animate-spin")} />
+              <Loader2 className={cn(icone.botao, temTarefasAtivas && "animate-spin")} />
               Tarefas
               {temTarefasAtivas && (
-                <Badge className="h-5 min-w-5 bg-primary px-1 text-xs text-primary-foreground">
+                <Badge className="bg-primary text-primary-foreground h-5 min-w-5 px-1 text-xs">
                   {identificadoresTarefas.length}
                 </Badge>
               )}
             </div>
             {abaAtiva === "tarefas" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
+              <span className="bg-foreground absolute right-0 bottom-0 left-0 h-0.5" />
             )}
           </button>
         </div>
@@ -533,7 +520,7 @@ export function ActivityCenter() {
           <>
             {/* Status e ações */}
             <div className="flex items-center justify-between border-b px-6 py-3">
-              <p className="text-xs text-muted-foreground">
+              <p className={tipografia.auxiliar}>
                 {contagemNaoVisualizadas > 0
                   ? `${contagemNaoVisualizadas} não lida${contagemNaoVisualizadas > 1 ? "s" : ""}`
                   : "Todas lidas"}
@@ -544,9 +531,9 @@ export function ActivityCenter() {
                     variant="ghost"
                     size="sm"
                     onClick={marcarTodasComoLidas}
-                    className="gap-1.5 text-xs text-muted-foreground"
+                    className={cn(tipografia.auxiliar, "gap-1.5")}
                   >
-                    <CheckCheck className="h-3.5 w-3.5" />
+                    <CheckCheck className={icone.micro} />
                     Ler todas
                   </Button>
                 )}
@@ -555,9 +542,9 @@ export function ActivityCenter() {
                     variant="ghost"
                     size="sm"
                     onClick={handleLimparTodas}
-                    className="gap-1.5 text-xs text-muted-foreground"
+                    className={cn(tipografia.auxiliar, "gap-1.5")}
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className={icone.micro} />
                     Limpar
                   </Button>
                 )}
@@ -567,16 +554,14 @@ export function ActivityCenter() {
             <div className="flex-1 overflow-y-auto">
               {estaCarregando && (
                 <div className="flex items-center justify-center p-6">
-                  <p className="text-sm text-muted-foreground">Carregando...</p>
+                  <p className="text-muted-foreground text-sm">Carregando...</p>
                 </div>
               )}
 
               {!estaCarregando && notificacoes.length === 0 && (
-                <div className="flex flex-col items-center justify-center gap-3 p-6">
-                  <Bell className="h-12 w-12 text-muted-foreground" />
-                  <p className="text-center text-sm text-muted-foreground">
-                    Nenhuma notificação
-                  </p>
+                <div className={layout.estadoVazio}>
+                  <Bell className={icone.estadoVazio} />
+                  <p className="text-muted-foreground text-center text-sm">Nenhuma notificação</p>
                 </div>
               )}
 
@@ -601,8 +586,8 @@ export function ActivityCenter() {
           <div className="flex-1 overflow-y-auto">
             {identificadoresTarefas.length === 0 && (
               <div className="flex flex-col items-center justify-center gap-3 p-6">
-                <Loader2 className="h-12 w-12 text-muted-foreground" />
-                <p className="text-center text-sm text-muted-foreground">
+                <Loader2 className={icone.estadoVazio} />
+                <p className="text-muted-foreground text-center text-sm">
                   Nenhuma tarefa em andamento
                 </p>
               </div>

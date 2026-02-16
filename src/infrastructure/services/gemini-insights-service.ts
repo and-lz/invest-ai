@@ -59,9 +59,7 @@ export class GeminiInsightsService implements InsightsService {
     };
   }
 
-  async gerarInsightsConsolidados(
-    todosRelatorios: RelatorioExtraido[],
-  ): Promise<InsightsResponse> {
+  async gerarInsightsConsolidados(todosRelatorios: RelatorioExtraido[]): Promise<InsightsResponse> {
     const prompt = this.construirPromptConsolidado(todosRelatorios);
 
     const resposta = await this.provedor.gerar({
@@ -97,9 +95,7 @@ export class GeminiInsightsService implements InsightsService {
     try {
       return JSON.parse(texto);
     } catch {
-      throw new AiApiError(
-        `Resposta nao e JSON valido: ${texto.substring(0, 200)}`,
-      );
+      throw new AiApiError(`Resposta nao e JSON valido: ${texto.substring(0, 200)}`);
     }
   }
 

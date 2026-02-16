@@ -14,6 +14,8 @@ import {
   ESTATISTICAS_GLOSSARIO,
   NOMES_CATEGORIAS,
 } from "@/lib/glossario-navegavel";
+import { icone, layout } from "@/lib/design-system";
+import { cn } from "@/lib/utils";
 
 export function GlossarioConteudo() {
   const [query, setQuery] = useState("");
@@ -37,20 +39,27 @@ export function GlossarioConteudo() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <BookMarked className="text-muted-foreground h-6 w-6" aria-hidden="true" />
-        <Header titulo="Glossário Financeiro" descricao="Todos os termos explicados de forma simples" />
+        <BookMarked
+          className={cn(icone.tituloPagina, "text-muted-foreground")}
+          aria-hidden="true"
+        />
+        <Header
+          titulo="Glossário Financeiro"
+          descricao="Todos os termos explicados de forma simples"
+        />
       </div>
 
       {/* Estatísticas */}
       <div className="bg-muted/50 flex items-center gap-2 rounded-lg px-6 py-3">
         <span className="text-sm">
-          <strong className="font-semibold">{ESTATISTICAS_GLOSSARIO.totalTermos}</strong> termos disponíveis
+          <strong className="font-semibold">{ESTATISTICAS_GLOSSARIO.totalTermos}</strong> termos
+          disponíveis
         </span>
       </div>
 
       {/* Busca */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
         <Input
           type="search"
           placeholder="Buscar por termo ou explicação..."
@@ -92,21 +101,21 @@ export function GlossarioConteudo() {
       {/* Grid de Termos */}
       {termosMostrados.length === 0 ? (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <BookMarked className="text-muted-foreground mb-4 h-12 w-12" aria-hidden="true" />
+          <CardContent className={cn(layout.estadoVazioCard, "justify-center")}>
+            <BookMarked className={icone.estadoVazio} aria-hidden="true" />
             <p className="text-muted-foreground text-center">
               Nenhum termo encontrado para &quot;{query}&quot;
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className={layout.gridConteudo}>
           {termosMostrados.map((termo) => (
             <Card key={termo.slug} id={termo.slug} className="scroll-mt-20">
               <CardHeader>
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle>{termo.termo}</CardTitle>
-                  <Badge variant="secondary" className="text-xs shrink-0">
+                  <Badge variant="secondary" className="shrink-0 text-xs">
                     {NOMES_CATEGORIAS[termo.categoria]}
                   </Badge>
                 </div>

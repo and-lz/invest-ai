@@ -9,9 +9,11 @@ import {
   BarChart3,
   CalendarDays,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { formatarDataBrasileira } from "@/lib/format-date";
+import { tipografia, icone, layout, corValor } from "@/lib/design-system";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
   GLOSSARIO_PATRIMONIO_TOTAL,
@@ -32,11 +34,14 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
   const variacaoPositiva = variacaoPatrimonialCentavos !== null && variacaoPatrimonialCentavos >= 0;
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className={layout.gridCards}>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="flex items-center gap-1 text-sm font-medium">
-            <DollarSign className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
+            <DollarSign
+              className={cn(icone.tituloCard, "text-muted-foreground")}
+              aria-hidden="true"
+            />
             Patrimonio Total
             <InfoTooltip conteudo={GLOSSARIO_PATRIMONIO_TOTAL.explicacao} />
           </CardTitle>
@@ -47,7 +52,10 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </div>
           {variacaoPatrimonialCentavos !== null && (
             <p
-              className={`text-xs ${variacaoPositiva ? "text-success" : "text-destructive"} flex items-center gap-1`}
+              className={cn(
+                "flex items-center gap-1 text-xs",
+                corValor(variacaoPatrimonialCentavos),
+              )}
             >
               {variacaoPositiva ? (
                 <TrendingUp className="h-3 w-3" />
@@ -66,8 +74,11 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="flex items-center gap-1 text-sm font-medium">
-            <BarChart3 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
+            <BarChart3
+              className={cn(icone.tituloCard, "text-muted-foreground")}
+              aria-hidden="true"
+            />
             Ganhos no Mes
             <InfoTooltip conteudo={GLOSSARIO_GANHOS_NO_MES.explicacao} />
           </CardTitle>
@@ -76,7 +87,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           <div className="text-2xl font-bold">
             {formatarMoeda(resumo.ganhosFinanceirosNoMes.valorEmCentavos)}
           </div>
-          <p className="text-muted-foreground flex items-center gap-1 text-xs">
+          <p className={cn(tipografia.auxiliar, "flex items-center gap-1")}>
             Rentabilidade: {formatarPercentualSimples(resumo.rentabilidadeMensal.valor)}
             <InfoTooltip
               conteudo={GLOSSARIO_RENTABILIDADE_MENSAL.explicacao}
@@ -88,8 +99,8 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="flex items-center gap-1 text-sm font-medium">
-            <Percent className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
+            <Percent className={cn(icone.tituloCard, "text-muted-foreground")} aria-hidden="true" />
             Rentabilidade Anual
             <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_ANUAL.explicacao} />
           </CardTitle>
@@ -99,7 +110,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
             {formatarPercentualSimples(resumo.rentabilidadeAnual.valor)}
           </div>
           {resumo.rentabilidadeAnoAnterior && (
-            <p className="text-muted-foreground text-xs">
+            <p className={tipografia.auxiliar}>
               {formatarPercentualSimples(resumo.rentabilidadeAnoAnterior.valor)} no ano anterior
             </p>
           )}
@@ -108,8 +119,11 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="flex items-center gap-1 text-sm font-medium">
-            <CalendarDays className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
+            <CalendarDays
+              className={cn(icone.tituloCard, "text-muted-foreground")}
+              aria-hidden="true"
+            />
             Desde o Inicio
             <InfoTooltip conteudo={GLOSSARIO_DESDE_INICIO.explicacao} />
           </CardTitle>
@@ -118,7 +132,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           <div className="text-2xl font-bold">
             {formatarPercentualSimples(resumo.rentabilidadeDesdeInicio.valor)}
           </div>
-          <p className="text-muted-foreground text-xs">
+          <p className={tipografia.auxiliar}>
             Desde {formatarDataBrasileira(resumo.dataInicioCarteira)}
           </p>
         </CardContent>

@@ -29,9 +29,7 @@ export function useAnaliseIaAtivo(ticker: string | null) {
  * Dispara analise IA de um ativo em background.
  * Retorna o identificador da tarefa para polling.
  */
-export async function dispararAnaliseIaAtivo(
-  codigoAtivo: string,
-): Promise<string> {
+export async function dispararAnaliseIaAtivo(codigoAtivo: string): Promise<string> {
   const resposta = await fetch("/api/asset-performance/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

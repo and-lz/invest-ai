@@ -11,7 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, ArrowUpDown, ArrowRightLeft, ArrowUpRight, ArrowDownRight, type LucideIcon } from "lucide-react";
+import {
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  ArrowRightLeft,
+  ArrowUpRight,
+  ArrowDownRight,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarDataBrasileira } from "@/lib/format-date";
@@ -126,7 +134,7 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <ArrowRightLeft className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <ArrowRightLeft className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Movimentações
           <InfoTooltip conteudo={GLOSSARIO_MOVIMENTACOES.explicacao} />
         </CardTitle>
@@ -190,9 +198,12 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
                       <TableCell className="text-muted-foreground">
                         <span className="flex items-center gap-1">
                           {(() => {
-                            const IconeMovimentacao = ICONES_TIPO_MOVIMENTACAO[movimentacao.tipoMovimentacao];
+                            const IconeMovimentacao =
+                              ICONES_TIPO_MOVIMENTACAO[movimentacao.tipoMovimentacao];
                             if (IconeMovimentacao) {
-                              return <IconeMovimentacao className="h-3.5 w-3.5" aria-hidden="true" />;
+                              return (
+                                <IconeMovimentacao className="h-3.5 w-3.5" aria-hidden="true" />
+                              );
                             }
                             return null;
                           })()}

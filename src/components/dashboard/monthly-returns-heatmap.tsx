@@ -124,7 +124,7 @@ export function MonthlyReturnsHeatmap({ retornosMensais }: MonthlyReturnsHeatmap
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-1">
-          <Calendar className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <Calendar className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Retornos Mensais
           <InfoTooltip conteudo={GLOSSARIO_RETORNOS_MENSAIS.explicacao} />
         </CardTitle>

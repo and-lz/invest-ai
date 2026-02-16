@@ -11,7 +11,5 @@ export interface InsightsService {
     relatorioAnterior: RelatorioExtraido | null,
   ): Promise<InsightsResponse>;
 
-  gerarInsightsConsolidados(
-    todosRelatorios: RelatorioExtraido[],
-  ): Promise<InsightsResponse>;
+  gerarInsightsConsolidados(todosRelatorios: RelatorioExtraido[]): Promise<InsightsResponse>;
 }

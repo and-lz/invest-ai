@@ -26,7 +26,12 @@ function extrairCategoria(chave: string): string {
   // Categorização baseada em padrões no nome da chave
   if (chave.includes("ESTRATEGIA")) return "estrategias";
   if (chave.includes("EVENTO")) return "eventos-financeiros";
-  if (chave.includes("BENCHMARK") || chave.includes("CDI") || chave.includes("IBOVESPA") || chave.includes("IPCA")) {
+  if (
+    chave.includes("BENCHMARK") ||
+    chave.includes("CDI") ||
+    chave.includes("IBOVESPA") ||
+    chave.includes("IPCA")
+  ) {
     return "benchmarks";
   }
   if (chave.includes("RENTABILIDADE") || chave.includes("GANHOS")) return "rentabilidade";
@@ -35,7 +40,12 @@ function extrairCategoria(chave: string): string {
   if (chave.includes("RISCO") || chave.includes("VOLATILIDADE")) return "risco";
   if (chave.includes("LIQUIDEZ")) return "liquidez";
   if (chave.includes("PERIODO")) return "periodos";
-  if (chave.includes("SELIC") || chave.includes("DOLAR") || chave.includes("IGPM") || chave.includes("VOLUME")) {
+  if (
+    chave.includes("SELIC") ||
+    chave.includes("DOLAR") ||
+    chave.includes("IGPM") ||
+    chave.includes("VOLUME")
+  ) {
     return "mercado";
   }
   return "geral";
@@ -114,7 +124,10 @@ export function buscarTermos(query: string): TermoGlossarioNavegavel[] {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    return termoNormalizado.includes(queryNormalizada) || explicacaoNormalizada.includes(queryNormalizada);
+    return (
+      termoNormalizado.includes(queryNormalizada) ||
+      explicacaoNormalizada.includes(queryNormalizada)
+    );
   });
 }
 

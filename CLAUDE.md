@@ -76,6 +76,7 @@ Metadata e definida via layouts (Server Components) para permitir Client Compone
 - PDFs em `data/reports/` (local) ou `{userId}/reports/` (blob)
 - JSON extraido em `data/extracted/` (local) ou `{userId}/extracted/` (blob)
 - Insights em `data/insights/` (local) ou `{userId}/insights/` (blob)
+- Conversas do chat em `data/conversations/{userId}/index.json` (local) ou `{userId}/conversations/index.json` (blob)
 - Tarefas em background em `data/tasks/`
 
 # Testing Strategy
@@ -455,6 +456,79 @@ notificar.success("Titulo", {
   action: { label: "...", onClick: () => {} },  // Acao do toast Sonner
 });
 ```
+
+## Chat com Historico Persistente
+
+### Arquitetura
+- Conversas salvas em `data/{userId}/conversations/index.json` (dev) ou Vercel Blob (prod)
+- Single index file (similar a `notifications`) para performance em read-heavy workload
+- Limite: 100 conversas por usuario (FIFO queue)
+- Auto-save debounced (2s) apos cada interacao com streaming concluido
+
+### Schemas
+- `src/schemas/conversa.schema.ts` — Zod schemas (fonte unica dos tipos)
+- `Conversa`: conversa completa com mensagens
+- `IndiceConversas`: array de conversas (single file storage)
+- `CriarConversa`, `AtualizarConversa`: schemas para mutacoes
+
+### Repository Pattern
+- Interface: `src/domain/interfaces/conversa-repository.ts`
+- Implementacao: `src/infrastructure/repositories/filesystem-conversa-repository.ts`
+- Factory: `obterConversaRepository()` em `src/lib/container.ts`
+- Reutiliza FileManager existente (switching automatico filesystem/blob)
+
+### API Routes
+- `GET /api/conversations` — Lista metadata de conversas (sem mensagens completas)
+- `POST /api/conversations` — Cria nova conversa
+- `GET /api/conversations/[id]` — Obtem conversa completa
+- `PATCH /api/conversations/[id]` — Atualiza titulo ou mensagens
+- `DELETE /api/conversations/[id]` — Deleta conversa
+
+### Frontend
+- Hook: `src/hooks/use-conversas.ts` (SWR para listar com optimistic updates)
+- Hook: `src/hooks/use-chat-assistente.ts` (integrado com persistencia)
+- Componentes:
+  - `src/components/chat/lista-conversas.tsx` — Sidebar com lista de conversas
+  - `src/components/chat/item-conversa.tsx` — Card individual de conversa
+  - `src/components/chat/chat-widget.tsx` — Modal com sidebar + tamanho aumentado
+
+### Geracao de Titulo
+- Primeira mensagem do usuario truncada a 50 chars
+- Fallback: "Nova conversa" se vazio
+
+### Layout do Chat
+- Desktop: 85vw ate max 1400px, 85vh (sidebar sempre visivel)
+- Mobile: Fullscreen com sidebar como drawer overlay (toggle via botao menu)
+- Auto-focus no textarea ao abrir
+
+## Chat Visual Highlighting
+
+Quando o assistente menciona elementos especificos da tela, destaca visualmente o card correspondente.
+
+### Fluxo
+1. LLM inclui `[HIGHLIGHT:identificador]` na resposta (instrucao do sistema)
+2. Frontend processa marcadores via `processarHighlights()` no hook
+3. Marcadores sao removidos do texto exibido
+4. `destacarElemento()` aplica class CSS + scroll suave
+5. Highlight dura 3s com ring azul pulsante
+
+### Arquivos-chave
+- `src/lib/chat-highlight.ts` — Funcao `destacarElemento()` + mapa de identificadores por pagina
+- `src/lib/construir-instrucao-sistema-chat.ts` — Instrucoes para LLM sobre highlighting
+- `src/app/globals.css` — Classe `.chat-highlight-active` com keyframes
+
+### Data-attributes nos Cards (Dashboard)
+- `data-chat-highlight="patrimonio-total"` — Evolucao patrimonial
+- `data-chat-highlight="benchmark"` — Carteira vs Benchmarks
+- `data-chat-highlight="alocacao-ativos"` — Alocacao por estrategia
+- `data-chat-highlight="top-performers"` — Melhores/piores ativos
+- `data-chat-highlight="eventos-financeiros"` — Eventos financeiros
+- `data-chat-highlight="ganhos-estrategia"` — Ganhos por estrategia
+
+### Regras
+- Maximo 1-2 highlights por resposta
+- Apenas dados ESPECIFICOS da tela (nao conceitos gerais)
+- Highlight com ring-4 ring-primary + scale pulse animation (2s)
 
 # Reports
 

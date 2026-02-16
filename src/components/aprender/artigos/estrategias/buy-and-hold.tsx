@@ -21,18 +21,20 @@ export default function BuyAndHoldArtigo() {
     <>
       <SecaoArtigo titulo="O que é Buy and Hold?">
         <Paragrafo>
-          Buy and Hold significa &quot;comprar e segurar&quot;: você compra bons ativos e os mantém por muitos anos,
-          independente das oscilações de curto prazo.
+          Buy and Hold significa &quot;comprar e segurar&quot;: você compra bons ativos e os mantém
+          por muitos anos, independente das oscilações de curto prazo.
         </Paragrafo>
 
         <Paragrafo>
-          A ideia é que, no longo prazo, boas empresas e bons investimentos tendem a crescer. Tentativas de adivinhar
-          o momento certo de comprar e vender (market timing) geralmente falham e geram prejuízo.
+          A ideia é que, no longo prazo, boas empresas e bons investimentos tendem a crescer.
+          Tentativas de adivinhar o momento certo de comprar e vender (market timing) geralmente
+          falham e geram prejuízo.
         </Paragrafo>
 
         <Destaque tipo="success">
           <p className="text-sm">
-            <strong>Warren Buffett:</strong> &quot;Nossa ação preferida é aquela que mantemos para sempre.&quot;
+            <strong>Warren Buffett:</strong> &quot;Nossa ação preferida é aquela que mantemos para
+            sempre.&quot;
           </p>
         </Destaque>
       </SecaoArtigo>
@@ -52,7 +54,8 @@ export default function BuyAndHoldArtigo() {
         <TakeawayBox
           conclusoes={[
             {
-              texto: "Estudos mostram que investidores que tentam adivinhar o melhor momento geralmente perdem para aqueles que simplesmente ficam investidos.",
+              texto:
+                "Estudos mostram que investidores que tentam adivinhar o melhor momento geralmente perdem para aqueles que simplesmente ficam investidos.",
               tipo: "positivo",
             },
           ]}
@@ -71,28 +74,30 @@ export default function BuyAndHoldArtigo() {
         />
 
         <Paragrafo>
-          Buy and Hold não significa nunca vender. Significa vender apenas quando os fundamentos da empresa ou do ativo
-          mudaram, não porque o preço caiu 10% em uma semana.
+          Buy and Hold não significa nunca vender. Significa vender apenas quando os fundamentos da
+          empresa ou do ativo mudaram, não porque o preço caiu 10% em uma semana.
         </Paragrafo>
       </SecaoArtigo>
 
       <SecaoArtigo titulo="Desafios do Buy and Hold">
         <Paragrafo>
-          A maior dificuldade do Buy and Hold é emocional. Quando o mercado cai 30%, o instinto é vender tudo. Mas é
-          exatamente nesses momentos que você deve manter a calma e continuar investindo.
+          A maior dificuldade do Buy and Hold é emocional. Quando o mercado cai 30%, o instinto é
+          vender tudo. Mas é exatamente nesses momentos que você deve manter a calma e continuar
+          investindo.
         </Paragrafo>
 
         <Destaque tipo="atencao">
           <p className="text-sm">
-            Crises são temporárias. Empresas boas se recuperam. Vender no fundo da crise é transformar prejuízo
-            temporário em prejuízo permanente.
+            Crises são temporárias. Empresas boas se recuperam. Vender no fundo da crise é
+            transformar prejuízo temporário em prejuízo permanente.
           </p>
         </Destaque>
 
         <TakeawayBox
           conclusoes={[
             {
-              texto: "Buy and Hold é simples, mas não é fácil. Exige disciplina, paciência e estômago para aguentar os altos e baixos sem desistir.",
+              texto:
+                "Buy and Hold é simples, mas não é fácil. Exige disciplina, paciência e estômago para aguentar os altos e baixos sem desistir.",
               tipo: "neutro",
             },
           ]}

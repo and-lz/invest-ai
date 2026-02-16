@@ -31,8 +31,7 @@ export class AtualizarConclusaoInsightUseCase {
     }
 
     // Determinar novo status: preferir statusAcao, caso contrário derivar de concluida
-    const novoStatus: StatusAcao =
-      input.statusAcao ?? (input.concluida ? "concluida" : "pendente");
+    const novoStatus: StatusAcao = input.statusAcao ?? (input.concluida ? "concluida" : "pendente");
 
     // Manter campo concluida para backward compatibility
     const novaConcluida = novoStatus === "concluida";

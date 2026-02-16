@@ -26,7 +26,7 @@ export function CardCategoria({
       <Card
         className={cn(
           "h-full transition-all duration-300",
-          "hover:shadow-lg hover:scale-[1.02]",
+          "hover:scale-[1.02] hover:shadow-lg",
           "border-border hover:border-primary/30",
           className,
         )}
@@ -41,11 +41,15 @@ export function CardCategoria({
               {quantidadeArtigos} {quantidadeArtigos === 1 ? "artigo" : "artigos"}
             </Badge>
           </div>
-          <CardTitle className="group-hover:text-primary mt-4 transition-colors">{titulo}</CardTitle>
+          <CardTitle className="group-hover:text-primary mt-4 transition-colors">
+            {titulo}
+          </CardTitle>
           <CardDescription className="leading-relaxed">{descricao}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-primary text-sm font-medium group-hover:underline">Explorar artigos →</p>
+          <p className="text-primary text-sm font-medium group-hover:underline">
+            Explorar artigos →
+          </p>
         </CardContent>
       </Card>
     </Link>

@@ -19,18 +19,13 @@ interface ItemConversaProps {
   readonly onDeletar: () => void;
 }
 
-export function ItemConversa({
-  conversa,
-  estaAtiva,
-  onSelecionar,
-  onDeletar,
-}: ItemConversaProps) {
+export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar }: ItemConversaProps) {
   const [mostrarAcoes, setMostrarAcoes] = useState(false);
 
   return (
     <div
       className={cn(
-        "group relative rounded-lg border p-3 transition-colors hover:bg-muted/50",
+        "group hover:bg-muted/50 relative rounded-lg border p-3 transition-colors",
         estaAtiva && "border-primary bg-muted",
       )}
       onMouseEnter={() => setMostrarAcoes(true)}
@@ -38,15 +33,15 @@ export function ItemConversa({
     >
       <button onClick={onSelecionar} className="w-full text-left">
         {/* Titulo */}
-        <h4 className="text-sm font-medium line-clamp-1">{conversa.titulo}</h4>
+        <h4 className="line-clamp-1 text-sm font-medium">{conversa.titulo}</h4>
 
         {/* Preview */}
-        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
           {conversa.previewMensagem}
         </p>
 
         {/* Footer: timestamp + contagem */}
-        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="text-muted-foreground mt-2 flex items-center gap-2 text-xs">
           <MessageSquare className="h-3 w-3" />
           <span>{conversa.contagemMensagens}</span>
           <span>•</span>
@@ -63,9 +58,9 @@ export function ItemConversa({
             evento.stopPropagation();
             onDeletar();
           }}
-          className="absolute right-2 top-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+          className="absolute top-2 right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
         >
-          <Trash2 className="h-3 w-3 text-destructive" />
+          <Trash2 className="text-destructive h-3 w-3" />
           <span className="sr-only">Deletar conversa</span>
         </Button>
       )}

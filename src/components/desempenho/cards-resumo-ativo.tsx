@@ -2,8 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { tipografia, icone, layout, corValor, corIconeTendencia } from "@/lib/design-system";
 import type { DadosAgregadosAtivo } from "@/schemas/analise-ativo.schema";
 
 interface CardsResumoAtivoProps {
@@ -22,14 +24,14 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
   );
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className={layout.gridCards}>
       {/* Cotacao / Saldo */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
+          <CardTitle className={tipografia.rotulo}>
             {cotacao ? "Cotacao" : "Saldo na Carteira"}
           </CardTitle>
-          <DollarSign className="text-muted-foreground h-5 w-5" />
+          <DollarSign className={cn(icone.tituloCard, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -40,9 +42,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
                 : "N/D"}
           </div>
           {cotacao && (
-            <p
-              className={`text-xs ${cotacao.variacaoPercentual >= 0 ? "text-success" : "text-destructive"}`}
-            >
+            <p className={cn("text-xs", corValor(cotacao.variacaoPercentual))}>
               {cotacao.variacaoPercentual >= 0 ? "+" : ""}
               {formatarPercentualSimples(cotacao.variacaoPercentual)} hoje
             </p>
@@ -53,23 +53,19 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       {/* Rentabilidade no Mes */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Rent. no Mes</CardTitle>
+          <CardTitle className={tipografia.rotulo}>Rent. no Mes</CardTitle>
           {rentabilidadeMes !== null && rentabilidadeMes >= 0 ? (
-            <TrendingUp className="text-success h-5 w-5" />
+            <TrendingUp className={cn(icone.tituloCard, corIconeTendencia(rentabilidadeMes))} />
           ) : (
-            <TrendingDown className="text-destructive h-5 w-5" />
+            <TrendingDown className={cn(icone.tituloCard, corIconeTendencia(rentabilidadeMes))} />
           )}
         </CardHeader>
         <CardContent>
-          <div
-            className={`text-2xl font-bold ${rentabilidadeMes !== null ? (rentabilidadeMes >= 0 ? "text-success" : "text-destructive") : ""}`}
-          >
-            {rentabilidadeMes !== null
-              ? formatarPercentualSimples(rentabilidadeMes)
-              : "N/D"}
+          <div className={cn("text-2xl font-bold", corValor(rentabilidadeMes))}>
+            {rentabilidadeMes !== null ? formatarPercentualSimples(rentabilidadeMes) : "N/D"}
           </div>
           {rentabilidade12Meses !== null && (
-            <p className="text-muted-foreground text-xs">
+            <p className={tipografia.auxiliar}>
               12 meses: {formatarPercentualSimples(rentabilidade12Meses)}
             </p>
           )}
@@ -79,8 +75,8 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       {/* Participacao na Carteira */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">% da Carteira</CardTitle>
-          <PieChart className="text-muted-foreground h-5 w-5" />
+          <CardTitle className={tipografia.rotulo}>% da Carteira</CardTitle>
+          <PieChart className={cn(icone.tituloCard, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -89,7 +85,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
               : "N/D"}
           </div>
           {dadosAtivo.saldoAtualCentavos > 0 && (
-            <p className="text-muted-foreground text-xs">
+            <p className={tipografia.auxiliar}>
               Saldo: {formatarMoedaCompacta(dadosAtivo.saldoAtualCentavos)}
             </p>
           )}
@@ -99,14 +95,14 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       {/* Proventos Recebidos */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Proventos</CardTitle>
-          <BarChart3 className="text-muted-foreground h-5 w-5" />
+          <CardTitle className={tipografia.rotulo}>Proventos</CardTitle>
+          <BarChart3 className={cn(icone.tituloCard, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
             {totalEventos > 0 ? formatarMoedaCompacta(totalEventos) : "N/D"}
           </div>
-          <p className="text-muted-foreground text-xs">
+          <p className={tipografia.auxiliar}>
             {dadosAtivo.eventosFinanceirosDoAtivo.length > 0
               ? `${dadosAtivo.eventosFinanceirosDoAtivo.length} eventos registrados`
               : "Nenhum provento registrado"}

@@ -70,9 +70,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
               {ROTULOS_RECOMENDACAO[analise.veredicto.recomendacao]}
             </Badge>
           </div>
-          <CardDescription>
-            Analise gerada em {analise.dataAnalise}
-          </CardDescription>
+          <CardDescription>Analise gerada em {analise.dataAnalise}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm leading-relaxed">{analise.resumoGeral}</p>
@@ -108,10 +106,10 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-muted-foreground border-b text-left">
-                    <th className="pb-2 pr-4 font-medium">Periodo</th>
-                    <th className="pb-2 pr-4 font-medium">Ativo</th>
-                    <th className="pb-2 pr-4 font-medium">CDI</th>
-                    <th className="pb-2 pr-4 font-medium">Ibovespa</th>
+                    <th className="pr-4 pb-2 font-medium">Periodo</th>
+                    <th className="pr-4 pb-2 font-medium">Ativo</th>
+                    <th className="pr-4 pb-2 font-medium">CDI</th>
+                    <th className="pr-4 pb-2 font-medium">Ibovespa</th>
                     <th className="pb-2 font-medium">Resultado</th>
                   </tr>
                 </thead>
@@ -119,16 +117,24 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
                   {analise.analisePerformance.comparacoes.map((comparacao) => (
                     <tr key={comparacao.periodo} className="border-b last:border-0">
                       <td className="py-2 pr-4">{comparacao.periodo}</td>
-                      <td className={`py-2 pr-4 font-medium ${comparacao.retornoAtivo >= 0 ? "text-success" : "text-destructive"}`}>
+                      <td
+                        className={`py-2 pr-4 font-medium ${comparacao.retornoAtivo >= 0 ? "text-success" : "text-destructive"}`}
+                      >
                         {formatarPercentualSimples(comparacao.retornoAtivo)}
                       </td>
                       <td className="text-muted-foreground py-2 pr-4">
-                        {comparacao.retornoCDI !== null ? formatarPercentualSimples(comparacao.retornoCDI) : "N/D"}
+                        {comparacao.retornoCDI !== null
+                          ? formatarPercentualSimples(comparacao.retornoCDI)
+                          : "N/D"}
                       </td>
                       <td className="text-muted-foreground py-2 pr-4">
-                        {comparacao.retornoIbovespa !== null ? formatarPercentualSimples(comparacao.retornoIbovespa) : "N/D"}
+                        {comparacao.retornoIbovespa !== null
+                          ? formatarPercentualSimples(comparacao.retornoIbovespa)
+                          : "N/D"}
                       </td>
-                      <td className="text-muted-foreground py-2 text-xs">{comparacao.veredictoPeriodo}</td>
+                      <td className="text-muted-foreground py-2 text-xs">
+                        {comparacao.veredictoPeriodo}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -136,8 +142,12 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
             </div>
           )}
 
-          <p className="text-muted-foreground text-sm">{analise.analisePerformance.tendenciaRecente}</p>
-          <p className="text-muted-foreground text-sm">{analise.analisePerformance.posicaoNaCarteira}</p>
+          <p className="text-muted-foreground text-sm">
+            {analise.analisePerformance.tendenciaRecente}
+          </p>
+          <p className="text-muted-foreground text-sm">
+            {analise.analisePerformance.posicaoNaCarteira}
+          </p>
         </CardContent>
       </Card>
 
@@ -180,9 +190,13 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
             <p className="text-muted-foreground text-sm">
               Total recebido: {formatarMoeda(analise.analiseRendaPassiva.totalRecebidoCentavos)}
             </p>
-            <p className="text-muted-foreground text-sm">{analise.analiseRendaPassiva.consistencia}</p>
+            <p className="text-muted-foreground text-sm">
+              {analise.analiseRendaPassiva.consistencia}
+            </p>
             {analise.analiseRendaPassiva.comparacaoComSelic && (
-              <p className="text-muted-foreground text-sm">{analise.analiseRendaPassiva.comparacaoComSelic}</p>
+              <p className="text-muted-foreground text-sm">
+                {analise.analiseRendaPassiva.comparacaoComSelic}
+              </p>
             )}
           </CardContent>
         </Card>
@@ -219,7 +233,9 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
                 <div>
                   <p className="text-muted-foreground text-xs">ROE</p>
                   <p className="text-lg font-semibold">
-                    {formatarPercentualSimples(analise.avaliacaoFundamentalista.retornoSobrePatrimonio)}
+                    {formatarPercentualSimples(
+                      analise.avaliacaoFundamentalista.retornoSobrePatrimonio,
+                    )}
                   </p>
                 </div>
               )}
@@ -240,9 +256,13 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
                 </div>
               )}
             </div>
-            <p className="text-muted-foreground text-sm">{analise.avaliacaoFundamentalista.resumoAvaliacao}</p>
+            <p className="text-muted-foreground text-sm">
+              {analise.avaliacaoFundamentalista.resumoAvaliacao}
+            </p>
             {analise.avaliacaoFundamentalista.comparacaoSetorial && (
-              <p className="text-muted-foreground text-sm">{analise.avaliacaoFundamentalista.comparacaoSetorial}</p>
+              <p className="text-muted-foreground text-sm">
+                {analise.avaliacaoFundamentalista.comparacaoSetorial}
+              </p>
             )}
           </CardContent>
         </Card>
@@ -305,10 +325,13 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
               </div>
             </CardHeader>
             <CardContent className="space-y-2">
-              <p className="text-muted-foreground text-sm">{analise.avaliacaoTimingUsuario.resumo}</p>
+              <p className="text-muted-foreground text-sm">
+                {analise.avaliacaoTimingUsuario.resumo}
+              </p>
               {analise.avaliacaoTimingUsuario.precoMedioEstimadoCentavos !== null && (
                 <p className="text-muted-foreground text-xs">
-                  Preco medio estimado: {formatarMoeda(analise.avaliacaoTimingUsuario.precoMedioEstimadoCentavos)}
+                  Preco medio estimado:{" "}
+                  {formatarMoeda(analise.avaliacaoTimingUsuario.precoMedioEstimadoCentavos)}
                 </p>
               )}
             </CardContent>

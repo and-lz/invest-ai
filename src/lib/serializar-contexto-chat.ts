@@ -51,30 +51,18 @@ export function serializarContextoDashboard(dados: DashboardData): string {
     linhas.push("## Comparacao com Benchmarks");
     for (const comparacao of dados.comparacaoBenchmarksAtual) {
       linhas.push(`### ${comparacao.periodo}`);
-      linhas.push(
-        `- Carteira: ${formatarPercentualSimples(comparacao.carteira.valor)}`,
-      );
-      linhas.push(
-        `- CDI: ${formatarPercentualSimples(comparacao.cdi.valor)}`,
-      );
-      linhas.push(
-        `- Ibovespa: ${formatarPercentualSimples(comparacao.ibovespa.valor)}`,
-      );
-      linhas.push(
-        `- IPCA: ${formatarPercentualSimples(comparacao.ipca.valor)}`,
-      );
+      linhas.push(`- Carteira: ${formatarPercentualSimples(comparacao.carteira.valor)}`);
+      linhas.push(`- CDI: ${formatarPercentualSimples(comparacao.cdi.valor)}`);
+      linhas.push(`- Ibovespa: ${formatarPercentualSimples(comparacao.ibovespa.valor)}`);
+      linhas.push(`- IPCA: ${formatarPercentualSimples(comparacao.ipca.valor)}`);
     }
   }
 
   // Risco
   linhas.push("");
   linhas.push("## Analise Risco-Retorno");
-  linhas.push(
-    `- Meses acima do benchmark: ${dados.analiseRiscoRetorno.mesesAcimaBenchmark}`,
-  );
-  linhas.push(
-    `- Meses abaixo do benchmark: ${dados.analiseRiscoRetorno.mesesAbaixoBenchmark}`,
-  );
+  linhas.push(`- Meses acima do benchmark: ${dados.analiseRiscoRetorno.mesesAcimaBenchmark}`);
+  linhas.push(`- Meses abaixo do benchmark: ${dados.analiseRiscoRetorno.mesesAbaixoBenchmark}`);
   linhas.push(
     `- Maior rentabilidade: ${formatarPercentualSimples(dados.analiseRiscoRetorno.maiorRentabilidade.valor.valor)} em ${dados.analiseRiscoRetorno.maiorRentabilidade.mesAno}`,
   );
@@ -202,9 +190,7 @@ export function serializarContextoTendencias(dados: DadosTendencias): string {
     linhas.push("");
     linhas.push("### Indicadores Macroeconomicos");
     for (const indicador of dados.indicadoresMacro) {
-      linhas.push(
-        `- ${indicador.nome}: ${indicador.valorAtual} ${indicador.unidade}`,
-      );
+      linhas.push(`- ${indicador.nome}: ${indicador.valorAtual} ${indicador.unidade}`);
     }
   }
 
@@ -247,17 +233,13 @@ export function serializarContextoTendencias(dados: DadosTendencias): string {
 /**
  * Serializa dados de desempenho de ativo individual em markdown compacto para contexto do chat.
  */
-export function serializarContextoDesempenho(
-  dados: DadosAgregadosAtivo,
-): string {
+export function serializarContextoDesempenho(dados: DadosAgregadosAtivo): string {
   const linhas: string[] = [];
 
   linhas.push(`## Ativo: ${dados.nomeAtivo} (${dados.codigoAtivo})`);
   linhas.push(`- Estrategia: ${dados.estrategia ?? "N/A"}`);
   linhas.push(`- Esta na Carteira: ${dados.estaNaCarteira ? "Sim" : "Nao"}`);
-  linhas.push(
-    `- Saldo Atual: ${formatarMoeda(dados.saldoAtualCentavos)}`,
-  );
+  linhas.push(`- Saldo Atual: ${formatarMoeda(dados.saldoAtualCentavos)}`);
   linhas.push(
     `- Participacao na Carteira: ${formatarPercentualSimples(dados.participacaoAtualCarteira)}`,
   );
@@ -281,19 +263,13 @@ export function serializarContextoDesempenho(
       linhas.push(`- P/L: ${fundamentalistas.precoLucro.toFixed(2)}`);
     }
     if (fundamentalistas.precoValorPatrimonial !== null) {
-      linhas.push(
-        `- P/VP: ${fundamentalistas.precoValorPatrimonial.toFixed(2)}`,
-      );
+      linhas.push(`- P/VP: ${fundamentalistas.precoValorPatrimonial.toFixed(2)}`);
     }
     if (fundamentalistas.retornoSobrePatrimonio !== null) {
-      linhas.push(
-        `- ROE: ${formatarPercentualSimples(fundamentalistas.retornoSobrePatrimonio)}`,
-      );
+      linhas.push(`- ROE: ${formatarPercentualSimples(fundamentalistas.retornoSobrePatrimonio)}`);
     }
     if (fundamentalistas.dividendYield !== null) {
-      linhas.push(
-        `- Dividend Yield: ${formatarPercentualSimples(fundamentalistas.dividendYield)}`,
-      );
+      linhas.push(`- Dividend Yield: ${formatarPercentualSimples(fundamentalistas.dividendYield)}`);
     }
   }
 

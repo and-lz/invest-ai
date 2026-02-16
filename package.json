@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "generate:icons": "node scripts/gerar-icones-pwa.mjs"
+    "generate:icons": "node scripts/gerar-icones-pwa.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -50,6 +51,7 @@
     "@vitejs/plugin-react": "^5.1.4",
     "eslint": "^9",
     "eslint-config-next": "15.5.12",
+    "husky": "^9.1.7",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",

@@ -21,7 +21,7 @@ export function ListaConversas({
   if (estaCarregando) {
     return (
       <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
       </div>
     );
   }
@@ -40,8 +40,8 @@ export function ListaConversas({
       <div className="flex-1 overflow-y-auto">
         {conversas.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 p-6">
-            <MessageSquare className="h-12 w-12 text-muted-foreground" />
-            <p className="text-center text-sm text-muted-foreground">
+            <MessageSquare className="text-muted-foreground h-12 w-12" />
+            <p className="text-muted-foreground text-center text-sm">
               Nenhuma conversa ainda.
               <br />
               Comece a conversar!

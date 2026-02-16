@@ -109,12 +109,12 @@ function serializarHistoricoCarteira(historico: HistoricoPosicaoAtivo[]): string
     const mesFormatado = formatarMesAno(ponto.mesAno, "abreviado");
     const saldoFormatado = formatarMoedaCompacta(ponto.saldoBrutoCentavos);
     const rentabilidadeMes = formatarPercentual(ponto.rentabilidadeMes);
-    const rentabilidade12Meses = ponto.rentabilidade12Meses !== null
-      ? formatarPercentual(ponto.rentabilidade12Meses)
-      : "N/D";
-    const rentabilidadeDesdeInicio = ponto.rentabilidadeDesdeInicio !== null
-      ? formatarPercentual(ponto.rentabilidadeDesdeInicio)
-      : "N/D";
+    const rentabilidade12Meses =
+      ponto.rentabilidade12Meses !== null ? formatarPercentual(ponto.rentabilidade12Meses) : "N/D";
+    const rentabilidadeDesdeInicio =
+      ponto.rentabilidadeDesdeInicio !== null
+        ? formatarPercentual(ponto.rentabilidadeDesdeInicio)
+        : "N/D";
     const participacao = formatarPercentual(ponto.participacaoNaCarteira);
 
     linhas.push(
@@ -128,11 +128,7 @@ function serializarHistoricoCarteira(historico: HistoricoPosicaoAtivo[]): string
 function serializarMovimentacoes(movimentacoes: MovimentacaoAtivo[]): string {
   if (movimentacoes.length === 0) return "";
 
-  const linhas = [
-    "## Movimentacoes do Usuario",
-    "| Data | Tipo | Valor |",
-    "|---|---|---|",
-  ];
+  const linhas = ["## Movimentacoes do Usuario", "| Data | Tipo | Valor |", "|---|---|---|"];
 
   for (const movimentacao of movimentacoes) {
     const dataFormatada = formatarDataBrasileira(movimentacao.data);
@@ -146,25 +142,16 @@ function serializarMovimentacoes(movimentacoes: MovimentacaoAtivo[]): string {
 function serializarEventosFinanceiros(eventos: EventoFinanceiroAtivo[]): string {
   if (eventos.length === 0) return "";
 
-  const linhas = [
-    "## Eventos Financeiros Recebidos",
-    "| Data | Tipo | Valor |",
-    "|---|---|---|",
-  ];
+  const linhas = ["## Eventos Financeiros Recebidos", "| Data | Tipo | Valor |", "|---|---|---|"];
 
   for (const evento of eventos) {
-    const dataFormatada = evento.data
-      ? formatarDataBrasileira(evento.data)
-      : "N/D";
+    const dataFormatada = evento.data ? formatarDataBrasileira(evento.data) : "N/D";
     const valorFormatado = formatarMoeda(evento.valorCentavos);
     linhas.push(`| ${dataFormatada} | ${evento.tipo} | ${valorFormatado} |`);
   }
 
   // Total recebido
-  const totalCentavos = eventos.reduce(
-    (soma, evento) => soma + evento.valorCentavos,
-    0,
-  );
+  const totalCentavos = eventos.reduce((soma, evento) => soma + evento.valorCentavos, 0);
   linhas.push(`\nTotal recebido: ${formatarMoeda(totalCentavos)}`);
 
   return linhas.join("\n");

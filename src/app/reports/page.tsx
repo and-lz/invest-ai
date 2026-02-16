@@ -20,7 +20,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, FileText, Upload, MessageSquare, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { notificar } from "@/lib/notificar";
+import { tipografia, icone, layout, dialog } from "@/lib/design-system";
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -86,14 +88,17 @@ export default function ReportsPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className={layout.espacamentoPagina}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <FileText className="text-muted-foreground h-6 w-6" aria-hidden="true" />
+        <div className={layout.headerPagina}>
+          <FileText
+            className={cn(icone.tituloPagina, "text-muted-foreground")}
+            aria-hidden="true"
+          />
           <Header titulo="Relatorios" descricao="Historico de relatorios importados" />
         </div>
         <Button onClick={abrirDialog} className="gap-2">
-          <Upload className="h-4 w-4" />
+          <Upload className={icone.botao} />
           Importar Novo Relatorio
         </Button>
       </div>
@@ -101,13 +106,16 @@ export default function ReportsPage() {
       <dialog
         ref={dialogRef}
         aria-label="Importar relatório"
-        className="bg-background fixed left-1/2 top-1/2 m-0 max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border p-0 shadow-lg backdrop:bg-background/80 backdrop:backdrop-blur-sm"
+        className={cn(
+          "bg-background fixed top-1/2 left-1/2 m-0 max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border p-0 shadow-lg",
+          dialog.backdrop,
+        )}
         style={{ maxWidth: "42rem", width: "90vw" }}
       >
         <div className="flex items-center justify-between border-b p-6">
-          <h2 className="text-lg font-semibold">Importar Relatorio</h2>
+          <h2 className={tipografia.h3}>Importar Relatorio</h2>
           <Button variant="ghost" size="icon" onClick={fecharDialog}>
-            <X className="h-4 w-4" />
+            <X className={icone.botao} />
             <span className="sr-only">Fechar</span>
           </Button>
         </div>
@@ -120,9 +128,9 @@ export default function ReportsPage() {
               onClick={() => setMetodoUploadSelecionado("automatico")}
               className="gap-1.5"
             >
-              <Upload className="h-4 w-4" />
+              <Upload className={icone.botao} />
               Upload Direto
-              <span className="bg-background/80 rounded px-1 py-0.5 text-[9px] font-medium leading-none">
+              <span className="bg-background/80 rounded px-1 py-0.5 text-[9px] leading-none font-medium">
                 REC
               </span>
             </Button>
@@ -132,7 +140,7 @@ export default function ReportsPage() {
               onClick={() => setMetodoUploadSelecionado("manual")}
               className="gap-1.5"
             >
-              <MessageSquare className="h-4 w-4" />
+              <MessageSquare className={icone.botao} />
               Via Chat
             </Button>
           </div>
@@ -148,13 +156,12 @@ export default function ReportsPage() {
 
       {/* Lista de Histórico */}
       <section className="space-y-4">
-
         {estaCarregando && <Skeleton className="h-64" />}
 
         {!estaCarregando && relatorios.length === 0 && (
           <Card>
-            <CardContent className="flex flex-col items-center gap-4 py-12">
-              <FileText className="text-muted-foreground h-12 w-12" />
+            <CardContent className={layout.estadoVazioCard}>
+              <FileText className={icone.estadoVazio} />
               <p className="text-muted-foreground mb-4">Nenhum relatorio encontrado.</p>
               <Button onClick={abrirDialog}>Importar Primeiro Relatorio</Button>
             </CardContent>
@@ -165,50 +172,52 @@ export default function ReportsPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Referencia</TableHead>
-                    <TableHead className="hidden sm:table-cell">Arquivo</TableHead>
-                    <TableHead className="hidden md:table-cell">Data Upload</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Acoes</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {relatorios.map((relatorio) => (
-                    <TableRow key={relatorio.identificador}>
-                      <TableCell className="font-medium">{relatorio.mesReferencia}</TableCell>
-                      <TableCell className="hidden sm:table-cell">{relatorio.nomeArquivoOriginal}</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {new Date(relatorio.dataUpload).toLocaleDateString("pt-BR")}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            relatorio.statusExtracao === "concluido"
-                              ? "default"
-                              : relatorio.statusExtracao === "erro"
-                                ? "destructive"
-                                : "secondary"
-                          }
-                        >
-                          {relatorio.statusExtracao}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => void handleRemover(relatorio.identificador)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Referencia</TableHead>
+                      <TableHead className="hidden sm:table-cell">Arquivo</TableHead>
+                      <TableHead className="hidden md:table-cell">Data Upload</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Acoes</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {relatorios.map((relatorio) => (
+                      <TableRow key={relatorio.identificador}>
+                        <TableCell className="font-medium">{relatorio.mesReferencia}</TableCell>
+                        <TableCell className="hidden sm:table-cell">
+                          {relatorio.nomeArquivoOriginal}
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {new Date(relatorio.dataUpload).toLocaleDateString("pt-BR")}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              relatorio.statusExtracao === "concluido"
+                                ? "default"
+                                : relatorio.statusExtracao === "erro"
+                                  ? "destructive"
+                                  : "secondary"
+                            }
+                          >
+                            {relatorio.statusExtracao}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => void handleRemover(relatorio.identificador)}
+                          >
+                            <Trash2 className={icone.botao} />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>

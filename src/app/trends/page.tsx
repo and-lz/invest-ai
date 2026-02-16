@@ -17,7 +17,10 @@ import { TabelaRankingFundos } from "@/components/trends/tabela-ranking-fundos";
 
 // Lazy-load chart component que usa Recharts
 const GraficoIndicadoresMacro = dynamic(
-  () => import("@/components/trends/grafico-indicadores-macro").then((mod) => mod.GraficoIndicadoresMacro),
+  () =>
+    import("@/components/trends/grafico-indicadores-macro").then(
+      (mod) => mod.GraficoIndicadoresMacro,
+    ),
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
 );
 
@@ -37,10 +40,7 @@ export default function TrendsPage() {
   // Registrar contexto da pagina para o chat
   const { definirContexto } = useContextoPaginaChat();
   const contextoSerializado = useMemo(
-    () =>
-      dadosTendencias
-        ? serializarContextoTendencias(dadosTendencias)
-        : undefined,
+    () => (dadosTendencias ? serializarContextoTendencias(dadosTendencias) : undefined),
     [dadosTendencias],
   );
   useEffect(() => {
@@ -50,11 +50,8 @@ export default function TrendsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <TrendingUp className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
-        <Header
-          titulo="Tendencias de Mercado"
-          descricao="Dados do mercado financeiro brasileiro"
-        />
+        <TrendingUp className="text-muted-foreground h-6 w-6" aria-hidden="true" />
+        <Header titulo="Tendencias de Mercado" descricao="Dados do mercado financeiro brasileiro" />
       </div>
 
       {/* Loading state */}
@@ -74,7 +71,7 @@ export default function TrendsPage() {
       {erro && !estaCarregando && (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
-            <AlertTriangle className="h-12 w-12 text-muted-foreground" />
+            <AlertTriangle className="text-muted-foreground h-12 w-12" />
             <p className="text-muted-foreground text-center">
               Erro ao carregar dados de mercado. Verifique se o BRAPI_TOKEN esta configurado.
             </p>
@@ -103,15 +100,11 @@ export default function TrendsPage() {
               maisNegociados={dadosTendencias.maisNegociados}
             />
 
-            <GraficoIndicadoresMacro
-              indicadoresMacro={dadosTendencias.indicadoresMacro}
-            />
+            <GraficoIndicadoresMacro indicadoresMacro={dadosTendencias.indicadoresMacro} />
           </div>
 
           {/* Sector Heatmap */}
-          <MapaCalorSetores
-            setoresPerformance={dadosTendencias.setoresPerformance}
-          />
+          <MapaCalorSetores setoresPerformance={dadosTendencias.setoresPerformance} />
 
           {/* Fund Rankings */}
           <TabelaRankingFundos fundosEmAlta={dadosTendencias.maioresAltasFundos} />
@@ -119,8 +112,7 @@ export default function TrendsPage() {
           {/* Footer: last update + refresh */}
           <div className="flex items-center justify-center gap-3 pb-8">
             <p className="text-muted-foreground text-xs">
-              Atualizado em{" "}
-              {formatarTimestampAtualizacao(dadosTendencias.atualizadoEm)}
+              Atualizado em {formatarTimestampAtualizacao(dadosTendencias.atualizadoEm)}
             </p>
             <Button
               variant="ghost"

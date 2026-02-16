@@ -10,16 +10,11 @@ interface MensagemChatBolhaProps {
   readonly estaTransmitindo?: boolean;
 }
 
-export function MensagemChatBolha({
-  mensagem,
-  estaTransmitindo,
-}: MensagemChatBolhaProps) {
+export function MensagemChatBolha({ mensagem, estaTransmitindo }: MensagemChatBolhaProps) {
   const ehUsuario = mensagem.papel === "usuario";
 
   return (
-    <div
-      className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}
-    >
+    <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       <div
         className={cn(
@@ -27,27 +22,18 @@ export function MensagemChatBolha({
           ehUsuario ? "bg-primary/10" : "bg-secondary",
         )}
       >
-        {ehUsuario ? (
-          <User className="h-4 w-4" />
-        ) : (
-          <Bot className="h-4 w-4" />
-        )}
+        {ehUsuario ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
       </div>
 
       {/* Bolha de mensagem */}
       <div
         className={cn(
           "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
-          ehUsuario
-            ? "bg-primary text-primary-foreground"
-            : "bg-secondary text-foreground",
+          ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
         )}
       >
         {mensagem.conteudo ? (
-          <ConteudoMarkdownChat
-            conteudo={mensagem.conteudo}
-            ehUsuario={ehUsuario}
-          />
+          <ConteudoMarkdownChat conteudo={mensagem.conteudo} ehUsuario={ehUsuario} />
         ) : (
           estaTransmitindo && (
             <span className="inline-flex gap-1">

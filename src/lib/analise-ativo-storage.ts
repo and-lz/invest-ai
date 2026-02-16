@@ -29,9 +29,7 @@ export async function salvarAnaliseAtivo(analise: AnaliseAtivoResponse): Promise
  * Carrega analise cacheada de um ativo.
  * Retorna null se nao existe ou se o cache expirou (> 24h).
  */
-export async function lerAnaliseAtivo(
-  codigoAtivo: string,
-): Promise<AnaliseAtivoResponse | null> {
+export async function lerAnaliseAtivo(codigoAtivo: string): Promise<AnaliseAtivoResponse | null> {
   const fileManager = await obterFileManager();
   const caminhoRelativo = obterCaminhoArquivo(codigoAtivo);
 
@@ -43,10 +41,7 @@ export async function lerAnaliseAtivo(
     const resultado = AnaliseAtivoResponseSchema.safeParse(dadosBrutos);
 
     if (!resultado.success) {
-      console.warn(
-        `[AnaliseAtivoStorage] JSON invalido para ${codigoAtivo}:`,
-        resultado.error,
-      );
+      console.warn(`[AnaliseAtivoStorage] JSON invalido para ${codigoAtivo}:`, resultado.error);
       return null;
     }
 
@@ -94,7 +89,6 @@ export async function verificarCacheAnalise(
 function cacheExpirou(dataAnalise: string): boolean {
   const dataAnaliseDate = new Date(dataAnalise);
   const agora = new Date();
-  const diferencaHoras =
-    (agora.getTime() - dataAnaliseDate.getTime()) / (1000 * 60 * 60);
+  const diferencaHoras = (agora.getTime() - dataAnaliseDate.getTime()) / (1000 * 60 * 60);
   return diferencaHoras > CACHE_DURACAO_HORAS;
 }

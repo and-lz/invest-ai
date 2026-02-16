@@ -26,18 +26,12 @@ export function ImportacaoManualStepper({ onImportacaoSucesso }: ImportacaoManua
     {
       numero: 1,
       rotulo: "Copiar prompt",
-      status:
-        passoAtual === "copiar-prompt"
-          ? ("ativo" as const)
-          : ("concluido" as const),
+      status: passoAtual === "copiar-prompt" ? ("ativo" as const) : ("concluido" as const),
     },
     {
       numero: 2,
       rotulo: "Colar resposta",
-      status:
-        passoAtual === "colar-json"
-          ? ("ativo" as const)
-          : ("pendente" as const),
+      status: passoAtual === "colar-json" ? ("ativo" as const) : ("pendente" as const),
     },
   ];
 

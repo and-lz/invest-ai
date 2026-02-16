@@ -53,9 +53,7 @@ export class GeminiAssetAnalysisService implements AssetAnalysisService {
     try {
       return JSON.parse(texto);
     } catch {
-      throw new AiApiError(
-        `Resposta nao e JSON valido: ${texto.substring(0, 200)}`,
-      );
+      throw new AiApiError(`Resposta nao e JSON valido: ${texto.substring(0, 200)}`);
     }
   }
 }

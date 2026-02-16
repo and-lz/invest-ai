@@ -15,10 +15,7 @@ const CAMINHO_SAIDA = "/saida.pdf";
  * @param senha - Senha do PDF (opcional)
  * @returns Buffer do PDF descriptografado
  */
-export async function descriptografarPdf(
-  pdfBuffer: Buffer,
-  senha?: string,
-): Promise<Buffer> {
+export async function descriptografarPdf(pdfBuffer: Buffer, senha?: string): Promise<Buffer> {
   if (!senha) {
     return pdfBuffer;
   }
@@ -51,9 +48,7 @@ export async function descriptografarPdf(
       const textoErroCompleto = saidaErro.toLowerCase();
 
       if (verificarErroSenhaIncorreta(textoErroCompleto)) {
-        throw new PdfDecryptionError(
-          "Senha incorreta. Por favor, verifique a senha do PDF.",
-        );
+        throw new PdfDecryptionError("Senha incorreta. Por favor, verifique a senha do PDF.");
       }
 
       throw new PdfDecryptionError(
@@ -73,14 +68,10 @@ export async function descriptografarPdf(
     const textoErroCompleto = `${mensagemErro} ${saidaErro}`.toLowerCase();
 
     if (verificarErroSenhaIncorreta(textoErroCompleto)) {
-      throw new PdfDecryptionError(
-        "Senha incorreta. Por favor, verifique a senha do PDF.",
-      );
+      throw new PdfDecryptionError("Senha incorreta. Por favor, verifique a senha do PDF.");
     }
 
-    throw new PdfDecryptionError(
-      `Erro ao descriptografar PDF: ${mensagemErro}`,
-    );
+    throw new PdfDecryptionError(`Erro ao descriptografar PDF: ${mensagemErro}`);
   } finally {
     limparFilesystemVirtual(moduloQpdf);
   }
@@ -95,7 +86,7 @@ function verificarErroSenhaIncorreta(textoErro: string): boolean {
 }
 
 function limparFilesystemVirtual(
-  moduloQpdf: Awaited<ReturnType<typeof import("@neslinesli93/qpdf-wasm")["default"]>>,
+  moduloQpdf: Awaited<ReturnType<(typeof import("@neslinesli93/qpdf-wasm"))["default"]>>,
 ): void {
   try {
     moduloQpdf.FS.unlink(CAMINHO_ENTRADA);

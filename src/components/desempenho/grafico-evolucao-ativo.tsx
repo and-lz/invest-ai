@@ -39,10 +39,7 @@ function TooltipCustomizado({ active, payload, label }: TooltipCustomizadoProps)
       <p className="mb-1 text-sm font-medium">{label}</p>
       {saldo && (
         <p className="text-muted-foreground text-sm">
-          Saldo:{" "}
-          <span className="text-foreground font-medium">
-            {formatarMoeda(saldo.value)}
-          </span>
+          Saldo: <span className="text-foreground font-medium">{formatarMoeda(saldo.value)}</span>
         </p>
       )}
     </div>
@@ -64,9 +61,7 @@ export function GraficoEvolucaoAtivo({ historico, nomeAtivo }: GraficoEvolucaoAt
           <TrendingUp className="text-muted-foreground h-5 w-5" />
           <CardTitle className="text-lg">Evolucao do Saldo</CardTitle>
         </div>
-        <CardDescription>
-          Historico do saldo de {nomeAtivo} na sua carteira
-        </CardDescription>
+        <CardDescription>Historico do saldo de {nomeAtivo} na sua carteira</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-[300px] w-full">
