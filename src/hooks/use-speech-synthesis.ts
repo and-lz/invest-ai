@@ -42,16 +42,27 @@ export function useSpeechSynthesis(
     if (!isSupported) return null;
 
     const voices = window.speechSynthesis.getVoices();
-    const vozesPtBr = voices.filter(
-      (voz) => voz.lang.startsWith("pt-BR") || voz.lang.startsWith("pt"),
+
+    // Separar vozes pt-BR (Brasil) das vozes pt genéricas (Portugal, etc.)
+    const vozesExatamentePtBr = voices.filter(
+      (voz) => voz.lang === "pt-BR" || voz.lang === "pt_BR",
+    );
+    const vozesPtGenerico = voices.filter(
+      (voz) =>
+        voz.lang.startsWith("pt") &&
+        voz.lang !== "pt-BR" &&
+        voz.lang !== "pt_BR",
     );
 
-    // Prioridade: vozes naturais > vozes de rede > qualquer pt-BR > primeira disponível
-    const vozNatural = vozesPtBr.find((voz) => voz.localService && voz.name.includes("Natural"));
-    const vozRede = vozesPtBr.find((voz) => !voz.localService);
-    const vozPtBr = vozesPtBr[0];
+    // Prioridade estrita: pt-BR natural > pt-BR rede > qualquer pt-BR > pt genérico > primeira disponível
+    const vozNaturalBr = vozesExatamentePtBr.find(
+      (voz) => voz.localService && voz.name.includes("Natural"),
+    );
+    const vozRedeBr = vozesExatamentePtBr.find((voz) => !voz.localService);
+    const qualquerVozBr = vozesExatamentePtBr[0];
+    const vozPtGenerico = vozesPtGenerico[0];
 
-    return vozNatural || vozRede || vozPtBr || voices[0] || null;
+    return vozNaturalBr || vozRedeBr || qualquerVozBr || vozPtGenerico || voices[0] || null;
   }, [isSupported]);
 
   // Falar texto
