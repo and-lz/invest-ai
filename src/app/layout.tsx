@@ -8,7 +8,6 @@ import { ProvedorContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { ProvedorSwr } from "@/components/providers/provedor-swr";
 import { PwaRegistration } from "@/components/providers/pwa-registration";
-import { ViewTransitions } from "next-view-transitions";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -75,33 +74,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ViewTransitions>
-      <html lang="pt-BR" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${inter.variable} antialiased`}
-        >
-          <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <ProvedorSwr>
-                <ProvedorContextoPaginaChat>
-                  <div className="flex h-screen flex-col">
-                    <HeaderNavigation />
-                    <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
-                  </div>
-                  <ChatWidget />
-                  <Toaster />
-                </ProvedorContextoPaginaChat>
-              </ProvedorSwr>
-              <PwaRegistration />
-            </ThemeProvider>
-          </AuthProvider>
-        </body>
-      </html>
-    </ViewTransitions>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${lora.variable} ${inter.variable} antialiased`}
+      >
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ProvedorSwr>
+              <ProvedorContextoPaginaChat>
+                <div className="flex h-screen flex-col">
+                  <HeaderNavigation />
+                  <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
+                </div>
+                <ChatWidget />
+                <Toaster />
+              </ProvedorContextoPaginaChat>
+            </ProvedorSwr>
+            <PwaRegistration />
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
+    </html>
   );
 }

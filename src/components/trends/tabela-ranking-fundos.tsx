@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,

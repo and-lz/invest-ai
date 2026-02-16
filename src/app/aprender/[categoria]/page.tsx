@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { BookOpen, ChevronLeft } from "lucide-react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { Header } from "@/components/layout/header";
 import { CardArtigo } from "@/components/aprender/card-artigo";
 import { Button } from "@/components/ui/button";

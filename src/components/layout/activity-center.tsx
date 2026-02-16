@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, useRef } from "react";
-import { useTransitionRouter } from "next-view-transitions";
+import { useRouter } from "next/navigation";
 import {
   Inbox,
   Bell,
@@ -84,7 +84,7 @@ function MonitorTarefa({
   identificadorTarefa: string;
   onConcluida: (identificador: string) => void;
 }) {
-  const router = useTransitionRouter();
+  const router = useRouter();
   const { tarefa, estaCarregando, estaConcluido, estaComErro, estaProcessando, estaCancelada } =
     useTarefaBackground(identificadorTarefa);
   const [jaNotificou, setJaNotificou] = useState(false);
@@ -266,7 +266,7 @@ interface ItemNotificacaoProps {
 }
 
 function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: ItemNotificacaoProps) {
-  const router = useTransitionRouter();
+  const router = useRouter();
   const [retryEmAndamento, setRetryEmAndamento] = useState(false);
   const Icone = ICONES_TIPO[notificacao.tipo];
   const corIcone = CORES_TIPO[notificacao.tipo];

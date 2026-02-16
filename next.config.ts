@@ -9,9 +9,6 @@ const cabecalhosSeguranca = [
 ];
 
 const nextConfig: NextConfig = {
-  experimental: {
-    viewTransition: true,
-  },
   poweredByHeader: false,
   outputFileTracingIncludes: {
     "/api/reports": ["./node_modules/@neslinesli93/qpdf-wasm/dist/*.wasm"],

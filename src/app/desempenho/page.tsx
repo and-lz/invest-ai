@@ -1,7 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useTransitionRouter } from "next-view-transitions";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { serializarContextoDesempenho } from "@/lib/serializar-contexto-chat";
@@ -23,7 +22,7 @@ import { notificar } from "@/lib/notificar";
 
 function DesempenhoConteudo() {
   const searchParams = useSearchParams();
-  const router = useTransitionRouter();
+  const router = useRouter();
   const tickerDaUrl = searchParams.get("ticker");
 
   const [tickerSelecionado, setTickerSelecionado] = useState<string | null>(tickerDaUrl);

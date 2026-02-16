@@ -19,7 +19,7 @@ import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, LayoutDashboard } from "lucide-react";
-import { Link } from "next-view-transitions";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 // Lazy-load chart components que usam Recharts (~150KB)
