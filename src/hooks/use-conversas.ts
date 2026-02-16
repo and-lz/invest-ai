@@ -43,7 +43,7 @@ export function useConversas() {
             if (!resposta.ok) {
               throw new Error(`Erro ao deletar conversa: ${resposta.status}`);
             }
-            return undefined;
+            return dadosOtimistas;
           },
           {
             optimisticData: dadosOtimistas,
