@@ -28,8 +28,17 @@ import {
   Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatarMesAno } from "@/lib/format-date";
+import { formatarMesAno, validarMesAno } from "@/lib/format-date";
 import type { InsightsResponse, Insight, StatusAcao } from "@/schemas/insights.schema";
+
+/** Formata mesReferencia de forma segura: se já estiver formatado, retorna como está */
+function formatarMesReferenciaSeguro(mesReferencia: string): string {
+  if (validarMesAno(mesReferencia)) {
+    return formatarMesAno(mesReferencia, "extenso");
+  }
+  // Valor já formatado pela Gemini (ex: "janeiro de 2026") — retornar como está
+  return mesReferencia;
+}
 
 const ICONES_CATEGORIA: Record<string, typeof TrendingUp> = {
   performance_positiva: TrendingUp,
@@ -241,12 +250,8 @@ export default function InsightsPage() {
   const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
 
-  // Se houver erro ao carregar relatórios, lançar para o Error Boundary com mensagem clara
-  if (erroRelatorios) {
-    throw new Error(
-      `Erro ao carregar relatórios: ${erroRelatorios.message || "Erro desconhecido"}`,
-    );
-  }
+  // Tratar erro de relatórios na UI sem crashar a página inteira
+  const temErroRelatorios = !!erroRelatorios;
 
   // Registrar contexto da pagina para o chat
   const { definirContexto } = useContextoPaginaChat();
@@ -432,9 +437,22 @@ export default function InsightsPage() {
         )}
       </div>
 
-      {(carregandoRelatorios || estaCarregandoInsights) && <Skeleton className="h-64" />}
+      {(carregandoRelatorios || estaCarregandoInsights) && !temErroRelatorios && (
+        <Skeleton className="h-64" />
+      )}
 
-      {!carregandoRelatorios && !estaCarregandoInsights && relatorios.length === 0 && (
+      {temErroRelatorios && (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
+            <AlertTriangle className="text-destructive h-12 w-12" />
+            <p className="text-muted-foreground">
+              Erro ao carregar relatórios. Verifique sua conexão e tente novamente.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {!carregandoRelatorios && !estaCarregandoInsights && !temErroRelatorios && relatorios.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
             <Lightbulb className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
@@ -509,7 +527,7 @@ export default function InsightsPage() {
               {ehConsolidado ? "Análise Consolidada" : "Análise de Carteira"}
             </p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight">
-              {ehConsolidado ? "Todos os meses" : formatarMesAno(insights.mesReferencia, "extenso")}
+              {ehConsolidado ? "Todos os meses" : formatarMesReferenciaSeguro(insights.mesReferencia)}
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
               {ehConsolidado && <span>{relatorios.length} relatórios analisados — </span>}
