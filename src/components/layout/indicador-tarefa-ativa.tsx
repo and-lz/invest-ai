@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { dispararEventoNotificacaoCriada } from "@/hooks/use-notificacoes";
@@ -49,7 +49,7 @@ function MonitorTarefa({
   identificadorTarefa: string;
   onConcluida: (identificador: string) => void;
 }) {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { tarefa, estaConcluido, estaComErro, estaProcessando } =
     useTarefaBackground(identificadorTarefa);
   const [jaNotificou, setJaNotificou] = useState(false);

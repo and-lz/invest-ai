@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { Header } from "@/components/layout/header";
@@ -25,7 +25,7 @@ import { notificar } from "@/lib/notificar";
 import { tipografia, icone, layout, dialog } from "@/lib/design-system";
 
 export default function ReportsPage() {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { relatorios, estaCarregando, revalidar } = useReports();
 
   // Registrar contexto da pagina para o chat
