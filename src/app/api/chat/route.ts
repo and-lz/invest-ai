@@ -5,6 +5,8 @@ import { construirInstrucaoSistemaChat } from "@/lib/construir-instrucao-sistema
 import { AiApiTransientError } from "@/domain/errors/app-errors";
 import type { MensagemAi } from "@/domain/interfaces/provedor-ai";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request): Promise<Response> {
   const verificacaoAuth = await requireAuth();
   if (!verificacaoAuth.authenticated) {

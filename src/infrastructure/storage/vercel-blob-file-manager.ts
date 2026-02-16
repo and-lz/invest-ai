@@ -1,4 +1,5 @@
 import { put, del, list, head } from "@vercel/blob";
+import { unstable_noStore as noStore } from "next/cache";
 import type { FileManager } from "@/domain/interfaces/file-manager";
 import { FileStorageError } from "@/domain/errors/app-errors";
 
@@ -10,6 +11,7 @@ export class VercelBlobFileManager implements FileManager {
   }
 
   async salvarArquivo(caminhoRelativo: string, conteudo: Buffer | string): Promise<string> {
+    noStore(); // Prevent Next.js from caching Vercel Blob SDK calls
     try {
       const blob = await put(this.getFullPath(caminhoRelativo), conteudo, {
         access: "public",
@@ -29,6 +31,7 @@ export class VercelBlobFileManager implements FileManager {
   }
 
   async lerArquivo(caminhoRelativo: string): Promise<Buffer> {
+    noStore(); // Prevent Next.js from caching Vercel Blob SDK calls
     try {
       const metadata = await head(this.getFullPath(caminhoRelativo));
       if (!metadata.url) throw new FileStorageError("Arquivo nao encontrado");
@@ -50,6 +53,7 @@ export class VercelBlobFileManager implements FileManager {
   }
 
   async arquivoExiste(caminhoRelativo: string): Promise<boolean> {
+    noStore(); // Prevent Next.js from caching Vercel Blob SDK calls
     try {
       await head(this.getFullPath(caminhoRelativo));
       return true;
@@ -59,6 +63,7 @@ export class VercelBlobFileManager implements FileManager {
   }
 
   async removerArquivo(caminhoRelativo: string): Promise<void> {
+    noStore(); // Prevent Next.js from caching Vercel Blob SDK calls
     try {
       await del(this.getFullPath(caminhoRelativo));
     } catch (erro) {
@@ -71,6 +76,7 @@ export class VercelBlobFileManager implements FileManager {
   }
 
   async listarArquivos(caminhoRelativo: string, extensao?: string): Promise<string[]> {
+    noStore(); // Prevent Next.js from caching Vercel Blob SDK calls
     const fullPath = this.getFullPath(caminhoRelativo);
     const { blobs } = await list({ prefix: fullPath });
 

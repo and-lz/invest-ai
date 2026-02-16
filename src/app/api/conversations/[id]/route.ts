@@ -4,6 +4,8 @@ import { obterConversaRepository } from "@/lib/container";
 import { AtualizarConversaSchema } from "@/schemas/conversa.schema";
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/conversations/[id]
  * Obtem conversa completa (com todas as mensagens).

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { marcarTodasComoVisualizadas } from "@/lib/notificacao";
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
+export const dynamic = "force-dynamic";
+
 export async function PATCH() {
   try {
     await marcarTodasComoVisualizadas();

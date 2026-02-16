@@ -4,6 +4,8 @@ import { obterConversaRepository } from "@/lib/container";
 import { CriarConversaSchema } from "@/schemas/conversa.schema";
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/conversations
  * Lista metadata de conversas do usuario autenticado (sem mensagens completas).

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { marcarComoVisualizada } from "@/lib/notificacao";
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
 
+export const dynamic = "force-dynamic";
+
 export async function PATCH(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
