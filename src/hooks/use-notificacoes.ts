@@ -50,13 +50,12 @@ export function useNotificacoes() {
             if (!resposta.ok) {
               throw new Error(`Erro ao marcar notificacao: ${resposta.status}`);
             }
-            // Retorna dados reais do servidor após sucesso
-            return undefined;
+            return dadosOtimistas;
           },
           {
             optimisticData: dadosOtimistas,
             rollbackOnError: true,
-            revalidate: true,
+            revalidate: false,
           },
         );
       } catch (erro) {
@@ -83,12 +82,12 @@ export function useNotificacoes() {
           if (!resposta.ok) {
             throw new Error(`Erro ao marcar todas: ${resposta.status}`);
           }
-          return undefined;
+          return dadosOtimistas;
         },
         {
           optimisticData: dadosOtimistas,
           rollbackOnError: true,
-          revalidate: true,
+          revalidate: false,
         },
       );
     } catch (erro) {
@@ -108,12 +107,12 @@ export function useNotificacoes() {
           if (!resposta.ok) {
             throw new Error(`Erro ao limpar notificacoes: ${resposta.status}`);
           }
-          return undefined;
+          return dadosOtimistas;
         },
         {
           optimisticData: dadosOtimistas,
           rollbackOnError: true,
-          revalidate: true,
+          revalidate: false,
         },
       );
     } catch (erro) {
