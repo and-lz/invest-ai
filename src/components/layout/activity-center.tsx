@@ -85,7 +85,7 @@ function MonitorTarefa({
   onConcluida: (identificador: string) => void;
 }) {
   const router = useRouter();
-  const { tarefa, estaConcluido, estaComErro, estaProcessando, estaCancelada } =
+  const { tarefa, estaCarregando, estaConcluido, estaComErro, estaProcessando, estaCancelada } =
     useTarefaBackground(identificadorTarefa);
   const [jaNotificou, setJaNotificou] = useState(false);
   const [cancelando, setCancelando] = useState(false);
@@ -170,6 +170,14 @@ function MonitorTarefa({
       }
     };
   }, [estaConcluido, estaComErro, estaCancelada, identificadorTarefa, onConcluida]);
+
+  // Cleanup: tarefa não encontrada no servidor (404/arquivo removido) — remover ID órfão do storage
+  useEffect(() => {
+    if (!estaCarregando && !tarefa && !onConcluidaChamadaRef.current) {
+      onConcluidaChamadaRef.current = true;
+      onConcluida(identificadorTarefa);
+    }
+  }, [estaCarregando, tarefa, identificadorTarefa, onConcluida]);
 
   const handleCancelar = useCallback(async () => {
     if (!tarefa) return;
