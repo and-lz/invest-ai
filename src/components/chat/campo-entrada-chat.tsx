@@ -12,6 +12,11 @@ interface CampoEntradaChatProps {
   readonly autoFocus?: boolean;
 }
 
+function ehDispositivoTouch(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(hover: none)").matches;
+}
+
 export function CampoEntradaChat({
   onEnviar,
   onParar,
@@ -22,9 +27,9 @@ export function CampoEntradaChat({
   const [valor, setValor] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-focus quando componente monta
+  // Auto-focus quando componente monta (apenas em desktop, nao abre teclado no mobile)
   useEffect(() => {
-    if (autoFocus && textareaRef.current) {
+    if (autoFocus && textareaRef.current && !ehDispositivoTouch()) {
       textareaRef.current.focus();
     }
   }, [autoFocus]);
