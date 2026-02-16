@@ -236,6 +236,67 @@ All tests use realistic data factories that create valid domain objects:
 - Evitar cor em elementos decorativos ou informativos que nao exigem atencao imediata
 - NUNCA usar cores Tailwind hardcoded (`text-green-600`, `bg-red-50`, etc.) — sempre usar variaveis semanticas
 
+## Design System: Constantes (DS Tokens)
+
+Constantes centralizadas em `src/lib/design-system.ts` — fonte unica de verdade para padroes visuais.
+SEMPRE usar estas constantes em vez de classes Tailwind hardcoded para tipografia, icones e layout.
+
+### Uso
+```typescript
+import { tipografia, icone, layout, corValor } from "@/lib/design-system";
+// Ou objeto agregado:
+import { ds } from "@/lib/design-system";
+```
+
+### Tipografia (`tipografia.*`)
+| Token | Classe | Uso |
+|-------|--------|-----|
+| `h1` | `font-heading text-2xl font-bold tracking-tight` | Titulos de pagina |
+| `h1Grande` | `font-heading text-3xl font-bold tracking-tight` | Titulos de artigo |
+| `h2` | `font-heading text-xl font-semibold tracking-tight` | Titulos de secao, headers |
+| `h3` | `text-lg font-semibold` | Titulos de card (CardTitle) |
+| `rotulo` | `text-sm font-medium` | Labels, nav, botoes, table headers |
+| `corpo` | `text-sm` | Descricoes, paragrafos, conteudo |
+| `auxiliar` | `text-xs text-muted-foreground` | Tooltips, timestamps, hints |
+| `mono` | `text-xs font-mono` | Codigo, erros tecnicos |
+
+### Icones (`icone.*`)
+| Token | Classe | Uso |
+|-------|--------|-----|
+| `tituloCard` | `h-5 w-5` | Icone em CardHeader |
+| `tituloPagina` | `h-6 w-6` | Icone de header de pagina |
+| `botao` | `h-4 w-4` | Icone inline em botao/input |
+| `micro` | `h-3.5 w-3.5` | Indicadores pequenos, badges |
+| `estadoVazio` | `h-12 w-12 text-muted-foreground` | Icone centralizado grande |
+| `carregandoPequeno` | `h-4 w-4 animate-spin` | Loading inline |
+| `carregandoGrande` | `h-8 w-8 animate-spin` | Loading de pagina |
+
+### Layout (`layout.*`)
+| Token | Classe | Uso |
+|-------|--------|-----|
+| `espacamentoPagina` | `space-y-6` | Entre secoes de pagina |
+| `espacamentoSecao` | `space-y-4` | Dentro de secoes |
+| `gridCards` | `grid gap-4 md:grid-cols-2 lg:grid-cols-4` | Grid de summary cards |
+| `gridConteudo` | `grid gap-4 md:grid-cols-2 lg:grid-cols-3` | Grid de conteudo |
+| `gridCharts` | `grid gap-6 lg:grid-cols-2` | Grid de graficos |
+| `estadoVazio` | `flex flex-col items-center justify-center gap-3 p-6` | Estado vazio |
+| `estadoVazioCard` | `flex flex-col items-center gap-4 py-12` | Estado vazio em card |
+| `headerPagina` | `flex items-center gap-3` | Header com icone + titulo |
+
+### Funcoes utilitarias de cor
+| Funcao | Retorno | Uso |
+|--------|---------|-----|
+| `corValor(n)` | `text-success` ou `text-destructive` | Valores positivos/negativos |
+| `corIconeTendencia(n)` | cor semantica ou `text-muted-foreground` | Icone de tendencia |
+| `corBadge(tipo)` | `bg-*/10 text-* border-*/30` | Badge semantico |
+
+### Combinando com classes extras
+Usar `cn()` de `@/lib/utils`:
+```tsx
+<h1 className={cn(tipografia.h1Grande, "flex-1")}>Titulo</h1>
+<Icon className={cn(icone.tituloCard, "text-muted-foreground")} />
+```
+
 ## Design System: Paleta Financeira OkLCH
 
 ### Filosofia
