@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,14 +20,18 @@ interface ItemConversaProps {
 }
 
 export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar }: ItemConversaProps) {
+  const [mostrarAcoes, setMostrarAcoes] = useState(false);
+
   return (
     <div
       className={cn(
         "group hover:bg-muted/50 relative rounded-lg border p-3 transition-colors",
         estaAtiva && "border-primary bg-muted",
       )}
+      onMouseEnter={() => setMostrarAcoes(true)}
+      onMouseLeave={() => setMostrarAcoes(false)}
     >
-      <button onClick={onSelecionar} className="w-full text-left pr-7">
+      <button onClick={onSelecionar} className="w-full text-left">
         {/* Titulo */}
         <h4 className="line-clamp-1 text-sm font-medium">{conversa.titulo}</h4>
 
@@ -44,19 +49,21 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar }: I
         </div>
       </button>
 
-      {/* Botao deletar: sempre visivel em touch, hover em desktop */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={(evento) => {
-          evento.stopPropagation();
-          onDeletar();
-        }}
-        className="absolute top-2 right-2 h-6 w-6 opacity-60 transition-opacity hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
-      >
-        <Trash2 className="text-destructive h-3 w-3" />
-        <span className="sr-only">Deletar conversa</span>
-      </Button>
+      {/* Botao deletar (hover) */}
+      {mostrarAcoes && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={(evento) => {
+            evento.stopPropagation();
+            onDeletar();
+          }}
+          className="absolute top-2 right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
+        >
+          <Trash2 className="text-destructive h-3 w-3" />
+          <span className="sr-only">Deletar conversa</span>
+        </Button>
+      )}
     </div>
   );
 }

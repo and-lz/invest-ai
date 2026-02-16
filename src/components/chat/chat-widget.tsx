@@ -35,7 +35,6 @@ export function ChatWidget() {
 
   const handleAlternarChat = useCallback(() => {
     setEstaAberto((anterior) => !anterior);
-    setMostrarSidebar(false);
   }, []);
 
   const handleSelecionarConversa = useCallback(
@@ -50,10 +49,6 @@ export function ChatWidget() {
     criarNovaConversa();
     setMostrarSidebar(false);
   }, [criarNovaConversa]);
-
-  const handleFecharSidebar = useCallback(() => {
-    setMostrarSidebar(false);
-  }, []);
 
   return (
     <>
@@ -72,22 +67,7 @@ export function ChatWidget() {
 
       {/* Painel de chat */}
       {estaAberto && (
-        <div
-          className={cn(
-            "bg-background fixed left-0 top-0 z-60 flex h-dvh w-dvw overflow-hidden border shadow-xl",
-            "md:inset-auto md:right-6 md:bottom-6 md:left-auto md:top-auto md:h-[85vh] md:max-h-[calc(100vh-3rem)] md:w-[85vw] md:max-w-350 md:rounded-2xl",
-          )}
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-        >
-          {/* Backdrop da sidebar (mobile) */}
-          {mostrarSidebar && (
-            <div
-              className="absolute inset-0 z-5 bg-black/40 transition-opacity md:hidden"
-              onClick={handleFecharSidebar}
-              aria-hidden="true"
-            />
-          )}
-
+        <div className="bg-background fixed inset-0 z-40 flex overflow-hidden border shadow-xl md:inset-auto md:right-6 md:bottom-6 md:h-[85vh] md:max-h-[calc(100vh-3rem)] md:w-[85vw] md:max-w-350 md:rounded-2xl">
           {/* Sidebar de conversas (overlay, aberta apenas ao clicar) */}
           <div
             className={cn(
