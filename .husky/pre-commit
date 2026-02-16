@@ -1,5 +1,5 @@
 echo "🔍 Running lint..."
-npm run lint
+npx eslint --max-warnings 0
 
 echo "🔍 Running TypeScript check..."
 npx tsc --noEmit
