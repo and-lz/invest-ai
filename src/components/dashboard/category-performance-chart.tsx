@@ -139,7 +139,7 @@ export function CategoryPerformanceChart({ categorias, cdiAnual }: CategoryPerfo
               dataKey="nome"
               tickLine={false}
               axisLine={false}
-              width={120}
+              width={80}
               className="text-xs"
             />
             <ChartTooltip content={<TooltipCategoria />} />

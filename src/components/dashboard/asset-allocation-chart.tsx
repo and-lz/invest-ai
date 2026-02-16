@@ -118,7 +118,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
             </Pie>
           </PieChart>
         </ChartContainer>
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-4 grid grid-cols-1 gap-1.5 sm:grid-cols-2 sm:gap-2">
           {dadosGrafico.map((item) => {
             const explicacaoEstrategia = GLOSSARIO_ESTRATEGIAS[item.nome];
             const IconeEstrategia = ICONES_ESTRATEGIA[item.nome];

@@ -11,6 +11,13 @@ html, body {
   max-width: 100vw;
 }
 
+/* Prevent grid children from overflowing their track —
+   min-width:auto (default) lets content push grid items wider than their column.
+   :where() keeps specificity at 0 so utility classes can override. */
+:where(.grid) > * {
+  min-width: 0;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

@@ -156,7 +156,7 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
               dataKey="nome"
               tickLine={false}
               axisLine={false}
-              width={100}
+              width={70}
               className="text-xs"
             />
             <ChartTooltip content={<TooltipLiquidez />} />

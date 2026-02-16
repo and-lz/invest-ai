@@ -154,7 +154,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
               tickLine={false}
               axisLine={false}
               tickFormatter={(valorCentavos: number) => formatarMoedaCompacta(valorCentavos)}
-              width={80}
+              width={55}
             />
             <ChartTooltip content={<TooltipCustomizado />} />
             <Area
