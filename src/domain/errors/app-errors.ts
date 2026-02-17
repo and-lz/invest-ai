@@ -57,3 +57,10 @@ export class ReportNotFoundError extends AppError {
     this.name = "ReportNotFoundError";
   }
 }
+
+export class InsightsNotFoundError extends AppError {
+  constructor(identificador: string) {
+    super(`Insights not found: ${identificador}`, "INSIGHTS_NOT_FOUND");
+    this.name = "InsightsNotFoundError";
+  }
+}

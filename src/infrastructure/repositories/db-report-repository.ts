@@ -1,7 +1,7 @@
 import type { ReportRepository } from "@/domain/interfaces/report-repository";
 import type { ReportMetadata } from "@/schemas/report-metadata.schema";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
-import type { InsightsResponse } from "@/schemas/insights.schema";
+import type { InsightsResponse, InsightsMetadata } from "@/schemas/insights.schema";
 import { ReportMetadataSchema } from "@/schemas/report-metadata.schema";
 import { RelatorioExtraidoSchema } from "@/schemas/report-extraction.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
@@ -149,6 +149,40 @@ export class DbReportRepository implements ReportRepository {
       .orderBy(desc(relatoriosMetadados.mesReferencia));
 
     return rows.map((row) => this.mapearMetadados(row));
+  }
+
+  async listarInsightsMetadados(): Promise<InsightsMetadata[]> {
+    const rows = await db
+      .select()
+      .from(relatoriosInsights)
+      .where(eq(relatoriosInsights.usuarioId, this.usuarioId))
+      .orderBy(desc(relatoriosInsights.atualizadoEm));
+
+    return rows.map((row) => {
+      const dados = row.dados as Record<string, unknown>;
+      const insights = (dados.insights ?? []) as unknown[];
+      const alertas = (dados.alertas ?? []) as unknown[];
+
+      return {
+        identificador: row.identificador,
+        dataGeracao: (dados.dataGeracao as string) ?? "",
+        mesReferencia: (dados.mesReferencia as string) ?? row.identificador,
+        totalInsights: insights.length,
+        totalAlertas: alertas.length,
+        atualizadoEm: row.atualizadoEm.toISOString(),
+      };
+    });
+  }
+
+  async removerInsights(identificador: string): Promise<void> {
+    await db
+      .delete(relatoriosInsights)
+      .where(
+        and(
+          eq(relatoriosInsights.usuarioId, this.usuarioId),
+          eq(relatoriosInsights.identificador, identificador),
+        ),
+      );
   }
 
   async removerRelatorio(identificador: string): Promise<void> {

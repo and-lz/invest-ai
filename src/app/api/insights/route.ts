@@ -5,8 +5,10 @@ import {
   obterListReportsUseCase,
   obterReportRepository,
   obterAtualizarConclusaoInsightUseCase,
+  obterListInsightsUseCase,
+  obterDeleteInsightsUseCase,
 } from "@/lib/container";
-import { AppError } from "@/domain/errors/app-errors";
+import { AppError, InsightsNotFoundError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
 import { z } from "zod/v4";
 import { StatusAcaoEnum } from "@/schemas/insights.schema";
@@ -27,6 +29,14 @@ export async function GET(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
+
+    // List all insights metadata
+    if (searchParams.get("list") === "true") {
+      const useCase = await obterListInsightsUseCase();
+      const insightsMetadados = await useCase.executar();
+      return NextResponse.json({ insightsMetadados }, cabecalhosCachePrivado(60, 300));
+    }
+
     const mesAnoParam = searchParams.get("mesAno");
 
     // Busca direta para insights consolidados
@@ -215,5 +225,39 @@ export async function PATCH(request: Request) {
     }
 
     return NextResponse.json({ erro: "Falha ao atualizar conclusao de insight" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const identificador = searchParams.get("identificador");
+
+    if (!identificador) {
+      return NextResponse.json(
+        { erro: "Parameter 'identificador' is required" },
+        { status: 400 },
+      );
+    }
+
+    const useCase = await obterDeleteInsightsUseCase();
+    await useCase.executar(identificador);
+
+    return NextResponse.json({ sucesso: true }, cabecalhosSemCache());
+  } catch (erro) {
+    if (erro instanceof InsightsNotFoundError) {
+      return NextResponse.json({ erro: erro.message }, { status: 404 });
+    }
+
+    console.error("Error deleting insights:", erro);
+
+    if (erro instanceof AppError) {
+      return NextResponse.json({ erro: erro.message, codigo: erro.code }, { status: 422 });
+    }
+
+    return NextResponse.json({ erro: "Failed to delete insights" }, { status: 500 });
   }
 }

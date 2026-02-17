@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { InsightsManualStepper } from "@/components/insights/insights-manual-stepper";
+import { InsightsList } from "@/components/insights/insights-list";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
 import {
   Lightbulb,
@@ -396,6 +397,17 @@ export default function InsightsPage() {
     setModoVisualizacao("inicial");
   }, []);
 
+  const handleInsightsDeleted = useCallback(
+    (identificador: string) => {
+      // If the deleted insights are the ones currently being viewed, reset view
+      if (identificador === periodoSelecionado) {
+        setInsights(null);
+        setModoVisualizacao("inicial");
+      }
+    },
+    [periodoSelecionado],
+  );
+
   const handleStatusAlterado = useCallback(
     (indiceInsight: number, statusAcao: StatusAcao) => {
       if (insights) {
@@ -626,6 +638,15 @@ export default function InsightsPage() {
             </Button>
           </div>
         </div>
+      )}
+
+      {/* --- Lista de insights gerados --- */}
+      {!carregandoRelatorios && relatorios.length > 0 && (
+        <InsightsList
+          onSelectPeriod={setPeriodoSelecionado}
+          selectedPeriod={periodoSelecionado}
+          onInsightsDeleted={handleInsightsDeleted}
+        />
       )}
     </div>
   );

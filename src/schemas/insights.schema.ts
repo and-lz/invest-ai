@@ -47,9 +47,21 @@ export const InsightsResponseSchema = z.object({
   recomendacoesLongoPrazo: z.array(z.string()),
 });
 
+// ---- Metadata (lightweight projection for listing) ----
+
+export const InsightsMetadataSchema = z.object({
+  identificador: z.string(),
+  dataGeracao: z.string(),
+  mesReferencia: z.string(),
+  totalInsights: z.number(),
+  totalAlertas: z.number(),
+  atualizadoEm: z.string(),
+});
+
 // ---- Tipos inferidos ----
 
 export type InsightsResponse = z.infer<typeof InsightsResponseSchema>;
 export type Insight = z.infer<typeof InsightSchema>;
 export type Alerta = z.infer<typeof AlertaSchema>;
 export type StatusAcao = z.infer<typeof StatusAcaoEnum>;
+export type InsightsMetadata = z.infer<typeof InsightsMetadataSchema>;

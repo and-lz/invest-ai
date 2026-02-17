@@ -104,6 +104,14 @@ class MockReportRepository implements ReportRepository {
   async removerRelatorio(): Promise<void> {
     return;
   }
+
+  async listarInsightsMetadados() {
+    return [];
+  }
+
+  async removerInsights(): Promise<void> {
+    return;
+  }
 }
 
 // ========== Tests ==========

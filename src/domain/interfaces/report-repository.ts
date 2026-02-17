@@ -1,6 +1,6 @@
 import type { ReportMetadata } from "@/schemas/report-metadata.schema";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
-import type { InsightsResponse } from "@/schemas/insights.schema";
+import type { InsightsResponse, InsightsMetadata } from "@/schemas/insights.schema";
 
 export interface ReportRepository {
   salvarPdf(identificador: string, pdfBuffer: Buffer): Promise<string>;
@@ -14,6 +14,8 @@ export interface ReportRepository {
   obterPdfComoBase64(identificador: string): Promise<string>;
 
   listarTodosMetadados(): Promise<ReportMetadata[]>;
+  listarInsightsMetadados(): Promise<InsightsMetadata[]>;
 
   removerRelatorio(identificador: string): Promise<void>;
+  removerInsights(identificador: string): Promise<void>;
 }

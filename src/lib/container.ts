@@ -13,6 +13,8 @@ import { SalvarInsightsManualUseCase } from "@/application/use-cases/salvar-insi
 import { AtualizarConclusaoInsightUseCase } from "@/application/use-cases/atualizar-conclusao-insight";
 import { GenerateInsightsConsolidadosUseCase } from "@/application/use-cases/generate-insights-consolidados";
 import { AnalyzeAssetPerformanceUseCase } from "@/application/use-cases/analyze-asset-performance";
+import { ListInsightsUseCase } from "@/application/use-cases/list-insights";
+import { DeleteInsightsUseCase } from "@/application/use-cases/delete-insights";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
@@ -112,6 +114,16 @@ export async function obterAtualizarConclusaoInsightUseCase() {
 export async function obterGenerateInsightsConsolidadosUseCase() {
   const repository = await criarRepositorio();
   return new GenerateInsightsConsolidadosUseCase(repository, criarServicoInsights());
+}
+
+export async function obterListInsightsUseCase() {
+  const repository = await criarRepositorio();
+  return new ListInsightsUseCase(repository);
+}
+
+export async function obterDeleteInsightsUseCase() {
+  const repository = await criarRepositorio();
+  return new DeleteInsightsUseCase(repository);
 }
 
 export async function obterReportRepository() {

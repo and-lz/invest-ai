@@ -202,6 +202,14 @@ class MockReportRepository implements ReportRepository {
     return;
   }
 
+  async listarInsightsMetadados() {
+    return [];
+  }
+
+  async removerInsights(): Promise<void> {
+    return;
+  }
+
   adicionarRelatorio(
     identificador: string,
     mesReferencia: string,
