@@ -14,21 +14,21 @@ export function MensagemChatBolha({ mensagem, estaTransmitindo }: MensagemChatBo
   const ehUsuario = mensagem.papel === "usuario";
 
   return (
-    <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
+    <div className={cn("flex gap-2", ehUsuario ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       <div
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
           ehUsuario ? "bg-primary/10" : "bg-secondary",
         )}
       >
-        {ehUsuario ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        {ehUsuario ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
       </div>
 
       {/* Bolha de mensagem */}
       <div
         className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+          "max-w-[85%] rounded-xl px-3 py-1.5 text-sm leading-relaxed",
           ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
         )}
       >

@@ -29,9 +29,9 @@ export function ListaConversas({
   return (
     <div className="flex h-full flex-col">
       {/* Botao Nova Conversa */}
-      <div className="border-b p-3">
+      <div className="border-b p-2">
         <Button onClick={onNovaConversa} variant="outline" size="sm" className="w-full">
-          <PlusCircle className="mr-2 h-4 w-4" />
+          <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
           Nova Conversa
         </Button>
       </div>
@@ -39,8 +39,8 @@ export function ListaConversas({
       {/* Lista de conversas */}
       <div className="flex-1 overflow-y-auto">
         {conversas.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 p-6">
-            <MessageSquare className="text-muted-foreground h-12 w-12" />
+          <div className="flex flex-col items-center justify-center gap-2 p-4">
+            <MessageSquare className="text-muted-foreground h-8 w-8" />
             <p className="text-muted-foreground text-center text-sm">
               Nenhuma conversa ainda.
               <br />

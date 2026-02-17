@@ -253,7 +253,7 @@ dialog::backdrop {
 }
 
 .markdown-content p {
-  @apply mb-3 last:mb-0;
+  @apply mb-1.5 last:mb-0;
 }
 
 .markdown-content p:first-child {
@@ -265,7 +265,7 @@ dialog::backdrop {
 .markdown-content h2,
 .markdown-content h3,
 .markdown-content h4 {
-  @apply font-semibold mb-2 mt-4 first:mt-0;
+  @apply font-semibold mb-1 mt-2.5 first:mt-0;
 }
 
 .markdown-content h1 {
@@ -284,7 +284,7 @@ dialog::backdrop {
 /* Lists */
 .markdown-content ul,
 .markdown-content ol {
-  @apply mb-3 pl-5 space-y-1;
+  @apply mb-1.5 pl-4 space-y-0.5;
 }
 
 .markdown-content ul {
@@ -340,17 +340,17 @@ dialog::backdrop {
 
 /* Horizontal rule */
 .markdown-content hr {
-  @apply my-3;
+  @apply my-2;
 }
 
 /* Blockquotes (if AI uses them) */
 .markdown-content blockquote {
-  @apply border-l-2 pl-3 italic opacity-90 my-3;
+  @apply border-l-2 pl-3 italic opacity-90 my-2;
 }
 
 /* Tables - spacing (components handle structure) */
 .markdown-content table {
-  @apply my-3;
+  @apply my-2;
 }
 
 /* Prevent overflow in chat bubble */

@@ -105,24 +105,24 @@ export function ChatWidget() {
           {/* Area principal do chat */}
           <div className="flex flex-1 flex-col">
             {/* Cabecalho */}
-            <div className="flex items-center justify-between border-b px-4 py-3">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between border-b px-3 py-2">
+              <div className="flex items-center gap-1.5">
                 {/* Botao toggle sidebar (historico de conversas) */}
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setMostrarSidebar(!mostrarSidebar)}
-                  className="h-8 w-8"
+                  className="h-7 w-7"
                 >
-                  <Menu className="h-4 w-4" />
+                  <Menu className="h-3.5 w-3.5" />
                 </Button>
 
-                <MessageCircle className="text-muted-foreground h-5 w-5" />
+                <MessageCircle className="text-muted-foreground h-4 w-4" />
                 <h3 className="text-sm font-medium">Assistente</h3>
               </div>
               <div className="flex items-center gap-1">
                 {mensagens.length > 0 && (
-                  <Button variant="ghost" size="icon" onClick={limparHistorico} className="h-8 w-8">
+                  <Button variant="ghost" size="icon" onClick={limparHistorico} className="h-7 w-7">
                     <Trash2 className="text-muted-foreground h-3.5 w-3.5" />
                     <span className="sr-only">Limpar historico</span>
                   </Button>
@@ -131,19 +131,19 @@ export function ChatWidget() {
                   variant="ghost"
                   size="icon"
                   onClick={handleAlternarChat}
-                  className="h-8 w-8"
+                  className="h-7 w-7"
                 >
-                  <X className="text-muted-foreground h-4 w-4" />
+                  <X className="text-muted-foreground h-3.5 w-3.5" />
                   <span className="sr-only">Fechar assistente</span>
                 </Button>
               </div>
             </div>
 
             {/* Area de mensagens */}
-            <div ref={areaScrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
+            <div ref={areaScrollRef} className="flex-1 space-y-2.5 overflow-y-auto p-3">
               {mensagens.length === 0 && (
                 <div className="flex h-full flex-col items-center justify-center text-center">
-                  <MessageCircle className="text-muted-foreground mb-3 h-10 w-10" />
+                  <MessageCircle className="text-muted-foreground mb-2 h-8 w-8" />
                   <p className="text-muted-foreground text-sm">
                     Pergunte sobre seus investimentos.
                   </p>
