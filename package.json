@@ -1,6 +1,6 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -16,6 +16,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:migrate-blob": "tsx scripts/migrate-blob-to-db.ts",
     "prepare": "husky"
   },
   "dependencies": {
