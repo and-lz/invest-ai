@@ -1,4 +1,13 @@
+import { execSync } from "child_process";
 import type { NextConfig } from "next";
+
+function getLastCommitMessage(): string {
+  try {
+    return execSync("git log -1 --format=%s", { encoding: "utf-8" }).trim();
+  } catch {
+    return "";
+  }
+}
 
 const cabecalhosSeguranca = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -9,6 +18,9 @@ const cabecalhosSeguranca = [
 ];
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_LAST_COMMIT_MESSAGE: getLastCommitMessage(),
+  },
   poweredByHeader: false,
   outputFileTracingIncludes: {
     "/api/reports": ["./node_modules/@neslinesli93/qpdf-wasm/dist/*.wasm"],

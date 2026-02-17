@@ -17,6 +17,7 @@ import { AlternarTema } from "@/components/layout/alternar-tema";
 import { ActivityCenter } from "@/components/layout/activity-center";
 import { UserProfileMenu } from "@/components/auth/user-profile-menu";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
@@ -26,6 +27,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import packageJson from "../../../package.json";
+
+const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
 
 const itensNavegacaoPrincipais = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
@@ -95,10 +98,23 @@ export function HeaderNavigation() {
             <SheetContent side="left" className="w-72 p-0">
               <SheetHeader className="border-b px-6 py-4">
                 <SheetTitle className="font-serif text-lg font-semibold tracking-tight">
-                  Investimentos{" "}
-                  <span className="text-muted-foreground text-xs font-normal">
-                    v{packageJson.version}
-                  </span>
+                  <Link href="/" onClick={() => setMenuMobileAberto(false)} className="hover:text-foreground/80 transition-colors">
+                    Investimentos
+                  </Link>{" "}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-muted-foreground cursor-default text-xs font-normal">
+                          v{packageJson.version}
+                        </span>
+                      </TooltipTrigger>
+                      {lastCommitMessage && (
+                        <TooltipContent>
+                          {lastCommitMessage}
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 p-4">
@@ -129,10 +145,23 @@ export function HeaderNavigation() {
           {/* Logo */}
           <div className="hidden items-center gap-2 md:flex">
             <h1 className="font-serif text-base font-semibold tracking-tight">
-              Investimentos{" "}
-              <span className="text-muted-foreground text-xs font-normal">
-                v{packageJson.version}
-              </span>
+              <Link href="/" className="hover:text-foreground/80 transition-colors">
+                Investimentos
+              </Link>{" "}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-muted-foreground cursor-default text-xs font-normal">
+                      v{packageJson.version}
+                    </span>
+                  </TooltipTrigger>
+                  {lastCommitMessage && (
+                    <TooltipContent>
+                      {lastCommitMessage}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
             </h1>
           </div>
 
