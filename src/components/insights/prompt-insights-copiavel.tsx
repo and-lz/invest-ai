@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Copy, Check, Loader2, ArrowRight } from "lucide-react";
 
 interface PromptInsightsCopiavelProps {
@@ -85,10 +84,6 @@ export function PromptInsightsCopiavel({
             gerar os insights.
           </p>
         </div>
-
-        <ScrollArea className="bg-muted/50 h-64 rounded-md border p-4">
-          <pre className="text-xs whitespace-pre-wrap">{promptCompleto}</pre>
-        </ScrollArea>
 
         <div className="flex items-center gap-3">
           <Button onClick={copiarPrompt} variant="outline">

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Copy, Check, Loader2, ArrowRight } from "lucide-react";
 
 interface PromptExtracaoCopiavelProps {
@@ -67,10 +66,6 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
             Copie o prompt abaixo e cole no chat de IA junto com o PDF do relatorio.
           </p>
         </div>
-
-        <ScrollArea className="bg-muted/50 h-64 rounded-md border p-4">
-          <pre className="text-sm whitespace-pre-wrap">{promptCompleto}</pre>
-        </ScrollArea>
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <Button onClick={copiarPrompt} variant="outline">
