@@ -107,7 +107,7 @@ export default function ReportsPage() {
         ref={dialogRef}
         aria-label="Importar relatório"
         className={cn(
-          "bg-background fixed top-1/2 left-1/2 m-0 max-h-[85vh] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-lg border p-0 shadow-lg",
+          "bg-background m-auto max-h-[85vh] overflow-y-auto rounded-lg border p-0 shadow-lg",
           dialog.backdrop,
         )}
         style={{ maxWidth: "42rem", width: "90vw" }}
