@@ -114,7 +114,7 @@ export async function obterGenerateInsightsConsolidadosUseCase() {
   return new GenerateInsightsConsolidadosUseCase(repository, criarServicoInsights());
 }
 
-export async function obterFilesystemReportRepository() {
+export async function obterReportRepository() {
   return criarRepositorio();
 }
 

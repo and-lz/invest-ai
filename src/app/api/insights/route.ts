@@ -3,7 +3,7 @@ import {
   obterGenerateInsightsUseCase,
   obterGenerateInsightsConsolidadosUseCase,
   obterListReportsUseCase,
-  obterFilesystemReportRepository,
+  obterReportRepository,
   obterAtualizarConclusaoInsightUseCase,
 } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
 
     // Busca direta para insights consolidados
     if (mesAnoParam === "consolidado") {
-      const repository = await obterFilesystemReportRepository();
+      const repository = await obterReportRepository();
       const insights = await repository.obterInsights("consolidado");
       return NextResponse.json(
         {
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const repository = await obterFilesystemReportRepository();
+    const repository = await obterReportRepository();
     const insights = await repository.obterInsights(relatorioSelecionado.identificador);
 
     return NextResponse.json(

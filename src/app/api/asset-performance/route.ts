@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { obterFilesystemReportRepository, obterBrapiAssetDetailService } from "@/lib/container";
+import { obterReportRepository, obterBrapiAssetDetailService } from "@/lib/container";
 import { agregarDadosDoAtivo, listarAtivosUnicos } from "@/lib/agregar-dados-ativo";
 import { verificarCacheAnalise } from "@/lib/analise-ativo-storage";
 import { cabecalhosCachePrivado } from "@/lib/cabecalhos-cache";
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const tickerParam = searchParams.get("ticker");
 
-    const repositorio = await obterFilesystemReportRepository();
+    const repositorio = await obterReportRepository();
     const todosMetadados = await repositorio.listarTodosMetadados();
 
     // Carregar todos os relatorios extraidos
