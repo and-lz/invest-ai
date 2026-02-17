@@ -1,3 +1,5 @@
+set -e
+
 echo "🔍 Running lint..."
 npx eslint --max-warnings 0
 
@@ -5,5 +7,18 @@ echo "🔍 Running TypeScript check..."
 npx tsc --noEmit
 
 echo "📦 Bumping patch version..."
-npm version patch --no-git-tag-version
+node -e "
+const fs = require('fs');
+function bump(file) {
+  const json = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const v = json.version.split('.');
+  v[2] = Number(v[2]) + 1;
+  json.version = v.join('.');
+  fs.writeFileSync(file, JSON.stringify(json, null, 2) + '\n');
+  return json.version;
+}
+const newVersion = bump('package.json');
+bump('package-lock.json');
+console.log('  → ' + newVersion);
+"
 git add package.json package-lock.json
