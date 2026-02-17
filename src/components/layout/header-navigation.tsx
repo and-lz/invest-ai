@@ -13,7 +13,6 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AlternarTema } from "@/components/layout/alternar-tema";
 import { ActivityCenter } from "@/components/layout/activity-center";
 import { UserProfileMenu } from "@/components/auth/user-profile-menu";
 import { Button } from "@/components/ui/button";
@@ -262,7 +261,6 @@ export function HeaderNavigation() {
           {/* Actions */}
           <div className="flex items-center gap-1">
             <ActivityCenter />
-            <AlternarTema />
             <UserProfileMenu />
           </div>
         </div>

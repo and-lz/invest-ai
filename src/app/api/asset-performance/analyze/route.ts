@@ -41,6 +41,7 @@ export async function POST(request: Request) {
 
     const tarefa: TarefaBackground = {
       identificador: identificadorTarefa,
+      usuarioId,
       tipo: "analisar-ativo",
       status: "processando",
       iniciadoEm: new Date().toISOString(),

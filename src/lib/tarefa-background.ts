@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { tarefasBackground as tabelaTarefas } from "@/lib/schema";
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 // ============================================================
 // Funções para tarefas de processamento em background.
@@ -28,6 +28,7 @@ export async function salvarTarefa(tarefa: TarefaBackground): Promise<void> {
     .insert(tabelaTarefas)
     .values({
       identificador: tarefa.identificador,
+      usuarioId: tarefa.usuarioId,
       tipo: tarefa.tipo,
       status: tarefa.status,
       iniciadoEm: new Date(tarefa.iniciadoEm),
@@ -50,6 +51,7 @@ export async function salvarTarefa(tarefa: TarefaBackground): Promise<void> {
     .onConflictDoUpdate({
       target: [tabelaTarefas.identificador],
       set: {
+        usuarioId: tarefa.usuarioId,
         status: tarefa.status,
         concluidoEm: tarefa.concluidoEm ? new Date(tarefa.concluidoEm) : undefined,
         erro: tarefa.erro,
@@ -82,6 +84,7 @@ export async function lerTarefa(identificador: string): Promise<TarefaBackground
   const row = rows[0]!;
   const resultado = TarefaBackgroundSchema.safeParse({
     identificador: row.identificador,
+    usuarioId: row.usuarioId ?? undefined,
     tipo: row.tipo,
     status: row.status,
     iniciadoEm: row.iniciadoEm.toISOString(),
@@ -132,4 +135,55 @@ export async function cancelarTarefa(
 
   await salvarTarefa(tarefaCancelada);
   return true;
+}
+
+/**
+ * Lists all active ("processando") tasks for a given user.
+ * Used by the Activity Center to poll active tasks from the DB
+ * instead of relying on localStorage.
+ */
+export async function listarTarefasAtivasPorUsuario(
+  usuarioId: string,
+): Promise<TarefaBackground[]> {
+  const rows = await db
+    .select()
+    .from(tabelaTarefas)
+    .where(
+      and(
+        eq(tabelaTarefas.usuarioId, usuarioId),
+        eq(tabelaTarefas.status, "processando"),
+      ),
+    )
+    .orderBy(desc(tabelaTarefas.iniciadoEm));
+
+  const tarefas: TarefaBackground[] = [];
+
+  for (const row of rows) {
+    const resultado = TarefaBackgroundSchema.safeParse({
+      identificador: row.identificador,
+      usuarioId: row.usuarioId ?? undefined,
+      tipo: row.tipo,
+      status: row.status,
+      iniciadoEm: row.iniciadoEm.toISOString(),
+      concluidoEm: row.concluidoEm?.toISOString(),
+      erro: row.erro ?? undefined,
+      descricaoResultado: row.descricaoResultado ?? undefined,
+      urlRedirecionamento: row.urlRedirecionamento ?? undefined,
+      tentativaAtual:
+        row.tentativaAtual !== null ? Number(row.tentativaAtual) : undefined,
+      maximoTentativas:
+        row.maximoTentativas !== null ? Number(row.maximoTentativas) : undefined,
+      erroRecuperavel: row.erroRecuperavel ?? undefined,
+      proximaTentativaEm: row.proximaTentativaEm?.toISOString(),
+      parametros: row.parametros ?? undefined,
+      canceladaEm: row.canceladaEm?.toISOString(),
+      canceladaPor: row.canceladaPor ?? undefined,
+    });
+
+    if (resultado.success) {
+      tarefas.push(resultado.data);
+    }
+  }
+
+  return tarefas;
 }

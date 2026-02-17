@@ -14,7 +14,7 @@ import { useDadosAtivo, useListaAtivosCarteira } from "@/hooks/use-dados-ativo";
 import { useAnaliseIaAtivo, dispararAnaliseIaAtivo } from "@/hooks/use-analise-ia-ativo";
 import { GridAtivosCarteira } from "@/components/desempenho/grid-ativos-carteira";
 import { CardsResumoAtivo } from "@/components/desempenho/cards-resumo-ativo";
-import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
+import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
 import { notificar } from "@/lib/notificar";
 
 // Lazy-load chart-heavy components to reduce initial bundle size
@@ -89,8 +89,8 @@ function DesempenhoConteudo() {
 
     setAnalisandoComIa(true);
     try {
-      const identificadorTarefa = await dispararAnaliseIaAtivo(tickerSelecionado);
-      adicionarTarefaAtivaNoStorage(identificadorTarefa);
+      await dispararAnaliseIaAtivo(tickerSelecionado);
+      revalidarTarefasAtivas();
       notificar.info("Analise iniciada", {
         description: `Analisando ${tickerSelecionado} com IA...`,
       });

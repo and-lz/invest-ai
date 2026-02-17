@@ -19,18 +19,15 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/hooks/use-notificacoes";
-import { useTarefaBackground } from "@/hooks/use-tarefa-background";
+import { useTarefasAtivas, revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
 import { descreverTarefa } from "@/lib/tarefa-descricao";
+import type { TarefaBackground } from "@/lib/tarefa-descricao";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
 import { tipografia, icone, layout, dialog as dialogDs } from "@/lib/design-system";
 import type { Notificacao } from "@/lib/notificacao";
-import { useEffect } from "react";
-
-const CHAVE_LOCAL_STORAGE = "tarefasAtivas";
-const TIMEOUT_MINUTOS = 5;
 
 const ICONES_TIPO = {
   success: CheckCircle,
@@ -46,151 +43,21 @@ const CORES_TIPO = {
   info: "text-muted-foreground",
 } as const;
 
-function obterTarefasAtivasDoStorage(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(CHAVE_LOCAL_STORAGE) ?? "[]") as string[];
-  } catch {
-    return [];
-  }
-}
-
-function salvarTarefasAtivasNoStorage(identificadores: string[]): void {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(CHAVE_LOCAL_STORAGE, JSON.stringify(identificadores));
-}
-
-function removerTarefaAtivaDoStorage(identificadorTarefa: string): void {
-  const atuais = obterTarefasAtivasDoStorage();
-  const filtradas = atuais.filter((id) => id !== identificadorTarefa);
-  salvarTarefasAtivasNoStorage(filtradas);
-}
-
-export function adicionarTarefaAtivaNoStorage(identificadorTarefa: string): void {
-  const atuais = obterTarefasAtivasDoStorage();
-  if (!atuais.includes(identificadorTarefa)) {
-    atuais.push(identificadorTarefa);
-    salvarTarefasAtivasNoStorage(atuais);
-  }
-  // Dispara evento para que o componente reaja imediatamente
-  window.dispatchEvent(new CustomEvent("tarefa-ativa-adicionada"));
-}
-
-// Componente interno que monitora uma única tarefa
-function MonitorTarefa({
-  identificadorTarefa,
-  onConcluida,
-}: {
-  identificadorTarefa: string;
-  onConcluida: (identificador: string) => void;
-}) {
-  const router = useRouter();
-  const { tarefa, estaCarregando, estaConcluido, estaComErro, estaProcessando, estaCancelada } =
-    useTarefaBackground(identificadorTarefa);
-  const [jaNotificou, setJaNotificou] = useState(false);
+// Internal component that renders a single active task card
+function TaskCard({ tarefa }: { tarefa: TarefaBackground }) {
   const [cancelando, setCancelando] = useState(false);
-  const onConcluidaChamadaRef = useRef(false);
-
-  // Função helper para notificar e remover tarefa (garante chamada única)
-  const notificarERemover = useCallback(
-    (tipoNotificacao: "sucesso" | "erro" | "timeout", mensagem?: string) => {
-      if (onConcluidaChamadaRef.current) return;
-      onConcluidaChamadaRef.current = true;
-
-      if (tipoNotificacao === "sucesso" && tarefa) {
-        toast.success("Tarefa concluída!", {
-          description: tarefa.descricaoResultado,
-          action: tarefa.urlRedirecionamento
-            ? {
-                label: "Ver resultado",
-                onClick: () => router.push(tarefa.urlRedirecionamento!),
-              }
-            : undefined,
-        });
-      } else if (tipoNotificacao === "erro" && tarefa) {
-        toast.error("Erro no processamento", {
-          description: tarefa.erro ?? mensagem ?? "Erro desconhecido",
-        });
-      } else if (tipoNotificacao === "timeout") {
-        toast.error("Tarefa parece ter falhado", {
-          description: mensagem ?? "O processamento excedeu o tempo limite. Tente novamente.",
-        });
-      }
-
-      window.dispatchEvent(new CustomEvent("tarefa-background-concluida"));
-      onConcluida(identificadorTarefa);
-    },
-    [tarefa, identificadorTarefa, onConcluida, router],
-  );
-
-  useEffect(() => {
-    if (jaNotificou) return;
-
-    if (estaConcluido && tarefa) {
-      setJaNotificou(true);
-      notificarERemover("sucesso");
-    }
-
-    if (estaComErro && tarefa) {
-      setJaNotificou(true);
-      notificarERemover("erro");
-    }
-
-    if (estaCancelada) {
-      setJaNotificou(true);
-      onConcluida(identificadorTarefa);
-    }
-
-    // Timeout: se "processando" por mais de 5 minutos, considerar como erro
-    if (estaProcessando && tarefa) {
-      const iniciadoHaMinutos = (Date.now() - new Date(tarefa.iniciadoEm).getTime()) / 60000;
-      if (iniciadoHaMinutos > TIMEOUT_MINUTOS) {
-        setJaNotificou(true);
-        notificarERemover("timeout");
-      }
-    }
-  }, [
-    estaConcluido,
-    estaComErro,
-    estaCancelada,
-    estaProcessando,
-    tarefa,
-    jaNotificou,
-    notificarERemover,
-    identificadorTarefa,
-    onConcluida,
-  ]);
-
-  // Cleanup no unmount: se tarefa estiver concluída/erro mas não foi removida, remove silenciosamente
-  useEffect(() => {
-    return () => {
-      if ((estaConcluido || estaComErro || estaCancelada) && !onConcluidaChamadaRef.current) {
-        // Remove silenciosamente (sem notificação pois componente já foi desmontado)
-        onConcluida(identificadorTarefa);
-      }
-    };
-  }, [estaConcluido, estaComErro, estaCancelada, identificadorTarefa, onConcluida]);
-
-  // Cleanup: tarefa não encontrada no servidor (404/arquivo removido) — remover ID órfão do storage
-  useEffect(() => {
-    if (!estaCarregando && !tarefa && !onConcluidaChamadaRef.current) {
-      onConcluidaChamadaRef.current = true;
-      onConcluida(identificadorTarefa);
-    }
-  }, [estaCarregando, tarefa, identificadorTarefa, onConcluida]);
+  const descricao = descreverTarefa(tarefa);
 
   const handleCancelar = useCallback(async () => {
-    if (!tarefa) return;
-
     setCancelando(true);
     try {
-      const resposta = await fetch(`/api/tasks/${identificadorTarefa}/cancel`, {
+      const resposta = await fetch(`/api/tasks/${tarefa.identificador}/cancel`, {
         method: "POST",
       });
 
       if (resposta.ok) {
         toast.info("Tarefa cancelada");
-        onConcluida(identificadorTarefa);
+        revalidarTarefasAtivas();
       } else {
         const corpo = (await resposta.json()) as { erro?: string };
         toast.error("Falha ao cancelar", {
@@ -204,17 +71,7 @@ function MonitorTarefa({
     } finally {
       setCancelando(false);
     }
-  }, [tarefa, identificadorTarefa, onConcluida]);
-
-  // Antes de renderizar null, garante que tarefa concluída/erro/cancelada seja removida
-  if (!estaProcessando || !tarefa) {
-    if ((estaConcluido || estaComErro) && !onConcluidaChamadaRef.current) {
-      notificarERemover(estaConcluido ? "sucesso" : "erro");
-    }
-    return null;
-  }
-
-  const descricao = descreverTarefa(tarefa);
+  }, [tarefa.identificador]);
 
   return (
     <div className="group rounded-lg border p-4">
@@ -251,14 +108,6 @@ function ehAcaoDeRetry(url: string): boolean {
   return url.includes("/retry");
 }
 
-function extrairTaskIdDeUrlRetry(url: string): string | null {
-  const partes = url.split("/tasks/");
-  if (partes.length < 2) return null;
-  const restante = partes[1];
-  if (!restante) return null;
-  return restante.split("/")[0] ?? null;
-}
-
 interface ItemNotificacaoProps {
   notificacao: Notificacao;
   onMarcarComoLida: (identificador: string) => void;
@@ -279,10 +128,7 @@ function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: Item
       try {
         const resposta = await fetch(notificacao.acao.url, { method: "POST" });
         if (resposta.ok) {
-          const taskId = extrairTaskIdDeUrlRetry(notificacao.acao.url);
-          if (taskId) {
-            adicionarTarefaAtivaNoStorage(taskId);
-          }
+          revalidarTarefasAtivas();
           onMarcarComoLida(notificacao.identificador);
           onFecharDialog();
           toast.info("Retentando tarefa...");
@@ -363,7 +209,6 @@ type AbaAtiva = "notificacoes" | "tarefas";
 export function ActivityCenter() {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>("notificacoes");
-  const [identificadoresTarefas, setIdentificadoresTarefas] = useState<string[]>([]);
 
   const {
     notificacoes,
@@ -374,26 +219,7 @@ export function ActivityCenter() {
     limparTodas,
   } = useNotificacoes();
 
-  // Carregar tarefas do localStorage ao montar
-  useEffect(() => {
-    setIdentificadoresTarefas(obterTarefasAtivasDoStorage());
-
-    // Reagir quando uma nova tarefa é adicionada
-    const handleNovaTarefa = () => {
-      setIdentificadoresTarefas(obterTarefasAtivasDoStorage());
-      // Auto-abrir na aba de tarefas quando nova tarefa é adicionada
-      setAbaAtiva("tarefas");
-      dialogRef.current?.showModal();
-    };
-
-    window.addEventListener("tarefa-ativa-adicionada", handleNovaTarefa);
-    return () => window.removeEventListener("tarefa-ativa-adicionada", handleNovaTarefa);
-  }, []);
-
-  const handleTarefaConcluida = useCallback((identificador: string) => {
-    removerTarefaAtivaDoStorage(identificador);
-    setIdentificadoresTarefas((anteriores) => anteriores.filter((id) => id !== identificador));
-  }, []);
+  const { tarefasAtivas, estaCarregando: tarefasCarregando } = useTarefasAtivas();
 
   const abrir = useCallback(() => {
     dialogRef.current?.showModal();
@@ -407,13 +233,12 @@ export function ActivityCenter() {
     await limparTodas();
   }, [limparTodas]);
 
-  // Fechar ao clicar no backdrop
+  // Close on backdrop click
   const handleClickDialog = useCallback(
     (evento: React.MouseEvent<HTMLDialogElement>) => {
       const dialog = dialogRef.current;
       if (!dialog) return;
 
-      // Se clicou diretamente no dialog (backdrop), fecha
       if (evento.target === dialog) {
         fechar();
       }
@@ -421,7 +246,7 @@ export function ActivityCenter() {
     [fechar],
   );
 
-  const temTarefasAtivas = identificadoresTarefas.length > 0;
+  const temTarefasAtivas = tarefasAtivas.length > 0;
   const temAtividade = contagemNaoVisualizadas > 0 || temTarefasAtivas;
 
   return (
@@ -513,7 +338,7 @@ export function ActivityCenter() {
               Tarefas
               {temTarefasAtivas && (
                 <Badge className="bg-primary text-primary-foreground h-5 min-w-5 px-1 text-xs">
-                  {identificadoresTarefas.length}
+                  {tarefasAtivas.length}
                 </Badge>
               )}
             </div>
@@ -523,10 +348,10 @@ export function ActivityCenter() {
           </button>
         </div>
 
-        {/* Conteúdo - Notificações */}
+        {/* Content - Notifications */}
         {abaAtiva === "notificacoes" && (
           <>
-            {/* Status e ações */}
+            {/* Status and actions */}
             <div className="flex items-center justify-between border-b px-6 py-3">
               <p className={tipografia.auxiliar}>
                 {contagemNaoVisualizadas > 0
@@ -589,26 +414,28 @@ export function ActivityCenter() {
           </>
         )}
 
-        {/* Conteúdo - Tarefas */}
+        {/* Content - Tasks */}
         {abaAtiva === "tarefas" && (
           <div className="flex-1 overflow-y-auto">
-            {identificadoresTarefas.length === 0 && (
-              <div className="flex flex-col items-center justify-center gap-3 p-6">
-                <Loader2 className={icone.estadoVazio} />
+            {tarefasCarregando && (
+              <div className="flex items-center justify-center p-6">
+                <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+              </div>
+            )}
+
+            {!tarefasCarregando && tarefasAtivas.length === 0 && (
+              <div className={layout.estadoVazio}>
+                <Inbox className={icone.estadoVazio} />
                 <p className="text-muted-foreground text-center text-sm">
                   Nenhuma tarefa em andamento
                 </p>
               </div>
             )}
 
-            {identificadoresTarefas.length > 0 && (
+            {!tarefasCarregando && tarefasAtivas.length > 0 && (
               <div className="space-y-3 p-6">
-                {identificadoresTarefas.map((identificador) => (
-                  <MonitorTarefa
-                    key={identificador}
-                    identificadorTarefa={identificador}
-                    onConcluida={handleTarefaConcluida}
-                  />
+                {tarefasAtivas.map((tarefa) => (
+                  <TaskCard key={tarefa.identificador} tarefa={tarefa} />
                 ))}
               </div>
             )}

@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
+import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
 
 type StatusUpload = "idle" | "uploading" | "success" | "error";
 
@@ -49,7 +49,7 @@ export function useUploadReport() {
 
       // 202 Accepted: processamento em background
       if (dados.identificadorTarefa) {
-        adicionarTarefaAtivaNoStorage(dados.identificadorTarefa);
+        revalidarTarefasAtivas();
         setIdentificadorTarefa(dados.identificadorTarefa);
       }
 

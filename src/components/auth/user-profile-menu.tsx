@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -10,11 +12,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut } from "lucide-react";
+import { LogOut, Monitor, Moon, Sun, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const OPCOES_TEMA = [
+  { valor: "light", rotulo: "Claro", icone: Sun },
+  { valor: "dark", rotulo: "Escuro", icone: Moon },
+  { valor: "system", rotulo: "Sistema", icone: Monitor },
+] as const;
 
 export function UserProfileMenu() {
   const { data: session } = useSession();
+  const { theme: temaSelecionado, setTheme: definirTema } = useTheme();
+  const [montado, setMontado] = useState(false);
+
+  useEffect(() => {
+    setMontado(true);
+  }, []);
 
   if (!session?.user) return null;
 
@@ -45,6 +60,19 @@ export function UserProfileMenu() {
             <p className="text-muted-foreground text-xs">{session.user.email}</p>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {OPCOES_TEMA.map(({ valor, rotulo, icone: Icone }) => (
+          <DropdownMenuItem
+            key={valor}
+            onClick={() => definirTema(valor)}
+          >
+            <Icone className="mr-2 h-4 w-4" />
+            <span className="flex-1">{rotulo}</span>
+            {montado && temaSelecionado === valor && (
+              <Check className={cn("ml-2 h-3.5 w-3.5", "text-muted-foreground")} />
+            )}
+          </DropdownMenuItem>
+        ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/auth/signin" })}>
           <LogOut className="mr-2 h-4 w-4" />

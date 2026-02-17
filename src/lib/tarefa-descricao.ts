@@ -16,6 +16,7 @@ export const StatusTarefaEnum = z.enum(["processando", "concluido", "erro", "can
 
 export const TarefaBackgroundSchema = z.object({
   identificador: z.string().uuid(),
+  usuarioId: z.string().optional(),
   tipo: TipoTarefaEnum,
   status: StatusTarefaEnum,
   iniciadoEm: z.string().datetime(),

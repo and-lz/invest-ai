@@ -5,7 +5,7 @@ import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { serializarContextoInsights } from "@/lib/serializar-contexto-chat";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
-import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
+import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -371,7 +371,7 @@ export default function InsightsPage() {
       // 202 Accepted: processamento em background
       const dados = (await resposta.json()) as { identificadorTarefa?: string };
       if (dados.identificadorTarefa) {
-        adicionarTarefaAtivaNoStorage(dados.identificadorTarefa);
+        revalidarTarefasAtivas();
       }
 
       setModoVisualizacao("inicial");

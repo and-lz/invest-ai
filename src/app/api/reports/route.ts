@@ -71,6 +71,7 @@ export async function POST(request: Request) {
 
     const tarefa: TarefaBackground = {
       identificador: identificadorTarefa,
+      usuarioId: authCheck.session.user.userId,
       tipo: "upload-pdf",
       status: "processando",
       iniciadoEm: new Date().toISOString(),
