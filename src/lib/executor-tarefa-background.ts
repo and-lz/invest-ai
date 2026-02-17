@@ -23,6 +23,7 @@ export interface ResultadoTarefaSucesso {
 export interface ConfiguracaoExecutorTarefa {
   readonly tarefa: TarefaBackground;
   readonly rotuloLog: string;
+  readonly usuarioId: string;
   readonly executarOperacao: () => Promise<ResultadoTarefaSucesso>;
 }
 
@@ -57,7 +58,7 @@ async function tarefaFoiCancelada(identificadorTarefa: string): Promise<boolean>
 export async function executarTarefaEmBackground(
   configuracao: ConfiguracaoExecutorTarefa,
 ): Promise<void> {
-  const { tarefa, rotuloLog, executarOperacao } = configuracao;
+  const { tarefa, rotuloLog, usuarioId, executarOperacao } = configuracao;
   const maximoTentativas = tarefa.maximoTentativas ?? 2;
   let tentativaAtual = tarefa.tentativaAtual ?? 0;
 
@@ -82,7 +83,7 @@ export async function executarTarefaEmBackground(
       });
 
       const descricaoTarefa = descreverTarefa(tarefa);
-      await criarNotificacaoSilenciosa({
+      await criarNotificacaoSilenciosa(usuarioId, {
         tipo: "success",
         titulo: `${descricaoTarefa} — concluida!`,
         descricao: resultado.descricaoResultado,
@@ -133,7 +134,7 @@ export async function executarTarefaEmBackground(
       });
 
       const descricaoTarefa = descreverTarefa(tarefa);
-      await criarNotificacaoSilenciosa({
+      await criarNotificacaoSilenciosa(usuarioId, {
         tipo: "error",
         titulo: `${descricaoTarefa} — erro`,
         descricao: mensagemErro,
@@ -149,9 +150,12 @@ export async function executarTarefaEmBackground(
 }
 
 /** Cria notificacao server-side. Falha silenciosa - nunca lanca excecao. */
-async function criarNotificacaoSilenciosa(dados: CriarNotificacao): Promise<void> {
+async function criarNotificacaoSilenciosa(
+  usuarioId: string,
+  dados: CriarNotificacao,
+): Promise<void> {
   try {
-    await adicionarNotificacao(dados);
+    await adicionarNotificacao(usuarioId, dados);
   } catch (erroNotificacao) {
     console.error("[ExecutorTarefa] Falha ao criar notificacao:", erroNotificacao);
   }

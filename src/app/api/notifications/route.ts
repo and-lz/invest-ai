@@ -6,13 +6,17 @@ import {
   CriarNotificacaoSchema,
 } from "@/lib/notificacao";
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { requireAuth } from "@/lib/auth-utils";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
-    const notificacoes = await listarNotificacoes();
-    return NextResponse.json({ notificacoes }, cabecalhosSemCache());
+    const notificacoesLista = await listarNotificacoes(authCheck.session.user.userId);
+    return NextResponse.json({ notificacoes: notificacoesLista }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao listar notificacoes:", erro);
     return NextResponse.json({ erro: "Falha ao listar notificacoes" }, { status: 500 });
@@ -20,6 +24,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const corpo = await request.json();
 
@@ -32,7 +39,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const notificacao = await adicionarNotificacao(validacao.data);
+    const notificacao = await adicionarNotificacao(
+      authCheck.session.user.userId,
+      validacao.data,
+    );
     return NextResponse.json({ notificacao }, { status: 201, ...cabecalhosSemCache() });
   } catch (erro) {
     console.error("Erro ao criar notificacao:", erro);
@@ -41,8 +51,11 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE() {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
-    await limparTodasNotificacoes();
+    await limparTodasNotificacoes(authCheck.session.user.userId);
     return NextResponse.json({ sucesso: true }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao limpar notificacoes:", erro);

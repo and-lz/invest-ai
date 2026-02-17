@@ -1,52 +1,78 @@
-import { obterFileManager } from "@/lib/container";
+import { db } from "@/lib/db";
+import { analiseAtivos } from "@/lib/schema";
+import { eq, and } from "drizzle-orm";
 import { AnaliseAtivoResponseSchema } from "@/schemas/analise-ativo.schema";
 import type { AnaliseAtivoResponse } from "@/schemas/analise-ativo.schema";
 
 // ============================================================
 // Storage para analises de ativo individual.
-// Persiste em data/asset-analysis/{ticker}.json (dev) ou Vercel Blob (prod).
-// Cache de 24h.
+// Persiste no PostgreSQL via Drizzle (Neon).
+// Cache de 24h controlado pela aplicação via campo dataAnalise.
 // ============================================================
 
-const SUBDIRETORIO_ANALISES = "asset-analysis";
 const CACHE_DURACAO_HORAS = 24;
 
-function obterCaminhoArquivo(codigoAtivo: string): string {
-  const tickerNormalizado = codigoAtivo.toUpperCase().replace(/[^A-Z0-9]/g, "_");
-  return `${SUBDIRETORIO_ANALISES}/${tickerNormalizado}.json`;
+function normalizarTicker(codigoAtivo: string): string {
+  return codigoAtivo.toUpperCase().replace(/[^A-Z0-9]/g, "_");
 }
 
 /**
- * Salva analise de ativo no filesystem.
+ * Salva analise de ativo no banco de dados.
  */
-export async function salvarAnaliseAtivo(analise: AnaliseAtivoResponse): Promise<void> {
-  const fileManager = await obterFileManager();
-  const caminhoRelativo = obterCaminhoArquivo(analise.codigoAtivo);
-  await fileManager.salvarJson(caminhoRelativo, analise);
+export async function salvarAnaliseAtivo(
+  analise: AnaliseAtivoResponse,
+  usuarioId: string,
+): Promise<void> {
+  const codigoNormalizado = normalizarTicker(analise.codigoAtivo);
+  await db
+    .insert(analiseAtivos)
+    .values({
+      usuarioId,
+      codigoAtivo: codigoNormalizado,
+      dados: analise as unknown as Record<string, unknown>,
+      dataAnalise: new Date(analise.dataAnalise),
+      atualizadoEm: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: [analiseAtivos.usuarioId, analiseAtivos.codigoAtivo],
+      set: {
+        dados: analise as unknown as Record<string, unknown>,
+        dataAnalise: new Date(analise.dataAnalise),
+        atualizadoEm: new Date(),
+      },
+    });
 }
 
 /**
  * Carrega analise cacheada de um ativo.
  * Retorna null se nao existe ou se o cache expirou (> 24h).
  */
-export async function lerAnaliseAtivo(codigoAtivo: string): Promise<AnaliseAtivoResponse | null> {
-  const fileManager = await obterFileManager();
-  const caminhoRelativo = obterCaminhoArquivo(codigoAtivo);
-
-  const existe = await fileManager.arquivoExiste(caminhoRelativo);
-  if (!existe) return null;
+export async function lerAnaliseAtivo(
+  codigoAtivo: string,
+  usuarioId: string,
+): Promise<AnaliseAtivoResponse | null> {
+  const codigoNormalizado = normalizarTicker(codigoAtivo);
 
   try {
-    const dadosBrutos = await fileManager.lerJson<unknown>(caminhoRelativo);
-    const resultado = AnaliseAtivoResponseSchema.safeParse(dadosBrutos);
+    const rows = await db
+      .select()
+      .from(analiseAtivos)
+      .where(
+        and(
+          eq(analiseAtivos.usuarioId, usuarioId),
+          eq(analiseAtivos.codigoAtivo, codigoNormalizado),
+        ),
+      )
+      .limit(1);
 
+    if (rows.length === 0) return null;
+
+    const row = rows[0]!;
+    if (cacheExpirou(row.dataAnalise)) return null;
+
+    const resultado = AnaliseAtivoResponseSchema.safeParse(row.dados);
     if (!resultado.success) {
-      console.warn(`[AnaliseAtivoStorage] JSON invalido para ${codigoAtivo}:`, resultado.error);
-      return null;
-    }
-
-    // Verificar se cache expirou
-    if (cacheExpirou(resultado.data.dataAnalise)) {
+      console.warn(`[AnaliseAtivoStorage] Dados invalidos para ${codigoAtivo}:`, resultado.error);
       return null;
     }
 
@@ -63,32 +89,37 @@ export async function lerAnaliseAtivo(codigoAtivo: string): Promise<AnaliseAtivo
  */
 export async function verificarCacheAnalise(
   codigoAtivo: string,
+  usuarioId: string,
 ): Promise<{ existe: boolean; dataAnalise: string | null }> {
-  const fileManager = await obterFileManager();
-  const caminhoRelativo = obterCaminhoArquivo(codigoAtivo);
-
-  const existe = await fileManager.arquivoExiste(caminhoRelativo);
-  if (!existe) return { existe: false, dataAnalise: null };
+  const codigoNormalizado = normalizarTicker(codigoAtivo);
 
   try {
-    const dadosBrutos = await fileManager.lerJson<unknown>(caminhoRelativo);
-    const resultado = AnaliseAtivoResponseSchema.safeParse(dadosBrutos);
+    const rows = await db
+      .select({ dataAnalise: analiseAtivos.dataAnalise })
+      .from(analiseAtivos)
+      .where(
+        and(
+          eq(analiseAtivos.usuarioId, usuarioId),
+          eq(analiseAtivos.codigoAtivo, codigoNormalizado),
+        ),
+      )
+      .limit(1);
 
-    if (!resultado.success) return { existe: false, dataAnalise: null };
+    if (rows.length === 0) return { existe: false, dataAnalise: null };
 
-    if (cacheExpirou(resultado.data.dataAnalise)) {
-      return { existe: false, dataAnalise: resultado.data.dataAnalise };
+    const dataAnalise = rows[0]!.dataAnalise.toISOString();
+    if (cacheExpirou(rows[0]!.dataAnalise)) {
+      return { existe: false, dataAnalise };
     }
 
-    return { existe: true, dataAnalise: resultado.data.dataAnalise };
+    return { existe: true, dataAnalise };
   } catch {
     return { existe: false, dataAnalise: null };
   }
 }
 
-function cacheExpirou(dataAnalise: string): boolean {
-  const dataAnaliseDate = new Date(dataAnalise);
+function cacheExpirou(dataAnalise: Date): boolean {
   const agora = new Date();
-  const diferencaHoras = (agora.getTime() - dataAnaliseDate.getTime()) / (1000 * 60 * 60);
+  const diferencaHoras = (agora.getTime() - dataAnalise.getTime()) / (1000 * 60 * 60);
   return diferencaHoras > CACHE_DURACAO_HORAS;
 }

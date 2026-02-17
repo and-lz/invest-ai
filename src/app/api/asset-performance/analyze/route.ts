@@ -7,6 +7,7 @@ import { salvarAnaliseAtivo } from "@/lib/analise-ativo-storage";
 import type { TarefaBackground } from "@/lib/tarefa-background";
 import { AppError } from "@/domain/errors/app-errors";
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { requireAuth } from "@/lib/auth-utils";
 
 const AnalisarAtivoRequestSchema = z.object({
   codigoAtivo: z.string().min(1),
@@ -19,6 +20,11 @@ const AnalisarAtivoRequestSchema = z.object({
  * Retorna 202 Accepted com identificador da tarefa para polling.
  */
 export async function POST(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
+  const usuarioId = authCheck.session.user.userId;
+
   try {
     const corpo: unknown = await request.json();
     const resultado = AnalisarAtivoRequestSchema.safeParse(corpo);
@@ -46,12 +52,13 @@ export async function POST(request: Request) {
     void executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Analise Ativo",
+      usuarioId,
       executarOperacao: async () => {
         const useCase = await obterAnalyzeAssetPerformanceUseCase();
         const analise = await useCase.executar({ codigoAtivo });
 
         // Persistir resultado para cache
-        await salvarAnaliseAtivo(analise);
+        await salvarAnaliseAtivo(analise, usuarioId);
 
         return {
           descricaoResultado: `Analise de ${codigoAtivo} concluida`,

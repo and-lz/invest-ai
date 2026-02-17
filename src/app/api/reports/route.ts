@@ -84,6 +84,7 @@ export async function POST(request: Request) {
     void executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Upload",
+      usuarioId: authCheck.session.user.userId,
       executarOperacao: async () => {
         const useCase = await obterUploadReportUseCase();
         const resultado = await useCase.executar({ nomeArquivoOriginal, pdfBuffer });

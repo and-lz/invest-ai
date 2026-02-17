@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { marcarComoVisualizada } from "@/lib/notificacao";
 import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { requireAuth } from "@/lib/auth-utils";
 
 export const dynamic = "force-dynamic";
 
 export async function PATCH(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const { id } = await params;
-    await marcarComoVisualizada(id);
+    await marcarComoVisualizada(authCheck.session.user.userId, id);
     return NextResponse.json({ sucesso: true }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao marcar notificacao como visualizada:", erro);

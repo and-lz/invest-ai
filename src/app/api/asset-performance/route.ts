@@ -3,6 +3,7 @@ import { obterFilesystemReportRepository, obterBrapiAssetDetailService } from "@
 import { agregarDadosDoAtivo, listarAtivosUnicos } from "@/lib/agregar-dados-ativo";
 import { verificarCacheAnalise } from "@/lib/analise-ativo-storage";
 import { cabecalhosCachePrivado } from "@/lib/cabecalhos-cache";
+import { requireAuth } from "@/lib/auth-utils";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 
 /**
@@ -12,6 +13,9 @@ import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
  * Se nenhum ticker fornecido, retorna lista de ativos da carteira.
  */
 export async function GET(request: Request) {
+  const authCheck = await requireAuth();
+  if (!authCheck.authenticated) return authCheck.response;
+
   try {
     const { searchParams } = new URL(request.url);
     const tickerParam = searchParams.get("ticker");
@@ -39,7 +43,7 @@ export async function GET(request: Request) {
     const servicoBrapi = obterBrapiAssetDetailService();
     const [detalhesBrapi, cacheAnalise] = await Promise.all([
       servicoBrapi.obterDetalhesAtivo(tickerParam).catch(() => null),
-      verificarCacheAnalise(tickerParam),
+      verificarCacheAnalise(tickerParam, authCheck.session.user.userId),
     ]);
 
     const estaNaCarteira = dadosAgregados !== null;

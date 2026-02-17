@@ -1,5 +1,7 @@
 import { z } from "zod/v4";
-import { obterFileManager } from "@/lib/container";
+import { db } from "@/lib/db";
+import { notificacoes as tabelaNotificacoes } from "@/lib/schema";
+import { eq, desc, asc } from "drizzle-orm";
 
 export const TipoNotificacaoEnum = z.enum(["success", "error", "warning", "info"]);
 
@@ -18,10 +20,6 @@ export const NotificacaoSchema = z.object({
   visualizada: z.boolean().default(false),
 });
 
-export const IndiceNotificacoesSchema = z.object({
-  notificacoes: z.array(NotificacaoSchema),
-});
-
 // Schema para criação (omite campos gerados automaticamente)
 export const CriarNotificacaoSchema = NotificacaoSchema.omit({
   identificador: true,
@@ -32,48 +30,34 @@ export const CriarNotificacaoSchema = NotificacaoSchema.omit({
 export type Notificacao = z.infer<typeof NotificacaoSchema>;
 export type CriarNotificacao = z.infer<typeof CriarNotificacaoSchema>;
 export type TipoNotificacao = z.infer<typeof TipoNotificacaoEnum>;
+
+// Mantido para retrocompatibilidade com código que importa este tipo
+export const IndiceNotificacoesSchema = z.object({
+  notificacoes: z.array(NotificacaoSchema),
+});
 export type IndiceNotificacoes = z.infer<typeof IndiceNotificacoesSchema>;
 
-const SUBDIRETORIO_NOTIFICACOES = "notifications";
-const NOME_ARQUIVO_INDICE = "index.json";
 const LIMITE_NOTIFICACOES = 50;
 
-export async function listarNotificacoes(): Promise<Notificacao[]> {
-  const fileManager = await obterFileManager();
-  const caminhoRelativo = `${SUBDIRETORIO_NOTIFICACOES}/${NOME_ARQUIVO_INDICE}`;
-  const existe = await fileManager.arquivoExiste(caminhoRelativo);
-
-  if (!existe) {
-    return [];
-  }
-
+export async function listarNotificacoes(usuarioId: string): Promise<Notificacao[]> {
   try {
-    const dadosBrutos = await fileManager.lerJson<unknown>(caminhoRelativo);
-    const resultado = IndiceNotificacoesSchema.safeParse(dadosBrutos);
+    const rows = await db
+      .select()
+      .from(tabelaNotificacoes)
+      .where(eq(tabelaNotificacoes.usuarioId, usuarioId))
+      .orderBy(desc(tabelaNotificacoes.criadaEm));
 
-    if (!resultado.success) {
-      console.warn(
-        `[Notificacoes] JSON invalido em ${caminhoRelativo}, recreando arquivo`,
-        resultado.error,
-      );
-      return [];
-    }
-
-    // Retorna ordenado por mais recente primeiro
-    return resultado.data.notificacoes.sort(
-      (a, b) => new Date(b.criadaEm).getTime() - new Date(a.criadaEm).getTime(),
-    );
+    return rows.map(mapearNotificacao);
   } catch (erro) {
-    console.error("[Notificacoes] Erro ao ler indice:", erro);
+    console.error("[Notificacoes] Erro ao listar:", erro);
     return [];
   }
 }
 
 export async function adicionarNotificacao(
+  usuarioId: string,
   novaNotificacao: CriarNotificacao,
 ): Promise<Notificacao> {
-  const notificacoesExistentes = await listarNotificacoes();
-
   const notificacaoCompleta: Notificacao = {
     ...novaNotificacao,
     identificador: crypto.randomUUID(),
@@ -81,43 +65,76 @@ export async function adicionarNotificacao(
     visualizada: false,
   };
 
-  // FIFO queue: adiciona no início, remove do final se exceder limite
-  const notificacoesAtualizadas = [notificacaoCompleta, ...notificacoesExistentes].slice(
-    0,
-    LIMITE_NOTIFICACOES,
-  );
+  await db.insert(tabelaNotificacoes).values({
+    identificador: notificacaoCompleta.identificador,
+    usuarioId,
+    tipo: notificacaoCompleta.tipo,
+    titulo: notificacaoCompleta.titulo,
+    descricao: notificacaoCompleta.descricao,
+    acao: notificacaoCompleta.acao as Record<string, string> | undefined,
+    visualizada: false,
+    criadaEm: new Date(notificacaoCompleta.criadaEm),
+  });
 
-  await salvarIndice({ notificacoes: notificacoesAtualizadas });
+  // FIFO: remover notificações mais antigas se exceder o limite
+  await enforcarLimiteNotificacoes(usuarioId);
+
   return notificacaoCompleta;
 }
 
-export async function marcarComoVisualizada(identificador: string): Promise<void> {
-  const notificacoes = await listarNotificacoes();
-  const notificacoesAtualizadas = notificacoes.map((notificacao) =>
-    notificacao.identificador === identificador
-      ? { ...notificacao, visualizada: true }
-      : notificacao,
-  );
-
-  await salvarIndice({ notificacoes: notificacoesAtualizadas });
+export async function marcarComoVisualizada(
+  usuarioId: string,
+  identificador: string,
+): Promise<void> {
+  await db
+    .update(tabelaNotificacoes)
+    .set({ visualizada: true })
+    .where(
+      eq(tabelaNotificacoes.identificador, identificador),
+    );
 }
 
-export async function marcarTodasComoVisualizadas(): Promise<void> {
-  const notificacoes = await listarNotificacoes();
-  const notificacoesAtualizadas = notificacoes.map((notificacao) => ({
-    ...notificacao,
-    visualizada: true,
-  }));
-
-  await salvarIndice({ notificacoes: notificacoesAtualizadas });
+export async function marcarTodasComoVisualizadas(usuarioId: string): Promise<void> {
+  await db
+    .update(tabelaNotificacoes)
+    .set({ visualizada: true })
+    .where(eq(tabelaNotificacoes.usuarioId, usuarioId));
 }
 
-export async function limparTodasNotificacoes(): Promise<void> {
-  await salvarIndice({ notificacoes: [] });
+export async function limparTodasNotificacoes(usuarioId: string): Promise<void> {
+  await db
+    .delete(tabelaNotificacoes)
+    .where(eq(tabelaNotificacoes.usuarioId, usuarioId));
 }
 
-async function salvarIndice(indice: IndiceNotificacoes): Promise<void> {
-  const fileManager = await obterFileManager();
-  const caminhoRelativo = `${SUBDIRETORIO_NOTIFICACOES}/${NOME_ARQUIVO_INDICE}`;
-  await fileManager.salvarJson(caminhoRelativo, indice);
+async function enforcarLimiteNotificacoes(usuarioId: string): Promise<void> {
+  const todasNotificacoes = await db
+    .select({ identificador: tabelaNotificacoes.identificador })
+    .from(tabelaNotificacoes)
+    .where(eq(tabelaNotificacoes.usuarioId, usuarioId))
+    .orderBy(asc(tabelaNotificacoes.criadaEm));
+
+  if (todasNotificacoes.length > LIMITE_NOTIFICACOES) {
+    const idsParaRemover = todasNotificacoes
+      .slice(0, todasNotificacoes.length - LIMITE_NOTIFICACOES)
+      .map((n) => n.identificador);
+
+    for (const id of idsParaRemover) {
+      await db
+        .delete(tabelaNotificacoes)
+        .where(eq(tabelaNotificacoes.identificador, id));
+    }
+  }
+}
+
+function mapearNotificacao(row: typeof tabelaNotificacoes.$inferSelect): Notificacao {
+  return NotificacaoSchema.parse({
+    identificador: row.identificador,
+    tipo: row.tipo,
+    titulo: row.titulo,
+    descricao: row.descricao ?? undefined,
+    acao: row.acao ?? undefined,
+    criadaEm: row.criadaEm.toISOString(),
+    visualizada: row.visualizada,
+  });
 }

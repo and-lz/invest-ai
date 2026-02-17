@@ -49,6 +49,7 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: async () => ({
         descricaoResultado: "Operacao concluida",
         urlRedirecionamento: "/resultado",
@@ -65,6 +66,7 @@ describe("executarTarefaEmBackground", () => {
     );
 
     expect(mockAdicionarNotificacao).toHaveBeenCalledWith(
+      "user-test-123",
       expect.objectContaining({
         tipo: "success",
         titulo: expect.stringContaining("concluida"),
@@ -80,6 +82,7 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: async () => {
         throw new AppError("API key invalida", "AI_API_ERROR");
       },
@@ -94,6 +97,7 @@ describe("executarTarefaEmBackground", () => {
     );
 
     expect(mockAdicionarNotificacao).toHaveBeenCalledWith(
+      "user-test-123",
       expect.objectContaining({
         tipo: "error",
         titulo: expect.stringContaining("erro"),
@@ -111,6 +115,7 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: operacaoMock,
     });
 
@@ -125,6 +130,7 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: async () => {
         chamada++;
         if (chamada === 1) {
@@ -157,6 +163,7 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: operacaoMock,
     });
 
@@ -174,6 +181,7 @@ describe("executarTarefaEmBackground", () => {
 
     // Notificacao de erro com link de retry
     expect(mockAdicionarNotificacao).toHaveBeenCalledWith(
+      "user-test-123",
       expect.objectContaining({
         tipo: "error",
         acao: expect.objectContaining({
@@ -190,12 +198,14 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: async () => ({
         descricaoResultado: "Concluido sem redirect",
       }),
     });
 
     expect(mockAdicionarNotificacao).toHaveBeenCalledWith(
+      "user-test-123",
       expect.objectContaining({
         acao: undefined,
       }),
@@ -208,12 +218,14 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: async () => {
         throw new Error("Erro generico");
       },
     });
 
     expect(mockAdicionarNotificacao).toHaveBeenCalledWith(
+      "user-test-123",
       expect.objectContaining({
         tipo: "error",
         acao: undefined,
@@ -230,6 +242,7 @@ describe("executarTarefaEmBackground", () => {
       executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Test",
+        usuarioId: "user-test-123",
         executarOperacao: async () => ({
           descricaoResultado: "OK",
         }),
@@ -251,6 +264,7 @@ describe("executarTarefaEmBackground", () => {
     await executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Test",
+      usuarioId: "user-test-123",
       executarOperacao: operacaoMock,
     });
 

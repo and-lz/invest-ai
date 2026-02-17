@@ -128,6 +128,7 @@ export async function POST(request: Request) {
       void executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights Consolidados",
+        usuarioId: authCheck.session.user.userId,
         executarOperacao: async () => {
           const useCase = await obterGenerateInsightsConsolidadosUseCase();
           await useCase.executar();
@@ -144,6 +145,7 @@ export async function POST(request: Request) {
       void executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights",
+        usuarioId: authCheck.session.user.userId,
         executarOperacao: async () => {
           const useCase = await obterGenerateInsightsUseCase();
           await useCase.executar({

@@ -1,6 +1,5 @@
-import { FilesystemReportRepository } from "@/infrastructure/repositories/filesystem-report-repository";
-import { VercelBlobReportRepository } from "@/infrastructure/repositories/vercel-blob-report-repository";
-import { FilesystemConversaRepository } from "@/infrastructure/repositories/filesystem-conversa-repository";
+import { DbReportRepository } from "@/infrastructure/repositories/db-report-repository";
+import { DbConversaRepository } from "@/infrastructure/repositories/db-conversa-repository";
 import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
 import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
@@ -17,31 +16,30 @@ import { AnalyzeAssetPerformanceUseCase } from "@/application/use-cases/analyze-
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
-import type { FileManager } from "@/domain/interfaces/file-manager";
 import type { ConversaRepository } from "@/domain/interfaces/conversa-repository";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-provedor-ai";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
 import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
-import { LocalFileManager } from "@/infrastructure/storage/local-file-manager";
-import { VercelBlobFileManager } from "@/infrastructure/storage/vercel-blob-file-manager";
+import { obterPdfStorage } from "@/infrastructure/storage/pdf-storage-factory";
 import { auth } from "@/auth";
-import path from "path";
 
-const diretorioDados = path.resolve(process.env.DATA_DIRECTORY ?? "./data");
-
-async function criarRepositorio() {
+async function obterUsuarioId(): Promise<string> {
   try {
     const session = await auth();
     if (session?.user?.userId) {
-      return new VercelBlobReportRepository(session.user.userId);
+      return session.user.userId;
     }
   } catch {
     // Build time ou sem contexto de sessao
   }
+  return "__anonimo__";
+}
 
-  return new FilesystemReportRepository(diretorioDados);
+async function criarRepositorio() {
+  const usuarioId = await obterUsuarioId();
+  return new DbReportRepository(usuarioId, obterPdfStorage());
 }
 
 function obterGoogleApiKey(): string {
@@ -151,28 +149,8 @@ export async function obterAnalyzeAssetPerformanceUseCase() {
 }
 
 /**
- * Obtem o FileManager apropriado baseado no ambiente:
- * - Producao com sessao autenticada: VercelBlobFileManager
- * - Desenvolvimento ou sem sessao: LocalFileManager
- */
-export async function obterFileManager(): Promise<FileManager> {
-  try {
-    const session = await auth();
-    if (session?.user?.userId) {
-      return new VercelBlobFileManager(session.user.userId);
-    }
-  } catch {
-    // Build time ou sem contexto de sessao
-  }
-
-  return new LocalFileManager(diretorioDados);
-}
-
-/**
- * Obtem o repository de conversas do chat.
- * Usa FileManager para switching automatico entre filesystem (dev) e blob (prod).
+ * Obtem o repository de conversas do chat (DB-backed).
  */
 export async function obterConversaRepository(): Promise<ConversaRepository> {
-  const fileManager = await obterFileManager();
-  return new FilesystemConversaRepository(fileManager);
+  return new DbConversaRepository();
 }

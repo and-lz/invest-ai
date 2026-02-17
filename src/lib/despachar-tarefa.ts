@@ -11,12 +11,13 @@ import {
  *
  * Nota: upload-pdf NAO suporta retry (buffer do PDF nao e persistido na tarefa).
  */
-export function despacharTarefaPorTipo(tarefa: TarefaBackground): boolean {
+export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: string): boolean {
   switch (tarefa.tipo) {
     case "gerar-insights-consolidados":
       void executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights Consolidados (retry)",
+        usuarioId,
         executarOperacao: async () => {
           const useCase = await obterGenerateInsightsConsolidadosUseCase();
           await useCase.executar();
@@ -44,6 +45,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground): boolean {
       void executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights (retry)",
+        usuarioId,
         executarOperacao: async () => {
           const useCase = await obterGenerateInsightsUseCase();
           await useCase.executar({

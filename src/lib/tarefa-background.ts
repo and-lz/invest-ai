@@ -1,8 +1,10 @@
-import { obterFileManager } from "@/lib/container";
+import { db } from "@/lib/db";
+import { tarefasBackground as tabelaTarefas } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 
 // ============================================================
-// Schema e utilitários para tarefas de processamento em background.
-// Persiste status em data/tasks/{uuid}.json (dev) ou Vercel Blob (prod).
+// Funções para tarefas de processamento em background.
+// Persiste status no PostgreSQL via Drizzle (Neon).
 // ============================================================
 
 // Re-exportar tipos e funções compartilhadas do arquivo tarefa-descricao.ts
@@ -21,27 +23,85 @@ export {
 import type { TarefaBackground } from "@/lib/tarefa-descricao";
 import { TarefaBackgroundSchema } from "@/lib/tarefa-descricao";
 
-// ---- Funções públicas ----
-
-const SUBDIRETORIO_TAREFAS = "tasks";
-
 export async function salvarTarefa(tarefa: TarefaBackground): Promise<void> {
-  const fileManager = await obterFileManager();
-  await fileManager.salvarJson(`${SUBDIRETORIO_TAREFAS}/${tarefa.identificador}.json`, tarefa);
+  await db
+    .insert(tabelaTarefas)
+    .values({
+      identificador: tarefa.identificador,
+      tipo: tarefa.tipo,
+      status: tarefa.status,
+      iniciadoEm: new Date(tarefa.iniciadoEm),
+      concluidoEm: tarefa.concluidoEm ? new Date(tarefa.concluidoEm) : undefined,
+      erro: tarefa.erro,
+      descricaoResultado: tarefa.descricaoResultado,
+      urlRedirecionamento: tarefa.urlRedirecionamento,
+      tentativaAtual:
+        tarefa.tentativaAtual !== undefined ? String(tarefa.tentativaAtual) : undefined,
+      maximoTentativas:
+        tarefa.maximoTentativas !== undefined ? String(tarefa.maximoTentativas) : undefined,
+      erroRecuperavel: tarefa.erroRecuperavel,
+      proximaTentativaEm: tarefa.proximaTentativaEm
+        ? new Date(tarefa.proximaTentativaEm)
+        : undefined,
+      parametros: tarefa.parametros as Record<string, string> | undefined,
+      canceladaEm: tarefa.canceladaEm ? new Date(tarefa.canceladaEm) : undefined,
+      canceladaPor: tarefa.canceladaPor,
+    })
+    .onConflictDoUpdate({
+      target: [tabelaTarefas.identificador],
+      set: {
+        status: tarefa.status,
+        concluidoEm: tarefa.concluidoEm ? new Date(tarefa.concluidoEm) : undefined,
+        erro: tarefa.erro,
+        descricaoResultado: tarefa.descricaoResultado,
+        urlRedirecionamento: tarefa.urlRedirecionamento,
+        tentativaAtual:
+          tarefa.tentativaAtual !== undefined ? String(tarefa.tentativaAtual) : undefined,
+        maximoTentativas:
+          tarefa.maximoTentativas !== undefined ? String(tarefa.maximoTentativas) : undefined,
+        erroRecuperavel: tarefa.erroRecuperavel,
+        proximaTentativaEm: tarefa.proximaTentativaEm
+          ? new Date(tarefa.proximaTentativaEm)
+          : undefined,
+        parametros: tarefa.parametros as Record<string, string> | undefined,
+        canceladaEm: tarefa.canceladaEm ? new Date(tarefa.canceladaEm) : undefined,
+        canceladaPor: tarefa.canceladaPor,
+      },
+    });
 }
 
 export async function lerTarefa(identificador: string): Promise<TarefaBackground | null> {
-  const fileManager = await obterFileManager();
-  const caminhoRelativo = `${SUBDIRETORIO_TAREFAS}/${identificador}.json`;
-  const existe = await fileManager.arquivoExiste(caminhoRelativo);
+  const rows = await db
+    .select()
+    .from(tabelaTarefas)
+    .where(eq(tabelaTarefas.identificador, identificador))
+    .limit(1);
 
-  if (!existe) return null;
+  if (rows.length === 0) return null;
 
-  const dadosBrutos = await fileManager.lerJson<unknown>(caminhoRelativo);
-  const resultado = TarefaBackgroundSchema.safeParse(dadosBrutos);
+  const row = rows[0]!;
+  const resultado = TarefaBackgroundSchema.safeParse({
+    identificador: row.identificador,
+    tipo: row.tipo,
+    status: row.status,
+    iniciadoEm: row.iniciadoEm.toISOString(),
+    concluidoEm: row.concluidoEm?.toISOString(),
+    erro: row.erro ?? undefined,
+    descricaoResultado: row.descricaoResultado ?? undefined,
+    urlRedirecionamento: row.urlRedirecionamento ?? undefined,
+    tentativaAtual:
+      row.tentativaAtual !== null ? Number(row.tentativaAtual) : undefined,
+    maximoTentativas:
+      row.maximoTentativas !== null ? Number(row.maximoTentativas) : undefined,
+    erroRecuperavel: row.erroRecuperavel ?? undefined,
+    proximaTentativaEm: row.proximaTentativaEm?.toISOString(),
+    parametros: row.parametros ?? undefined,
+    canceladaEm: row.canceladaEm?.toISOString(),
+    canceladaPor: row.canceladaPor ?? undefined,
+  });
 
   if (!resultado.success) {
-    console.warn(`[TarefaBackground] JSON inválido em ${caminhoRelativo}:`, resultado.error);
+    console.warn(`[TarefaBackground] Dados invalidos para ${identificador}:`, resultado.error);
     return null;
   }
 
@@ -50,7 +110,7 @@ export async function lerTarefa(identificador: string): Promise<TarefaBackground
 
 /**
  * Cancela uma tarefa em andamento.
- * Marca como "cancelada" no storage para que o executor detecte e aborte.
+ * Marca como "cancelada" no banco de dados.
  */
 export async function cancelarTarefa(
   identificador: string,
@@ -58,7 +118,6 @@ export async function cancelarTarefa(
 ): Promise<boolean> {
   const tarefaAtual = await lerTarefa(identificador);
 
-  // Não existe ou já finalizou
   if (!tarefaAtual || tarefaAtual.status !== "processando") {
     return false;
   }
