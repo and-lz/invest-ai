@@ -3,3 +3,7 @@ npx eslint --max-warnings 0
 
 echo "🔍 Running TypeScript check..."
 npx tsc --noEmit
+
+echo "📦 Bumping patch version..."
+npm version patch --no-git-tag-version
+git add package.json package-lock.json

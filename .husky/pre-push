@@ -1,10 +1,2 @@
-echo "🔍 Running lint..."
-npx eslint --max-warnings 0
-
 echo "🧪 Running tests..."
 npm run test
-
-echo "📦 Bumping patch version..."
-npm version patch --no-git-tag-version
-git add package.json package-lock.json
-git commit --amend --no-edit
