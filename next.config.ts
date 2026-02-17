@@ -22,6 +22,14 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_LAST_COMMIT_MESSAGE: getLastCommitMessage(),
   },
   poweredByHeader: false,
+  eslint: {
+    // Linting is already enforced by the pre-commit hook (eslint --max-warnings 0).
+    // Skipping it during build avoids redundant work on Vercel deploys.
+    ignoreDuringBuilds: true,
+  },
+  experimental: {
+    optimizePackageImports: ["recharts"],
+  },
   outputFileTracingIncludes: {
     "/api/reports": ["./node_modules/@neslinesli93/qpdf-wasm/dist/*.wasm"],
   },

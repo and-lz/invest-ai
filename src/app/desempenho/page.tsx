@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
@@ -13,12 +14,30 @@ import { useDadosAtivo, useListaAtivosCarteira } from "@/hooks/use-dados-ativo";
 import { useAnaliseIaAtivo, dispararAnaliseIaAtivo } from "@/hooks/use-analise-ia-ativo";
 import { GridAtivosCarteira } from "@/components/desempenho/grid-ativos-carteira";
 import { CardsResumoAtivo } from "@/components/desempenho/cards-resumo-ativo";
-import { GraficoEvolucaoAtivo } from "@/components/desempenho/grafico-evolucao-ativo";
-import { GraficoRendimentos } from "@/components/desempenho/grafico-rendimentos";
-import { TabelaMovimentacoes } from "@/components/desempenho/tabela-movimentacoes";
-import { AnaliseIaAtivo } from "@/components/desempenho/analise-ia-ativo";
 import { adicionarTarefaAtivaNoStorage } from "@/components/layout/activity-center";
 import { notificar } from "@/lib/notificar";
+
+// Lazy-load chart-heavy components to reduce initial bundle size
+const GraficoEvolucaoAtivo = dynamic(
+  () =>
+    import("@/components/desempenho/grafico-evolucao-ativo").then((m) => m.GraficoEvolucaoAtivo),
+  { loading: () => <Skeleton className="h-80" /> },
+);
+
+const GraficoRendimentos = dynamic(
+  () => import("@/components/desempenho/grafico-rendimentos").then((m) => m.GraficoRendimentos),
+  { loading: () => <Skeleton className="h-80" /> },
+);
+
+const TabelaMovimentacoes = dynamic(
+  () => import("@/components/desempenho/tabela-movimentacoes").then((m) => m.TabelaMovimentacoes),
+  { loading: () => <Skeleton className="h-64" /> },
+);
+
+const AnaliseIaAtivo = dynamic(
+  () => import("@/components/desempenho/analise-ia-ativo").then((m) => m.AnaliseIaAtivo),
+  { loading: () => <Skeleton className="h-96" /> },
+);
 
 function DesempenhoConteudo() {
   const searchParams = useSearchParams();

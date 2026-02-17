@@ -1,0 +1,20 @@
+# Tests
+__tests__/
+
+# Development scripts
+scripts/
+
+# Local data directory
+data/
+
+# Git hooks
+.husky/
+
+# IDE / editor config
+.vscode/
+.idea/
+
+# Documentation / examples
+*.md
+!README.md
+.env.example
