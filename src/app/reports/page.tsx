@@ -107,10 +107,18 @@ export default function ReportsPage() {
         ref={dialogRef}
         aria-label="Importar relatório"
         className={cn(
-          "bg-background m-auto max-h-[85vh] overflow-y-auto rounded-lg border p-0 shadow-lg",
+          "bg-background max-h-[85vh] overflow-y-auto rounded-lg border p-0 shadow-lg",
           dialog.backdrop,
         )}
-        style={{ maxWidth: "42rem", width: "90vw" }}
+        style={{
+          maxWidth: "42rem",
+          width: "90vw",
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          margin: 0,
+        }}
       >
         <div className="flex items-center justify-between border-b p-6">
           <h2 className={tipografia.h3}>Importar Relatorio</h2>
