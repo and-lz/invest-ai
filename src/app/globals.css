@@ -249,11 +249,11 @@ dialog::backdrop {
 
 /* Markdown Content - Chat Messages */
 .markdown-content {
-  @apply text-sm leading-relaxed;
+  @apply text-xs leading-relaxed;
 }
 
 .markdown-content p {
-  @apply mb-1.5 last:mb-0;
+  @apply mb-1 last:mb-0;
 }
 
 .markdown-content p:first-child {

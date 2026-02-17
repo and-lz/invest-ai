@@ -62,11 +62,11 @@ export function ChatWidget() {
         onClick={handleAlternarChat}
         size="icon"
         className={cn(
-          "fixed right-6 bottom-6 z-40 h-14 w-14 rounded-full shadow-lg transition-transform",
+          "fixed right-4 bottom-4 z-40 h-12 w-12 rounded-full shadow-lg transition-transform",
           estaAberto && "scale-0",
         )}
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-5 w-5" />
         <span className="sr-only">Abrir assistente</span>
       </Button>
 
@@ -75,7 +75,7 @@ export function ChatWidget() {
         <div
           className={cn(
             "bg-background fixed left-0 top-0 z-60 flex h-dvh w-dvw overflow-hidden border shadow-xl",
-            "md:inset-auto md:right-6 md:bottom-6 md:left-auto md:top-auto md:h-[85vh] md:max-h-[calc(100vh-3rem)] md:w-[85vw] md:max-w-350 md:rounded-2xl",
+            "md:inset-auto md:right-4 md:bottom-4 md:left-auto md:top-auto md:h-[min(600px,75vh)] md:w-[420px] md:rounded-xl",
           )}
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
@@ -91,7 +91,7 @@ export function ChatWidget() {
           {/* Sidebar de conversas (overlay, aberta apenas ao clicar) */}
           <div
             className={cn(
-              "bg-background absolute z-10 h-full w-64 border-r transition-transform",
+              "bg-background absolute z-10 h-full w-56 border-r transition-transform",
               mostrarSidebar ? "translate-x-0" : "-translate-x-full",
             )}
           >
@@ -140,7 +140,7 @@ export function ChatWidget() {
             </div>
 
             {/* Area de mensagens */}
-            <div ref={areaScrollRef} className="flex-1 space-y-2.5 overflow-y-auto p-3">
+            <div ref={areaScrollRef} className="flex-1 space-y-2 overflow-y-auto p-2.5">
               {mensagens.length === 0 && (
                 <div className="flex h-full flex-col items-center justify-center text-center">
                   <MessageCircle className="text-muted-foreground mb-2 h-8 w-8" />

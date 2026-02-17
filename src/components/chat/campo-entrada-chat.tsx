@@ -58,7 +58,7 @@ export function CampoEntradaChat({
     setValor(evento.target.value);
     const textarea = evento.target;
     textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 80)}px`;
   }, []);
 
   return (
@@ -71,11 +71,11 @@ export function CampoEntradaChat({
         placeholder="Pergunte algo sobre seus investimentos..."
         disabled={desabilitado}
         rows={1}
-        className="bg-background placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50"
+        className="bg-background placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none rounded-md border px-2.5 py-1.5 text-xs focus:ring-1 focus:outline-none disabled:opacity-50"
       />
       {estaTransmitindo ? (
-        <Button variant="ghost" size="icon" onClick={onParar} className="shrink-0">
-          <Square className="h-4 w-4" />
+        <Button variant="ghost" size="icon" onClick={onParar} className="h-7 w-7 shrink-0">
+          <Square className="h-3.5 w-3.5" />
           <span className="sr-only">Parar transmissao</span>
         </Button>
       ) : (
@@ -84,9 +84,9 @@ export function CampoEntradaChat({
           size="icon"
           onClick={handleEnviar}
           disabled={!valor.trim() || desabilitado}
-          className="shrink-0"
+          className="h-7 w-7 shrink-0"
         >
-          <Send className="h-4 w-4" />
+          <Send className="h-3.5 w-3.5" />
           <span className="sr-only">Enviar mensagem</span>
         </Button>
       )}

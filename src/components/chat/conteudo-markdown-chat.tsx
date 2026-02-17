@@ -61,16 +61,16 @@ export const ConteudoMarkdownChat = React.memo(
               <ol className="my-1 list-inside list-decimal space-y-0.5">{children}</ol>
             ),
             // Paragraphs
-            p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
+            p: ({ children }) => <p className="mb-1 last:mb-0">{children}</p>,
             // Emphasis
             strong: ({ children }) => (
               <strong className="text-foreground font-semibold">{children}</strong>
             ),
             em: ({ children }) => <em className="italic">{children}</em>,
             // Headings (caso AI retorne)
-            h1: ({ children }) => <h1 className="mt-3 mb-1 text-base font-semibold">{children}</h1>,
-            h2: ({ children }) => <h2 className="mt-2 mb-1 text-sm font-semibold">{children}</h2>,
-            h3: ({ children }) => <h3 className="mt-2 mb-0.5 text-sm font-semibold">{children}</h3>,
+            h1: ({ children }) => <h1 className="mt-2 mb-0.5 text-sm font-semibold">{children}</h1>,
+            h2: ({ children }) => <h2 className="mt-1.5 mb-0.5 text-xs font-semibold">{children}</h2>,
+            h3: ({ children }) => <h3 className="mt-1.5 mb-0.5 text-xs font-semibold">{children}</h3>,
           }}
         >
           {conteudo}
