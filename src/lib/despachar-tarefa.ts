@@ -3,7 +3,9 @@ import type { TarefaBackground } from "@/lib/tarefa-background";
 import {
   obterGenerateInsightsUseCase,
   obterGenerateInsightsConsolidadosUseCase,
+  obterAnalyzeAssetPerformanceUseCase,
 } from "@/lib/container";
+import { salvarAnaliseAtivo } from "@/lib/analise-ativo-storage";
 
 /**
  * Despacha a re-execucao de uma tarefa em background com base no seu tipo.
@@ -55,6 +57,33 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
           return {
             descricaoResultado: `Insights para ${identificadorRelatorio} gerados`,
             urlRedirecionamento: `/insights?mesAno=${encodeURIComponent(identificadorRelatorio)}`,
+          };
+        },
+      });
+      return true;
+    }
+
+    case "analisar-ativo": {
+      const codigoAtivo = tarefa.parametros?.codigoAtivo;
+
+      if (!codigoAtivo) {
+        console.warn(
+          `[Despachar] Tarefa ${tarefa.identificador} nao tem parametros.codigoAtivo para retry`,
+        );
+        return false;
+      }
+
+      void executarTarefaEmBackground({
+        tarefa,
+        rotuloLog: "Analise Ativo (retry)",
+        usuarioId,
+        executarOperacao: async () => {
+          const useCase = await obterAnalyzeAssetPerformanceUseCase();
+          const analise = await useCase.executar({ codigoAtivo });
+          await salvarAnaliseAtivo(analise, usuarioId);
+          return {
+            descricaoResultado: `Analise de ${codigoAtivo} concluida`,
+            urlRedirecionamento: `/desempenho?ticker=${encodeURIComponent(codigoAtivo)}`,
           };
         },
       });

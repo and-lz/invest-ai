@@ -73,6 +73,16 @@ export async function executarTarefaEmBackground(
     try {
       const resultado = await executarOperacao();
 
+      // Re-check cancellation after operation completes to avoid
+      // overwriting "cancelada" status with "concluido"
+      const canceladaAposOperacao = await tarefaFoiCancelada(tarefa.identificador);
+      if (canceladaAposOperacao) {
+        console.info(
+          `[${rotuloLog}] Tarefa ${tarefa.identificador} foi cancelada durante execucao, descartando resultado`,
+        );
+        return;
+      }
+
       await salvarTarefa({
         ...tarefa,
         status: "concluido",
