@@ -120,7 +120,7 @@ export default function TrendsPage() {
               onClick={() => void revalidar()}
               className="text-muted-foreground h-7 gap-1.5 text-xs"
             >
-              <RefreshCw className="h-3 w-3" />
+              <RefreshCw className="h-4 w-4" />
               Atualizar
             </Button>
           </div>

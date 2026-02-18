@@ -163,7 +163,7 @@ export function ChatWidget() {
               <div className="flex items-center gap-1">
                 {mensagens.length > 0 && (
                   <Button variant="ghost" size="icon" onClick={limparHistorico} className="h-8 w-8">
-                    <Trash2 className="text-muted-foreground h-3.5 w-3.5" />
+                    <Trash2 className="text-muted-foreground h-4 w-4" />
                     <span className="sr-only">Limpar historico</span>
                   </Button>
                 )}
@@ -174,9 +174,9 @@ export function ChatWidget() {
                   className="hidden h-8 w-8 md:inline-flex"
                 >
                   {telaCheia ? (
-                    <Minimize2 className="text-muted-foreground h-3.5 w-3.5" />
+                    <Minimize2 className="text-muted-foreground h-4 w-4" />
                   ) : (
-                    <Maximize2 className="text-muted-foreground h-3.5 w-3.5" />
+                    <Maximize2 className="text-muted-foreground h-4 w-4" />
                   )}
                   <span className="sr-only">{telaCheia ? "Sair da tela cheia" : "Tela cheia"}</span>
                 </Button>

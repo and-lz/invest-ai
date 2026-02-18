@@ -174,7 +174,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
                   onClick={() => setMostrarInputSenha(true)}
                   className="text-muted-foreground hover:text-foreground flex w-full items-center justify-center gap-1.5 text-xs underline-offset-4 transition-colors hover:underline"
                 >
-                  <Lock className="h-3 w-3" />
+                  <Lock className="h-4 w-4" />
                   Meu PDF tem senha
                 </button>
               )}

@@ -54,7 +54,7 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar }: I
         }}
         className="absolute top-2 right-2 h-6 w-6 opacity-60 transition-opacity hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
       >
-        <Trash2 className="text-destructive h-3.5 w-3.5" />
+        <Trash2 className="text-destructive h-4 w-4" />
         <span className="sr-only">Deletar conversa</span>
       </Button>
     </div>

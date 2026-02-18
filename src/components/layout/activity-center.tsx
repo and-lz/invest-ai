@@ -184,7 +184,7 @@ function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: Item
             onClick={() => onMarcarComoLida(notificacao.identificador)}
             className="opacity-0 transition-opacity group-hover:opacity-100"
           >
-            <Check className="text-muted-foreground h-3 w-3" />
+            <Check className="text-muted-foreground h-4 w-4" />
           </Button>
         )}
       </div>
@@ -196,7 +196,7 @@ function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: Item
           disabled={retryEmAndamento}
           className={cn(tipografia.auxiliar, "mt-3 w-full gap-1.5")}
         >
-          {ehRetry && <RotateCcw className="h-3 w-3" />}
+          {ehRetry && <RotateCcw className="h-4 w-4" />}
           {retryEmAndamento ? "Retentando..." : notificacao.acao.rotulo}
         </Button>
       )}

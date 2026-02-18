@@ -162,7 +162,7 @@ function DesempenhoConteudo() {
               size="sm"
               className="text-muted-foreground gap-1.5 text-xs"
             >
-              <RefreshCw className={`h-3 w-3 ${analisandoComIa ? "animate-spin" : ""}`} />
+              <RefreshCw className={`h-4 w-4 ${analisandoComIa ? "animate-spin" : ""}`} />
               Re-analisar
             </Button>
           )}

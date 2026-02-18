@@ -190,7 +190,7 @@ function InsightCard({
                 disabled={estaAtualizando}
                 className="text-muted-foreground hover:text-success h-8 gap-1.5 text-xs"
               >
-                <Check className="h-3.5 w-3.5" />
+                <Check className="h-4 w-4" />
                 Concluir
               </Button>
               <Button
@@ -200,7 +200,7 @@ function InsightCard({
                 disabled={estaAtualizando}
                 className="text-muted-foreground hover:text-warning h-8 gap-1.5 text-xs"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-4 w-4" />
                 Ignorar
               </Button>
             </>

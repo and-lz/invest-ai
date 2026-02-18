@@ -135,7 +135,7 @@ export function BotaoLerArtigo({ className }: BotaoLerArtigoProps) {
                 className="h-8 w-8 rounded-full transition-transform hover:scale-105"
                 aria-label="Parar leitura"
               >
-                <Square className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+                <Square className="h-4 w-4 fill-current" aria-hidden="true" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
