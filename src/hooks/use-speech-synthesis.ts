@@ -27,7 +27,7 @@ interface UseSpeechSynthesisReturn {
 export function useSpeechSynthesis(
   options: UseSpeechSynthesisOptions = {},
 ): UseSpeechSynthesisReturn {
-  const { rate = 1, pitch = 1, volume = 0.9, lang = "pt-BR" } = options;
+  const { rate = 0.95, pitch = 1, volume = 0.9, lang = "pt-BR" } = options;
 
   const [status, setStatus] = useState<SpeechStatus>("idle");
   const [error, setError] = useState<Error | null>(null);
@@ -37,33 +37,52 @@ export function useSpeechSynthesis(
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // Selecionar melhor voz pt-BR disponível
+  // Score a voice by quality — higher is better
+  const scoreVoice = useCallback((voice: SpeechSynthesisVoice): number => {
+    const name = voice.name.toLowerCase();
+    let score = 0;
+
+    // Exact pt-BR match is strongly preferred over pt-PT or generic pt
+    if (voice.lang === "pt-BR" || voice.lang === "pt_BR") score += 100;
+    else if (voice.lang.startsWith("pt")) score += 10;
+
+    // Quality indicators in voice name (macOS/iOS labels)
+    if (name.includes("premium")) score += 50;
+    if (name.includes("enhanced")) score += 40;
+    if (name.includes("natural")) score += 35;
+
+    // Google neural voices (Chrome) — network-based but highest quality
+    if (name.includes("google")) score += 45;
+
+    // Microsoft neural voices (Edge)
+    if (name.includes("microsoft") && name.includes("online")) score += 40;
+
+    // Network voices are generally neural/high-quality
+    if (!voice.localService) score += 5;
+
+    return score;
+  }, []);
+
+  // Select the best available pt-BR voice by quality score
   const obterMelhorVoz = useCallback((): SpeechSynthesisVoice | null => {
     if (!isSupported) return null;
 
     const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) return null;
 
-    // Separar vozes pt-BR (Brasil) das vozes pt genéricas (Portugal, etc.)
-    const vozesExatamentePtBr = voices.filter(
-      (voz) => voz.lang === "pt-BR" || voz.lang === "pt_BR",
-    );
-    const vozesPtGenerico = voices.filter(
-      (voz) =>
-        voz.lang.startsWith("pt") &&
-        voz.lang !== "pt-BR" &&
-        voz.lang !== "pt_BR",
-    );
+    // Filter to Portuguese voices, then sort by quality score descending
+    const portugueseVoices = voices
+      .filter((v) => v.lang.startsWith("pt"))
+      .sort((a, b) => scoreVoice(b) - scoreVoice(a));
 
-    // Prioridade estrita: pt-BR natural > pt-BR rede > qualquer pt-BR > pt genérico > primeira disponível
-    const vozNaturalBr = vozesExatamentePtBr.find(
-      (voz) => voz.localService && voz.name.includes("Natural"),
-    );
-    const vozRedeBr = vozesExatamentePtBr.find((voz) => !voz.localService);
-    const qualquerVozBr = vozesExatamentePtBr[0];
-    const vozPtGenerico = vozesPtGenerico[0];
+    const best = portugueseVoices[0] ?? voices[0] ?? null;
 
-    return vozNaturalBr || vozRedeBr || qualquerVozBr || vozPtGenerico || voices[0] || null;
-  }, [isSupported]);
+    if (best && process.env.NODE_ENV === "development") {
+      console.log(`[TTS] Selected voice: "${best.name}" (lang=${best.lang}, local=${best.localService}, score=${scoreVoice(best)})`);
+    }
+
+    return best;
+  }, [isSupported, scoreVoice]);
 
   // Falar texto
   const speak = useCallback(
