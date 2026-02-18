@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import {
   Table,
   TableBody,
@@ -168,6 +169,9 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
           Quanto cada tipo de investimento rendeu em reais. Valores em vermelho indicam prejuízo no
           período. Clique nos cabeçalhos para ordenar.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="ganhos-estrategia" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">

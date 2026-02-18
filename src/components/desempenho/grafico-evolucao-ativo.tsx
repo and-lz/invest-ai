@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
@@ -62,6 +63,9 @@ export function GraficoEvolucaoAtivo({ historico, nomeAtivo }: GraficoEvolucaoAt
           <CardTitle className="text-lg">Evolucao do Saldo</CardTitle>
         </div>
         <CardDescription>Historico do saldo de {nomeAtivo} na sua carteira</CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="evolucao-ativo" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-[300px] w-full">

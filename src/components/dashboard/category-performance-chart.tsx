@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, ReferenceLine } from "recharts";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -123,6 +124,9 @@ export function CategoryPerformanceChart({ categorias, cdiAnual }: CategoryPerfo
           {cdiAnual !== undefined &&
             ` A linha tracejada indica o CDI (${formatarPercentualSimples(cdiAnual)}).`}
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="rentabilidade-categoria" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-48 w-full sm:h-64">

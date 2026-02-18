@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import type { Conclusao } from "@/components/ui/takeaway-box";
@@ -76,6 +77,9 @@ export function MapaCalorSetores({ setoresPerformance }: MapaCalorSetoresProps) 
           <InfoTooltip conteudo={GLOSSARIO_HEATMAP_SETORES.explicacao} />
         </CardTitle>
         <CardDescription>Variacao media dos 5 ativos mais negociados de cada setor</CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="heatmap-setores" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">

@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { configGraficoBenchmarks } from "@/lib/chart-config";
@@ -120,6 +121,9 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
           (renda fixa básica), o Ibovespa (média da bolsa) e o IPCA (inflação). Se a barra da sua
           carteira é a maior do grupo, você está indo muito bem naquele período!
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="benchmark" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-52 w-full sm:h-64 lg:h-75">

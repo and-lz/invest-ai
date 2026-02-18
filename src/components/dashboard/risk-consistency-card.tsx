@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_RISCO_CONSISTENCIA } from "@/lib/glossario-financeiro";
@@ -68,6 +69,9 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
           Mostra com que frequência sua carteira supera o CDI e qual foi o melhor e pior mês da
           história.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="risco-consistencia" />
+        </CardAction>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center gap-2">

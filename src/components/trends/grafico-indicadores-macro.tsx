@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import type { Conclusao } from "@/components/ui/takeaway-box";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -132,6 +133,9 @@ export function GraficoIndicadoresMacro({ indicadoresMacro }: GraficoIndicadores
           Indicadores Macroeconômicos
         </CardTitle>
         <CardDescription>SELIC, IPCA e IGP-M dos últimos 12 meses</CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="indicadores-macro" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         {/* Cards com valores atuais */}

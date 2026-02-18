@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { formatarMoeda } from "@/domain/value-objects/money";
@@ -70,6 +71,9 @@ export function GraficoRendimentos({ eventos, nomeAtivo }: GraficoRendimentosPro
         <CardDescription>
           Dividendos, JCP e outros eventos de {nomeAtivo}. Total: {formatarMoeda(totalCentavos)}
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="rendimentos-ativo" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-[250px] w-full">

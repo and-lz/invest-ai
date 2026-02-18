@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { configGraficoPatrimonio } from "@/lib/chart-config";
@@ -144,6 +145,9 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
           mais seus investimentos estão rendendo. Se as duas linhas estão juntas, os rendimentos
           estão baixos.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="patrimonio-total" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-52 w-full sm:h-64 lg:h-75">

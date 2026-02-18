@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { CORES_ESTRATEGIA } from "@/lib/chart-config";
@@ -123,6 +124,9 @@ export function AllocationEvolutionChart({ evolucaoAlocacao }: AllocationEvoluti
           Veja como a distribuição da sua carteira mudou ao longo dos meses. Cada cor representa um
           tipo de investimento.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="evolucao-alocacao" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-52 w-full sm:h-64 lg:h-75">

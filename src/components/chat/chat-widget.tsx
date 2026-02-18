@@ -7,6 +7,10 @@ import { MensagemChatBolha } from "@/components/chat/mensagem-chat";
 import { CampoEntradaChat } from "@/components/chat/campo-entrada-chat";
 import { ListaConversas } from "@/components/chat/lista-conversas";
 import { useChatAssistente } from "@/hooks/use-chat-assistente";
+import {
+  EVENTO_ABRIR_CHAT_COM_PERGUNTA,
+  type EventoAbrirChatDetalhe,
+} from "@/components/ui/botao-explicar-ia";
 import { cn } from "@/lib/utils";
 
 export function ChatWidget() {
@@ -33,6 +37,24 @@ export function ChatWidget() {
       areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
     }
   }, [mensagens]);
+
+  // Listen for external "ask AI to explain" events from chart card buttons
+  useEffect(() => {
+    function handleAbrirComPergunta(evento: Event) {
+      const { pergunta } = (evento as CustomEvent<EventoAbrirChatDetalhe>).detail;
+      setEstaAberto(true);
+      criarNovaConversa();
+      // Small delay to let React render the open state before sending
+      setTimeout(() => {
+        void enviarMensagem(pergunta);
+      }, 100);
+    }
+
+    window.addEventListener(EVENTO_ABRIR_CHAT_COM_PERGUNTA, handleAbrirComPergunta);
+    return () => {
+      window.removeEventListener(EVENTO_ABRIR_CHAT_COM_PERGUNTA, handleAbrirComPergunta);
+    };
+  }, [criarNovaConversa, enviarMensagem]);
 
   const handleAlternarChat = useCallback(() => {
     setEstaAberto((anterior) => !anterior);

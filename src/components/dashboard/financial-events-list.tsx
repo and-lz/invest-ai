@@ -2,7 +2,8 @@
 
 import { useCallback } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import {
   Table,
   TableBody,
@@ -147,6 +148,9 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
             {eventos.length} eventos — Total: {formatarMoeda(totalRecebidoCentavos)}
           </CardDescription>
         )}
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="eventos-financeiros" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         {eventos.length === 0 ? (

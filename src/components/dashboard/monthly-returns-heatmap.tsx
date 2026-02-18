@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import {
   Table,
   TableBody,
@@ -132,6 +133,9 @@ export function MonthlyReturnsHeatmap({ retornosMensais }: MonthlyReturnsHeatmap
           Cada célula mostra o retorno da sua carteira naquele mês. Verde indica ganho, vermelho
           indica perda. Passe o mouse para ver o percentual do CDI.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="retornos-mensais" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">

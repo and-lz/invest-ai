@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell } from "recharts";
 import { CORES_ESTRATEGIA } from "@/lib/chart-config";
@@ -99,6 +100,9 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
           Veja como seu dinheiro está distribuído. Cada fatia representa um tipo de investimento —
           passe o mouse sobre os nomes para entender cada um.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="alocacao-ativos" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-75">

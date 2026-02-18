@@ -2,7 +2,8 @@
 
 import { useCallback } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import {
   Table,
   TableBody,
@@ -156,6 +157,9 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
             ? "Seus investimentos com melhor desempenho neste período."
             : "Investimentos com menor desempenho. Perdas no curto prazo são normais."}
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="top-performers" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">

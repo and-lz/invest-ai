@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
@@ -140,6 +141,9 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
           Mostra em quanto tempo você consegue resgatar cada parte do seu patrimônio. Barras à
           esquerda representam dinheiro mais acessível — importante para emergências.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="escada-liquidez" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <ChartContainer config={configGrafico} className="h-48 w-full sm:h-64">

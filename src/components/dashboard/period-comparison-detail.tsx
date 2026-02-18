@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import {
   Table,
   TableBody,
@@ -77,6 +78,9 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
           Veja o retorno da sua carteira em diferentes janelas de tempo comparado ao CDI. Verde
           indica que você superou a renda fixa naquele período.
         </CardDescription>
+        <CardAction>
+          <BotaoExplicarIA identificadorCard="comparacao-periodos" />
+        </CardAction>
       </CardHeader>
       <CardContent>
         <Table>
