@@ -1,5 +1,6 @@
 import { DbReportRepository } from "@/infrastructure/repositories/db-report-repository";
 import { DbConversaRepository } from "@/infrastructure/repositories/db-conversa-repository";
+import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-plano-acao-repository";
 import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
 import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
@@ -19,6 +20,7 @@ import type { ExtractionService, InsightsService } from "@/domain/interfaces/ext
 import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
 import type { ConversaRepository } from "@/domain/interfaces/conversa-repository";
+import type { PlanoAcaoRepository } from "@/domain/interfaces/plano-acao-repository";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-provedor-ai";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
@@ -165,4 +167,11 @@ export async function obterAnalyzeAssetPerformanceUseCase() {
  */
 export async function obterConversaRepository(): Promise<ConversaRepository> {
   return new DbConversaRepository();
+}
+
+/**
+ * Obtem o repository de itens do plano de acao (DB-backed).
+ */
+export async function obterPlanoAcaoRepository(): Promise<PlanoAcaoRepository> {
+  return new DbPlanoAcaoRepository();
 }

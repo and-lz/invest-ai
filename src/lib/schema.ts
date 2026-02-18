@@ -214,6 +214,58 @@ export const tarefasBackground = pgTable(
 // Cache de 24h com TTL controlado pela aplicação via dataAnalise
 // ============================================================
 
+// ============================================================
+// Tabela: itens_plano_acao
+// Action plan items: takeaway conclusions enriched by AI
+// with contextual investment recommendations
+// ============================================================
+
+export const statusItemPlanoEnum = pgEnum("status_item_plano", [
+  "pendente",
+  "concluida",
+  "ignorada",
+]);
+
+export const origemItemPlanoEnum = pgEnum("origem_item_plano", [
+  "takeaway-dashboard",
+  "insight-acao-sugerida",
+]);
+
+export const tipoConclusaoPlanoEnum = pgEnum("tipo_conclusao_plano", [
+  "positivo",
+  "neutro",
+  "atencao",
+]);
+
+export const itensPlanoAcao = pgTable(
+  "itens_plano_acao",
+  {
+    identificador: text("identificador").primaryKey(), // UUID
+    usuarioId: text("usuario_id").notNull(),
+    textoOriginal: text("texto_original").notNull(),
+    tipoConclusao: tipoConclusaoPlanoEnum("tipo_conclusao").notNull(),
+    origem: origemItemPlanoEnum("origem").notNull(),
+    recomendacaoEnriquecida: text("recomendacao_enriquecida").notNull(),
+    fundamentacao: text("fundamentacao").notNull(),
+    ativosRelacionados: jsonb("ativos_relacionados").notNull().default("[]"), // string[]
+    status: statusItemPlanoEnum("status").notNull().default("pendente"),
+    criadoEm: timestamp("criado_em", { withTimezone: true }).notNull().defaultNow(),
+    atualizadoEm: timestamp("atualizado_em", { withTimezone: true }).notNull().defaultNow(),
+    concluidoEm: timestamp("concluido_em", { withTimezone: true }),
+  },
+  (table) => [
+    index("idx_plano_acao_usuario_id").on(table.usuarioId),
+    index("idx_plano_acao_usuario_status").on(table.usuarioId, table.status),
+    index("idx_plano_acao_usuario_criado").on(table.usuarioId, table.criadoEm),
+  ],
+);
+
+// ============================================================
+// Tabela: analise_ativos
+// Substitui: data/asset-analysis/{ticker}.json
+// Cache de 24h com TTL controlado pela aplicação via dataAnalise
+// ============================================================
+
 export const analiseAtivos = pgTable(
   "analise_ativos",
   {

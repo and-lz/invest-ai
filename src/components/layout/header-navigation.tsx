@@ -9,6 +9,7 @@ import {
   TrendingUp,
   BarChart3,
   BookOpen,
+  ClipboardList,
   Menu,
   MoreHorizontal,
 } from "lucide-react";
@@ -38,6 +39,7 @@ const itensNavegacaoPrincipais = [
 
 const itensNavegacaoSecundarios = [
   { href: "/trends", rotulo: "Tendencias", icone: TrendingUp },
+  { href: "/plano-acao", rotulo: "Plano de Ação", icone: ClipboardList },
   { href: "/aprender", rotulo: "Aprender", icone: BookOpen },
 ];
 
