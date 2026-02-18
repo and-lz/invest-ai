@@ -9,7 +9,7 @@ import { Header } from "@/components/layout/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Brain, RefreshCw, AlertTriangle, Loader2 } from "lucide-react";
+import { BarChart3, BotIcon, RefreshCw, AlertTriangle, Loader2 } from "lucide-react";
 import { useDadosAtivo, useListaAtivosCarteira } from "@/hooks/use-dados-ativo";
 import { useAnaliseIaAtivo, dispararAnaliseIaAtivo } from "@/hooks/use-analise-ia-ativo";
 import { GridAtivosCarteira } from "@/components/desempenho/grid-ativos-carteira";
@@ -148,7 +148,7 @@ function DesempenhoConteudo() {
               {analisandoComIa ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Brain className="h-4 w-4" />
+                <BotIcon className="h-4 w-4" />
               )}
               {analisandoComIa ? "Analisando..." : "Analisar com IA"}
             </Button>

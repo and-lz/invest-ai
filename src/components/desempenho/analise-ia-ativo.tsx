@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  Brain,
+  BotIcon,
   Shield,
   TrendingUp,
   Wallet,
@@ -60,7 +60,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Brain className="text-muted-foreground h-5 w-5" />
+              <BotIcon className="text-muted-foreground h-5 w-5" />
               <CardTitle className="text-lg">Analise IA</CardTitle>
             </div>
             <Badge
