@@ -235,29 +235,37 @@ dialog:not([open]) {
   }
 }
 
-/* Centered modal: fade + subtle scale (positioned via translate(-50%,-50%)) */
+/* ─── Dialog keyframes ───────────────────────────────────────── */
+
 @keyframes dialogScaleIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes dialogScaleOut {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  to   { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
 }
 
-/* Slide from left (mobile nav drawer) */
 @keyframes slideInFromLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes slideOutToLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
 }
 
-/* Per-variant open animations */
+@keyframes slideOutToRight {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ─── Per-variant open animations ───────────────────────────── */
 dialog[open].dialog-centered {
   animation: dialogScaleIn 0.2s ease-out;
 }
@@ -271,9 +279,27 @@ dialog[open].dialog-fullscreen {
   animation: fadeIn 0.15s ease-out;
 }
 
+/* ─── Per-variant close animations (via [data-closing]) ──────── */
+dialog[data-closing].dialog-centered {
+  animation: dialogScaleOut 0.15s ease-in forwards;
+}
+dialog[data-closing].dialog-drawer-right {
+  animation: slideOutToRight 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+dialog[data-closing].dialog-drawer-left {
+  animation: slideOutToLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+dialog[data-closing].dialog-fullscreen {
+  animation: fadeOut 0.15s ease-in forwards;
+}
+
+/* ─── Backdrop ───────────────────────────────────────────────── */
 dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+dialog[data-closing]::backdrop {
+  animation: fadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* Markdown Content - Chat Messages */
