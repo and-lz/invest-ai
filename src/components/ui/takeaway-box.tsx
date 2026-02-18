@@ -16,6 +16,8 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { tipografia, icone } from "@/lib/design-system";
 import { notificar } from "@/lib/notificar";
+import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
+import type { TarefaBackground } from "@/lib/tarefa-descricao";
 import {
   Tooltip,
   TooltipContent,
@@ -66,10 +68,18 @@ const INITIAL_STATE: ExplanationState = {
 
 type AddToPlanStatus = "idle" | "loading" | "added" | "error";
 
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_ATTEMPTS = 30; // 60s max
+
+/**
+ * Creates an explain-takeaway background task and polls until completion.
+ * Returns the explanations map from the task's descricaoResultado.
+ */
 async function fetchExplanations(
   conclusions: Conclusao[],
 ): Promise<Record<string, string>> {
-  const response = await fetch("/api/explain-takeaway", {
+  // 1. Create background task
+  const createResponse = await fetch("/api/explain-takeaway", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -80,17 +90,47 @@ async function fetchExplanations(
     }),
   });
 
-  if (!response.ok) {
-    const errorBody = (await response.json().catch(() => ({}))) as {
+  if (!createResponse.ok) {
+    const errorBody = (await createResponse.json().catch(() => ({}))) as {
       erro?: string;
     };
-    throw new Error(errorBody.erro ?? "Falha ao gerar explicações");
+    throw new Error(errorBody.erro ?? "Falha ao iniciar explicações");
   }
 
-  const data = (await response.json()) as {
-    explanations: Record<string, string>;
+  const { identificadorTarefa } = (await createResponse.json()) as {
+    identificadorTarefa: string;
   };
-  return data.explanations;
+
+  // Notify activity center about new task
+  revalidarTarefasAtivas();
+
+  // 2. Poll task status until completion
+  for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+
+    const statusResponse = await fetch(`/api/tasks/${identificadorTarefa}`);
+    if (!statusResponse.ok) continue;
+
+    const tarefa = (await statusResponse.json()) as TarefaBackground;
+
+    if (tarefa.status === "concluido" && tarefa.descricaoResultado) {
+      const parsed: unknown = JSON.parse(tarefa.descricaoResultado);
+      if (parsed && typeof parsed === "object" && "error" in parsed) {
+        throw new Error("IA retornou formato inesperado");
+      }
+      return parsed as Record<string, string>;
+    }
+
+    if (tarefa.status === "erro") {
+      throw new Error(tarefa.erro ?? "Erro ao gerar explicações");
+    }
+
+    if (tarefa.status === "cancelada") {
+      throw new Error("Tarefa cancelada");
+    }
+  }
+
+  throw new Error("Tempo limite excedido ao gerar explicações");
 }
 
 export type { Conclusao, TipoConclusao };

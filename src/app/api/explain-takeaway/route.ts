@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod/v4";
 import { requireAuth } from "@/lib/auth-utils";
 import { criarProvedorAi } from "@/lib/container";
@@ -8,8 +8,9 @@ import {
   buildExplanationUserPrompt,
 } from "@/lib/prompt-explicacao-conclusao";
 import { ExplainTakeawayRequestSchema } from "@/schemas/explain-takeaway.schema";
-import { AiApiTransientError } from "@/domain/errors/app-errors";
-import { retryWithBackoff } from "@/lib/retry-with-backoff";
+import { salvarTarefa } from "@/lib/tarefa-background";
+import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
+import type { TarefaBackground } from "@/lib/tarefa-background";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -20,7 +21,8 @@ const ExplanationsResponseSchema = z.record(z.string(), z.string());
  * POST /api/explain-takeaway
  *
  * Receives conclusion texts from a TakeawayBox and returns
- * AI-generated educational explanations for each one.
+ * a task ID. AI-generated educational explanations are processed
+ * in background and stored in the task's descricaoResultado as JSON.
  */
 export async function POST(request: Request) {
   const authCheck = await requireAuth();
@@ -38,51 +40,61 @@ export async function POST(request: Request) {
     }
 
     const { conclusions } = validation.data;
-    const userPrompt = buildExplanationUserPrompt(conclusions);
+    const userId = authCheck.session.user.userId;
 
-    const provider = criarProvedorAi();
-    const response = await retryWithBackoff(() =>
-      provider.gerar({
-        instrucaoSistema: SYSTEM_PROMPT_EXPLANATION,
-        mensagens: [
-          {
-            papel: "usuario",
-            partes: [{ tipo: "texto", dados: userPrompt }],
-          },
-        ],
-        temperatura: 0.4,
-        formatoResposta: "json",
-      }),
-    );
+    const tarefa: TarefaBackground = {
+      identificador: crypto.randomUUID(),
+      usuarioId: userId,
+      tipo: "explicar-conclusoes",
+      status: "processando",
+      iniciadoEm: new Date().toISOString(),
+    };
 
-    const parsed: unknown = JSON.parse(response.texto);
-    const explanationsValidation = ExplanationsResponseSchema.safeParse(parsed);
+    await salvarTarefa(tarefa);
 
-    if (!explanationsValidation.success) {
-      console.error("[ExplainTakeaway] AI returned invalid JSON structure");
-      return NextResponse.json(
-        { erro: "Resposta da IA em formato inesperado" },
-        { status: 502 },
-      );
-    }
+    after(executarTarefaEmBackground({
+      tarefa,
+      rotuloLog: "Explicar Conclusoes",
+      usuarioId: userId,
+      executarOperacao: async () => {
+        const userPrompt = buildExplanationUserPrompt(conclusions);
+        const provider = criarProvedorAi();
+        const response = await provider.gerar({
+          instrucaoSistema: SYSTEM_PROMPT_EXPLANATION,
+          mensagens: [
+            {
+              papel: "usuario",
+              partes: [{ tipo: "texto", dados: userPrompt }],
+            },
+          ],
+          temperatura: 0.4,
+          formatoResposta: "json",
+        });
+
+        const parsed: unknown = JSON.parse(response.texto);
+        const explanationsValidation = ExplanationsResponseSchema.safeParse(parsed);
+
+        if (!explanationsValidation.success) {
+          console.error("[ExplainTakeaway] AI returned invalid JSON structure");
+          return {
+            descricaoResultado: JSON.stringify({ error: "invalid_format" }),
+          };
+        }
+
+        return {
+          descricaoResultado: JSON.stringify(explanationsValidation.data),
+        };
+      },
+    }));
 
     return NextResponse.json(
-      { explanations: explanationsValidation.data },
-      cabecalhosSemCache(),
+      { identificadorTarefa: tarefa.identificador },
+      { status: 202, ...cabecalhosSemCache() },
     );
   } catch (error) {
-    if (error instanceof AiApiTransientError) {
-      return NextResponse.json(
-        {
-          erro: "Servico de IA temporariamente indisponivel. Tente novamente.",
-        },
-        { status: 503 },
-      );
-    }
-
     console.error("[ExplainTakeaway] Unexpected error:", error);
     return NextResponse.json(
-      { erro: "Falha ao gerar explicacoes" },
+      { erro: "Falha ao iniciar explicacoes" },
       { status: 500 },
     );
   }

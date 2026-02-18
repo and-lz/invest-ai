@@ -14,6 +14,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/logo";
 import { ActivityCenter } from "@/components/layout/activity-center";
 import { UserProfileMenu } from "@/components/auth/user-profile-menu";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,10 @@ export function HeaderNavigation() {
             </SheetTrigger>
             <SheetContent side="left" className="w-72 p-0">
               <SheetHeader className="border-b px-6 py-4">
-                <SheetTitle className="font-serif text-lg font-semibold tracking-tight">
+                <SheetTitle className="flex items-center gap-2 font-serif text-lg font-semibold tracking-tight">
+                  <Link href="/" onClick={() => setMenuMobileAberto(false)} className="hover:opacity-80 transition-opacity">
+                    <Logo />
+                  </Link>
                   <Link href="/" onClick={() => setMenuMobileAberto(false)} className="hover:text-foreground/80 transition-colors">
                     Investimentos
                   </Link>{" "}
@@ -110,6 +114,9 @@ export function HeaderNavigation() {
 
           {/* Logo */}
           <div className="hidden items-center gap-2 md:flex">
+            <Link href="/" className="hover:opacity-80 transition-opacity">
+              <Logo />
+            </Link>
             <h1 className="font-serif text-base font-semibold tracking-tight">
               <Link href="/" className="hover:text-foreground/80 transition-colors">
                 Investimentos

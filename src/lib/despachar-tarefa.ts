@@ -135,6 +135,14 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
           const enrichValidation = EnriquecimentoAiSchema.safeParse(parsed);
 
           if (!enrichValidation.success) {
+            console.warn(
+              "[Despachar] AI returned invalid JSON structure, writing fallback enrichment",
+              enrichValidation.error.issues,
+            );
+            await repository.atualizarEnriquecimento(usuarioId, identificadorItem, {
+              recomendacaoEnriquecida: textoOriginal,
+              fundamentacao: "Recomendação automática indisponível no momento.",
+            });
             return { descricaoResultado: "Recomendação IA indisponível" };
           }
 
@@ -145,6 +153,13 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
             urlRedirecionamento: "/plano-acao",
           };
         },
+        aoFalharDefinitivo: async () => {
+          const repository = await obterPlanoAcaoRepository();
+          await repository.atualizarEnriquecimento(usuarioId, identificadorItem, {
+            recomendacaoEnriquecida: textoOriginal,
+            fundamentacao: "Recomendação automática indisponível no momento.",
+          });
+        },
       }));
       return true;
     }
@@ -152,6 +167,12 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
     case "upload-pdf":
       console.warn(
         `[Despachar] Tipo upload-pdf nao suporta retry (buffer do PDF nao e persistido)`,
+      );
+      return false;
+
+    case "explicar-conclusoes":
+      console.warn(
+        `[Despachar] Tipo explicar-conclusoes nao suporta retry (parametros efemeros)`,
       );
       return false;
 

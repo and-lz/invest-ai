@@ -11,6 +11,7 @@ export const TipoTarefaEnum = z.enum([
   "gerar-insights-consolidados",
   "analisar-ativo",
   "enriquecer-item-plano",
+  "explicar-conclusoes",
 ]);
 
 export const StatusTarefaEnum = z.enum(["processando", "concluido", "erro", "cancelada"]);
@@ -48,6 +49,7 @@ export const LABELS_TIPO_TAREFA: Record<TipoTarefa, string> = {
   "gerar-insights-consolidados": "Gerando insights consolidados",
   "analisar-ativo": "Analisando ativo",
   "enriquecer-item-plano": "Enriquecendo item do plano",
+  "explicar-conclusoes": "Explicando conclusões",
 };
 
 /**
@@ -82,6 +84,11 @@ export function descreverTarefa(tarefa: TarefaBackground): string {
 
   // Enriquecer item do plano: sem contexto adicional
   if (tarefa.tipo === "enriquecer-item-plano") {
+    return labelBase;
+  }
+
+  // Explicar conclusoes: sem contexto adicional
+  if (tarefa.tipo === "explicar-conclusoes") {
     return labelBase;
   }
 

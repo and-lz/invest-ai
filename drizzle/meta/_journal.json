@@ -15,6 +15,13 @@
       "when": 1771381239361,
       "tag": "0001_third_betty_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1771394728316,
+      "tag": "0002_clammy_nextwave",
+      "breakpoints": true
     }
   ]
 }
