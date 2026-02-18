@@ -17,6 +17,7 @@ import { TakeawayBox } from "@/components/ui/takeaway-box";
 import type { Conclusao } from "@/components/ui/takeaway-box";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
 import { cn } from "@/lib/utils";
+import { corValor } from "@/lib/design-system";
 import type { AtivoRanking } from "@/schemas/trends.schema";
 
 type ColunaRanking = "ticker" | "nome" | "preco" | "variacao" | "volume";
@@ -192,7 +193,7 @@ function TabelaAtivos({
             <TableCell
               className={cn(
                 "text-right text-sm font-medium",
-                ativo.variacao >= 0 ? "text-success" : "text-destructive",
+                corValor(ativo.variacao),
               )}
             >
               {formatarVariacao(ativo.variacao)}

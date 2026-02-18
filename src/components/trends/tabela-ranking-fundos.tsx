@@ -16,6 +16,7 @@ import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_FUNDOS_EM_ALTA } from "@/lib/glossario-financeiro";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
 import { cn } from "@/lib/utils";
+import { corValor } from "@/lib/design-system";
 import type { AtivoRanking } from "@/schemas/trends.schema";
 
 type ColunaFundos = "ticker" | "nome" | "preco" | "variacao" | "volume";
@@ -186,7 +187,7 @@ export function TabelaRankingFundos({ fundosEmAlta }: TabelaRankingFundosProps) 
                 <TableCell
                   className={cn(
                     "text-right text-sm font-medium",
-                    fundo.variacao >= 0 ? "text-success" : "text-destructive",
+                    corValor(fundo.variacao),
                   )}
                 >
                   {formatarVariacao(fundo.variacao)}

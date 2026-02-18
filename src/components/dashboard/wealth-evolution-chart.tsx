@@ -17,6 +17,8 @@ import {
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { TrendingUp } from "lucide-react";
 import type { DashboardData } from "@/application/use-cases/get-dashboard-data";
+import { cn } from "@/lib/utils";
+import { corValor } from "@/lib/design-system";
 
 interface WealthEvolutionChartProps {
   evolucaoPatrimonial: DashboardData["evolucaoPatrimonial"];
@@ -60,9 +62,7 @@ function TooltipCustomizado({ active, payload, label }: TooltipCustomizadoProps)
           <span className="text-foreground font-medium">{formatarMoeda(totalAportado.value)}</span>
         </p>
       )}
-      <p
-        className={`text-sm font-medium ${rendimentosCentavos >= 0 ? "text-success" : "text-destructive"}`}
-      >
+      <p className={cn("text-sm font-medium", corValor(rendimentosCentavos))}>
         Rendimentos: {formatarMoeda(rendimentosCentavos)}
       </p>
     </div>

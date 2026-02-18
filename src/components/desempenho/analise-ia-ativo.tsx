@@ -17,6 +17,8 @@ import {
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { AnaliseAtivoResponse, VeredictoRecomendacao } from "@/schemas/analise-ativo.schema";
+import { cn } from "@/lib/utils";
+import { corValor } from "@/lib/design-system";
 
 interface AnaliseIaAtivoProps {
   readonly analise: AnaliseAtivoResponse;
@@ -118,7 +120,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
                     <tr key={comparacao.periodo} className="border-b last:border-0">
                       <td className="py-2 pr-4">{comparacao.periodo}</td>
                       <td
-                        className={`py-2 pr-4 font-medium ${comparacao.retornoAtivo >= 0 ? "text-success" : "text-destructive"}`}
+                        className={cn("py-2 pr-4 font-medium", corValor(comparacao.retornoAtivo))}
                       >
                         {formatarPercentualSimples(comparacao.retornoAtivo)}
                       </td>

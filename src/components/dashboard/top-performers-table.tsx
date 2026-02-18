@@ -18,6 +18,8 @@ import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
+import { cn } from "@/lib/utils";
+import { corValor } from "@/lib/design-system";
 import {
   GLOSSARIO_MELHORES_PERFORMERS,
   GLOSSARIO_PIORES_PERFORMERS,
@@ -252,7 +254,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                     {formatarMoeda(ativo.saldoBruto.valorEmCentavos)}
                   </TableCell>
                   <TableCell
-                    className={`text-right font-medium ${ativo.rentabilidadeMes.valor >= 0 ? "text-success" : "text-destructive"}`}
+                    className={cn("text-right font-medium", corValor(ativo.rentabilidadeMes.valor))}
                   >
                     {formatarPercentualSimples(ativo.rentabilidadeMes.valor)}
                   </TableCell>
