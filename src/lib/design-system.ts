@@ -83,13 +83,12 @@ export const icone = {
 // Todos os dialogs nativos devem usar estas classes de backdrop
 
 export const dialog = {
-  /** Backdrop padrão com blur. Aplicar no elemento <dialog> */
-  backdrop: "backdrop:bg-background/80 backdrop:backdrop-blur-sm",
+  /** Backdrop for native <dialog>. Uses semantic --background at 40% opacity. */
+  backdrop: "backdrop:bg-background/40",
 
-  /** Overlay div — fixed backdrop para painéis e modals baseados em React.
-   *  Renderizar como <div aria-hidden="true" onClick={fechar} className={dialog.overlay} />
-   *  O elemento pai precisa ter z-index superior a 50. */
-  overlay: "fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity",
+  /** Fixed overlay div for React-based modals and panels.
+   *  Usage: <div aria-hidden="true" onClick={close} className={dialog.overlay} /> */
+  overlay: "fixed inset-0 z-50 bg-background/40 transition-opacity",
 } as const;
 
 // ─── Layout ──────────────────────────────────────────────────────
