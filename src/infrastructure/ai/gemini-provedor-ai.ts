@@ -1,5 +1,5 @@
-import { GoogleGenerativeAI, DynamicRetrievalMode } from "@google/generative-ai";
-import type { Content, Part, Tool } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import type { Content, Part } from "@google/generative-ai";
 import type {
   ProvedorAi,
   ConfiguracaoGeracao,
@@ -84,17 +84,10 @@ export class GeminiProvedorAi implements ProvedorAi {
         requestOptions,
       );
 
-      const searchTools: Tool[] | undefined = configuracao.pesquisaWeb
-        ? [
-            {
-              googleSearchRetrieval: {
-                dynamicRetrievalConfig: {
-                  mode: DynamicRetrievalMode.MODE_DYNAMIC,
-                  dynamicThreshold: 0.3,
-                },
-              },
-            },
-          ]
+      // gemini-2.x uses `googleSearch` tool (SDK v0.24 types only define
+      // `googleSearchRetrieval` for 1.5 models, so we cast here)
+      const searchTools = configuracao.pesquisaWeb
+        ? [{ googleSearch: {} } as Record<string, unknown>]
         : undefined;
 
       const contents = this.converterMensagensParaContents(configuracao);
