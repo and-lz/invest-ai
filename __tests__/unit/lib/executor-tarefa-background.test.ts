@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { TarefaBackground } from "@/lib/tarefa-background";
+import type { TarefaBackground } from "@/lib/background-task";
 import { AppError, AiApiTransientError } from "@/domain/errors/app-errors";
 
 // Mock tarefa-background
-vi.mock("@/lib/tarefa-background", () => ({
+vi.mock("@/lib/background-task", () => ({
   salvarTarefa: vi.fn(),
   lerTarefa: vi.fn().mockResolvedValue(null), // Retorna null por padrão (tarefa não cancelada)
   descreverTarefa: vi.fn((tarefa: TarefaBackground) => `Mock: ${tarefa.tipo}`),
@@ -14,19 +14,19 @@ vi.mock("@/lib/tarefa-background", () => ({
 }));
 
 // Mock notificacao
-vi.mock("@/lib/notificacao", () => ({
-  adicionarNotificacao: vi.fn(),
+vi.mock("@/lib/notification", () => ({
+  addNotification: vi.fn(),
   NotificacaoSchema: {},
   TipoNotificacaoEnum: {},
 }));
 
 // Importar apos os mocks
-import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
-import { salvarTarefa } from "@/lib/tarefa-background";
-import { adicionarNotificacao } from "@/lib/notificacao";
+import { executeBackgroundTask } from "@/lib/background-task-executor";
+import { salvarTarefa } from "@/lib/background-task";
+import { addNotification } from "@/lib/notification";
 
 const mockSalvarTarefa = vi.mocked(salvarTarefa);
-const mockAdicionarNotificacao = vi.mocked(adicionarNotificacao);
+const mockAdicionarNotificacao = vi.mocked(addNotification);
 
 function criarTarefaBase(overrides?: Partial<TarefaBackground>): TarefaBackground {
   return {
@@ -38,7 +38,7 @@ function criarTarefaBase(overrides?: Partial<TarefaBackground>): TarefaBackgroun
   };
 }
 
-describe("executarTarefaEmBackground", () => {
+describe("executeBackgroundTask", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -46,7 +46,7 @@ describe("executarTarefaEmBackground", () => {
   it("salva tarefa como concluido e cria notificacao de sucesso", async () => {
     const tarefa = criarTarefaBase();
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -79,7 +79,7 @@ describe("executarTarefaEmBackground", () => {
   it("salva tarefa como erro e cria notificacao de erro para erros nao recuperaveis", async () => {
     const tarefa = criarTarefaBase();
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -112,7 +112,7 @@ describe("executarTarefaEmBackground", () => {
       new AppError("Erro permanente", "AI_API_ERROR"),
     );
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -127,7 +127,7 @@ describe("executarTarefaEmBackground", () => {
     const tarefa = criarTarefaBase({ maximoTentativas: 3 });
     let chamada = 0;
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -160,7 +160,7 @@ describe("executarTarefaEmBackground", () => {
       new AiApiTransientError("503 Service Unavailable"),
     );
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -195,7 +195,7 @@ describe("executarTarefaEmBackground", () => {
   it("cria notificacao sem acao quando nao ha urlRedirecionamento", async () => {
     const tarefa = criarTarefaBase();
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -215,7 +215,7 @@ describe("executarTarefaEmBackground", () => {
   it("notificacao de erro sem acao de retry para erros nao recuperaveis", async () => {
     const tarefa = criarTarefaBase();
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -233,13 +233,13 @@ describe("executarTarefaEmBackground", () => {
     );
   });
 
-  it("nao lanca excecao se adicionarNotificacao falhar", async () => {
+  it("nao lanca excecao se addNotification falhar", async () => {
     const tarefa = criarTarefaBase();
     mockAdicionarNotificacao.mockRejectedValueOnce(new Error("Filesystem error"));
 
     // Nao deve lancar excecao
     await expect(
-      executarTarefaEmBackground({
+      executeBackgroundTask({
         tarefa,
         rotuloLog: "Test",
         usuarioId: "user-test-123",
@@ -261,7 +261,7 @@ describe("executarTarefaEmBackground", () => {
       new AiApiTransientError("timeout"),
     );
 
-    await executarTarefaEmBackground({
+    await executeBackgroundTask({
       tarefa,
       rotuloLog: "Test",
       usuarioId: "user-test-123",
@@ -277,7 +277,7 @@ describe("executarTarefaEmBackground", () => {
       const tarefa = criarTarefaBase();
       const cleanupMock = vi.fn();
 
-      await executarTarefaEmBackground({
+      await executeBackgroundTask({
         tarefa,
         rotuloLog: "Test",
         usuarioId: "user-test-123",
@@ -297,7 +297,7 @@ describe("executarTarefaEmBackground", () => {
       const tarefa = criarTarefaBase({ maximoTentativas: 2 });
       const cleanupMock = vi.fn();
 
-      await executarTarefaEmBackground({
+      await executeBackgroundTask({
         tarefa,
         rotuloLog: "Test",
         usuarioId: "user-test-123",
@@ -314,7 +314,7 @@ describe("executarTarefaEmBackground", () => {
       const tarefa = criarTarefaBase();
       const cleanupMock = vi.fn();
 
-      await executarTarefaEmBackground({
+      await executeBackgroundTask({
         tarefa,
         rotuloLog: "Test",
         usuarioId: "user-test-123",
@@ -330,7 +330,7 @@ describe("executarTarefaEmBackground", () => {
     it("Given aoFalharDefinitivo throws, When task fails permanently, Then error is logged but task still saved as erro", async () => {
       const tarefa = criarTarefaBase();
 
-      await executarTarefaEmBackground({
+      await executeBackgroundTask({
         tarefa,
         rotuloLog: "Test",
         usuarioId: "user-test-123",

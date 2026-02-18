@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import {
-  listarNotificacoes,
-  adicionarNotificacao,
-  limparTodasNotificacoes,
+  listNotifications,
+  addNotification,
+  clearAllNotifications,
   CriarNotificacaoSchema,
-} from "@/lib/notificacao";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+} from "@/lib/notification";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 import { requireAuth } from "@/lib/auth-utils";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export async function GET() {
   if (!authCheck.authenticated) return authCheck.response;
 
   try {
-    const notificacoesLista = await listarNotificacoes(authCheck.session.user.userId);
+    const notificacoesLista = await listNotifications(authCheck.session.user.userId);
     return NextResponse.json({ notificacoes: notificacoesLista }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao listar notificacoes:", erro);
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const notificacao = await adicionarNotificacao(
+    const notificacao = await addNotification(
       authCheck.session.user.userId,
       validacao.data,
     );
@@ -55,7 +55,7 @@ export async function DELETE() {
   if (!authCheck.authenticated) return authCheck.response;
 
   try {
-    await limparTodasNotificacoes(authCheck.session.user.userId);
+    await clearAllNotifications(authCheck.session.user.userId);
     return NextResponse.json({ sucesso: true }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao limpar notificacoes:", erro);

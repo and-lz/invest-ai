@@ -4,7 +4,7 @@ import {
   AtualizarItemPlanoSchema,
   ItemPlanoAcaoSchema,
   EnriquecimentoAiSchema,
-} from "@/schemas/plano-acao.schema";
+} from "@/schemas/action-plan.schema";
 
 describe("Action Plan Schemas", () => {
   describe("CriarItemPlanoSchema", () => {

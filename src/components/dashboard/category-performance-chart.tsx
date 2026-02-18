@@ -1,14 +1,14 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, ReferenceLine } from "recharts";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_RENTABILIDADE_POR_CATEGORIA } from "@/lib/glossario-financeiro";
+import { GLOSSARY_RENTABILIDADE_POR_CATEGORIA } from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { BarChart3 } from "lucide-react";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import type { RentabilidadePorCategoria } from "@/schemas/report-extraction.schema";
 import type { ChartConfig } from "@/components/ui/chart";
 
@@ -43,7 +43,7 @@ function TooltipCategoria({ active, payload }: TooltipCategoriaProps) {
       <p className="text-muted-foreground text-sm">
         12 meses:{" "}
         <span className="text-foreground font-medium">
-          {formatarPercentualSimples(dados.rentabilidade)}
+          {formatSimplePercentage(dados.rentabilidade)}
         </span>
       </p>
     </div>
@@ -67,7 +67,7 @@ export function gerarConclusaoCategorias(
   if (!melhor || !pior) return conclusoes;
 
   conclusoes.push({
-    texto: `A melhor categoria em 12 meses foi ${melhor.nomeCategoria} (${formatarPercentualSimples(melhor.rentabilidade12Meses.valor)}). A pior foi ${pior.nomeCategoria} (${formatarPercentualSimples(pior.rentabilidade12Meses.valor)}).`,
+    texto: `A melhor categoria em 12 meses foi ${melhor.nomeCategoria} (${formatSimplePercentage(melhor.rentabilidade12Meses.valor)}). A pior foi ${pior.nomeCategoria} (${formatSimplePercentage(pior.rentabilidade12Meses.valor)}).`,
     tipo: melhor.rentabilidade12Meses.valor > 0 ? "positivo" : "atencao",
   });
 
@@ -76,7 +76,7 @@ export function gerarConclusaoCategorias(
       (categoria) => categoria.rentabilidade12Meses.valor > cdiAnual,
     );
     conclusoes.push({
-      texto: `${categoriasAcimaCdi.length} de ${categorias.length} categorias bateram o CDI (${formatarPercentualSimples(cdiAnual)}) nos últimos 12 meses.`,
+      texto: `${categoriasAcimaCdi.length} de ${categorias.length} categorias bateram o CDI (${formatSimplePercentage(cdiAnual)}) nos últimos 12 meses.`,
       tipo:
         categoriasAcimaCdi.length > categorias.length / 2
           ? "positivo"
@@ -117,12 +117,12 @@ export function CategoryPerformanceChart({ categorias, cdiAnual }: CategoryPerfo
         <CardTitle className="flex items-center gap-1">
           <BarChart3 className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Rentabilidade por Categoria
-          <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_POR_CATEGORIA.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_RENTABILIDADE_POR_CATEGORIA.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Compara o retorno de cada tipo de investimento nos últimos 12 meses.
           {cdiAnual !== undefined &&
-            ` A linha tracejada indica o CDI (${formatarPercentualSimples(cdiAnual)}).`}
+            ` A linha tracejada indica o CDI (${formatSimplePercentage(cdiAnual)}).`}
         </CardDescription>
         <CardAction>
           <BotaoExplicarIA identificadorCard="rentabilidade-categoria" />

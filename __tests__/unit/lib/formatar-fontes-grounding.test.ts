@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatarFontesGrounding } from "@/lib/formatar-fontes-grounding";
+import { formatarFontesGrounding } from "@/lib/format-grounding-sources";
 import type { GroundingMetadata } from "@google/generative-ai";
 
 describe("formatarFontesGrounding", () => {

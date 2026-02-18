@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { obterGetDashboardDataUseCase } from "@/lib/container";
 import { validarMesAno } from "@/lib/format-date";
 import { requireAuth } from "@/lib/auth-utils";
-import { cabecalhosCachePrivado } from "@/lib/cabecalhos-cache";
-import { cacheGlobal } from "@/lib/cache-em-memoria";
+import { cabecalhosCachePrivado } from "@/lib/cache-headers";
+import { cacheGlobal } from "@/lib/in-memory-cache";
 import type { DashboardData } from "@/application/use-cases/get-dashboard-data";
 
 const TTL_DASHBOARD_MS = 60 * 1000; // 60 segundos

@@ -15,9 +15,9 @@ import {
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { tipografia, icone } from "@/lib/design-system";
-import { notificar } from "@/lib/notificar";
-import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
-import type { TarefaBackground } from "@/lib/tarefa-descricao";
+import { notificar } from "@/lib/notifier";
+import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
+import type { TarefaBackground } from "@/lib/task-description";
 import {
   Tooltip,
   TooltipContent,

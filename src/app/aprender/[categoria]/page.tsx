@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { BookOpen, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
-import { CardArtigo } from "@/components/aprender/card-artigo";
+import { CardArtigo } from "@/components/aprender/article-card";
 import { Button } from "@/components/ui/button";
 import { obterArtigosPorCategoria } from "@/lib/artigos-registry";
-import { INFORMACOES_CATEGORIAS, CategoriaArtigoEnum } from "@/schemas/artigo-educacional.schema";
-import type { CategoriaArtigo } from "@/schemas/artigo-educacional.schema";
+import { INFORMACOES_CATEGORIAS, CategoriaArtigoEnum } from "@/schemas/educational-article.schema";
+import type { CategoriaArtigo } from "@/schemas/educational-article.schema";
 
 interface CategoriaPageProps {
   params: Promise<{

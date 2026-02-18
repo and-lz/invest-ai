@@ -2,7 +2,7 @@ import type {
   CotacaoAtual,
   DadosFundamentalistas,
   DividendoHistorico,
-} from "@/schemas/analise-ativo.schema";
+} from "@/schemas/asset-analysis.schema";
 import { z } from "zod/v4";
 
 // ============================================================

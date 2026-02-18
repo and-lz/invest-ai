@@ -1,8 +1,8 @@
-import { SecaoArtigo, Paragrafo, Lista, Destaque, TabelaSimples } from "../../template-artigo";
+import { SecaoArtigo, Paragrafo, Lista, Destaque, TabelaSimples } from "../../article-template";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_IPCA } from "@/lib/glossario-financeiro";
-import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
+import { GLOSSARY_IPCA } from "@/lib/financial-glossary";
+import type { ArtigoMetadata } from "@/schemas/educational-article.schema";
 
 export const metadata: ArtigoMetadata = {
   slug: "tesouro-direto",
@@ -101,7 +101,7 @@ export default function TesouroDiretoArtigo() {
       <SecaoArtigo titulo="Tesouro IPCA+: proteção contra a inflação">
         <Paragrafo>
           O Tesouro IPCA+ é ideal para objetivos de longo prazo, como aposentadoria. Ele garante que
-          seu dinheiro sempre vai render <InfoTooltip conteudo={GLOSSARIO_IPCA.explicacao} /> mais
+          seu dinheiro sempre vai render <InfoTooltip conteudo={GLOSSARY_IPCA.explicacao} /> mais
           que a inflação.
         </Paragrafo>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import {
   Table,
   TableBody,
@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_RETORNOS_MENSAIS, GLOSSARIO_PERCENTUAL_CDI } from "@/lib/glossario-financeiro";
+import { GLOSSARY_RETORNOS_MENSAIS, GLOSSARY_PERCENTUAL_CDI } from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { Calendar } from "lucide-react";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import type { RetornoAnual } from "@/schemas/report-extraction.schema";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -106,7 +106,7 @@ export function gerarConclusaoRetornosMensais(retornos: RetornoAnual[]): Conclus
     melhorAno.ano !== piorAno.ano
   ) {
     conclusoes.push({
-      texto: `Melhor ano: ${melhorAno.ano} (${formatarPercentualSimples(melhorAno.rentabilidadeAnual.valor)}). Pior ano: ${piorAno.ano} (${formatarPercentualSimples(piorAno.rentabilidadeAnual.valor)}).`,
+      texto: `Melhor ano: ${melhorAno.ano} (${formatSimplePercentage(melhorAno.rentabilidadeAnual.valor)}). Pior ano: ${piorAno.ano} (${formatSimplePercentage(piorAno.rentabilidadeAnual.valor)}).`,
       tipo: "neutro",
     });
   }
@@ -127,7 +127,7 @@ export function MonthlyReturnsHeatmap({ retornosMensais }: MonthlyReturnsHeatmap
         <CardTitle className="flex items-center gap-1">
           <Calendar className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Retornos Mensais
-          <InfoTooltip conteudo={GLOSSARIO_RETORNOS_MENSAIS.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_RETORNOS_MENSAIS.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Cada célula mostra o retorno da sua carteira naquele mês. Verde indica ganho, vermelho
@@ -153,7 +153,7 @@ export function MonthlyReturnsHeatmap({ retornosMensais }: MonthlyReturnsHeatmap
                   <span className="flex items-center justify-center gap-1">
                     Acum.
                     <InfoTooltip
-                      conteudo={GLOSSARIO_PERCENTUAL_CDI.explicacao}
+                      conteudo={GLOSSARY_PERCENTUAL_CDI.explicacao}
                       tamanhoIcone="h-3 w-3"
                     />
                   </span>
@@ -185,7 +185,7 @@ export function MonthlyReturnsHeatmap({ retornosMensais }: MonthlyReturnsHeatmap
                                   <span className="cursor-default">{valorRetorno.toFixed(2)}%</span>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>{formatarPercentualSimples(percentualCdi)} do CDI</p>
+                                  <p>{formatSimplePercentage(percentualCdi)} do CDI</p>
                                 </TooltipContent>
                               </Tooltip>
                             ) : (

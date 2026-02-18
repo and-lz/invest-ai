@@ -1,19 +1,19 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { configGraficoPatrimonio } from "@/lib/chart-config";
-import { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatarMoeda, formatCompactCurrency } from "@/domain/value-objects/money";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import { formatarMesAno } from "@/lib/format-date";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_EVOLUCAO_PATRIMONIAL,
-  GLOSSARIO_TOTAL_APORTADO,
-  GLOSSARIO_RENDIMENTOS,
-} from "@/lib/glossario-financeiro";
+  GLOSSARY_EVOLUCAO_PATRIMONIAL,
+  GLOSSARY_TOTAL_APORTADO,
+  GLOSSARY_RENDIMENTOS,
+} from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { TrendingUp } from "lucide-react";
 import type { DashboardData } from "@/application/use-cases/get-dashboard-data";
@@ -82,7 +82,7 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
 
   if (rendimentosCentavos > 0) {
     conclusoes.push({
-      texto: `Seus investimentos já geraram ${formatarMoeda(rendimentosCentavos)} de rendimentos, o que representa ${formatarPercentualSimples(percentualRendimento)} sobre o que você investiu do próprio bolso.`,
+      texto: `Seus investimentos já geraram ${formatarMoeda(rendimentosCentavos)} de rendimentos, o que representa ${formatSimplePercentage(percentualRendimento)} sobre o que você investiu do próprio bolso.`,
       tipo: "positivo",
     });
   } else if (rendimentosCentavos < 0) {
@@ -140,7 +140,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
         <CardTitle className="flex items-center gap-1">
           <TrendingUp className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Evolucao Patrimonial
-          <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_PATRIMONIAL.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_EVOLUCAO_PATRIMONIAL.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Acompanhe a evolução do seu dinheiro. Quanto mais a área de cima se distancia da de baixo,
@@ -159,7 +159,7 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
             <YAxis
               tickLine={false}
               axisLine={false}
-              tickFormatter={(valorCentavos: number) => formatarMoedaCompacta(valorCentavos)}
+              tickFormatter={(valorCentavos: number) => formatCompactCurrency(valorCentavos)}
               width={55}
             />
             <ChartTooltip content={<TooltipCustomizado />} />
@@ -196,14 +196,14 @@ export function WealthEvolutionChart({ evolucaoPatrimonial }: WealthEvolutionCha
             />
             <span className="text-muted-foreground flex items-center gap-1">
               Total Aportado
-              <InfoTooltip conteudo={GLOSSARIO_TOTAL_APORTADO.explicacao} tamanhoIcone="h-3 w-3" />
+              <InfoTooltip conteudo={GLOSSARY_TOTAL_APORTADO.explicacao} tamanhoIcone="h-3 w-3" />
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <div className="from-chart-3/30 to-chart-1/30 h-3 w-3 rounded-sm bg-linear-to-b" />
             <span className="text-muted-foreground flex items-center gap-1">
               Rendimentos (diferença)
-              <InfoTooltip conteudo={GLOSSARIO_RENDIMENTOS.explicacao} tamanhoIcone="h-3 w-3" />
+              <InfoTooltip conteudo={GLOSSARY_RENDIMENTOS.explicacao} tamanhoIcone="h-3 w-3" />
             </span>
           </div>
         </div>

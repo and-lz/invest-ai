@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { listarTarefasAtivasPorUsuario } from "@/lib/tarefa-background";
+import { listActiveTasksByUser } from "@/lib/background-task";
 import { requireAuth } from "@/lib/auth-utils";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 
 export async function GET() {
   const authCheck = await requireAuth();
   if (!authCheck.authenticated) return authCheck.response;
 
   try {
-    const tarefas = await listarTarefasAtivasPorUsuario(
+    const tarefas = await listActiveTasksByUser(
       authCheck.session.user.userId,
     );
     return NextResponse.json({ tarefas }, cabecalhosSemCache());

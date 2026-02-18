@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Header } from "@/components/layout/header";
-import { usePlanoAcao } from "@/hooks/use-plano-acao";
+import { usePlanoAcao } from "@/hooks/use-action-plan";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { tipografia, icone, layout, corBadge } from "@/lib/design-system";
-import { notificar } from "@/lib/notificar";
-import type { ItemPlanoAcao, TipoConclusaoPlano } from "@/schemas/plano-acao.schema";
+import { notificar } from "@/lib/notifier";
+import type { ItemPlanoAcao, TipoConclusaoPlano } from "@/schemas/action-plan.schema";
 import Link from "next/link";
 
 const CONCLUSION_ICONS: Record<TipoConclusaoPlano, LucideIcon> = {

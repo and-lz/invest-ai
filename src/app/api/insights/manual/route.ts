@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
 import {
-  obterSalvarInsightsManualUseCase,
+  obterSaveManualInsightsUseCase,
   obterGetReportDetailUseCase,
   obterListReportsUseCase,
 } from "@/lib/container";
 import {
   gerarPromptInsightsManual,
   gerarPromptInsightsConsolidadoManual,
-} from "@/lib/prompt-insights-manual";
+} from "@/lib/manual-insights-prompt";
 import { AppError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
 import { z } from "zod/v4";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 
 const GerarPromptRequestSchema = z.object({
   acao: z.literal("gerar-prompt"),
@@ -107,7 +107,7 @@ export async function POST(request: Request) {
     }
 
     // acao === "salvar"
-    const useCase = await obterSalvarInsightsManualUseCase();
+    const useCase = await obterSaveManualInsightsUseCase();
     const insights = await useCase.executar({
       identificadorRelatorio: dados.identificadorRelatorio,
       jsonBruto: dados.json,

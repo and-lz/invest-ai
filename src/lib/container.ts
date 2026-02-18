@@ -1,6 +1,6 @@
 import { DbReportRepository } from "@/infrastructure/repositories/db-report-repository";
-import { DbConversaRepository } from "@/infrastructure/repositories/db-conversa-repository";
-import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-plano-acao-repository";
+import { DbConversaRepository } from "@/infrastructure/repositories/db-conversation-repository";
+import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-action-plan-repository";
 import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
 import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
@@ -9,19 +9,19 @@ import { GetReportDetailUseCase } from "@/application/use-cases/get-report-detai
 import { GetDashboardDataUseCase } from "@/application/use-cases/get-dashboard-data";
 import { GenerateInsightsUseCase } from "@/application/use-cases/generate-insights";
 import { DeleteReportUseCase } from "@/application/use-cases/delete-report";
-import { SalvarRelatorioManualUseCase } from "@/application/use-cases/salvar-relatorio-manual";
-import { SalvarInsightsManualUseCase } from "@/application/use-cases/salvar-insights-manual";
-import { AtualizarConclusaoInsightUseCase } from "@/application/use-cases/atualizar-conclusao-insight";
-import { GenerateInsightsConsolidadosUseCase } from "@/application/use-cases/generate-insights-consolidados";
+import { SaveManualReportUseCase } from "@/application/use-cases/save-manual-report";
+import { SaveManualInsightsUseCase } from "@/application/use-cases/save-manual-insights";
+import { UpdateInsightConclusionUseCase } from "@/application/use-cases/update-insight-conclusion";
+import { GenerateConsolidatedInsightsUseCase } from "@/application/use-cases/generate-consolidated-insights";
 import { AnalyzeAssetPerformanceUseCase } from "@/application/use-cases/analyze-asset-performance";
 import { ListInsightsUseCase } from "@/application/use-cases/list-insights";
 import { DeleteInsightsUseCase } from "@/application/use-cases/delete-insights";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
-import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
+import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
-import type { ConversaRepository } from "@/domain/interfaces/conversa-repository";
-import type { PlanoAcaoRepository } from "@/domain/interfaces/plano-acao-repository";
-import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-provedor-ai";
+import type { ConversaRepository } from "@/domain/interfaces/conversation-repository";
+import type { PlanoAcaoRepository } from "@/domain/interfaces/action-plan-repository";
+import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-ai-provider";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
@@ -98,24 +98,24 @@ export async function obterDeleteReportUseCase() {
   return new DeleteReportUseCase(repository);
 }
 
-export async function obterSalvarRelatorioManualUseCase() {
+export async function obterSaveManualReportUseCase() {
   const repository = await criarRepositorio();
-  return new SalvarRelatorioManualUseCase(repository);
+  return new SaveManualReportUseCase(repository);
 }
 
-export async function obterSalvarInsightsManualUseCase() {
+export async function obterSaveManualInsightsUseCase() {
   const repository = await criarRepositorio();
-  return new SalvarInsightsManualUseCase(repository);
+  return new SaveManualInsightsUseCase(repository);
 }
 
-export async function obterAtualizarConclusaoInsightUseCase() {
+export async function obterUpdateInsightConclusionUseCase() {
   const repository = await criarRepositorio();
-  return new AtualizarConclusaoInsightUseCase(repository);
+  return new UpdateInsightConclusionUseCase(repository);
 }
 
-export async function obterGenerateInsightsConsolidadosUseCase() {
+export async function obterGenerateConsolidatedInsightsUseCase() {
   const repository = await criarRepositorio();
-  return new GenerateInsightsConsolidadosUseCase(repository, criarServicoInsights());
+  return new GenerateConsolidatedInsightsUseCase(repository, criarServicoInsights());
 }
 
 export async function obterListInsightsUseCase() {

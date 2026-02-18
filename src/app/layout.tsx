@@ -3,9 +3,9 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
 import { AuthProvider } from "@/contexts/auth-provider";
-import { ProvedorContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
+import { ChatPageProvider } from "@/contexts/chat-page-context";
 import { ChatWidget } from "@/components/chat/chat-widget";
-import { ProvedorSwr } from "@/components/providers/provedor-swr";
+import { ProvedorSwr } from "@/components/providers/swr-provider";
 import { PwaRegistration } from "@/components/providers/pwa-registration";
 import "./globals.css";
 
@@ -59,14 +59,14 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ProvedorSwr>
-              <ProvedorContextoPaginaChat>
+              <ChatPageProvider>
                 <div className="flex h-screen flex-col">
                   <HeaderNavigation />
                   <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
                 </div>
                 <ChatWidget />
                 <Toaster />
-              </ProvedorContextoPaginaChat>
+              </ChatPageProvider>
             </ProvedorSwr>
             <PwaRegistration />
           </ThemeProvider>

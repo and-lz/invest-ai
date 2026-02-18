@@ -1,17 +1,17 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { configGraficoBenchmarks } from "@/lib/chart-config";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_CARTEIRA_VS_BENCHMARKS,
-  GLOSSARIO_CDI,
-  GLOSSARIO_IBOVESPA,
-  GLOSSARIO_IPCA,
-} from "@/lib/glossario-financeiro";
+  GLOSSARY_CARTEIRA_VS_BENCHMARKS,
+  GLOSSARY_CDI,
+  GLOSSARY_IBOVESPA,
+  GLOSSARY_IPCA,
+} from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { Scale, Wallet, Landmark, TrendingUp, ShoppingCart } from "lucide-react";
 import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
@@ -116,7 +116,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
         <CardTitle className="flex items-center gap-1">
           <Scale className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Carteira vs Benchmarks
-          <InfoTooltip conteudo={GLOSSARIO_CARTEIRA_VS_BENCHMARKS.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_CARTEIRA_VS_BENCHMARKS.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Cada grupo de barras mostra um período. Sua carteira é comparada com 3 referências: o CDI
@@ -157,7 +157,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
             <div className="h-3 w-3 rounded-full" style={{ backgroundColor: "var(--color-cdi)" }} />
             <Landmark className="h-3 w-3" aria-hidden="true" />
             CDI
-            <InfoTooltip conteudo={GLOSSARIO_CDI.explicacao} tamanhoIcone="h-3 w-3" />
+            <InfoTooltip conteudo={GLOSSARY_CDI.explicacao} tamanhoIcone="h-3 w-3" />
           </div>
           <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
             <div
@@ -166,7 +166,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
             />
             <TrendingUp className="h-3 w-3" aria-hidden="true" />
             Ibovespa
-            <InfoTooltip conteudo={GLOSSARIO_IBOVESPA.explicacao} tamanhoIcone="h-3 w-3" />
+            <InfoTooltip conteudo={GLOSSARY_IBOVESPA.explicacao} tamanhoIcone="h-3 w-3" />
           </div>
           <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
             <div
@@ -175,7 +175,7 @@ export function BenchmarkComparisonChart({ comparacoes }: BenchmarkComparisonCha
             />
             <ShoppingCart className="h-3 w-3" aria-hidden="true" />
             IPCA
-            <InfoTooltip conteudo={GLOSSARIO_IPCA.explicacao} tamanhoIcone="h-3 w-3" />
+            <InfoTooltip conteudo={GLOSSARY_IPCA.explicacao} tamanhoIcone="h-3 w-3" />
           </div>
         </div>
         <TakeawayBox conclusoes={conclusoes} />

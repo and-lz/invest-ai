@@ -1,16 +1,16 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { PieChart, Pie, Cell } from "recharts";
 import { CORES_ESTRATEGIA } from "@/lib/chart-config";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_ALOCACAO_POR_ESTRATEGIA,
-  GLOSSARIO_ESTRATEGIAS,
-} from "@/lib/glossario-financeiro";
+  GLOSSARY_ALOCACAO_POR_ESTRATEGIA,
+  GLOSSARY_ESTRATEGIAS,
+} from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import {
   PieChart as PieChartIcon,
@@ -50,7 +50,7 @@ function gerarConclusaoAlocacao(dadosGrafico: Array<{ nome: string; valor: numbe
 
   if (maiorCategoria.valor > 50) {
     conclusoes.push({
-      texto: `${formatarPercentualSimples(maiorCategoria.valor)} do seu dinheiro está em ${maiorCategoria.nome}. Concentrar mais de 50% em um único tipo de investimento aumenta o risco. Considere diversificar.`,
+      texto: `${formatSimplePercentage(maiorCategoria.valor)} do seu dinheiro está em ${maiorCategoria.nome}. Concentrar mais de 50% em um único tipo de investimento aumenta o risco. Considere diversificar.`,
       tipo: "atencao",
       acionavel: true,
     });
@@ -95,7 +95,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
         <CardTitle className="flex items-center gap-1">
           <PieChartIcon className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Alocacao por Estrategia
-          <InfoTooltip conteudo={GLOSSARIO_ALOCACAO_POR_ESTRATEGIA.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_ALOCACAO_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Veja como seu dinheiro está distribuído. Cada fatia representa um tipo de investimento —
@@ -125,7 +125,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
         </ChartContainer>
         <div className="mt-4 grid grid-cols-1 gap-1.5 sm:grid-cols-2 sm:gap-2">
           {dadosGrafico.map((item) => {
-            const explicacaoEstrategia = GLOSSARIO_ESTRATEGIAS[item.nome];
+            const explicacaoEstrategia = GLOSSARY_ESTRATEGIAS[item.nome];
             const IconeEstrategia = ICONES_ESTRATEGIA[item.nome];
             return (
               <div key={item.nome} className="flex items-center gap-2 text-sm">
@@ -143,7 +143,7 @@ export function AssetAllocationChart({ alocacaoMensal }: AssetAllocationChartPro
                     />
                   )}
                 </span>
-                <span className="ml-auto font-medium">{formatarPercentualSimples(item.valor)}</span>
+                <span className="ml-auto font-medium">{formatSimplePercentage(item.valor)}</span>
               </div>
             );
           })}

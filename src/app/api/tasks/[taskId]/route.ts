@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { lerTarefa } from "@/lib/tarefa-background";
+import { lerTarefa } from "@/lib/background-task";
 import { requireAuth } from "@/lib/auth-utils";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ taskId: string }> }) {
   const authCheck = await requireAuth();

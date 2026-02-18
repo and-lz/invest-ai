@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   formatarMesAno,
-  formatarDataBrasileira,
-  formatarTimestampBrasileiro,
+  formatBrazilianDate,
+  formatBrazilianTimestamp,
   converterParaISO,
   obterMesAnterior,
   validarMesAno,
@@ -81,56 +81,56 @@ describe("format-date utilities", () => {
     });
   });
 
-  describe("formatarDataBrasileira", () => {
+  describe("formatBrazilianDate", () => {
     it("deve formatar data no último dia do ano", () => {
-      expect(formatarDataBrasileira("2024-12-31")).toBe("31/12/2024");
+      expect(formatBrazilianDate("2024-12-31")).toBe("31/12/2024");
     });
 
     it("deve formatar data no primeiro dia do ano", () => {
-      expect(formatarDataBrasileira("2024-01-01")).toBe("01/01/2024");
+      expect(formatBrazilianDate("2024-01-01")).toBe("01/01/2024");
     });
 
     it("deve formatar data no meio do ano", () => {
-      expect(formatarDataBrasileira("2023-06-15")).toBe("15/06/2023");
+      expect(formatBrazilianDate("2023-06-15")).toBe("15/06/2023");
     });
 
     it("deve preservar zeros à esquerda", () => {
-      expect(formatarDataBrasileira("2024-03-05")).toBe("05/03/2024");
+      expect(formatBrazilianDate("2024-03-05")).toBe("05/03/2024");
     });
   });
 
-  describe("formatarTimestampBrasileiro", () => {
+  describe("formatBrazilianTimestamp", () => {
     it("deve formatar timestamp com hora e minutos", () => {
       // UTC-3: 17:30 UTC → 14:30 local
-      expect(formatarTimestampBrasileiro("2024-12-31T17:30:00Z")).toBe(
+      expect(formatBrazilianTimestamp("2024-12-31T17:30:00Z")).toBe(
         "31/12/2024 às 14:30"
       );
     });
 
     it("deve formatar timestamp no início do dia", () => {
       // UTC-3: 03:00 UTC → 00:00 local
-      expect(formatarTimestampBrasileiro("2024-12-31T03:00:00Z")).toBe(
+      expect(formatBrazilianTimestamp("2024-12-31T03:00:00Z")).toBe(
         "31/12/2024 às 00:00"
       );
     });
 
     it("deve formatar timestamp no final do dia", () => {
       // UTC-3: 02:59 UTC → 23:59 local (previous day)
-      expect(formatarTimestampBrasileiro("2025-01-01T02:59:00Z")).toBe(
+      expect(formatBrazilianTimestamp("2025-01-01T02:59:00Z")).toBe(
         "31/12/2024 às 23:59"
       );
     });
 
     it("deve formatar primeiro dia do ano", () => {
       // UTC-3: 15:00 UTC → 12:00 local
-      expect(formatarTimestampBrasileiro("2024-01-01T15:00:00Z")).toBe(
+      expect(formatBrazilianTimestamp("2024-01-01T15:00:00Z")).toBe(
         "01/01/2024 às 12:00"
       );
     });
 
     it("deve preservar zeros à esquerda em hora e minuto", () => {
       // UTC-3: 08:03 UTC → 05:03 local
-      expect(formatarTimestampBrasileiro("2024-06-05T08:03:00Z")).toBe(
+      expect(formatBrazilianTimestamp("2024-06-05T08:03:00Z")).toBe(
         "05/06/2024 às 05:03"
       );
     });
@@ -234,7 +234,7 @@ describe("format-date utilities", () => {
     it("deve converter de brasileiro para ISO e voltar", () => {
       const dataBrasileira = "15/06/2024";
       const iso = converterParaISO(dataBrasileira);
-      const resultado = formatarDataBrasileira(iso);
+      const resultado = formatBrazilianDate(iso);
       expect(resultado).toBe(dataBrasileira);
     });
 

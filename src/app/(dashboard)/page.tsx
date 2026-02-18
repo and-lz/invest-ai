@@ -2,8 +2,8 @@
 
 import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
-import { serializarContextoDashboard } from "@/lib/serializar-contexto-chat";
+import { useChatPageContext } from "@/contexts/chat-page-context";
+import { serializarContextoDashboard } from "@/lib/serialize-chat-context";
 import { Header } from "@/components/layout/header";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { TopPerformersTable } from "@/components/dashboard/top-performers-table";
@@ -106,7 +106,7 @@ export default function DashboardPage() {
   );
 
   // Registrar contexto da pagina para o chat
-  const { definirContexto } = useContextoPaginaChat();
+  const { definirContexto } = useChatPageContext();
   const contextoSerializado = useMemo(
     () => (dadosDashboard ? serializarContextoDashboard(dadosDashboard) : undefined),
     [dadosDashboard],

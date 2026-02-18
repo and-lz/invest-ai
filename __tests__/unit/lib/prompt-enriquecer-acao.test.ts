@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   buildEnrichUserPrompt,
   SYSTEM_PROMPT_ENRIQUECER_ACAO,
-} from "@/lib/prompt-enriquecer-acao";
+} from "@/lib/enrich-action-prompt";
 
 describe("Action Plan AI Enrichment Prompt", () => {
   describe("buildEnrichUserPrompt", () => {

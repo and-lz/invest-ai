@@ -1,14 +1,14 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import { cn } from "@/lib/utils";
 import { tipografia } from "@/lib/design-system";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_RISCO_CONSISTENCIA } from "@/lib/glossario-financeiro";
+import { GLOSSARY_RISCO_CONSISTENCIA } from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { Shield } from "lucide-react";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import type { AnaliseRiscoRetorno } from "@/schemas/report-extraction.schema";
 
 interface RiskConsistencyCardProps {
@@ -41,7 +41,7 @@ export function gerarConclusaoRiscoConsistencia(analise: AnaliseRiscoRetorno): C
   }
 
   conclusoes.push({
-    texto: `Maior ganho: ${formatarPercentualSimples(analise.maiorRentabilidade.valor.valor)} em ${analise.maiorRentabilidade.mesAno}. Maior perda: ${formatarPercentualSimples(analise.menorRentabilidade.valor.valor)} em ${analise.menorRentabilidade.mesAno}.`,
+    texto: `Maior ganho: ${formatSimplePercentage(analise.maiorRentabilidade.valor.valor)} em ${analise.maiorRentabilidade.mesAno}. Maior perda: ${formatSimplePercentage(analise.menorRentabilidade.valor.valor)} em ${analise.menorRentabilidade.mesAno}.`,
     tipo: analise.menorRentabilidade.valor.valor < -5 ? "atencao" : "neutro",
   });
 
@@ -64,7 +64,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
         <CardTitle className="flex items-center gap-1">
           <Shield className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Risco e Consistência
-          <InfoTooltip conteudo={GLOSSARIO_RISCO_CONSISTENCIA.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_RISCO_CONSISTENCIA.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Mostra com que frequência sua carteira supera o CDI e qual foi o melhor e pior mês da
@@ -126,7 +126,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs">Melhor Mês</p>
             <p className="text-success text-lg font-bold">
-              {formatarPercentualSimples(analiseRiscoRetorno.maiorRentabilidade.valor.valor)}
+              {formatSimplePercentage(analiseRiscoRetorno.maiorRentabilidade.valor.valor)}
             </p>
             <p className="text-muted-foreground text-xs">
               {analiseRiscoRetorno.maiorRentabilidade.mesAno}
@@ -135,7 +135,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs">Pior Mês</p>
             <p className="text-destructive text-lg font-bold">
-              {formatarPercentualSimples(analiseRiscoRetorno.menorRentabilidade.valor.valor)}
+              {formatSimplePercentage(analiseRiscoRetorno.menorRentabilidade.valor.valor)}
             </p>
             <p className="text-muted-foreground text-xs">
               {analiseRiscoRetorno.menorRentabilidade.mesAno}

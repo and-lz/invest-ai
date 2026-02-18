@@ -1,1 +1,1 @@
-export { formatarPercentual, formatarPercentualSimples } from "@/domain/value-objects/percentage";
+export { formatarPercentual, formatSimplePercentage } from "@/domain/value-objects/percentage";

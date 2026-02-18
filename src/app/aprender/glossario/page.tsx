@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { GlossarioConteudo } from "@/components/aprender/glossario-conteudo";
-import { ESTATISTICAS_GLOSSARIO } from "@/lib/glossario-navegavel";
+import { GlossarioConteudo } from "@/components/aprender/glossary-content";
+import { ESTATISTICAS_GLOSSARIO } from "@/lib/navigable-glossary";
 
 export const metadata: Metadata = {
   title: "Glossário Financeiro | Investimentos",

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AprenderConteudo } from "@/components/aprender/aprender-conteudo";
+import { AprenderConteudo } from "@/components/aprender/learn-content";
 import { ESTATISTICAS_ARTIGOS } from "@/lib/artigos-registry";
 
 export const metadata: Metadata = {

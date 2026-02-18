@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, FileText, Lock, Loader2 } from "lucide-react";
 import { useUploadReport } from "@/hooks/use-upload-report";
-import { ResultadoUpload } from "./resultado-upload";
+import { ResultadoUpload } from "./upload-result";
 import { cn } from "@/lib/utils";
 import { tipografia, icone } from "@/lib/design-system";
 

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, Lightbulb, Layers } from "lucide-react";
-import { notificar } from "@/lib/notificar";
+import { notificar } from "@/lib/notifier";
 import { formatarMesAno, validarMesAno } from "@/lib/format-date";
 import { icone, tipografia } from "@/lib/design-system";
 import { cn } from "@/lib/utils";

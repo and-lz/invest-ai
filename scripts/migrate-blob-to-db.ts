@@ -20,7 +20,7 @@ import * as schema from "../src/lib/schema";
 import { ReportMetadataSchema } from "../src/schemas/report-metadata.schema";
 import { RelatorioExtraidoSchema } from "../src/schemas/report-extraction.schema";
 import { InsightsResponseSchema } from "../src/schemas/insights.schema";
-import { IndiceConversasSchema } from "../src/schemas/conversa.schema";
+import { IndiceConversasSchema } from "../src/schemas/conversation.schema";
 
 // ============================================================
 // Config

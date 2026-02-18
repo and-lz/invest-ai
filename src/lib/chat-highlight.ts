@@ -36,7 +36,7 @@ export function destacarElemento(seletor: string, duracao: number = 3000): void 
  * Mapa de identificadores disponiveis por pagina.
  * Usado para instruir o LLM sobre quais elementos podem ser destacados.
  */
-export const IDENTIFICADORES_HIGHLIGHT_POR_PAGINA: Record<string, string[]> = {
+export const HIGHLIGHT_IDS_BY_PAGE: Record<string, string[]> = {
   dashboard: [
     "patrimonio-total - Evolucao patrimonial",
     "benchmark - Comparacao com benchmarks (CDI, Ibovespa, IPCA)",
@@ -57,7 +57,7 @@ export const IDENTIFICADORES_HIGHLIGHT_POR_PAGINA: Record<string, string[]> = {
  * Retorna string formatada para instrucao do sistema do LLM.
  */
 export function obterIdentificadoresDisponiveis(pagina: string): string {
-  const identificadores = IDENTIFICADORES_HIGHLIGHT_POR_PAGINA[pagina] ?? [];
+  const identificadores = HIGHLIGHT_IDS_BY_PAGE[pagina] ?? [];
   return identificadores.length > 0
     ? identificadores.join("\n")
     : "Nenhum elemento disponivel para highlight nesta pagina.";

@@ -2,12 +2,12 @@ import { NextResponse, after } from "next/server";
 import { obterUploadReportUseCase, obterListReportsUseCase } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
 import { descriptografarPdf } from "@/lib/pdf-decrypt";
-import { salvarTarefa } from "@/lib/tarefa-background";
-import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
-import type { TarefaBackground } from "@/lib/tarefa-background";
+import { salvarTarefa } from "@/lib/background-task";
+import { executeBackgroundTask } from "@/lib/background-task-executor";
+import type { TarefaBackground } from "@/lib/background-task";
 import { requireAuth } from "@/lib/auth-utils";
-import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cabecalhos-cache";
-import { cacheGlobal } from "@/lib/cache-em-memoria";
+import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cache-headers";
+import { cacheGlobal } from "@/lib/in-memory-cache";
 
 const TAMANHO_MAXIMO_PDF_BYTES = 32 * 1024 * 1024; // 32MB
 
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     // Invalidar cache do dashboard para o usuario (dados serao atualizados apos processamento)
     cacheGlobal.invalidarPorPrefixo(`dashboard:${authCheck.session.user.userId}`);
 
-    after(executarTarefaEmBackground({
+    after(executeBackgroundTask({
       tarefa,
       rotuloLog: "Upload",
       usuarioId: authCheck.session.user.userId,

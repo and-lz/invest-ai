@@ -79,9 +79,9 @@ export function formatarMesAno(
  * @param dataISO - String no formato ISO "YYYY-MM-DD" (ex: "2024-12-31")
  * @returns String no formato "DD/MM/YYYY"
  * @example
- * formatarDataBrasileira("2024-12-31") // "31/12/2024"
+ * formatBrazilianDate("2024-12-31") // "31/12/2024"
  */
-export function formatarDataBrasileira(dataISO: string): string {
+export function formatBrazilianDate(dataISO: string): string {
   const partes = dataISO.split("-");
   const ano = partes[0];
   const mes = partes[1];
@@ -94,9 +94,9 @@ export function formatarDataBrasileira(dataISO: string): string {
  * @param timestampISO - String ISO 8601 (ex: "2024-12-31T14:30:00Z")
  * @returns String no formato "DD/MM/YYYY às HH:MM"
  * @example
- * formatarTimestampBrasileiro("2024-12-31T14:30:00Z") // "31/12/2024 às 14:30"
+ * formatBrazilianTimestamp("2024-12-31T14:30:00Z") // "31/12/2024 às 14:30"
  */
-export function formatarTimestampBrasileiro(timestampISO: string): string {
+export function formatBrazilianTimestamp(timestampISO: string): string {
   const data = new Date(timestampISO);
 
   const dia = String(data.getDate()).padStart(2, "0");

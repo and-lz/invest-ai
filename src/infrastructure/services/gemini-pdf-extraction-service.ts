@@ -1,10 +1,10 @@
 import { toJSONSchema } from "zod/v4";
 import type { ExtractionService } from "@/domain/interfaces/extraction-service";
-import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
+import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import { RelatorioExtraidoSchema } from "@/schemas/report-extraction.schema";
 import { PdfParsingError } from "@/domain/errors/app-errors";
-import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/prompt-extracao-manual";
+import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/manual-extraction-prompt";
 
 /**
  * Servico de extracao de PDFs usando ProvedorAi.

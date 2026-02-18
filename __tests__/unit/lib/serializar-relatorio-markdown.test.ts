@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   serializarRelatorioMarkdown,
   serializarRelatoriosConsolidadoMarkdown,
-} from "@/lib/serializar-relatorio-markdown";
+} from "@/lib/serialize-report-markdown";
 import type {
   RelatorioExtraido,
   Money,
@@ -573,7 +573,7 @@ describe("serializarRelatorioMarkdown", () => {
       };
       const resultado = serializarRelatorioMarkdown(relatorio);
       expect(resultado).toContain("| Liquidez |");
-      // formatarMoedaCompacta usa ponto decimal (toFixed) e espaco regular
+      // formatCompactCurrency usa ponto decimal (toFixed) e espaco regular
       expect(resultado).toContain("R$ 1.6k");
       expect(resultado).toContain("R$ 67.1k");
     });
@@ -600,7 +600,7 @@ describe("serializarRelatorioMarkdown", () => {
       };
       const resultado = serializarRelatorioMarkdown(relatorio);
       expect(resultado).toContain("## Posicoes Detalhadas (2 ativos)");
-      // formatarMoedaCompacta usa ponto decimal e espaco regular
+      // formatCompactCurrency usa ponto decimal e espaco regular
       expect(resultado).toContain("R$ 142.7k");
     });
 

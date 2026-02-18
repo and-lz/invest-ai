@@ -1,4 +1,4 @@
-import type { ArtigoEducacional, CategoriaArtigo } from "@/schemas/artigo-educacional.schema";
+import type { ArtigoEducacional, CategoriaArtigo } from "@/schemas/educational-article.schema";
 
 // ============================================================
 // Registry centralizado de todos os artigos educacionais.

@@ -1,15 +1,15 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell } from "recharts";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_LIQUIDEZ } from "@/lib/glossario-financeiro";
+import { GLOSSARY_LIQUIDEZ } from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { Droplets } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import type { FaixaLiquidez } from "@/schemas/report-extraction.schema";
 import type { ChartConfig } from "@/components/ui/chart";
 
@@ -59,13 +59,13 @@ function TooltipLiquidez({ active, payload }: TooltipLiquidezProps) {
       <p className="text-muted-foreground text-sm">
         Participação:{" "}
         <span className="text-foreground font-medium">
-          {formatarPercentualSimples(dados.percentual)}
+          {formatSimplePercentage(dados.percentual)}
         </span>
       </p>
       <p className="text-muted-foreground text-sm">
         Acumulado:{" "}
         <span className="text-foreground font-medium">
-          {formatarPercentualSimples(dados.acumulado)}
+          {formatSimplePercentage(dados.acumulado)}
         </span>
       </p>
     </div>
@@ -93,7 +93,7 @@ export function gerarConclusaoLiquidez(faixas: FaixaLiquidez[]): Conclusao[] {
   );
 
   conclusoes.push({
-    texto: `${formatarPercentualSimples(percentualCurtoPrazo)} do seu patrimônio (${formatarMoeda(valorCurtoPrazoCentavos)}) pode ser resgatado em até 5 dias. ${formatarPercentualSimples(percentualAte30Dias)} está acessível em até 30 dias.`,
+    texto: `${formatSimplePercentage(percentualCurtoPrazo)} do seu patrimônio (${formatarMoeda(valorCurtoPrazoCentavos)}) pode ser resgatado em até 5 dias. ${formatSimplePercentage(percentualAte30Dias)} está acessível em até 30 dias.`,
     tipo: percentualCurtoPrazo >= 15 ? "positivo" : "atencao",
     acionavel: percentualCurtoPrazo < 15,
   });
@@ -106,7 +106,7 @@ export function gerarConclusaoLiquidez(faixas: FaixaLiquidez[]): Conclusao[] {
 
   if (percentualLongoPrazo > 50) {
     conclusoes.push({
-      texto: `${formatarPercentualSimples(percentualLongoPrazo)} do seu patrimônio tem liquidez acima de 90 dias. Certifique-se de manter uma reserva de emergência acessível.`,
+      texto: `${formatSimplePercentage(percentualLongoPrazo)} do seu patrimônio tem liquidez acima de 90 dias. Certifique-se de manter uma reserva de emergência acessível.`,
       tipo: "atencao",
       acionavel: true,
     });
@@ -137,7 +137,7 @@ export function LiquidityLadder({ faixasLiquidez }: LiquidityLadderProps) {
         <CardTitle className="flex items-center gap-1">
           <Droplets className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Escada de Liquidez
-          <InfoTooltip conteudo={GLOSSARIO_LIQUIDEZ.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_LIQUIDEZ.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Mostra em quanto tempo você consegue resgatar cada parte do seu patrimônio. Barras à

@@ -1,6 +1,6 @@
 import { toJSONSchema } from "zod/v4";
 import type { InsightsService } from "@/domain/interfaces/extraction-service";
-import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
+import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { InsightsResponse } from "@/schemas/insights.schema";
 import { InsightsResponseSchema } from "@/schemas/insights.schema";
@@ -10,11 +10,11 @@ import {
   INSTRUCAO_USUARIO_INSIGHTS,
   SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
   INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO,
-} from "@/lib/prompt-insights-manual";
+} from "@/lib/manual-insights-prompt";
 import {
   serializarRelatorioMarkdown,
   serializarRelatoriosConsolidadoMarkdown,
-} from "@/lib/serializar-relatorio-markdown";
+} from "@/lib/serialize-report-markdown";
 
 /**
  * Servico de geracao de insights usando ProvedorAi.

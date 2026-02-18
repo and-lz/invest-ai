@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { cancelarTarefa, lerTarefa, descreverTarefa } from "@/lib/tarefa-background";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
-import { adicionarNotificacao } from "@/lib/notificacao";
+import { cancelarTarefa, lerTarefa, descreverTarefa } from "@/lib/background-task";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
+import { addNotification } from "@/lib/notification";
 import { requireAuth } from "@/lib/auth-utils";
 
 export async function POST(_request: Request, { params }: { params: Promise<{ taskId: string }> }) {
@@ -30,7 +30,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ta
 
   // Criar notificação de cancelamento (server-side)
   const descricao = descreverTarefa(tarefa);
-  await adicionarNotificacao(authCheck.session.user.userId, {
+  await addNotification(authCheck.session.user.userId, {
     tipo: "info",
     titulo: "Tarefa cancelada",
     descricao: `${descricao} foi cancelada.`,

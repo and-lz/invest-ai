@@ -4,16 +4,16 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Bot, X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { MensagemChatBolha } from "@/components/chat/mensagem-chat";
-import { CampoEntradaChat } from "@/components/chat/campo-entrada-chat";
-import { ListaConversas } from "@/components/chat/lista-conversas";
-import { useChatAssistente } from "@/hooks/use-chat-assistente";
+import { MensagemChatBolha } from "@/components/chat/chat-message";
+import { CampoEntradaChat } from "@/components/chat/chat-input-field";
+import { ListaConversas } from "@/components/chat/conversations-list";
+import { useChatAssistant } from "@/hooks/use-chat-assistant";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { stripMarkdown } from "@/lib/strip-markdown";
 import {
   EVENTO_ABRIR_CHAT_COM_PERGUNTA,
   type EventoAbrirChatDetalhe,
-} from "@/components/ui/botao-explicar-ia";
+} from "@/components/ui/ai-explain-button";
 import { cn } from "@/lib/utils";
 import { dialog as dialogDs } from "@/lib/design-system";
 
@@ -38,7 +38,7 @@ export function ChatWidget() {
     conversaAtualId,
     criarNovaConversa,
     carregarConversa,
-  } = useChatAssistente();
+  } = useChatAssistant();
 
   // Auto-scroll ao receber novas mensagens
   useEffect(() => {

@@ -1,9 +1,9 @@
 import { requireAuth } from "@/lib/auth-utils";
 import { criarProvedorAi } from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
-import { construirInstrucaoSistemaChat } from "@/lib/construir-instrucao-sistema-chat";
+import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { AiApiTransientError } from "@/domain/errors/app-errors";
-import type { MensagemAi } from "@/domain/interfaces/provedor-ai";
+import type { MensagemAi } from "@/domain/interfaces/ai-provider";
 
 export const dynamic = "force-dynamic";
 

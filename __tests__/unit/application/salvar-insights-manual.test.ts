@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { SalvarInsightsManualUseCase } from "@/application/use-cases/salvar-insights-manual";
+import { SaveManualInsightsUseCase } from "@/application/use-cases/save-manual-insights";
 import type { ReportRepository } from "@/domain/interfaces/report-repository";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 import type { ReportMetadata } from "@/schemas/report-metadata.schema";
@@ -104,13 +104,13 @@ class MockReportRepository implements ReportRepository {
 
 // ========== Tests ==========
 
-describe("SalvarInsightsManualUseCase", () => {
+describe("SaveManualInsightsUseCase", () => {
   let repository: MockReportRepository;
-  let useCase: SalvarInsightsManualUseCase;
+  let useCase: SaveManualInsightsUseCase;
 
   beforeEach(() => {
     repository = new MockReportRepository();
-    useCase = new SalvarInsightsManualUseCase(repository);
+    useCase = new SaveManualInsightsUseCase(repository);
   });
 
   describe("validação de existência do relatório", () => {

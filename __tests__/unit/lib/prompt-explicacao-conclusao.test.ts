@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildExplanationUserPrompt } from "@/lib/prompt-explicacao-conclusao";
+import { buildExplanationUserPrompt } from "@/lib/explain-conclusion-prompt";
 
 describe("buildExplanationUserPrompt", () => {
   it("Given a single conclusion, When building the prompt, Then it should format as a numbered line with type", () => {
