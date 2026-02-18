@@ -58,7 +58,7 @@ describe("Action Plan AI Enrichment Prompt", () => {
     });
 
     it("Given the system prompt / Then should contain non-directive language instructions", () => {
-      expect(SYSTEM_PROMPT_ENRIQUECER_ACAO).toContain("considere");
+      expect(SYSTEM_PROMPT_ENRIQUECER_ACAO).toContain("Considere");
       expect(SYSTEM_PROMPT_ENRIQUECER_ACAO).toContain("NUNCA");
     });
 
