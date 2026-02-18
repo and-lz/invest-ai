@@ -135,12 +135,17 @@ export function useChatAssistente(): UseChatAssistenteRetorno {
       setMensagens((anteriores) => [...anteriores, mensagemUsuario, mensagemAssistentePlaceholder]);
 
       // Montar mensagens para a API (ultimas N)
+      // Filter out empty messages (e.g. aborted stream placeholders) and
+      // truncate long assistant responses to stay within schema limits
       const todasMensagens = [...mensagens, mensagemUsuario];
       const mensagensRecentes = todasMensagens.slice(-LIMITE_MENSAGENS_PARA_API);
-      const mensagensParaServidor: MensagemParaServidor[] = mensagensRecentes.map((mensagem) => ({
-        papel: mensagem.papel,
-        conteudo: mensagem.conteudo,
-      }));
+      const mensagensParaServidor: MensagemParaServidor[] = mensagensRecentes
+        .filter((mensagem) => mensagem.conteudo.length > 0)
+        .map((mensagem) => ({
+          papel: mensagem.papel,
+          conteudo:
+            mensagem.papel === "assistente" ? mensagem.conteudo.slice(0, 4000) : mensagem.conteudo,
+        }));
 
       const controladorAbort = new AbortController();
       controladorAbortRef.current = controladorAbort;

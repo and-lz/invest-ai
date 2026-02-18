@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Bot, X, Trash2, Menu, Maximize2, Minimize2 } from "lucide-react";
+import { Bot, X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MensagemChatBolha } from "@/components/chat/mensagem-chat";
 import { CampoEntradaChat } from "@/components/chat/campo-entrada-chat";
 import { ListaConversas } from "@/components/chat/lista-conversas";
 import { useChatAssistente } from "@/hooks/use-chat-assistente";
+import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
+import { stripMarkdown } from "@/lib/strip-markdown";
 import {
   EVENTO_ABRIR_CHAT_COM_PERGUNTA,
   type EventoAbrirChatDetalhe,
@@ -17,7 +20,12 @@ export function ChatWidget() {
   const [estaAberto, setEstaAberto] = useState(false);
   const [telaCheia, setTelaCheia] = useState(false);
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
+  const [ttsEnabled, setTtsEnabled] = useState(false);
   const areaScrollRef = useRef<HTMLDivElement>(null);
+  const prevTransmitindoRef = useRef(false);
+
+  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
+    useSpeechSynthesis();
 
   const {
     mensagens,
@@ -37,6 +45,25 @@ export function ChatWidget() {
       areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
     }
   }, [mensagens]);
+
+  // Auto-read: when streaming ends and TTS is enabled, read the last assistant message
+  useEffect(() => {
+    const wasTransmitting = prevTransmitindoRef.current;
+    prevTransmitindoRef.current = estaTransmitindo;
+
+    if (wasTransmitting && !estaTransmitindo && ttsEnabled) {
+      const lastMessage = mensagens[mensagens.length - 1];
+      if (lastMessage?.papel === "assistente" && lastMessage.conteudo) {
+        const plainText = stripMarkdown(lastMessage.conteudo);
+        if (plainText) speak(plainText);
+      }
+    }
+  }, [estaTransmitindo, ttsEnabled, mensagens, speak]);
+
+  // Stop speech when chat closes
+  useEffect(() => {
+    if (!estaAberto) stopSpeech();
+  }, [estaAberto, stopSpeech]);
 
   // Close chat on ESC key
   useEffect(() => {
@@ -161,6 +188,39 @@ export function ChatWidget() {
                 <h3 className="text-sm font-medium">Assistente</h3>
               </div>
               <div className="flex items-center gap-1">
+                {ttsSupported && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            setTtsEnabled((v) => {
+                              if (v) stopSpeech();
+                              return !v;
+                            });
+                          }}
+                          className={cn("h-8 w-8", ttsEnabled && "text-primary")}
+                        >
+                          {ttsEnabled ? (
+                            <Volume2
+                              className={cn(
+                                "h-4 w-4",
+                                speechStatus === "speaking" && "animate-pulse",
+                              )}
+                            />
+                          ) : (
+                            <VolumeX className="text-muted-foreground h-4 w-4" />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {ttsEnabled ? "Desativar leitura em voz alta" : "Ativar leitura em voz alta"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
                 {mensagens.length > 0 && (
                   <Button variant="ghost" size="icon" onClick={limparHistorico} className="h-8 w-8">
                     <Trash2 className="text-muted-foreground h-4 w-4" />
