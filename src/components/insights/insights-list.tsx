@@ -24,6 +24,7 @@ interface InsightsListProps {
   onSelectPeriod: (identificador: string) => void;
   selectedPeriod: string;
   onInsightsDeleted: (identificador: string) => void;
+  onGenerateNew?: () => void;
 }
 
 function formatPeriodLabel(item: InsightsMetadata): string {
@@ -32,7 +33,7 @@ function formatPeriodLabel(item: InsightsMetadata): string {
   return item.mesReferencia;
 }
 
-export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted }: InsightsListProps) {
+export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted, onGenerateNew }: InsightsListProps) {
   const { insightsMetadados, isLoading, deleteInsights } = useInsightsList();
 
   const handleDelete = async (identificador: string, evento: React.MouseEvent) => {
@@ -40,21 +41,35 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
     try {
       await deleteInsights(identificador);
       onInsightsDeleted(identificador);
-      notificar.success("Insights removidos");
+      notificar.success("Análises removidas");
     } catch {
-      notificar.error("Falha ao remover insights");
+      notificar.error("Falha ao remover análises");
     }
   };
 
   if (isLoading) return <Skeleton className="h-48" />;
-  if (insightsMetadados.length === 0) return null;
+  if (insightsMetadados.length === 0) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
+          <Lightbulb className="text-muted-foreground h-12 w-12" />
+          <p className="text-muted-foreground">
+            Nenhuma análise gerada ainda. Gere sua primeira análise para acompanhar sua carteira.
+          </p>
+          {onGenerateNew && (
+            <Button onClick={onGenerateNew}>Gerar análise</Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className={cn(tipografia.h3, "flex items-center gap-2")}>
           <Lightbulb className={cn(icone.tituloCard, "text-muted-foreground")} />
-          Insights gerados
+          Análises geradas
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -64,7 +79,7 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
               <TableRow>
                 <TableHead>Periodo</TableHead>
                 <TableHead className="hidden sm:table-cell">Gerado em</TableHead>
-                <TableHead>Insights</TableHead>
+                <TableHead>Análises</TableHead>
                 <TableHead className="hidden md:table-cell">Alertas</TableHead>
                 <TableHead className="text-right">Acoes</TableHead>
               </TableRow>

@@ -70,9 +70,9 @@ export function FormularioInsightsManual({
           <div className="flex flex-col items-center gap-4 py-8">
             <CheckCircle className="text-success h-12 w-12" />
             <div className="text-center">
-              <h3 className="text-lg font-semibold">Insights salvos!</h3>
+              <h3 className="text-lg font-semibold">Análise salva!</h3>
               <p className="text-muted-foreground text-sm">
-                Os insights foram validados e salvos com sucesso.
+                A análise foi validada e salva com sucesso.
               </p>
             </div>
           </div>
@@ -87,7 +87,7 @@ export function FormularioInsightsManual({
         <div>
           <h3 className="text-lg font-semibold">Passo 2: Colar a resposta da IA</h3>
           <p className="text-muted-foreground text-sm">
-            Cole abaixo o JSON que o chat de IA retornou com os insights da sua carteira.
+            Cole abaixo o JSON que o chat de IA retornou com a análise da sua carteira.
           </p>
         </div>
 

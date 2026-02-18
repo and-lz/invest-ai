@@ -5,13 +5,19 @@ import {
   CheckCircle2,
   AlertCircle,
   Info,
-  Sparkles,
+  BotIcon,
   Loader2,
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { tipografia, icone } from "@/lib/design-system";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Collapsible,
   CollapsibleContent,
@@ -172,16 +178,27 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
               <span className="text-muted-foreground flex-1 text-sm leading-relaxed">
                 {conclusao.texto}
               </span>
-              <Sparkles
-                className={cn(
-                  icone.micro,
-                  "mt-0.5 shrink-0 transition-opacity",
-                  isOpen
-                    ? "text-primary opacity-100"
-                    : "text-muted-foreground/40 opacity-0 group-hover:opacity-100",
-                )}
-                aria-hidden="true"
-              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="shrink-0">
+                      <BotIcon
+                        className={cn(
+                          icone.micro,
+                          "mt-0.5 transition-colors",
+                          isOpen
+                            ? "text-muted-foreground"
+                            : "text-muted-foreground/60 group-hover:text-muted-foreground",
+                        )}
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" sideOffset={4}>
+                    Pedir para a IA explicar
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </CollapsibleTrigger>
 
             <CollapsibleContent>

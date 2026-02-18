@@ -81,7 +81,7 @@ export function PromptInsightsCopiavel({
           <h3 className="text-lg font-semibold">Passo 1: Copiar o prompt com dados do relatorio</h3>
           <p className="text-muted-foreground text-sm">
             O prompt abaixo ja inclui os dados do seu relatorio. Copie e cole no chat de IA para
-            gerar os insights.
+            gerar a análise.
           </p>
         </div>
 

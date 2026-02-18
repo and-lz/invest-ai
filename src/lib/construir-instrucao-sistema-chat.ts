@@ -6,7 +6,7 @@ const DESCRICOES_PAGINA: Record<IdentificadorPagina, string> = {
     "Dashboard principal com resumo patrimonial, alocacao por categoria, comparacao com benchmarks (CDI, Ibovespa, IPCA), melhores e piores ativos, e evolucao historica.",
   reports: "Pagina de gerenciamento de relatorios importados (PDFs da corretora Inter Prime).",
   insights:
-    "Insights gerados por IA sobre a carteira do usuario, organizados por categorias como performance, riscos, oportunidades e diversificacao.",
+    "Análises geradas por IA sobre a carteira do usuario, organizadas por categorias como performance, riscos, oportunidades e diversificacao.",
   trends:
     "Tendencias de mercado em tempo real: maiores altas e baixas da bolsa, indices (Ibovespa), taxa SELIC, inflacao (IPCA), e cambio.",
   desempenho:

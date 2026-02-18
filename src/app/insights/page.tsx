@@ -27,6 +27,7 @@ import {
   X,
   Check,
   Layers,
+  ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatarMesAno, validarMesAno } from "@/lib/format-date";
@@ -240,15 +241,15 @@ function InsightCard({
   );
 }
 
-type ModoVisualizacao = "inicial" | "manual" | "insights";
+type ModoVisualizacao = "lista" | "gerar" | "manual" | "insights";
 
 export default function InsightsPage() {
   const { relatorios, estaCarregando: carregandoRelatorios, erro: erroRelatorios } = useReports();
   const [insights, setInsights] = useState<InsightsResponse | null>(null);
   const [estaGerando, setEstaGerando] = useState(false);
   const [erroInsights, setErroInsights] = useState<string | null>(null);
-  const [modoVisualizacao, setModoVisualizacao] = useState<ModoVisualizacao>("inicial");
-  const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(true);
+  const [modoVisualizacao, setModoVisualizacao] = useState<ModoVisualizacao>("lista");
+  const [estaCarregandoInsights, setEstaCarregandoInsights] = useState(false);
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string>("");
 
   // Tratar erro de relatórios na UI sem crashar a página inteira
@@ -272,50 +273,52 @@ export default function InsightsPage() {
 
   const ehConsolidado = periodoSelecionado === "consolidado";
 
-  // Definir período padrão como o mais recente quando carregar relatórios
-  useEffect(() => {
-    if (relatorios.length > 0 && !periodoSelecionado) {
+  // Encontrar relatório do período selecionado
+  const relatorioSelecionado = relatorios.find(
+    (relatorio) => relatorio.mesReferencia === periodoSelecionado,
+  );
+
+  // --- Navigation callbacks ---
+
+  const handleSelectInsight = useCallback(async (identificador: string) => {
+    setEstaCarregandoInsights(true);
+    setPeriodoSelecionado(identificador);
+
+    try {
+      const url = `/api/insights?mesAno=${encodeURIComponent(identificador)}`;
+      const resposta = await fetch(url);
+      if (resposta.ok) {
+        const dados = (await resposta.json()) as {
+          insights: InsightsResponse | null;
+          identificadorRelatorio: string | null;
+          mesReferencia: string;
+        };
+        if (dados.insights) {
+          setInsights(dados.insights);
+          setModoVisualizacao("insights");
+        }
+      }
+    } catch (erro) {
+      console.error("Erro ao carregar insights:", erro);
+    } finally {
+      setEstaCarregandoInsights(false);
+    }
+  }, []);
+
+  const voltarParaLista = useCallback(() => {
+    setModoVisualizacao("lista");
+    setInsights(null);
+  }, []);
+
+  const entrarModoGerar = useCallback(() => {
+    if (!periodoSelecionado && relatorios.length > 0) {
       const relatorioRecente = relatorios[0];
       if (relatorioRecente) {
         setPeriodoSelecionado(relatorioRecente.mesReferencia);
       }
     }
-  }, [relatorios, periodoSelecionado]);
-
-  // Carregar insights salvos quando o período mudar
-  useEffect(() => {
-    if (!periodoSelecionado) return;
-
-    const carregarInsightsSalvos = async () => {
-      setEstaCarregandoInsights(true);
-      try {
-        const url = `/api/insights?mesAno=${encodeURIComponent(periodoSelecionado)}`;
-        const resposta = await fetch(url);
-        if (resposta.ok) {
-          const dados = (await resposta.json()) as {
-            insights: InsightsResponse | null;
-            identificadorRelatorio: string | null;
-            mesReferencia: string;
-          };
-          if (dados.insights) {
-            setInsights(dados.insights);
-            setModoVisualizacao("insights");
-          } else {
-            setInsights(null);
-            setModoVisualizacao("inicial");
-          }
-        }
-      } catch (erro) {
-        console.error("Erro ao carregar insights salvos:", erro);
-        setInsights(null);
-        setModoVisualizacao("inicial");
-      } finally {
-        setEstaCarregandoInsights(false);
-      }
-    };
-
-    void carregarInsightsSalvos();
-  }, [periodoSelecionado]);
+    setModoVisualizacao("gerar");
+  }, [periodoSelecionado, relatorios]);
 
   const gerarInsightsViaApi = useCallback(async () => {
     if (relatorios.length === 0 || !periodoSelecionado) return;
@@ -374,7 +377,8 @@ export default function InsightsPage() {
         revalidarTarefasAtivas();
       }
 
-      setModoVisualizacao("inicial");
+      // Return to list to wait for background task
+      setModoVisualizacao("lista");
       setErroInsights(null);
     } catch (erro) {
       setErroInsights(erro instanceof Error ? erro.message : "Erro desconhecido");
@@ -389,12 +393,7 @@ export default function InsightsPage() {
   }, []);
 
   const handleCancelarManual = useCallback(() => {
-    setModoVisualizacao("inicial");
-  }, []);
-
-  const handleRegerar = useCallback(() => {
-    setInsights(null);
-    setModoVisualizacao("inicial");
+    setModoVisualizacao("gerar");
   }, []);
 
   const handleInsightsDeleted = useCallback(
@@ -402,7 +401,7 @@ export default function InsightsPage() {
       // If the deleted insights are the ones currently being viewed, reset view
       if (identificador === periodoSelecionado) {
         setInsights(null);
-        setModoVisualizacao("inicial");
+        setModoVisualizacao("lista");
       }
     },
     [periodoSelecionado],
@@ -425,34 +424,40 @@ export default function InsightsPage() {
     [insights],
   );
 
-  // Encontrar relatório do período selecionado
-  const relatorioSelecionado = relatorios.find(
-    (relatorio) => relatorio.mesReferencia === periodoSelecionado,
-  );
-
   return (
     <div className="space-y-6">
+      {/* --- Header --- */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
+          {modoVisualizacao !== "lista" && (
+            <Button variant="ghost" size="icon" onClick={voltarParaLista}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+          )}
           <Lightbulb className="text-muted-foreground h-6 w-6" aria-hidden="true" />
           <Header
-            titulo="Insights IA"
+            titulo="Análises IA"
             descricao="Analise inteligente da sua carteira de investimentos"
           />
         </div>
-        {!carregandoRelatorios && periodosDisponiveis.length > 0 && periodoSelecionado && (
-          <PeriodSelector
-            periodosDisponiveis={periodosDisponiveis}
-            periodoSelecionado={periodoSelecionado}
-            onPeriodoChange={setPeriodoSelecionado}
-          />
-        )}
+        {(modoVisualizacao === "gerar" || modoVisualizacao === "manual") &&
+          !carregandoRelatorios &&
+          periodosDisponiveis.length > 0 &&
+          periodoSelecionado && (
+            <PeriodSelector
+              periodosDisponiveis={periodosDisponiveis}
+              periodoSelecionado={periodoSelecionado}
+              onPeriodoChange={setPeriodoSelecionado}
+            />
+          )}
       </div>
 
+      {/* --- Loading --- */}
       {(carregandoRelatorios || estaCarregandoInsights) && !temErroRelatorios && (
         <Skeleton className="h-64" />
       )}
 
+      {/* --- Error state --- */}
       {temErroRelatorios && (
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
@@ -464,21 +469,44 @@ export default function InsightsPage() {
         </Card>
       )}
 
-      {!carregandoRelatorios && !estaCarregandoInsights && !temErroRelatorios && relatorios.length === 0 && (
+      {/* --- No reports --- */}
+      {!carregandoRelatorios && !temErroRelatorios && relatorios.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
             <Lightbulb className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
             <p className="text-muted-foreground">
-              Faca upload de um relatorio para gerar insights.
+              Faca upload de um relatorio para gerar analises.
             </p>
           </CardContent>
         </Card>
       )}
 
+      {/* === LIST MODE (default) === */}
       {!carregandoRelatorios &&
         !estaCarregandoInsights &&
+        !temErroRelatorios &&
         relatorios.length > 0 &&
-        modoVisualizacao === "inicial" && (
+        modoVisualizacao === "lista" && (
+          <>
+            <InsightsList
+              onSelectPeriod={(id) => void handleSelectInsight(id)}
+              selectedPeriod=""
+              onInsightsDeleted={handleInsightsDeleted}
+              onGenerateNew={entrarModoGerar}
+            />
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={entrarModoGerar}>
+                <Lightbulb className="mr-2 h-4 w-4" />
+                Gerar novas análises
+              </Button>
+            </div>
+          </>
+        )}
+
+      {/* === GENERATE MODE === */}
+      {!carregandoRelatorios &&
+        relatorios.length > 0 &&
+        modoVisualizacao === "gerar" && (
           <Card>
             <CardContent className="flex flex-col items-center gap-4 py-12">
               {ehConsolidado ? (
@@ -488,14 +516,14 @@ export default function InsightsPage() {
               )}
               <p className="text-muted-foreground text-center">
                 {ehConsolidado
-                  ? `Gere insights analisando todos os ${relatorios.length} meses disponíveis.`
-                  : `Gere insights baseados no período selecionado (${relatorioSelecionado?.mesReferencia}).`}
+                  ? `Gere uma análise consolidada de todos os ${relatorios.length} meses disponíveis.`
+                  : `Gere uma análise baseada no período selecionado (${relatorioSelecionado?.mesReferencia ?? periodoSelecionado}).`}
               </p>
               <div className="flex items-center gap-3">
                 <Button onClick={() => void gerarInsightsViaApi()} disabled={estaGerando}>
                   {estaGerando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {estaGerando
-                    ? "Gerando insights..."
+                    ? "Gerando análise..."
                     : ehConsolidado
                       ? "Gerar analise consolidada"
                       : "Gerar via API"}
@@ -514,8 +542,8 @@ export default function InsightsPage() {
           </Card>
         )}
 
+      {/* === MANUAL MODE === */}
       {!carregandoRelatorios &&
-        !estaCarregandoInsights &&
         relatorios.length > 0 &&
         modoVisualizacao === "manual" &&
         (relatorioSelecionado || ehConsolidado) && (
@@ -531,7 +559,8 @@ export default function InsightsPage() {
           />
         )}
 
-      {modoVisualizacao === "insights" && insights && (relatorioSelecionado || ehConsolidado) && (
+      {/* === DETAIL MODE === */}
+      {modoVisualizacao === "insights" && insights && (
         <div className="mx-auto max-w-3xl space-y-16">
           {/* --- Cabeçalho Editorial --- */}
           <header className="text-center">
@@ -594,7 +623,7 @@ export default function InsightsPage() {
           {/* --- Insights Detalhados --- */}
           <section>
             <h2 className="text-muted-foreground text-sm font-semibold tracking-widest uppercase">
-              Insights Detalhados
+              Análises Detalhadas
             </h2>
             <Separator className="my-3" />
             <div className="space-y-14">
@@ -604,7 +633,7 @@ export default function InsightsPage() {
                   insight={insight}
                   indiceInsight={indice}
                   identificadorRelatorio={
-                    ehConsolidado ? "consolidado" : (relatorioSelecionado?.identificador ?? "")
+                    ehConsolidado ? "consolidado" : (relatorioSelecionado?.identificador ?? periodoSelecionado)
                   }
                   onStatusAlterado={handleStatusAlterado}
                 />
@@ -632,21 +661,13 @@ export default function InsightsPage() {
 
           {/* --- Rodapé --- */}
           <Separator />
-          <div className="flex justify-center pb-12">
-            <Button variant="outline" onClick={handleRegerar}>
-              Gerar novos insights
+          <div className="flex justify-center gap-3 pb-12">
+            <Button variant="outline" onClick={voltarParaLista}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Voltar para lista
             </Button>
           </div>
         </div>
-      )}
-
-      {/* --- Lista de insights gerados --- */}
-      {!carregandoRelatorios && relatorios.length > 0 && (
-        <InsightsList
-          onSelectPeriod={setPeriodoSelecionado}
-          selectedPeriod={periodoSelecionado}
-          onInsightsDeleted={handleInsightsDeleted}
-        />
       )}
     </div>
   );

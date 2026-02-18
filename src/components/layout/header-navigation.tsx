@@ -32,7 +32,7 @@ const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
 const itensNavegacaoPrincipais = [
   { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
   { href: "/reports", rotulo: "Relatorios", icone: FileText },
-  { href: "/insights", rotulo: "Insights", icone: Lightbulb },
+  { href: "/insights", rotulo: "Análises", icone: Lightbulb },
   { href: "/desempenho", rotulo: "Desempenho", icone: BarChart3 },
 ];
 
