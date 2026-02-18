@@ -251,9 +251,9 @@ import { ds } from "@/lib/design-system";
 ### Tipografia (`tipografia.*`)
 | Token | Classe | Uso |
 |-------|--------|-----|
-| `h1` | `font-heading text-2xl font-bold tracking-tight` | Titulos de pagina |
-| `h1Grande` | `font-heading text-3xl font-bold tracking-tight` | Titulos de artigo |
-| `h2` | `font-heading text-xl font-semibold tracking-tight` | Titulos de secao, headers |
+| `h1` | `text-2xl font-bold tracking-tight` | Titulos de pagina |
+| `h1Grande` | `text-3xl font-bold tracking-tight` | Titulos de artigo |
+| `h2` | `text-xl font-semibold tracking-tight` | Titulos de secao, headers |
 | `h3` | `text-lg font-semibold` | Titulos de card (CardTitle) |
 | `rotulo` | `text-sm font-medium` | Labels, nav, botoes, table headers |
 | `corpo` | `text-sm` | Descricoes, paragrafos, conteudo |
@@ -378,64 +378,42 @@ Paleta de 5 cores com hues espacados: navy (250), teal (165), gold (75), purple 
 
 ### Header Navigation
 - Backdrop-blur com efeito frosted glass (`backdrop-blur-md backdrop-saturate-150`)
-- Titulo em `font-serif` (Lora) para sensacao editorial/premium
 - Navegacao ativa: underline sutil (`bg-foreground/60`) em vez de background preenchido
 - Always sticky (no auto-hide on scroll)
 
 ## Typography System
 
 ### Font Families
-- **Geist Sans** (`font-sans`) - Body text, UI elements, labels (default)
-- **Inter** (base layer h1-h6) - All headings throughout the app
-- **Lora** (`font-serif`) - Brand logo only (intentional distinction)
-- **Geist Mono** (`font-mono`) - Code blocks, error messages, technical content
+- **System UI** (`font-sans`) - All text: body, headings, UI elements (system-ui stack for zero network requests)
+- **System Mono** (`font-mono`) - Code blocks, error messages, technical content (ui-monospace stack)
 
 ### Visual Hierarchy
 
-#### Headings (Inter font family)
+#### Headings (system-ui)
 - **H1 - Page Titles**: `text-2xl font-bold tracking-tight`
-  - Uso: Titulos principais de paginas (via componente `Header`)
-  - Exemplo: "Dashboard", "Insights", "Importar Relatorio"
-
 - **H2 - Section Titles**: `text-xl font-semibold tracking-tight`
-  - Uso: Titulos de secoes principais dentro de uma pagina
-  - Exemplo: Titulos de dialogs, titulos de stepper steps
-
 - **H3 - Card/Component Titles**: `text-lg font-semibold`
-  - Uso: Titulos de cards, titulos de tabelas (via `CardTitle`)
-  - Exemplo: "Evolucao Patrimonial", "Top 5 Ativos"
 
-#### Body Text (Geist Sans font family)
+#### Body Text (system-ui)
 - **Labels/Navigation**: `text-sm font-medium`
-  - Uso: Labels de formularios, links de navegacao, botoes, table headers
-  - Consistencia: Sempre `font-medium` para elementos interativos ou de controle
-
 - **Body/Descriptions**: `text-sm` (font-weight normal/400)
-  - Uso: Descricoes de cards, paragrafos, conteudo de tabelas
-  - Consistencia: Peso normal para conteudo de leitura
-
 - **Helper Text**: `text-xs text-muted-foreground`
-  - Uso: Tooltips, hints, badges, timestamps, footnotes
-  - Consistencia: Sempre usar `text-muted-foreground` para reduzir hierarquia visual
 
-#### Monospace (Geist Mono font family)
+#### Monospace (system mono)
 - **Code/Technical**: `text-xs font-mono`
-  - Uso: Mensagens de erro, blocos de codigo, IDs tecnicos
-  - Exemplo: Stack traces, JSON display
 
 ### Typography Principles
 1. **Consistencia de peso por tamanho**: Elementos do mesmo tamanho devem usar o mesmo peso em contextos similares
 2. **Tracking tight para headings**: `tracking-tight` em h1 e h2 melhora legibilidade em titulos grandes
 3. **Evitar tracking em body text**: Texto corrido nao deve ter letter-spacing customizado
 4. **Font-medium para controles**: Botoes, labels, navigation sempre usam `font-medium` para destaque
-5. **Brand exception**: Logo usa `font-serif` como elemento de identidade visual (unica excecao a regra de headings)
 
 ### Usage Guidelines
 - NUNCA misturar diferentes pesos para o mesmo tamanho de texto em contextos similares
 - NUNCA usar `font-bold` em elementos de UI pequenos (text-sm ou menor)
 - SEMPRE usar `tracking-tight` em h1 e h2 para melhor legibilidade
 - SEMPRE usar `text-muted-foreground` em helper text para hierarquia visual
-- O logo `font-serif` e a UNICA excecao permitida ao sistema de headings
+- NUNCA importar custom fonts — system-ui only for performance
 
 ## Background Tasks Pattern (after + Fire-and-Forget)
 

@@ -11,19 +11,19 @@
  */
 
 // ─── Tipografia ──────────────────────────────────────────────────
-// Regras: headings usam Inter (font-heading), body usa Geist Sans (default)
+// All text uses system-ui font stack for maximum performance
 // NUNCA usar font-bold em text-sm ou menor
 // NUNCA usar font-medium em text-xs (helper text)
 
 export const tipografia = {
   /** H1 — Títulos de página. Ex: "Dashboard", "Insights" */
-  h1: "font-heading text-2xl font-bold tracking-tight",
+  h1: "text-2xl font-bold tracking-tight",
 
   /** H1 grande — Títulos de artigo (3xl) */
-  h1Grande: "font-heading text-3xl font-bold tracking-tight",
+  h1Grande: "text-3xl font-bold tracking-tight",
 
   /** H2 — Títulos de seção, headers de página. Ex: "Relatórios", "Importar" */
-  h2: "font-heading text-xl font-semibold tracking-tight",
+  h2: "text-xl font-semibold tracking-tight",
 
   /** H3 — Títulos de card (CardTitle). Ex: "Patrimônio Total" */
   h3: "text-lg font-semibold",
@@ -76,6 +76,11 @@ export const icone = {
 export const dialog = {
   /** Backdrop padrão com blur. Aplicar no elemento <dialog> */
   backdrop: "backdrop:bg-background/80 backdrop:backdrop-blur-sm",
+
+  /** Overlay div — fixed backdrop para painéis e modals baseados em React.
+   *  Renderizar como <div aria-hidden="true" onClick={fechar} className={dialog.overlay} />
+   *  O elemento pai precisa ter z-index superior a 50. */
+  overlay: "fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity",
 } as const;
 
 // ─── Layout ──────────────────────────────────────────────────────

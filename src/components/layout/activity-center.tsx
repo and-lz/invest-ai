@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
 import { tipografia, icone, layout, dialog as dialogDs } from "@/lib/design-system";
+
 import type { Notificacao } from "@/lib/notificacao";
 
 const ICONES_TIPO = {
@@ -208,6 +209,7 @@ type AbaAtiva = "notificacoes" | "tarefas";
 
 export function ActivityCenter() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const [estaAberto, setEstaAberto] = useState(false);
   const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>("notificacoes");
 
   const {
@@ -223,10 +225,12 @@ export function ActivityCenter() {
 
   const abrir = useCallback(() => {
     dialogRef.current?.showModal();
+    setEstaAberto(true);
   }, []);
 
   const fechar = useCallback(() => {
     dialogRef.current?.close();
+    setEstaAberto(false);
   }, []);
 
   const handleLimparTodas = useCallback(async () => {
@@ -251,6 +255,13 @@ export function ActivityCenter() {
 
   return (
     <>
+      {estaAberto && (
+        <div
+          className={dialogDs.overlay}
+          onClick={fechar}
+          aria-hidden="true"
+        />
+      )}
       <Button variant="ghost" size="icon" className="relative" onClick={abrir}>
         <Inbox className="h-5 w-5" />
         {temAtividade && (
@@ -274,10 +285,7 @@ export function ActivityCenter() {
         ref={dialogRef}
         onClick={handleClickDialog}
         aria-label="Central de atividades"
-        className={cn(
-          "bg-background flex h-full flex-col border-l p-0 shadow-lg",
-          dialogDs.backdrop,
-        )}
+        className="bg-background relative z-60 flex h-full flex-col border-l p-0 shadow-lg backdrop:hidden"
         style={{
           position: "fixed",
           top: 0,

@@ -15,6 +15,7 @@ import {
   type EventoAbrirChatDetalhe,
 } from "@/components/ui/botao-explicar-ia";
 import { cn } from "@/lib/utils";
+import { dialog as dialogDs } from "@/lib/design-system";
 
 export function ChatWidget() {
   const [estaAberto, setEstaAberto] = useState(false);
@@ -134,6 +135,15 @@ export function ChatWidget() {
         <Bot className="relative z-10 h-6 w-6" />
         <span className="sr-only">Abrir assistente</span>
       </button>
+
+      {/* Backdrop */}
+      {estaAberto && (
+        <div
+          className={dialogDs.overlay}
+          onClick={handleAlternarChat}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Painel de chat */}
       {estaAberto && (
