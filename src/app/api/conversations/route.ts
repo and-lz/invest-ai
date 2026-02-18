@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-utils";
 import { obterConversaRepository } from "@/lib/container";
-import { CriarConversaSchema } from "@/schemas/conversa.schema";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { CriarConversaSchema } from "@/schemas/conversation.schema";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 
 export const dynamic = "force-dynamic";
 

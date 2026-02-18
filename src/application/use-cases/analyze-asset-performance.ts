@@ -1,17 +1,17 @@
 import type { ReportRepository } from "@/domain/interfaces/report-repository";
 import type { AssetAnalysisService } from "@/domain/interfaces/asset-analysis-service";
-import type { AnaliseAtivoResponse } from "@/schemas/analise-ativo.schema";
+import type { AnaliseAtivoResponse } from "@/schemas/asset-analysis.schema";
 import type {
   DadosAtivoParaPrompt,
   ContextoMacroCondensado,
-} from "@/lib/serializar-dados-ativo-markdown";
+} from "@/lib/serialize-asset-data-markdown";
 import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
 import type {
   DetalhesAtivoBrapi,
   BrapiAssetDetailService,
 } from "@/infrastructure/services/brapi-asset-detail-service";
 import type { MacroDataService } from "@/domain/interfaces/market-data-service";
-import { agregarDadosDoAtivo } from "@/lib/agregar-dados-ativo";
+import { agregarDadosDoAtivo } from "@/lib/aggregate-asset-data";
 
 // ============================================================
 // Use case: Analise de desempenho de ativo individual.

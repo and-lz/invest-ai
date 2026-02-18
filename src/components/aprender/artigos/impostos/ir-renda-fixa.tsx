@@ -1,6 +1,6 @@
-import { SecaoArtigo, Paragrafo, Lista, Destaque, TabelaSimples } from "../../template-artigo";
+import { SecaoArtigo, Paragrafo, Lista, Destaque, TabelaSimples } from "../../article-template";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
-import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
+import type { ArtigoMetadata } from "@/schemas/educational-article.schema";
 
 export const metadata: ArtigoMetadata = {
   slug: "ir-renda-fixa",

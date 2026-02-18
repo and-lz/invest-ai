@@ -19,17 +19,17 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useNotificacoes } from "@/hooks/use-notificacoes";
-import { useTarefasAtivas, revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
-import { descreverTarefa } from "@/lib/tarefa-descricao";
-import type { TarefaBackground } from "@/lib/tarefa-descricao";
+import { useNotifications } from "@/hooks/use-notifications";
+import { useActiveTasks, revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
+import { descreverTarefa } from "@/lib/task-description";
+import type { TarefaBackground } from "@/lib/task-description";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
 import { typography, icon, layout, dialog } from "@/lib/design-system";
 
-import type { Notificacao } from "@/lib/notificacao";
+import type { Notificacao } from "@/lib/notification";
 
 const ICONES_TIPO = {
   success: CheckCircle,
@@ -218,9 +218,9 @@ export function ActivityCenter() {
     marcarComoLida,
     marcarTodasComoLidas,
     limparTodas,
-  } = useNotificacoes();
+  } = useNotifications();
 
-  const { tarefasAtivas, estaCarregando: tarefasCarregando } = useTarefasAtivas();
+  const { tarefasAtivas, estaCarregando: tarefasCarregando } = useActiveTasks();
 
   const {
     dialogRef,

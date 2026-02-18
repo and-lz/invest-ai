@@ -2,15 +2,15 @@ import { NextResponse, after } from "next/server";
 import { z } from "zod/v4";
 import { requireAuth } from "@/lib/auth-utils";
 import { criarProvedorAi } from "@/lib/container";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 import {
   SYSTEM_PROMPT_EXPLANATION,
   buildExplanationUserPrompt,
-} from "@/lib/prompt-explicacao-conclusao";
+} from "@/lib/explain-conclusion-prompt";
 import { ExplainTakeawayRequestSchema } from "@/schemas/explain-takeaway.schema";
-import { salvarTarefa } from "@/lib/tarefa-background";
-import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
-import type { TarefaBackground } from "@/lib/tarefa-background";
+import { salvarTarefa } from "@/lib/background-task";
+import { executeBackgroundTask } from "@/lib/background-task-executor";
+import type { TarefaBackground } from "@/lib/background-task";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
     await salvarTarefa(tarefa);
 
-    after(executarTarefaEmBackground({
+    after(executeBackgroundTask({
       tarefa,
       rotuloLog: "Explicar Conclusoes",
       usuarioId: userId,

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { lerTarefa, salvarTarefa } from "@/lib/tarefa-background";
-import { despacharTarefaPorTipo } from "@/lib/despachar-tarefa";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { lerTarefa, salvarTarefa } from "@/lib/background-task";
+import { dispatchTaskByType } from "@/lib/dispatch-task";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 import { requireAuth } from "@/lib/auth-utils";
 
 export async function POST(_request: Request, { params }: { params: Promise<{ taskId: string }> }) {
@@ -41,7 +41,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ ta
 
   await salvarTarefa(tarefaResetada);
 
-  const foiDespachada = despacharTarefaPorTipo(tarefaResetada, authCheck.session.user.userId);
+  const foiDespachada = dispatchTaskByType(tarefaResetada, authCheck.session.user.userId);
 
   if (!foiDespachada) {
     await salvarTarefa({

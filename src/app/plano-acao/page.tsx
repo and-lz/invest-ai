@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Header } from "@/components/layout/header";
-import { usePlanoAcao } from "@/hooks/use-plano-acao";
+import { usePlanoAcao } from "@/hooks/use-action-plan";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { typography, icon, layout, badgeColor } from "@/lib/design-system";
-import { notificar } from "@/lib/notificar";
-import type { ItemPlanoAcao, TipoConclusaoPlano } from "@/schemas/plano-acao.schema";
+import { notificar as notify } from "@/lib/notifier";
+import type { ItemPlanoAcao, TipoConclusaoPlano } from "@/schemas/action-plan.schema";
 import Link from "next/link";
 
 const CONCLUSION_ICONS: Record<TipoConclusaoPlano, LucideIcon> = {
@@ -201,10 +201,10 @@ export default function PlanoAcaoPage() {
     try {
       await atualizarStatus(id, status);
       if (status === "concluida") {
-        notificar.success("Ação concluída!");
+        notify.success("Ação concluída!");
       }
     } catch {
-      notificar.error("Erro ao atualizar status");
+      notify.error("Erro ao atualizar status");
     }
   };
 
@@ -212,7 +212,7 @@ export default function PlanoAcaoPage() {
     try {
       await removerItem(id);
     } catch {
-      notificar.error("Erro ao remover item");
+      notify.error("Erro ao remover item");
     }
   };
 

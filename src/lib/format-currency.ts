@@ -1,1 +1,1 @@
-export { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
+export { formatarMoeda, formatCompactCurrency } from "@/domain/value-objects/money";

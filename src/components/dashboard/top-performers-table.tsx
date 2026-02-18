@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import Link from "next/link";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import {
   Table,
   TableBody,
@@ -15,19 +15,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
-import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
+import { useTableSorting } from "@/hooks/use-table-sorting";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
 import { valueColor } from "@/lib/design-system";
 import {
-  GLOSSARIO_MELHORES_PERFORMERS,
-  GLOSSARIO_PIORES_PERFORMERS,
-  GLOSSARIO_ATIVO,
-  GLOSSARIO_SALDO,
-  GLOSSARIO_RENTABILIDADE_MES,
-  GLOSSARIO_PARTICIPACAO,
-} from "@/lib/glossario-financeiro";
+  GLOSSARY_MELHORES_PERFORMERS,
+  GLOSSARY_PIORES_PERFORMERS,
+  GLOSSARY_ATIVO,
+  GLOSSARY_SALDO,
+  GLOSSARY_RENTABILIDADE_MES,
+  GLOSSARY_PARTICIPACAO,
+} from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { PosicaoAtivo } from "@/schemas/report-extraction.schema";
 
@@ -100,12 +100,12 @@ function gerarConclusaoPerformers(
   const primeiroAtivo = ativos[0];
   if (!primeiroAtivo) return [];
   const nomeAtivo = primeiroAtivo.codigoAtivo ?? primeiroAtivo.nomeAtivo;
-  const rentabilidade = formatarPercentualSimples(primeiroAtivo.rentabilidadeMes.valor);
+  const rentabilidade = formatSimplePercentage(primeiroAtivo.rentabilidadeMes.valor);
 
   if (tipo === "melhores") {
     return [
       {
-        texto: `Seu campeão do mês é ${nomeAtivo} com ${rentabilidade} de retorno. Ele representa ${formatarPercentualSimples(primeiroAtivo.participacaoNaCarteira.valor)} da sua carteira.`,
+        texto: `Seu campeão do mês é ${nomeAtivo} com ${rentabilidade} de retorno. Ele representa ${formatSimplePercentage(primeiroAtivo.participacaoNaCarteira.valor)} da sua carteira.`,
         tipo: "positivo",
         acionavel: true,
       },
@@ -140,7 +140,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
   );
 
   const { itensOrdenados, colunaOrdenacao, direcaoOrdenacao, alternarOrdenacao } =
-    useOrdenacaoTabela<PosicaoAtivo, ColunaPerformers>(ativos, obterValor);
+    useTableSorting<PosicaoAtivo, ColunaPerformers>(ativos, obterValor);
 
   return (
     <Card data-chat-highlight="top-performers">
@@ -151,8 +151,8 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
           <InfoTooltip
             conteudo={
               tipo === "melhores"
-                ? GLOSSARIO_MELHORES_PERFORMERS.explicacao
-                : GLOSSARIO_PIORES_PERFORMERS.explicacao
+                ? GLOSSARY_MELHORES_PERFORMERS.explicacao
+                : GLOSSARY_PIORES_PERFORMERS.explicacao
             }
           />
         </CardTitle>
@@ -178,7 +178,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                 >
                   <span className="flex items-center gap-1">
                     Ativo
-                    <InfoTooltip conteudo={GLOSSARIO_ATIVO.explicacao} tamanhoIcone="h-3 w-3" />
+                    <InfoTooltip conteudo={GLOSSARY_ATIVO.explicacao} tamanhoIcone="h-3 w-3" />
                   </span>
                 </CabecalhoOrdenavel>
                 <CabecalhoOrdenavel
@@ -199,7 +199,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                 >
                   <span className="flex items-center gap-1">
                     Saldo
-                    <InfoTooltip conteudo={GLOSSARIO_SALDO.explicacao} tamanhoIcone="h-3 w-3" />
+                    <InfoTooltip conteudo={GLOSSARY_SALDO.explicacao} tamanhoIcone="h-3 w-3" />
                   </span>
                 </CabecalhoOrdenavel>
                 <CabecalhoOrdenavel
@@ -212,7 +212,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                   <span className="flex items-center gap-1">
                     Rent. Mes
                     <InfoTooltip
-                      conteudo={GLOSSARIO_RENTABILIDADE_MES.explicacao}
+                      conteudo={GLOSSARY_RENTABILIDADE_MES.explicacao}
                       tamanhoIcone="h-3 w-3"
                     />
                   </span>
@@ -227,7 +227,7 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                   <span className="flex items-center gap-1">
                     Part.
                     <InfoTooltip
-                      conteudo={GLOSSARIO_PARTICIPACAO.explicacao}
+                      conteudo={GLOSSARY_PARTICIPACAO.explicacao}
                       tamanhoIcone="h-3 w-3"
                     />
                   </span>
@@ -256,10 +256,10 @@ export function TopPerformersTable({ titulo, ativos, tipo }: TopPerformersTableP
                   <TableCell
                     className={cn("text-right font-medium", valueColor(ativo.rentabilidadeMes.valor))}
                   >
-                    {formatarPercentualSimples(ativo.rentabilidadeMes.valor)}
+                    {formatSimplePercentage(ativo.rentabilidadeMes.valor)}
                   </TableCell>
                   <TableCell className="text-muted-foreground hidden text-right sm:table-cell">
-                    {formatarPercentualSimples(ativo.participacaoNaCarteira.valor)}
+                    {formatSimplePercentage(ativo.participacaoNaCarteira.valor)}
                   </TableCell>
                 </TableRow>
               ))}

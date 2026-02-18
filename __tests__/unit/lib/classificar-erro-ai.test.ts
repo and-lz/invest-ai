@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ehErroTransienteDeAi } from "@/lib/classificar-erro-ai";
+import { ehErroTransienteDeAi } from "@/lib/classify-ai-error";
 
 describe("ehErroTransienteDeAi", () => {
   describe("erros transientes (retornam true)", () => {

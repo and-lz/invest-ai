@@ -1,15 +1,15 @@
 import { NextResponse, after } from "next/server";
 import { requireAuth } from "@/lib/auth-utils";
 import { obterPlanoAcaoRepository, criarProvedorAi } from "@/lib/container";
-import { CriarItemPlanoSchema, EnriquecimentoAiSchema } from "@/schemas/plano-acao.schema";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { CriarItemPlanoSchema, EnriquecimentoAiSchema } from "@/schemas/action-plan.schema";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 import {
   SYSTEM_PROMPT_ENRIQUECER_ACAO,
   buildEnrichUserPrompt,
-} from "@/lib/prompt-enriquecer-acao";
-import { salvarTarefa } from "@/lib/tarefa-background";
-import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
-import type { TarefaBackground } from "@/lib/tarefa-background";
+} from "@/lib/enrich-action-prompt";
+import { salvarTarefa } from "@/lib/background-task";
+import { executeBackgroundTask } from "@/lib/background-task-executor";
+import type { TarefaBackground } from "@/lib/background-task";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
 
     await salvarTarefa(tarefa);
 
-    after(executarTarefaEmBackground({
+    after(executeBackgroundTask({
       tarefa,
       rotuloLog: "Enriquecer Item Plano",
       usuarioId: userId,

@@ -15,14 +15,14 @@ import { ArrowUp, ArrowDown, ArrowUpDown, Briefcase } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
-import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
+import { useTableSorting } from "@/hooks/use-table-sorting";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_TODAS_POSICOES,
-  GLOSSARIO_RENTABILIDADE_12M,
-  GLOSSARIO_RENTABILIDADE_DESDE_INICIO_ATIVO,
-} from "@/lib/glossario-financeiro";
+  GLOSSARY_TODAS_POSICOES,
+  GLOSSARY_RENTABILIDADE_12M,
+  GLOSSARY_RENTABILIDADE_DESDE_INICIO_ATIVO,
+} from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { PosicaoAtivo } from "@/schemas/report-extraction.schema";
 
@@ -119,7 +119,7 @@ export function gerarConclusaoTodasPosicoes(posicoes: PosicaoAtivo[]): Conclusao
 
   if (maisConcentrada && maisConcentrada.participacaoNaCarteira.valor > 10) {
     conclusoes.push({
-      texto: `Maior posição: ${maisConcentrada.codigoAtivo ?? maisConcentrada.nomeAtivo} com ${formatarPercentualSimples(maisConcentrada.participacaoNaCarteira.valor)} da carteira.`,
+      texto: `Maior posição: ${maisConcentrada.codigoAtivo ?? maisConcentrada.nomeAtivo} com ${formatSimplePercentage(maisConcentrada.participacaoNaCarteira.valor)} da carteira.`,
       tipo: maisConcentrada.participacaoNaCarteira.valor > 25 ? "atencao" : "neutro",
       acionavel: maisConcentrada.participacaoNaCarteira.valor > 25,
     });
@@ -135,7 +135,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
   );
 
   const { itensOrdenados, colunaOrdenacao, direcaoOrdenacao, alternarOrdenacao } =
-    useOrdenacaoTabela<PosicaoAtivo, ColunaPosicoes>(posicoes, obterValor);
+    useTableSorting<PosicaoAtivo, ColunaPosicoes>(posicoes, obterValor);
 
   const conclusoes = gerarConclusaoTodasPosicoes(posicoes);
 
@@ -145,7 +145,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
         <CardTitle className="flex items-center gap-1">
           <Briefcase className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Todas as Posições
-          <InfoTooltip conteudo={GLOSSARIO_TODAS_POSICOES.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_TODAS_POSICOES.explicacao} />
         </CardTitle>
         {posicoes.length > 0 && (
           <CardDescription>{posicoes.length} investimentos na carteira</CardDescription>
@@ -204,7 +204,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     <span className="flex items-center gap-1">
                       12M
                       <InfoTooltip
-                        conteudo={GLOSSARIO_RENTABILIDADE_12M.explicacao}
+                        conteudo={GLOSSARY_RENTABILIDADE_12M.explicacao}
                         tamanhoIcone="h-3 w-3"
                       />
                     </span>
@@ -219,7 +219,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                     <span className="flex items-center gap-1">
                       Início
                       <InfoTooltip
-                        conteudo={GLOSSARIO_RENTABILIDADE_DESDE_INICIO_ATIVO.explicacao}
+                        conteudo={GLOSSARY_RENTABILIDADE_DESDE_INICIO_ATIVO.explicacao}
                         tamanhoIcone="h-3 w-3"
                       />
                     </span>
@@ -261,7 +261,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                         posicao.rentabilidadeMes.valor < 0 && "text-destructive",
                       )}
                     >
-                      {formatarPercentualSimples(posicao.rentabilidadeMes.valor)}
+                      {formatSimplePercentage(posicao.rentabilidadeMes.valor)}
                     </TableCell>
                     <TableCell
                       className={cn(
@@ -275,7 +275,7 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                       )}
                     >
                       {posicao.rentabilidade12Meses
-                        ? formatarPercentualSimples(posicao.rentabilidade12Meses.valor)
+                        ? formatSimplePercentage(posicao.rentabilidade12Meses.valor)
                         : "—"}
                     </TableCell>
                     <TableCell
@@ -290,11 +290,11 @@ export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {
                       )}
                     >
                       {posicao.rentabilidadeDesdeInicio
-                        ? formatarPercentualSimples(posicao.rentabilidadeDesdeInicio.valor)
+                        ? formatSimplePercentage(posicao.rentabilidadeDesdeInicio.valor)
                         : "—"}
                     </TableCell>
                     <TableCell className="text-muted-foreground text-right tabular-nums">
-                      {formatarPercentualSimples(posicao.participacaoNaCarteira.valor)}
+                      {formatSimplePercentage(posicao.participacaoNaCarteira.valor)}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -2,23 +2,23 @@
 
 import { useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
-import { serializarContextoTendencias } from "@/lib/serializar-contexto-chat";
+import { useChatPageContext } from "@/contexts/chat-page-context";
+import { serializarContextoTendencias } from "@/lib/serialize-chat-context";
 import { Header } from "@/components/layout/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, RefreshCw, AlertTriangle } from "lucide-react";
-import { useDadosTendencias } from "@/hooks/use-dados-tendencias";
-import { IndicadoresResumo } from "@/components/trends/indicadores-resumo";
-import { TabelaRankingAtivos } from "@/components/trends/tabela-ranking-ativos";
-import { MapaCalorSetores } from "@/components/trends/mapa-calor-setores";
-import { TabelaRankingFundos } from "@/components/trends/tabela-ranking-fundos";
+import { useTrendsData } from "@/hooks/use-trends-data";
+import { IndicadoresResumo } from "@/components/trends/indicators-summary";
+import { TabelaRankingAtivos } from "@/components/trends/asset-ranking-table";
+import { MapaCalorSetores } from "@/components/trends/sector-heatmap";
+import { TabelaRankingFundos } from "@/components/trends/fund-ranking-table";
 
 // Lazy-load chart component que usa Recharts
 const GraficoIndicadoresMacro = dynamic(
   () =>
-    import("@/components/trends/grafico-indicadores-macro").then(
+    import("@/components/trends/macro-indicators-chart").then(
       (mod) => mod.GraficoIndicadoresMacro,
     ),
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
@@ -35,10 +35,10 @@ function formatarTimestampAtualizacao(isoString: string): string {
 }
 
 export default function TrendsPage() {
-  const { dadosTendencias, estaCarregando, erro, revalidar } = useDadosTendencias();
+  const { dadosTendencias, estaCarregando, erro, revalidar } = useTrendsData();
 
   // Registrar contexto da pagina para o chat
-  const { definirContexto } = useContextoPaginaChat();
+  const { definirContexto } = useChatPageContext();
   const contextoSerializado = useMemo(
     () => (dadosTendencias ? serializarContextoTendencias(dadosTendencias) : undefined),
     [dadosTendencias],

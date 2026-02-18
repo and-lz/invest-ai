@@ -19,7 +19,7 @@
 
 ## Padroes
 - Valores monetarios em centavos (inteiros) para evitar float
-- Nomes de variaveis verbosos em portugues
+- All identifiers (variables, functions, types, constants) must be in English
 - NUNCA usar `any` - usar tipos Zod inferidos
 - Schemas Zod sao a fonte unica de verdade dos tipos TypeScript
 - Use cases recebem interfaces (inversao de dependencia)
@@ -38,7 +38,7 @@
 - `public/manifest.json` - Configuracao PWA (nome, icones, cores, orientacao)
 - `public/sw.js` - Service Worker com cache Network-First
 - `public/icon.svg` - Icone base vetorial (512x512)
-- `scripts/gerar-icones-pwa.mjs` - Script para gerar PNGs (192, 512, 180 para Apple)
+- `scripts/generate-pwa-icons.mjs` - Script para gerar PNGs (192, 512, 180 para Apple)
 - `PwaRegistration` component - Registra Service Worker em producao
 - Meta tags iOS: `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`
 - Cores tema: `#0d0c14` (dark) para statusbar translucent no iOS

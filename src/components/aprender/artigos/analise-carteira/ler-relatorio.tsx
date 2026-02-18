@@ -1,12 +1,12 @@
-import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../template-artigo";
+import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../article-template";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_PATRIMONIO_TOTAL,
-  GLOSSARIO_RENTABILIDADE_MENSAL,
-  GLOSSARIO_ALOCACAO_POR_ESTRATEGIA,
-} from "@/lib/glossario-financeiro";
-import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
+  GLOSSARY_PATRIMONIO_TOTAL,
+  GLOSSARY_RENTABILIDADE_MENSAL,
+  GLOSSARY_ALOCACAO_POR_ESTRATEGIA,
+} from "@/lib/financial-glossary";
+import type { ArtigoMetadata } from "@/schemas/educational-article.schema";
 
 export const metadata: ArtigoMetadata = {
   slug: "ler-relatorio",
@@ -39,7 +39,7 @@ export default function LerRelatorioArtigo() {
 
       <SecaoArtigo titulo="Patrimônio Total e Variação">
         <Paragrafo>
-          O <InfoTooltip conteudo={GLOSSARIO_PATRIMONIO_TOTAL.explicacao} /> é o valor total de
+          O <InfoTooltip conteudo={GLOSSARY_PATRIMONIO_TOTAL.explicacao} /> é o valor total de
           todos os seus investimentos neste momento. Inclui ações, fundos, renda fixa — tudo.
         </Paragrafo>
 
@@ -62,7 +62,7 @@ export default function LerRelatorioArtigo() {
 
       <SecaoArtigo titulo="Rentabilidade: entendendo os percentuais">
         <Paragrafo>
-          A <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_MENSAL.explicacao} /> rentabilidade
+          A <InfoTooltip conteudo={GLOSSARY_RENTABILIDADE_MENSAL.explicacao} /> rentabilidade
           mostra quanto seus investimentos renderam em percentual.
         </Paragrafo>
 
@@ -82,7 +82,7 @@ export default function LerRelatorioArtigo() {
 
       <SecaoArtigo titulo="Alocação de Ativos: como seu dinheiro está distribuído">
         <Paragrafo>
-          O gráfico de <InfoTooltip conteudo={GLOSSARIO_ALOCACAO_POR_ESTRATEGIA.explicacao} />{" "}
+          O gráfico de <InfoTooltip conteudo={GLOSSARY_ALOCACAO_POR_ESTRATEGIA.explicacao} />{" "}
           alocação mostra quanto do seu patrimônio está em cada tipo de investimento: renda fixa,
           ações, fundos, etc.
         </Paragrafo>

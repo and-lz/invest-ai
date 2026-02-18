@@ -1,13 +1,13 @@
 import type { AssetAnalysisService } from "@/domain/interfaces/asset-analysis-service";
-import type { ProvedorAi } from "@/domain/interfaces/provedor-ai";
-import type { AnaliseAtivoResponse } from "@/schemas/analise-ativo.schema";
-import { AnaliseAtivoResponseSchema } from "@/schemas/analise-ativo.schema";
-import type { DadosAtivoParaPrompt } from "@/lib/serializar-dados-ativo-markdown";
+import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
+import type { AnaliseAtivoResponse } from "@/schemas/asset-analysis.schema";
+import { AnaliseAtivoResponseSchema } from "@/schemas/asset-analysis.schema";
+import type { DadosAtivoParaPrompt } from "@/lib/serialize-asset-data-markdown";
 import { AiApiError } from "@/domain/errors/app-errors";
 import {
   SYSTEM_PROMPT_ANALISE_ATIVO,
   construirPromptAnaliseAtivo,
-} from "@/lib/prompt-analise-ativo";
+} from "@/lib/asset-analysis-prompt";
 
 /**
  * Servico de analise de ativo usando ProvedorAi.

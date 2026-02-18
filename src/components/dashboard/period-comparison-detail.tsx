@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import {
   Table,
   TableBody,
@@ -13,12 +13,12 @@ import {
 import { cn } from "@/lib/utils";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_COMPARACAO_PERIODOS,
-  GLOSSARIO_VOLATILIDADE,
-  GLOSSARIO_PERCENTUAL_CDI,
-} from "@/lib/glossario-financeiro";
+  GLOSSARY_COMPARACAO_PERIODOS,
+  GLOSSARY_VOLATILIDADE,
+  GLOSSARY_PERCENTUAL_CDI,
+} from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import type { ComparacaoPeriodo } from "@/schemas/report-extraction.schema";
 import { Scale } from "lucide-react";
 
@@ -53,7 +53,7 @@ export function gerarConclusaoComparacaoPeriodos(periodos: ComparacaoPeriodo[]):
     const mediaVolatilidade = somaVolatilidade / periodosComVolatilidade.length;
 
     conclusoes.push({
-      texto: `Sua volatilidade média é de ${formatarPercentualSimples(mediaVolatilidade)}. ${mediaVolatilidade > 5 ? "Isso indica variações significativas — seu patrimônio oscila bastante." : "Nível moderado de oscilação no patrimônio."}`,
+      texto: `Sua volatilidade média é de ${formatSimplePercentage(mediaVolatilidade)}. ${mediaVolatilidade > 5 ? "Isso indica variações significativas — seu patrimônio oscila bastante." : "Nível moderado de oscilação no patrimônio."}`,
       tipo: mediaVolatilidade > 5 ? "atencao" : "neutro",
     });
   }
@@ -72,7 +72,7 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
         <CardTitle className="flex items-center gap-2">
           <Scale className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Comparação por Período
-          <InfoTooltip conteudo={GLOSSARIO_COMPARACAO_PERIODOS.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_COMPARACAO_PERIODOS.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Veja o retorno da sua carteira em diferentes janelas de tempo comparado ao CDI. Verde
@@ -93,7 +93,7 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
                 <span className="flex items-center justify-end gap-1">
                   % CDI
                   <InfoTooltip
-                    conteudo={GLOSSARIO_PERCENTUAL_CDI.explicacao}
+                    conteudo={GLOSSARY_PERCENTUAL_CDI.explicacao}
                     tamanhoIcone="h-3 w-3"
                   />
                 </span>
@@ -102,7 +102,7 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
                 <span className="flex items-center justify-end gap-1">
                   Volatilidade
                   <InfoTooltip
-                    conteudo={GLOSSARIO_VOLATILIDADE.explicacao}
+                    conteudo={GLOSSARY_VOLATILIDADE.explicacao}
                     tamanhoIcone="h-3 w-3"
                   />
                 </span>
@@ -123,10 +123,10 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
                       superouCdi ? "text-success" : "text-destructive",
                     )}
                   >
-                    {formatarPercentualSimples(periodo.rentabilidadeCarteira.valor)}
+                    {formatSimplePercentage(periodo.rentabilidadeCarteira.valor)}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-right tabular-nums">
-                    {formatarPercentualSimples(periodo.rentabilidadeCDI.valor)}
+                    {formatSimplePercentage(periodo.rentabilidadeCDI.valor)}
                   </TableCell>
                   <TableCell
                     className={cn(
@@ -134,11 +134,11 @@ export function PeriodComparisonDetail({ comparacaoPeriodos }: PeriodComparisonD
                       periodo.percentualDoCDI.valor >= 100 ? "text-success" : "text-destructive",
                     )}
                   >
-                    {formatarPercentualSimples(periodo.percentualDoCDI.valor)}
+                    {formatSimplePercentage(periodo.percentualDoCDI.valor)}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-right tabular-nums">
                     {periodo.volatilidade
-                      ? formatarPercentualSimples(periodo.volatilidade.valor)
+                      ? formatSimplePercentage(periodo.volatilidade.valor)
                       : "—"}
                   </TableCell>
                 </TableRow>

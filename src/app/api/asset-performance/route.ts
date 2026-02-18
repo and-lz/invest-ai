@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { obterReportRepository, obterBrapiAssetDetailService } from "@/lib/container";
-import { agregarDadosDoAtivo, listarAtivosUnicos } from "@/lib/agregar-dados-ativo";
-import { verificarCacheAnalise } from "@/lib/analise-ativo-storage";
-import { cabecalhosCachePrivado } from "@/lib/cabecalhos-cache";
+import { agregarDadosDoAtivo, listarAtivosUnicos } from "@/lib/aggregate-asset-data";
+import { verificarCacheAnalise } from "@/lib/asset-analysis-storage";
+import { cabecalhosCachePrivado } from "@/lib/cache-headers";
 import { requireAuth } from "@/lib/auth-utils";
 import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
 

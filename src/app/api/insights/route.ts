@@ -1,10 +1,10 @@
 import { NextResponse, after } from "next/server";
 import {
   obterGenerateInsightsUseCase,
-  obterGenerateInsightsConsolidadosUseCase,
+  obterGenerateConsolidatedInsightsUseCase,
   obterListReportsUseCase,
   obterReportRepository,
-  obterAtualizarConclusaoInsightUseCase,
+  obterUpdateInsightConclusionUseCase,
   obterListInsightsUseCase,
   obterDeleteInsightsUseCase,
 } from "@/lib/container";
@@ -12,10 +12,10 @@ import { AppError, InsightsNotFoundError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
 import { z } from "zod/v4";
 import { StatusAcaoEnum } from "@/schemas/insights.schema";
-import { salvarTarefa } from "@/lib/tarefa-background";
-import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
-import type { TarefaBackground } from "@/lib/tarefa-background";
-import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { salvarTarefa } from "@/lib/background-task";
+import { executeBackgroundTask } from "@/lib/background-task-executor";
+import type { TarefaBackground } from "@/lib/background-task";
+import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cache-headers";
 
 const InsightsRequestSchema = z.object({
   identificadorRelatorio: z.string().min(1),
@@ -136,12 +136,12 @@ export async function POST(request: Request) {
     await salvarTarefa(tarefa);
 
     if (ehConsolidado) {
-      after(executarTarefaEmBackground({
+      after(executeBackgroundTask({
         tarefa,
         rotuloLog: "Insights Consolidados",
         usuarioId: authCheck.session.user.userId,
         executarOperacao: async () => {
-          const useCase = await obterGenerateInsightsConsolidadosUseCase();
+          const useCase = await obterGenerateConsolidatedInsightsUseCase();
           await useCase.executar();
           return {
             descricaoResultado: "Insights consolidados gerados",
@@ -153,7 +153,7 @@ export async function POST(request: Request) {
       const identificadorRelatorio = resultado.data.identificadorRelatorio;
       const identificadorRelatorioAnterior = resultado.data.identificadorRelatorioAnterior;
 
-      after(executarTarefaEmBackground({
+      after(executeBackgroundTask({
         tarefa,
         rotuloLog: "Insights",
         usuarioId: authCheck.session.user.userId,
@@ -209,7 +209,7 @@ export async function PATCH(request: Request) {
       );
     }
 
-    const useCase = await obterAtualizarConclusaoInsightUseCase();
+    const useCase = await obterUpdateInsightConclusionUseCase();
     const insights = await useCase.executar({
       identificadorRelatorio: resultado.data.identificadorRelatorio,
       indiceInsight: resultado.data.indiceInsight,

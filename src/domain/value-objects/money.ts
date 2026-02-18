@@ -13,7 +13,7 @@ export function formatarMoeda(valorEmCentavos: number): string {
   return FORMATTER.format(valorEmCentavos / 100);
 }
 
-export function formatarMoedaCompacta(valorEmCentavos: number): string {
+export function formatCompactCurrency(valorEmCentavos: number): string {
   const valorAbsoluto = Math.abs(valorEmCentavos / 100);
   const sinal = valorEmCentavos < 0 ? "-" : "";
 

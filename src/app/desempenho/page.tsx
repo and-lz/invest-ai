@@ -3,39 +3,39 @@
 import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
-import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
-import { serializarContextoDesempenho } from "@/lib/serializar-contexto-chat";
+import { useChatPageContext } from "@/contexts/chat-page-context";
+import { serializarContextoDesempenho } from "@/lib/serialize-chat-context";
 import { Header } from "@/components/layout/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, BotIcon, RefreshCw, AlertTriangle, Loader2 } from "lucide-react";
-import { useDadosAtivo, useListaAtivosCarteira } from "@/hooks/use-dados-ativo";
-import { useAnaliseIaAtivo, dispararAnaliseIaAtivo } from "@/hooks/use-analise-ia-ativo";
-import { GridAtivosCarteira } from "@/components/desempenho/grid-ativos-carteira";
-import { CardsResumoAtivo } from "@/components/desempenho/cards-resumo-ativo";
-import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
-import { notificar } from "@/lib/notificar";
+import { useDadosAtivo, useListaAtivosCarteira } from "@/hooks/use-asset-data";
+import { useAssetAiAnalysis, dispararAnaliseIaAtivo } from "@/hooks/use-asset-ai-analysis";
+import { GridAtivosCarteira } from "@/components/desempenho/portfolio-assets-grid";
+import { CardsResumoAtivo } from "@/components/desempenho/asset-summary-cards";
+import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
+import { notificar } from "@/lib/notifier";
 
 // Lazy-load chart-heavy components to reduce initial bundle size
 const GraficoEvolucaoAtivo = dynamic(
   () =>
-    import("@/components/desempenho/grafico-evolucao-ativo").then((m) => m.GraficoEvolucaoAtivo),
+    import("@/components/desempenho/asset-evolution-chart").then((m) => m.GraficoEvolucaoAtivo),
   { loading: () => <Skeleton className="h-80" /> },
 );
 
 const GraficoRendimentos = dynamic(
-  () => import("@/components/desempenho/grafico-rendimentos").then((m) => m.GraficoRendimentos),
+  () => import("@/components/desempenho/returns-chart").then((m) => m.GraficoRendimentos),
   { loading: () => <Skeleton className="h-80" /> },
 );
 
 const TabelaMovimentacoes = dynamic(
-  () => import("@/components/desempenho/tabela-movimentacoes").then((m) => m.TabelaMovimentacoes),
+  () => import("@/components/desempenho/transactions-table").then((m) => m.TabelaMovimentacoes),
   { loading: () => <Skeleton className="h-64" /> },
 );
 
 const AnaliseIaAtivo = dynamic(
-  () => import("@/components/desempenho/analise-ia-ativo").then((m) => m.AnaliseIaAtivo),
+  () => import("@/components/desempenho/asset-ai-analysis").then((m) => m.AnaliseIaAtivo),
   { loading: () => <Skeleton className="h-96" /> },
 );
 
@@ -57,10 +57,10 @@ function DesempenhoConteudo() {
     analise,
     estaCarregando: carregandoAnalise,
     revalidar: revalidarAnalise,
-  } = useAnaliseIaAtivo(tickerSelecionado);
+  } = useAssetAiAnalysis(tickerSelecionado);
 
   // Registrar contexto da pagina para o chat
-  const { definirContexto } = useContextoPaginaChat();
+  const { definirContexto } = useChatPageContext();
   const contextoSerializado = useMemo(
     () => (dadosAtivo ? serializarContextoDesempenho(dadosAtivo) : undefined),
     [dadosAtivo],

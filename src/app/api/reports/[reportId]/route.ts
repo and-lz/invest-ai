@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { obterGetReportDetailUseCase, obterDeleteReportUseCase } from "@/lib/container";
 import { ReportNotFoundError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
-import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cabecalhos-cache";
-import { cacheGlobal } from "@/lib/cache-em-memoria";
+import { cabecalhosCachePrivado, cabecalhosSemCache } from "@/lib/cache-headers";
+import { cacheGlobal } from "@/lib/in-memory-cache";
 
 interface RouteParams {
   params: Promise<{ reportId: string }>;

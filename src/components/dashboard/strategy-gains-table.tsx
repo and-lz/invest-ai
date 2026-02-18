@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import {
   Table,
   TableBody,
@@ -26,15 +26,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
-import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
+import { useTableSorting } from "@/hooks/use-table-sorting";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_GANHOS_POR_ESTRATEGIA,
-  GLOSSARIO_PERIODO_NO_MES,
-  GLOSSARIO_PERIODO_NO_ANO,
-  GLOSSARIO_PERIODO_12_MESES,
-  GLOSSARIO_PERIODO_DESDE_INICIO,
-} from "@/lib/glossario-financeiro";
+  GLOSSARY_GANHOS_POR_ESTRATEGIA,
+  GLOSSARY_PERIODO_NO_MES,
+  GLOSSARY_PERIODO_NO_ANO,
+  GLOSSARY_PERIODO_12_MESES,
+  GLOSSARY_PERIODO_DESDE_INICIO,
+} from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { GanhosPorEstrategia } from "@/schemas/report-extraction.schema";
 
@@ -156,7 +156,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
   );
 
   const { itensOrdenados, colunaOrdenacao, direcaoOrdenacao, alternarOrdenacao } =
-    useOrdenacaoTabela<GanhosPorEstrategia, ColunaGanhos>(ganhos, obterValor);
+    useTableSorting<GanhosPorEstrategia, ColunaGanhos>(ganhos, obterValor);
 
   return (
     <Card data-chat-highlight="ganhos-estrategia">
@@ -164,7 +164,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
         <CardTitle className="flex items-center gap-1">
           <Wallet className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Ganhos por Estrategia
-          <InfoTooltip conteudo={GLOSSARIO_GANHOS_POR_ESTRATEGIA.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_GANHOS_POR_ESTRATEGIA.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Quanto cada tipo de investimento rendeu em reais. Valores em vermelho indicam prejuízo no
@@ -197,7 +197,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                   <span className="flex items-center gap-1">
                     No Mes
                     <InfoTooltip
-                      conteudo={GLOSSARIO_PERIODO_NO_MES.explicacao}
+                      conteudo={GLOSSARY_PERIODO_NO_MES.explicacao}
                       tamanhoIcone="h-3 w-3"
                     />
                   </span>
@@ -212,7 +212,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                   <span className="flex items-center gap-1">
                     No Ano
                     <InfoTooltip
-                      conteudo={GLOSSARIO_PERIODO_NO_ANO.explicacao}
+                      conteudo={GLOSSARY_PERIODO_NO_ANO.explicacao}
                       tamanhoIcone="h-3 w-3"
                     />
                   </span>
@@ -227,7 +227,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                   <span className="flex items-center gap-1">
                     12 Meses
                     <InfoTooltip
-                      conteudo={GLOSSARIO_PERIODO_12_MESES.explicacao}
+                      conteudo={GLOSSARY_PERIODO_12_MESES.explicacao}
                       tamanhoIcone="h-3 w-3"
                     />
                   </span>
@@ -242,7 +242,7 @@ export function StrategyGainsTable({ ganhos }: StrategyGainsTableProps) {
                   <span className="flex items-center gap-1">
                     Desde Inicio
                     <InfoTooltip
-                      conteudo={GLOSSARIO_PERIODO_DESDE_INICIO.explicacao}
+                      conteudo={GLOSSARY_PERIODO_DESDE_INICIO.explicacao}
                       tamanhoIcone="h-3 w-3"
                     />
                   </span>

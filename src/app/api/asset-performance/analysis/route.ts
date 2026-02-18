@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { lerAnaliseAtivo } from "@/lib/analise-ativo-storage";
-import { cabecalhosCachePrivado } from "@/lib/cabecalhos-cache";
+import { lerAnaliseAtivo } from "@/lib/asset-analysis-storage";
+import { cabecalhosCachePrivado } from "@/lib/cache-headers";
 import { requireAuth } from "@/lib/auth-utils";
 
 /**

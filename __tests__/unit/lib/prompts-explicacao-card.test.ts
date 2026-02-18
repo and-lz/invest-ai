@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { PROMPTS_EXPLICACAO_CARD } from "@/lib/prompts-explicacao-card";
+import { PROMPTS_EXPLICACAO_CARD } from "@/lib/card-explanation-prompts";
 
 describe("PROMPTS_EXPLICACAO_CARD", () => {
   it("Given the prompt registry, When checking all entries, Then every key should have a non-empty Portuguese prompt ending with a question mark", () => {

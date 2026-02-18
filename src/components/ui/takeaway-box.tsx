@@ -15,9 +15,9 @@ import {
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { typography, icon } from "@/lib/design-system";
-import { notificar } from "@/lib/notificar";
-import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
-import type { TarefaBackground } from "@/lib/tarefa-descricao";
+import { notificar as notify } from "@/lib/notifier";
+import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
+import type { TarefaBackground } from "@/lib/task-description";
 import {
   Tooltip,
   TooltipContent,
@@ -221,7 +221,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
         });
 
         if (response.status === 409) {
-          notificar.info("Já no plano", {
+          notify.info("Já no plano", {
             description: "Este item já está no seu plano de ação.",
           });
           setAddToPlanStatuses((prev) => ({ ...prev, [index]: "added" }));
@@ -235,7 +235,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
           throw new Error(errorBody.erro ?? "Falha ao adicionar ao plano");
         }
 
-        notificar.success("Adicionado ao plano", {
+        notify.success("Adicionado ao plano", {
           description: "Ação adicionada com recomendação da IA.",
           actionUrl: "/plano-acao",
           actionLabel: "Ver plano",
@@ -248,7 +248,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
         setAddToPlanStatuses((prev) => ({ ...prev, [index]: "added" }));
       } catch (error) {
         console.error("[TakeawayBox] Error adding to plan:", error);
-        notificar.error("Erro ao adicionar", {
+        notify.error("Erro ao adicionar", {
           description:
             error instanceof Error
               ? error.message

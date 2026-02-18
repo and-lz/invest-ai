@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   formatarMoeda,
-  formatarMoedaCompacta,
+  formatCompactCurrency,
   somarMoney,
   subtrairMoney,
   centavosParaReais,
@@ -27,17 +27,17 @@ describe("Money value object", () => {
     });
   });
 
-  describe("formatarMoedaCompacta", () => {
+  describe("formatCompactCurrency", () => {
     it("deve formatar valor acima de 1 milhao com M", () => {
-      expect(formatarMoedaCompacta(150000000)).toBe("R$ 1.5M");
+      expect(formatCompactCurrency(150000000)).toBe("R$ 1.5M");
     });
 
     it("deve formatar valor acima de 1000 com k", () => {
-      expect(formatarMoedaCompacta(41533291)).toBe("R$ 415.3k");
+      expect(formatCompactCurrency(41533291)).toBe("R$ 415.3k");
     });
 
     it("deve formatar valor pequeno normalmente", () => {
-      expect(formatarMoedaCompacta(5000)).toBe("R$\u00A050,00");
+      expect(formatCompactCurrency(5000)).toBe("R$\u00A050,00");
     });
   });
 

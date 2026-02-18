@@ -1,8 +1,8 @@
-import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../template-artigo";
+import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../article-template";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_LIQUIDEZ } from "@/lib/glossario-financeiro";
-import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
+import { GLOSSARY_LIQUIDEZ } from "@/lib/financial-glossary";
+import type { ArtigoMetadata } from "@/schemas/educational-article.schema";
 
 export const metadata: ArtigoMetadata = {
   slug: "reserva-emergencia",
@@ -75,7 +75,7 @@ export default function ReservaEmergenciaArtigo() {
       <SecaoArtigo titulo="Onde investir a reserva de emergência?">
         <Paragrafo>
           A reserva de emergência precisa ter duas características essenciais:{" "}
-          <InfoTooltip conteudo={GLOSSARIO_LIQUIDEZ.explicacao} /> liquidez diária e segurança
+          <InfoTooltip conteudo={GLOSSARY_LIQUIDEZ.explicacao} /> liquidez diária e segurança
           total.
         </Paragrafo>
 

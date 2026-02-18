@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { obterBrapiMarketDataService, obterBcbMacroDataService } from "@/lib/container";
-import { cacheGlobal } from "@/lib/cache-em-memoria";
-import { cabecalhosCachePublico } from "@/lib/cabecalhos-cache";
+import { cacheGlobal } from "@/lib/in-memory-cache";
+import { cabecalhosCachePublico } from "@/lib/cache-headers";
 import type { DadosTendencias } from "@/schemas/trends.schema";
 
 const CHAVE_CACHE_TENDENCIAS = "tendencias-mercado";

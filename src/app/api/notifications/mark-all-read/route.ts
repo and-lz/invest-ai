@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { marcarTodasComoVisualizadas } from "@/lib/notificacao";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { markAllAsRead } from "@/lib/notification";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 import { requireAuth } from "@/lib/auth-utils";
 
 export const dynamic = "force-dynamic";
@@ -10,7 +10,7 @@ export async function PATCH() {
   if (!authCheck.authenticated) return authCheck.response;
 
   try {
-    await marcarTodasComoVisualizadas(authCheck.session.user.userId);
+    await markAllAsRead(authCheck.session.user.userId);
     return NextResponse.json({ sucesso: true }, cabecalhosSemCache());
   } catch (erro) {
     console.error("Erro ao marcar todas notificacoes como visualizadas:", erro);

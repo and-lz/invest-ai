@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { LayoutArtigo } from "@/components/aprender/layout-artigo";
+import { LayoutArtigo } from "@/components/aprender/article-layout";
 import {
   TODOS_ARTIGOS,
   obterArtigoPorSlug,
   obterProximoArtigo,
   obterArtigoAnterior,
 } from "@/lib/artigos-registry";
-import { CategoriaArtigoEnum } from "@/schemas/artigo-educacional.schema";
-import type { CategoriaArtigo } from "@/schemas/artigo-educacional.schema";
+import { CategoriaArtigoEnum } from "@/schemas/educational-article.schema";
+import type { CategoriaArtigo } from "@/schemas/educational-article.schema";
 
 interface ArtigoPageProps {
   params: Promise<{

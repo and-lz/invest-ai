@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import Link from "next/link";
 import { Card, CardAction, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import {
   Table,
   TableBody,
@@ -26,10 +26,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
-import { formatarDataBrasileira } from "@/lib/format-date";
-import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
+import { formatBrazilianDate } from "@/lib/format-date";
+import { useTableSorting } from "@/hooks/use-table-sorting";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_EVENTO_FINANCEIRO, GLOSSARIO_TIPOS_EVENTO } from "@/lib/glossario-financeiro";
+import { GLOSSARY_EVENTO_FINANCEIRO, GLOSSARY_TIPOS_EVENTO } from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { EventoFinanceiro } from "@/schemas/report-extraction.schema";
 
@@ -126,7 +126,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
   );
 
   const { itensOrdenados, colunaOrdenacao, direcaoOrdenacao, alternarOrdenacao } =
-    useOrdenacaoTabela<EventoFinanceiro, ColunaEventos>(eventos, obterValor);
+    useTableSorting<EventoFinanceiro, ColunaEventos>(eventos, obterValor);
 
   const totalRecebidoCentavos = eventos.reduce(
     (acumulador, evento) => acumulador + evento.valor.valorEmCentavos,
@@ -141,7 +141,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
         <CardTitle className="flex items-center gap-1">
           <Zap className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Eventos Financeiros
-          <InfoTooltip conteudo={GLOSSARIO_EVENTO_FINANCEIRO.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_EVENTO_FINANCEIRO.explicacao} />
         </CardTitle>
         {eventos.length > 0 && (
           <CardDescription>
@@ -209,9 +209,9 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                           return null;
                         })()}
                         {evento.tipoEvento}
-                        {GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento] != null && (
+                        {GLOSSARY_TIPOS_EVENTO[evento.tipoEvento] != null && (
                           <InfoTooltip
-                            conteudo={GLOSSARIO_TIPOS_EVENTO[evento.tipoEvento]!.explicacao}
+                            conteudo={GLOSSARY_TIPOS_EVENTO[evento.tipoEvento]!.explicacao}
                             tamanhoIcone="h-3 w-3"
                           />
                         )}
@@ -226,7 +226,7 @@ export function FinancialEventsList({ eventos }: FinancialEventsListProps) {
                       </Link>
                     </TableCell>
                     <TableCell className="text-muted-foreground hidden sm:table-cell">
-                      {evento.dataEvento ? formatarDataBrasileira(evento.dataEvento) : "—"}
+                      {evento.dataEvento ? formatBrazilianDate(evento.dataEvento) : "—"}
                     </TableCell>
                     <TableCell className="text-right font-medium">
                       {formatarMoeda(evento.valor.valorEmCentavos)}

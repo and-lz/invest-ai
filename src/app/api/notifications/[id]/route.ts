@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { marcarComoVisualizada } from "@/lib/notificacao";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { marcarComoVisualizada } from "@/lib/notification";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 import { requireAuth } from "@/lib/auth-utils";
 
 export const dynamic = "force-dynamic";

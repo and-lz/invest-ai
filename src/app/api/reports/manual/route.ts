@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { obterSalvarRelatorioManualUseCase } from "@/lib/container";
-import { gerarPromptCompletoParaExtracaoManual } from "@/lib/prompt-extracao-manual";
+import { obterSaveManualReportUseCase } from "@/lib/container";
+import { gerarPromptCompletoParaExtracaoManual } from "@/lib/manual-extraction-prompt";
 import { AppError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
 
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ erro: "Nenhum JSON fornecido" }, { status: 400 });
     }
 
-    const useCase = await obterSalvarRelatorioManualUseCase();
+    const useCase = await obterSaveManualReportUseCase();
     const resultado = await useCase.executar({ jsonBruto: corpo.json });
 
     return NextResponse.json({

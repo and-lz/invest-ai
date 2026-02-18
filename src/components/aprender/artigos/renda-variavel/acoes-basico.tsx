@@ -1,8 +1,8 @@
-import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../template-artigo";
+import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../article-template";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_IBOVESPA, GLOSSARIO_VOLATILIDADE } from "@/lib/glossario-financeiro";
-import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
+import { GLOSSARY_IBOVESPA, GLOSSARY_VOLATILIDADE } from "@/lib/financial-glossary";
+import type { ArtigoMetadata } from "@/schemas/educational-article.schema";
 
 export const metadata: ArtigoMetadata = {
   slug: "acoes-basico",
@@ -49,7 +49,7 @@ export default function AcoesBasicoArtigo() {
         </Paragrafo>
 
         <Paragrafo>
-          O <InfoTooltip conteudo={GLOSSARIO_IBOVESPA.explicacao} /> Ibovespa é o índice que mede o
+          O <InfoTooltip conteudo={GLOSSARY_IBOVESPA.explicacao} /> Ibovespa é o índice que mede o
           desempenho médio das ações mais negociadas. Se o Ibovespa subiu 2%, significa que em média
           as principais ações subiram 2% naquele dia.
         </Paragrafo>
@@ -80,7 +80,7 @@ export default function AcoesBasicoArtigo() {
         />
 
         <Paragrafo>
-          Mas atenção: ações têm <InfoTooltip conteudo={GLOSSARIO_VOLATILIDADE.explicacao} /> alta
+          Mas atenção: ações têm <InfoTooltip conteudo={GLOSSARY_VOLATILIDADE.explicacao} /> alta
           volatilidade. Isso significa que o preço sobe e desce bastante. É normal ver sua carteira
           cair 10% ou 20% em crises — mas também subir muito em anos bons.
         </Paragrafo>

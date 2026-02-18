@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { detectCompletedTaskIds } from "@/hooks/use-tarefas-ativas";
+import { detectCompletedTaskIds } from "@/hooks/use-active-tasks";
 
 describe("detectCompletedTaskIds", () => {
   describe("Given previous and current task ID sets", () => {

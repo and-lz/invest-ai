@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
+import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
 
 type StatusUpload = "idle" | "uploading" | "success" | "error";
 

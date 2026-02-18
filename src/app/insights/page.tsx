@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
-import { serializarContextoInsights } from "@/lib/serializar-contexto-chat";
+import { useChatPageContext } from "@/contexts/chat-page-context";
+import { serializarContextoInsights } from "@/lib/serialize-chat-context";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
-import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
+import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { InsightsManualStepper } from "@/components/insights/insights-manual-stepper";
+import { InsightsManualStepper } from "@/components/insights/manual-insights-stepper";
 import { InsightsList } from "@/components/insights/insights-list";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
 import {
@@ -33,7 +33,7 @@ import {
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { icon } from "@/lib/design-system";
-import { notificar } from "@/lib/notificar";
+import { notificar as notify } from "@/lib/notifier";
 import { formatarMesAno, validarMesAno } from "@/lib/format-date";
 import type { InsightsResponse, Insight, StatusAcao } from "@/schemas/insights.schema";
 
@@ -147,7 +147,7 @@ function InsightCard({
       });
 
       if (response.status === 409) {
-        notificar.info("Já no plano", {
+        notify.info("Já no plano", {
           description: "Este item já está no seu plano de ação.",
         });
         setPlanStatus("added");
@@ -159,7 +159,7 @@ function InsightCard({
         throw new Error(errorBody.erro ?? "Falha ao adicionar ao plano");
       }
 
-      notificar.success("Adicionado ao plano", {
+      notify.success("Adicionado ao plano", {
         description: "Ação adicionada com recomendação da IA.",
         actionUrl: "/plano-acao",
         actionLabel: "Ver plano",
@@ -171,7 +171,7 @@ function InsightCard({
       setPlanStatus("added");
     } catch (error) {
       console.error("[Insights] Error adding to plan:", error);
-      notificar.error("Erro ao adicionar", {
+      notify.error("Erro ao adicionar", {
         description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
       });
       setPlanStatus("error");
@@ -346,7 +346,7 @@ export default function InsightsPage() {
   const temErroRelatorios = !!erroRelatorios;
 
   // Registrar contexto da pagina para o chat
-  const { definirContexto } = useContextoPaginaChat();
+  const { definirContexto } = useChatPageContext();
   const contextoSerializado = useMemo(
     () => (insights ? serializarContextoInsights(insights) : undefined),
     [insights],

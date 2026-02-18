@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   abrirChatComPergunta,
   EVENTO_ABRIR_CHAT_COM_PERGUNTA,
-} from "@/components/ui/botao-explicar-ia";
+} from "@/components/ui/ai-explain-button";
 
 describe("abrirChatComPergunta", () => {
   const mockDispatchEvent = vi.fn();

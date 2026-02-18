@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-utils";
 import { obterPlanoAcaoRepository } from "@/lib/container";
-import { AtualizarItemPlanoSchema } from "@/schemas/plano-acao.schema";
-import { cabecalhosSemCache } from "@/lib/cabecalhos-cache";
+import { AtualizarItemPlanoSchema } from "@/schemas/action-plan.schema";
+import { cabecalhosSemCache } from "@/lib/cache-headers";
 
 export const dynamic = "force-dynamic";
 

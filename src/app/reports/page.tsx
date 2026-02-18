@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState, useEffect } from "react";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
-import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
+import { useChatPageContext } from "@/contexts/chat-page-context";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
 import { PdfUploadDropzone } from "@/components/upload/pdf-upload-dropzone";
-import { ImportacaoManualStepper } from "@/components/upload/importacao-manual-stepper";
+import { ImportacaoManualStepper } from "@/components/upload/manual-import-stepper";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, FileText, Upload, MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { notificar } from "@/lib/notificar";
+import { notificar as notify } from "@/lib/notifier";
 import { typography, icon, layout, dialog } from "@/lib/design-system";
 
 export default function ReportsPage() {
@@ -30,7 +30,7 @@ export default function ReportsPage() {
   const { relatorios, estaCarregando, revalidar } = useReports();
 
   // Registrar contexto da pagina para o chat
-  const { definirContexto } = useContextoPaginaChat();
+  const { definirContexto } = useChatPageContext();
   useEffect(() => {
     definirContexto("reports");
   }, [definirContexto]);
@@ -45,7 +45,7 @@ export default function ReportsPage() {
   } = useNativeDialog();
 
   const handleUploadAceito = useCallback(() => {
-    notificar.success("Upload aceito!", {
+    notify.success("Upload aceito!", {
       description:
         "O relatório está sendo processado em background. Você será notificado quando concluir.",
       actionUrl: "/",
@@ -57,7 +57,7 @@ export default function ReportsPage() {
 
   const handleImportacaoManualSucesso = useCallback(
     (identificador: string) => {
-      notificar.success("Relatorio importado com sucesso!", {
+      notify.success("Relatorio importado com sucesso!", {
         description: `Referencia: ${identificador}`,
         actionUrl: "/",
         actionLabel: "Ver dashboard",
@@ -75,11 +75,11 @@ export default function ReportsPage() {
           method: "DELETE",
         });
         if (resposta.ok) {
-          notificar.success("Relatorio removido");
+          notify.success("Relatorio removido");
           await revalidar();
         }
       } catch {
-        notificar.error("Falha ao remover relatorio");
+        notify.error("Falha ao remover relatorio");
       }
     },
     [revalidar],

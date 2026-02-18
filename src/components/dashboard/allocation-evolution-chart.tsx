@@ -1,16 +1,16 @@
 "use client";
 
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
+import { BotaoExplicarIA } from "@/components/ui/ai-explain-button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from "recharts";
 import { CORES_ESTRATEGIA } from "@/lib/chart-config";
 import { formatarMesAno } from "@/lib/format-date";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_EVOLUCAO_ALOCACAO, GLOSSARIO_ESTRATEGIAS } from "@/lib/glossario-financeiro";
+import { GLOSSARY_EVOLUCAO_ALOCACAO, GLOSSARY_ESTRATEGIAS } from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import { Layers } from "lucide-react";
-import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 import type { AlocacaoMensal } from "@/schemas/report-extraction.schema";
 import type { ChartConfig } from "@/components/ui/chart";
 
@@ -65,7 +65,7 @@ export function gerarConclusaoEvolucaoAlocacao(evolucao: AlocacaoMensal[]): Conc
 
   if (maiorMudancaCategoria) {
     conclusoes.push({
-      texto: `Sua maior mudança de alocação foi em ${maiorMudancaCategoria}: foi de ${formatarPercentualSimples(percentualInicial)} para ${formatarPercentualSimples(percentualFinal)}.`,
+      texto: `Sua maior mudança de alocação foi em ${maiorMudancaCategoria}: foi de ${formatSimplePercentage(percentualInicial)} para ${formatSimplePercentage(percentualFinal)}.`,
       tipo: "neutro",
     });
   }
@@ -118,7 +118,7 @@ export function AllocationEvolutionChart({ evolucaoAlocacao }: AllocationEvoluti
         <CardTitle className="flex items-center gap-1">
           <Layers className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Evolução da Alocação
-          <InfoTooltip conteudo={GLOSSARIO_EVOLUCAO_ALOCACAO.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_EVOLUCAO_ALOCACAO.explicacao} />
         </CardTitle>
         <CardDescription className="leading-relaxed">
           Veja como a distribuição da sua carteira mudou ao longo dos meses. Cada cor representa um
@@ -154,7 +154,7 @@ export function AllocationEvolutionChart({ evolucaoAlocacao }: AllocationEvoluti
         </ChartContainer>
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           {categoriasOrdenadas.map((nomeCategoria) => {
-            const explicacao = GLOSSARIO_ESTRATEGIAS[nomeCategoria];
+            const explicacao = GLOSSARY_ESTRATEGIAS[nomeCategoria];
             return (
               <div
                 key={nomeCategoria}

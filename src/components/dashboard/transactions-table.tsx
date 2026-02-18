@@ -22,10 +22,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
-import { formatarDataBrasileira } from "@/lib/format-date";
-import { useOrdenacaoTabela } from "@/hooks/use-ordenacao-tabela";
+import { formatBrazilianDate } from "@/lib/format-date";
+import { useTableSorting } from "@/hooks/use-table-sorting";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
-import { GLOSSARIO_MOVIMENTACOES } from "@/lib/glossario-financeiro";
+import { GLOSSARY_MOVIMENTACOES } from "@/lib/financial-glossary";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
 import type { Movimentacao } from "@/schemas/report-extraction.schema";
 
@@ -126,7 +126,7 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
   );
 
   const { itensOrdenados, colunaOrdenacao, direcaoOrdenacao, alternarOrdenacao } =
-    useOrdenacaoTabela<Movimentacao, ColunaMovimentacoes>(movimentacoes, obterValor);
+    useTableSorting<Movimentacao, ColunaMovimentacoes>(movimentacoes, obterValor);
 
   const conclusoes = gerarConclusaoMovimentacoes(movimentacoes);
 
@@ -136,7 +136,7 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
         <CardTitle className="flex items-center gap-1">
           <ArrowRightLeft className="text-muted-foreground h-5 w-5" aria-hidden="true" />
           Movimentações
-          <InfoTooltip conteudo={GLOSSARIO_MOVIMENTACOES.explicacao} />
+          <InfoTooltip conteudo={GLOSSARY_MOVIMENTACOES.explicacao} />
         </CardTitle>
         {movimentacoes.length > 0 && (
           <CardDescription>{movimentacoes.length} movimentações no mês</CardDescription>
@@ -193,7 +193,7 @@ export function TransactionsTable({ movimentacoes }: TransactionsTableProps) {
                   return (
                     <TableRow key={`${movimentacao.data}-${movimentacao.nomeAtivo}-${indice}`}>
                       <TableCell className="text-muted-foreground">
-                        {formatarDataBrasileira(movimentacao.data)}
+                        {formatBrazilianDate(movimentacao.data)}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         <span className="flex items-center gap-1">

@@ -12,11 +12,11 @@ export function formatarPercentual(valor: number): string {
   return FORMATTER.format(valor / 100);
 }
 
-export function formatarPercentualSimples(valor: number): string {
+export function formatSimplePercentage(valor: number): string {
   return `${valor.toFixed(2).replace(".", ",")}%`;
 }
 
-export function calcularVariacaoPercentual(valorAnterior: number, valorAtual: number): number {
+export function calculatePercentageChange(valorAnterior: number, valorAtual: number): number {
   if (valorAnterior === 0) return 0;
   return ((valorAtual - valorAnterior) / Math.abs(valorAnterior)) * 100;
 }

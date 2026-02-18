@@ -1,11 +1,11 @@
-import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../template-artigo";
+import { SecaoArtigo, Paragrafo, Lista, Destaque } from "../../article-template";
 import { TakeawayBox } from "@/components/ui/takeaway-box";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
-  GLOSSARIO_PATRIMONIO_TOTAL,
-  GLOSSARIO_RENTABILIDADE_MENSAL,
-} from "@/lib/glossario-financeiro";
-import type { ArtigoMetadata } from "@/schemas/artigo-educacional.schema";
+  GLOSSARY_PATRIMONIO_TOTAL,
+  GLOSSARY_RENTABILIDADE_MENSAL,
+} from "@/lib/financial-glossary";
+import type { ArtigoMetadata } from "@/schemas/educational-article.schema";
 
 export const metadata: ArtigoMetadata = {
   slug: "primeiros-passos",
@@ -173,7 +173,7 @@ export default function PrimeirosPassosArtigo() {
       <SecaoArtigo titulo="Começando a investir: os primeiros passos">
         <Paragrafo>
           Agora sim, com dívidas quitadas e reserva de emergência pronta, você pode começar a
-          investir para construir <InfoTooltip conteudo={GLOSSARIO_PATRIMONIO_TOTAL.explicacao} />{" "}
+          investir para construir <InfoTooltip conteudo={GLOSSARY_PATRIMONIO_TOTAL.explicacao} />{" "}
           patrimônio de longo prazo.
         </Paragrafo>
 
@@ -190,7 +190,7 @@ export default function PrimeirosPassosArtigo() {
         <Paragrafo>
           Esses investimentos são simples, seguros e te ajudam a pegar prática sem correr grandes
           riscos. Com o tempo, você pode diversificar para{" "}
-          <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_MENSAL.explicacao} /> investimentos que
+          <InfoTooltip conteudo={GLOSSARY_RENTABILIDADE_MENSAL.explicacao} /> investimentos que
           rendem mais, mas que também têm mais risco.
         </Paragrafo>
 
