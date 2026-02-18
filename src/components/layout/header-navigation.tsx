@@ -24,7 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import packageJson from "../../../package.json";
 
 const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
@@ -45,45 +45,10 @@ const todosItensNavegacao = [...itensNavegacaoPrincipais, ...itensNavegacaoSecun
 
 export function HeaderNavigation() {
   const pathname = usePathname();
-  const [estaVisivel, setEstaVisivel] = useState(true);
   const [menuMobileAberto, setMenuMobileAberto] = useState(false);
 
-  useEffect(() => {
-    let scrollAnteriorLocal = 0;
-
-    const handleScroll = () => {
-      const elementoScroll = document.querySelector("main") as HTMLElement | null;
-      if (!elementoScroll) return;
-
-      const scrollAtual = elementoScroll.scrollTop;
-
-      if (scrollAtual < 50) {
-        setEstaVisivel(true);
-      } else if (scrollAtual > scrollAnteriorLocal) {
-        setEstaVisivel(false);
-      } else {
-        setEstaVisivel(true);
-      }
-
-      scrollAnteriorLocal = scrollAtual;
-    };
-
-    // Find the scrollable main element
-    const elementoScroll = document.querySelector("main") as HTMLElement | null;
-
-    if (elementoScroll) {
-      elementoScroll.addEventListener("scroll", handleScroll, { passive: true });
-      return () => elementoScroll.removeEventListener("scroll", handleScroll);
-    }
-  }, []);
-
   return (
-    <div
-      className={cn(
-        "sticky top-0 z-50 overflow-hidden transition-all duration-300",
-        estaVisivel ? "h-14" : "h-0",
-      )}
-    >
+    <div className="sticky top-0 z-50">
       <header className="border-border/20 relative h-14 border-b">
         <div className="flex h-14 items-center justify-between gap-2 px-3 sm:gap-4 sm:px-4">
           {/* Mobile menu */}

@@ -380,7 +380,7 @@ Paleta de 5 cores com hues espacados: navy (250), teal (165), gold (75), purple 
 - Backdrop-blur com efeito frosted glass (`backdrop-blur-md backdrop-saturate-150`)
 - Titulo em `font-serif` (Lora) para sensacao editorial/premium
 - Navegacao ativa: underline sutil (`bg-foreground/60`) em vez de background preenchido
-- Auto-hide no scroll para maximizar area de conteudo
+- Always sticky (no auto-hide on scroll)
 
 ## Typography System
 
