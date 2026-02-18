@@ -394,7 +394,7 @@ dialog::backdrop {
 }
 
 .chat-fullscreen [data-chat-bubble] {
-  @apply text-base px-5 py-3;
+  @apply text-base px-5 py-3 max-w-[80ch];
 }
 
 /* Chat Highlight - Destaque visual de elementos mencionados pelo assistente */
