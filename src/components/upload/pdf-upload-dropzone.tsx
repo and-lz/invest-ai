@@ -204,9 +204,9 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
         estaSobreDropzone ? "border-primary bg-primary/5" : "border-muted-foreground/25",
       )}
     >
-      <Upload className="text-muted-foreground h-12 w-12" />
+      <Upload className={icone.estadoVazio} />
       <div className="text-center">
-        <h3 className="text-lg font-semibold">Arraste seu relatorio PDF aqui</h3>
+        <h3 className={tipografia.h3}>Arraste seu relatorio PDF aqui</h3>
         <p className="text-muted-foreground text-sm">ou clique para selecionar (max 32MB)</p>
       </div>
       <input

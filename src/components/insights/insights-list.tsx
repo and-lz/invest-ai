@@ -52,7 +52,7 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-          <Lightbulb className="text-muted-foreground h-12 w-12" />
+          <Lightbulb className={icone.estadoVazio} />
           <p className="text-muted-foreground">
             Nenhuma análise gerada ainda. Gere sua primeira análise para acompanhar sua carteira.
           </p>

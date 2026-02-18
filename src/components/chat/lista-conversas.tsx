@@ -4,6 +4,7 @@ import { useConversas } from "@/hooks/use-conversas";
 import { ItemConversa } from "./item-conversa";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Loader2, MessageSquare } from "lucide-react";
+import { icone } from "@/lib/design-system";
 
 interface ListaConversasProps {
   readonly conversaAtualId: string | null;
@@ -40,7 +41,7 @@ export function ListaConversas({
       <div className="flex-1 overflow-y-auto">
         {conversas.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 p-6">
-            <MessageSquare className="text-muted-foreground h-12 w-12" />
+            <MessageSquare className={icone.estadoVazio} />
             <p className="text-muted-foreground text-center text-sm">
               Nenhuma conversa ainda.
               <br />

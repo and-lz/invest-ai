@@ -47,7 +47,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className={tipografia.valorPrincipal}>
             {formatarMoeda(resumo.patrimonioTotal.valorEmCentavos)}
           </div>
           {variacaoPatrimonialCentavos !== null && (
@@ -84,7 +84,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className={tipografia.valorPrincipal}>
             {formatarMoeda(resumo.ganhosFinanceirosNoMes.valorEmCentavos)}
           </div>
           <p className={cn(tipografia.auxiliar, "flex items-center gap-1")}>
@@ -106,7 +106,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className={tipografia.valorPrincipal}>
             {formatarPercentualSimples(resumo.rentabilidadeAnual.valor)}
           </div>
           {resumo.rentabilidadeAnoAnterior && (
@@ -129,7 +129,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className={tipografia.valorPrincipal}>
             {formatarPercentualSimples(resumo.rentabilidadeDesdeInicio.valor)}
           </div>
           <p className={tipografia.auxiliar}>

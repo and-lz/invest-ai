@@ -34,7 +34,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
           <DollarSign className={cn(icone.tituloCard, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className={tipografia.valorPrincipal}>
             {cotacao
               ? formatarMoeda(Math.round(cotacao.preco * 100))
               : dadosAtivo.saldoAtualCentavos > 0
@@ -61,7 +61,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
           )}
         </CardHeader>
         <CardContent>
-          <div className={cn("text-2xl font-bold", corValor(rentabilidadeMes))}>
+          <div className={cn(tipografia.valorPrincipal, corValor(rentabilidadeMes))}>
             {rentabilidadeMes !== null ? formatarPercentualSimples(rentabilidadeMes) : "N/D"}
           </div>
           {rentabilidade12Meses !== null && (
@@ -79,7 +79,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
           <PieChart className={cn(icone.tituloCard, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className={tipografia.valorPrincipal}>
             {dadosAtivo.participacaoAtualCarteira > 0
               ? formatarPercentualSimples(dadosAtivo.participacaoAtualCarteira)
               : "N/D"}
@@ -99,7 +99,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
           <BarChart3 className={cn(icone.tituloCard, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className={tipografia.valorPrincipal}>
             {totalEventos > 0 ? formatarMoedaCompacta(totalEventos) : "N/D"}
           </div>
           <p className={tipografia.auxiliar}>

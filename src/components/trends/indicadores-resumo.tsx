@@ -10,7 +10,7 @@ import {
   GLOSSARIO_DOLAR,
 } from "@/lib/glossario-financeiro";
 import { cn } from "@/lib/utils";
-import { corValor } from "@/lib/design-system";
+import { tipografia, corValor } from "@/lib/design-system";
 import type { IndiceMercado, IndicadorMacro } from "@/schemas/trends.schema";
 
 interface IndicadoresResumoProps {
@@ -71,7 +71,7 @@ function CardIndicador({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{valor}</div>
+        <div className={tipografia.valorPrincipal}>{valor}</div>
         {variacao !== undefined && (
           <p
             className={cn(

@@ -18,7 +18,7 @@ import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import type { AnaliseAtivoResponse, VeredictoRecomendacao } from "@/schemas/analise-ativo.schema";
 import { cn } from "@/lib/utils";
-import { corValor } from "@/lib/design-system";
+import { icone, corValor } from "@/lib/design-system";
 
 interface AnaliseIaAtivoProps {
   readonly analise: AnaliseAtivoResponse;
@@ -62,7 +62,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BotIcon className="text-muted-foreground h-5 w-5" />
+              <BotIcon className={cn(icone.tituloCard, "text-muted-foreground")} />
               <CardTitle>Analise IA</CardTitle>
             </div>
             <Badge
@@ -98,7 +98,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <TrendingUp className="text-muted-foreground h-5 w-5" />
+            <TrendingUp className={cn(icone.tituloCard, "text-muted-foreground")} />
             <CardTitle>Performance</CardTitle>
           </div>
         </CardHeader>
@@ -158,7 +158,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Wallet className="text-muted-foreground h-5 w-5" />
+              <Wallet className={cn(icone.tituloCard, "text-muted-foreground")} />
               <CardTitle>Renda Passiva</CardTitle>
             </div>
           </CardHeader>
@@ -209,7 +209,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <BarChart3 className="text-muted-foreground h-5 w-5" />
+              <BarChart3 className={cn(icone.tituloCard, "text-muted-foreground")} />
               <CardTitle>Fundamentos</CardTitle>
             </div>
           </CardHeader>
@@ -275,7 +275,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Shield className="text-muted-foreground h-5 w-5" />
+              <Shield className={cn(icone.tituloCard, "text-muted-foreground")} />
               <CardTitle>Riscos</CardTitle>
             </div>
           </CardHeader>
@@ -306,7 +306,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Globe className="text-muted-foreground h-5 w-5" />
+              <Globe className={cn(icone.tituloCard, "text-muted-foreground")} />
               <CardTitle>Cenario Macro</CardTitle>
             </div>
           </CardHeader>
@@ -322,7 +322,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <AlertTriangle className="text-muted-foreground h-5 w-5" />
+                <AlertTriangle className={cn(icone.tituloCard, "text-muted-foreground")} />
                 <CardTitle>Timing</CardTitle>
               </div>
             </CardHeader>
@@ -346,7 +346,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Eye className="text-muted-foreground h-5 w-5" />
+              <Eye className={cn(icone.tituloCard, "text-muted-foreground")} />
               <CardTitle>Pontos de Atencao</CardTitle>
             </div>
           </CardHeader>

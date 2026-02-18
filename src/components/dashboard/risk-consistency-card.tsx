@@ -3,6 +3,7 @@
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BotaoExplicarIA } from "@/components/ui/botao-explicar-ia";
 import { cn } from "@/lib/utils";
+import { tipografia } from "@/lib/design-system";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { GLOSSARIO_RISCO_CONSISTENCIA } from "@/lib/glossario-financeiro";
 import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
@@ -105,7 +106,7 @@ export function RiskConsistencyCard({ analiseRiscoRetorno }: RiskConsistencyCard
               />
             </svg>
             <div className="absolute flex flex-col items-center">
-              <span className="text-2xl font-bold">{taxaAcerto}%</span>
+              <span className={tipografia.valorPrincipal}>{taxaAcerto}%</span>
               <span className="text-muted-foreground text-xs">acerto</span>
             </div>
           </div>
