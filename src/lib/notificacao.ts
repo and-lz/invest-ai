@@ -12,7 +12,7 @@ export const NotificacaoSchema = z.object({
   descricao: z.string().optional(),
   acao: z
     .object({
-      rotulo: z.string(),
+      label: z.string(),
       url: z.string(),
     })
     .optional(),

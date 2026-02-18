@@ -1,172 +1,185 @@
 /**
  * Design System Constants
  *
- * Fonte única de verdade para padrões visuais do app.
- * Usar estas constantes em vez de classes Tailwind hardcoded garante
- * consistência visual e facilita alterações globais.
+ * Single source of truth for visual patterns across the app.
+ * Use these constants instead of hardcoded Tailwind classes to ensure
+ * visual consistency and enable global changes.
  *
- * Uso: import { ds } from "@/lib/design-system";
- *      <h1 className={ds.tipografia.h1}>Título</h1>
- *      <Icon className={ds.icone.tituloCard} />
+ * Usage: import { ds } from "@/lib/design-system";
+ *        <h1 className={ds.typography.h1}>Title</h1>
+ *        <Icon className={ds.icon.cardTitle} />
  */
 
-// ─── Tipografia ──────────────────────────────────────────────────
+// ─── Typography ─────────────────────────────────────────────────
 // All text uses system-ui font stack for maximum performance
-// NUNCA usar font-bold em text-sm ou menor
-// NUNCA usar font-medium em text-xs (helper text)
+// NEVER use font-bold on text-sm or smaller
+// NEVER use font-medium on text-xs (helper text)
 
-export const tipografia = {
-  /** H1 — Títulos de página. Ex: "Dashboard", "Insights" */
+export const typography = {
+  /** H1 — Page titles. Ex: "Dashboard", "Insights" */
   h1: "text-2xl font-bold tracking-tight",
 
-  /** H1 grande — Títulos de artigo (3xl) */
-  h1Grande: "text-3xl font-bold tracking-tight",
+  /** H1 large — Article titles (3xl) */
+  h1Large: "text-3xl font-bold tracking-tight",
 
-  /** H2 — Títulos de seção, headers de página. Ex: "Relatórios", "Importar" */
+  /** H2 — Section titles, page headers. Ex: "Reports", "Import" */
   h2: "text-xl font-semibold tracking-tight",
 
-  /** H3 — Títulos de card (CardTitle). Ex: "Patrimônio Total" */
+  /** H3 — Card titles (CardTitle). Ex: "Total Wealth" */
   h3: "text-lg font-semibold",
 
-  /** Valor principal — Número de destaque em summary cards. Ex: "R$ 42.000", "3,4%" */
-  valorPrincipal: "text-2xl font-bold",
+  /** Main value — Highlight numbers in summary cards. Ex: "R$ 42.000", "3.4%" */
+  mainValue: "text-2xl font-bold",
 
-  /** Rótulo — Labels, nav links, botões, table headers */
-  rotulo: "text-sm font-medium",
+  /** Label — Labels, nav links, buttons, table headers */
+  label: "text-sm font-medium",
 
-  /** Corpo — Descrições de card, parágrafos, conteúdo de tabela */
-  corpo: "text-sm",
+  /** Body — Card descriptions, paragraphs, table content */
+  body: "text-sm",
 
-  /** Auxiliar — Tooltips, timestamps, hints, footnotes */
-  auxiliar: "text-xs text-muted-foreground",
+  /** Helper — Tooltips, timestamps, hints, footnotes */
+  helper: "text-xs text-muted-foreground",
 
-  /** Mono — Código, mensagens de erro técnicas, JSON */
+  /** Mono — Code, technical error messages, JSON */
   mono: "text-xs font-mono",
 
-  /** Mono médio — Blocos de código maiores */
-  monoMedio: "text-sm font-mono",
+  /** Mono medium — Larger code blocks */
+  monoMedium: "text-sm font-mono",
 } as const;
 
-// ─── Ícones ──────────────────────────────────────────────────────
-// Padronizar tamanhos por contexto evita inconsistências visuais
+// ─── Icons ──────────────────────────────────────────────────────
+// Standardize sizes by context to avoid visual inconsistencies
 
-export const icone = {
-  /** Ícone em título de card (CardHeader). Ex: DollarSign, TrendingUp */
-  tituloCard: "h-5 w-5",
+export const icon = {
+  /** Icon in card title (CardHeader). Ex: DollarSign, TrendingUp */
+  cardTitle: "h-5 w-5",
 
-  /** Ícone de cabeçalho de página. Ex: FileText, BookMarked */
-  tituloPagina: "h-6 w-6",
+  /** Page header icon. Ex: FileText, BookMarked */
+  pageTitle: "h-6 w-6",
 
-  /** Ícone inline em botão, input, badge */
-  botao: "h-4 w-4",
+  /** Inline icon in button, input, badge */
+  button: "h-4 w-4",
 
-  /** Ícone micro — indicadores pequenos, badges, chart legends */
+  /** Micro icon — small indicators, badges, chart legends */
   micro: "h-3.5 w-3.5",
 
-  /** Ícone tiny — chart swatches, bullet points (não interativo) */
+  /** Tiny icon — chart swatches, bullet points (non-interactive) */
   tiny: "h-3 w-3",
 
-  /** Ícone de estado vazio — centralizado, grande */
-  estadoVazio: "h-12 w-12 text-muted-foreground",
+  /** Empty state icon — centered, large */
+  emptyState: "h-12 w-12 text-muted-foreground",
 
-  /** Ícone de loading pequeno — inline em botões */
-  carregandoPequeno: "h-4 w-4 animate-spin",
+  /** Small loading icon — inline in buttons */
+  loadingSmall: "h-4 w-4 animate-spin",
 
-  /** Ícone de loading médio — estados de loading de card/section */
-  carregandoMedio: "h-8 w-8 animate-spin",
+  /** Medium loading icon — card/section loading states */
+  loadingMedium: "h-8 w-8 animate-spin",
 
-  /** Ícone de loading grande — estados de carregamento de página inteira */
-  carregandoGrande: "h-12 w-12 animate-spin",
+  /** Large loading icon — full page loading states */
+  loadingLarge: "h-12 w-12 animate-spin",
 } as const;
 
-// ─── Dialog ──────────────────────────────────────────────────────
-// Todos os dialogs nativos devem usar estas classes de backdrop
+// ─── Dialog ─────────────────────────────────────────────────────
+// All native dialogs must use these backdrop classes
 
 export const dialog = {
   /** Backdrop for native <dialog>. Uses semantic --background at 40% opacity. */
   backdrop: "backdrop:bg-background/40",
-
-  /** Fixed overlay div for React-based modals and panels.
-   *  Usage: <div aria-hidden="true" onClick={close} className={dialog.overlay} /> */
-  overlay: "fixed inset-0 z-50 bg-background/40 transition-opacity",
 } as const;
 
-// ─── Layout ──────────────────────────────────────────────────────
-// Padrões de espaçamento e grid recorrentes
+// ─── Layout ─────────────────────────────────────────────────────
+// Recurring spacing and grid patterns
 
 export const layout = {
-  /** Espaçamento vertical entre seções de página */
-  espacamentoPagina: "space-y-6",
+  /** Vertical spacing between page sections */
+  pageSpacing: "space-y-6",
 
-  /** Espaçamento vertical dentro de seções */
-  espacamentoSecao: "space-y-4",
+  /** Vertical spacing within sections */
+  sectionSpacing: "space-y-4",
 
-  /** Grid de summary cards — 1 col → 2 col → 4 col */
+  /** Summary cards grid — 1 col → 2 col → 4 col */
   gridCards: "grid gap-4 md:grid-cols-2 lg:grid-cols-4",
 
-  /** Grid de conteúdo — 1 col → 2 col → 3 col */
-  gridConteudo: "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
+  /** Content grid — 1 col → 2 col → 3 col */
+  gridContent: "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
 
-  /** Grid de charts — 1 col → 2 col (layouts largos) */
+  /** Charts grid — 1 col → 2 col (wide layouts) */
   gridCharts: "grid gap-6 lg:grid-cols-2",
 
-  /** Layout de estado vazio — flex centralizado */
-  estadoVazio: "flex flex-col items-center justify-center gap-3 p-6",
+  /** Empty state layout — centered flex */
+  emptyState: "flex flex-col items-center justify-center gap-3 p-6",
 
-  /** Layout de estado vazio em card — com mais padding */
-  estadoVazioCard: "flex flex-col items-center gap-4 py-12",
+  /** Empty state in card — with extra padding */
+  emptyStateCard: "flex flex-col items-center gap-4 py-12",
 
-  /** Header de página — flex com ícone + título */
-  headerPagina: "flex items-center gap-3",
+  /** Page header — flex with icon + title */
+  pageHeader: "flex items-center gap-3",
 
-  /** Padding padrão de CardContent */
+  /** Default CardContent padding */
   cardContent: "space-y-4 p-6",
+
+  /** Card title row — flex row with icon + title + tooltip */
+  cardTitleRow: "flex items-center gap-1",
 } as const;
 
-// ─── Utilitários de cor semântica ────────────────────────────────
-// Funções helper para evitar ternários repetidos em todo o codebase
+// ─── Interaction ────────────────────────────────────────────────
+// Reusable hover/focus/active state patterns
+
+export const interaction = {
+  /** Hoverable card — subtle border + shadow on hover */
+  cardHover: "transition-all duration-200 hover:border-primary/30 hover:shadow-md",
+
+  /** Hover reveal — hidden element that appears on group hover */
+  hoverReveal: "opacity-0 transition-opacity group-hover:opacity-100",
+} as const;
+
+// ─── Semantic color utilities ───────────────────────────────────
+// Helper functions to avoid repeated ternaries across the codebase
 
 /**
- * Retorna a classe de cor semântica baseada em valor positivo/negativo.
- * Uso: <span className={corValor(rentabilidade)}>
+ * Returns semantic color class based on positive/negative value.
+ * Usage: <span className={valueColor(profitability)}>
  */
-export function corValor(valor: number | null): string {
-  if (valor === null) return "";
-  return valor >= 0 ? "text-success" : "text-destructive";
+export function valueColor(value: number | null): string {
+  if (value === null) return "";
+  return value >= 0 ? "text-success" : "text-destructive";
 }
 
 /**
- * Retorna a classe de cor para ícone de tendência.
- * Uso: <TrendingUp className={cn(ds.icone.tituloCard, corIconeTendencia(valor))} />
+ * Returns color class for trend icon.
+ * Usage: <TrendingUp className={cn(icon.cardTitle, trendIconColor(value))} />
  */
-export function corIconeTendencia(valor: number | null): string {
-  if (valor === null) return "text-muted-foreground";
-  return valor >= 0 ? "text-success" : "text-destructive";
+export function trendIconColor(value: number | null): string {
+  if (value === null) return "text-muted-foreground";
+  return value >= 0 ? "text-success" : "text-destructive";
 }
 
 /**
- * Retorna classes de badge semântico (bg + text + border).
- * Uso: <Badge className={corBadge("success")}>
+ * Returns semantic badge classes (bg + text + border).
+ * Usage: <Badge className={badgeColor("success")}>
  */
-export function corBadge(tipo: "success" | "destructive" | "warning"): string {
-  const mapa = {
+export function badgeColor(
+  type: "success" | "destructive" | "warning",
+): string {
+  const map = {
     success: "bg-success/10 text-success border-success/30",
     destructive: "bg-destructive/10 text-destructive border-destructive/30",
     warning: "bg-warning/10 text-warning border-warning/30",
   } as const;
-  return mapa[tipo];
+  return map[type];
 }
 
-// ─── Objeto agregado (atalho) ────────────────────────────────────
+// ─── Aggregate object (shortcut) ────────────────────────────────
 // import { ds } from "@/lib/design-system";
-// <h1 className={ds.tipografia.h1}>
+// <h1 className={ds.typography.h1}>
 
 export const ds = {
-  tipografia,
-  icone,
+  typography,
+  icon,
   dialog,
   layout,
-  corValor,
-  corIconeTendencia,
-  corBadge,
+  interaction,
+  valueColor,
+  trendIconColor,
+  badgeColor,
 } as const;

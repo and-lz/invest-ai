@@ -2,13 +2,13 @@
 
 import { Check, Circle, Loader2, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { tipografia } from "@/lib/design-system";
+import { typography } from "@/lib/design-system";
 
 type StatusEtapa = "pendente" | "ativa" | "concluida";
 
 interface Etapa {
   readonly id: string;
-  readonly rotulo: string;
+  readonly label: string;
   readonly status: StatusEtapa;
   readonly detalhes?: readonly string[];
 }
@@ -77,7 +77,7 @@ export function EtapasProcessamento({
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       <div className="space-y-1 text-center">
-        <h3 className={tipografia.h3}>Processando seu relatorio</h3>
+        <h3 className={typography.h3}>Processando seu relatorio</h3>
         <p className="text-muted-foreground text-sm">{nomeArquivo}</p>
       </div>
 
@@ -99,7 +99,7 @@ export function EtapasProcessamento({
                   etapa.status === "concluida" && "text-muted-foreground",
                 )}
               >
-                {etapa.rotulo}
+                {etapa.label}
               </span>
             </div>
             {etapa.status === "ativa" && etapa.detalhes && (

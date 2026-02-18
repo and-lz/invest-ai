@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Loader2, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { tipografia, icone } from "@/lib/design-system";
+import { typography, icon } from "@/lib/design-system";
 
 interface PromptExtracaoCopiavelProps {
   onProximoPasso: () => void;
@@ -43,7 +43,7 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
     return (
       <Card>
         <CardContent className="flex items-center justify-center p-12">
-          <Loader2 className={cn(icone.carregandoMedio, "text-muted-foreground")} />
+          <Loader2 className={cn(icon.loadingMedium, "text-muted-foreground")} />
         </CardContent>
       </Card>
     );
@@ -63,7 +63,7 @@ export function PromptExtracaoCopiavel({ onProximoPasso }: PromptExtracaoCopiave
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className={tipografia.h3}>Copiar o prompt</h3>
+          <h3 className={typography.h3}>Copiar o prompt</h3>
           <p className="text-muted-foreground text-sm">
             Copie o prompt abaixo e cole no chat de IA junto com o PDF do relatorio.
           </p>

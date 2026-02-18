@@ -4,12 +4,12 @@ import { useState, useMemo, useRef, useCallback } from "react";
 import { Search, TrendingUp, TrendingDown, Minus, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  tipografia,
-  icone,
+  typography,
+  icon,
   layout,
   dialog,
-  corValor,
-  corIconeTendencia,
+  valueColor,
+  trendIconColor,
 } from "@/lib/design-system";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -26,7 +26,7 @@ interface AtivoDaCarteira {
 
 interface GrupoAtivos {
   id: string;
-  rotulo: string;
+  label: string;
   emoji: string;
   ativos: AtivoDaCarteira[];
   mediaRentabilidade: number | null;
@@ -76,7 +76,7 @@ function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
   if (excelentes.length > 0) {
     grupos.push({
       id: "excelentes",
-      rotulo: "Excelentes (12m ≥ +15%)",
+      label: "Excelentes (12m ≥ +15%)",
       emoji: "🔥",
       ativos: excelentes,
       mediaRentabilidade: calcularMediaRentabilidade(excelentes),
@@ -85,7 +85,7 @@ function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
   if (bons.length > 0) {
     grupos.push({
       id: "bons",
-      rotulo: "Bons (12m +5% a +15%)",
+      label: "Bons (12m +5% a +15%)",
       emoji: "📈",
       ativos: bons,
       mediaRentabilidade: calcularMediaRentabilidade(bons),
@@ -94,7 +94,7 @@ function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
   if (moderados.length > 0) {
     grupos.push({
       id: "moderados",
-      rotulo: "Moderados (12m 0% a +5%)",
+      label: "Moderados (12m 0% a +5%)",
       emoji: "📊",
       ativos: moderados,
       mediaRentabilidade: calcularMediaRentabilidade(moderados),
@@ -103,7 +103,7 @@ function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
   if (negativos.length > 0) {
     grupos.push({
       id: "negativos",
-      rotulo: "Negativos (12m < 0%)",
+      label: "Negativos (12m < 0%)",
       emoji: "📉",
       ativos: negativos,
       mediaRentabilidade: calcularMediaRentabilidade(negativos),
@@ -112,7 +112,7 @@ function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
   if (semDados.length > 0) {
     grupos.push({
       id: "sem-dados",
-      rotulo: "Sem Dados (12m)",
+      label: "Sem Dados (12m)",
       emoji: "❓",
       ativos: semDados,
       mediaRentabilidade: null,
@@ -209,7 +209,7 @@ export function GridAtivosCarteira({
             <div className="flex min-w-0 flex-1 items-center gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="truncate font-semibold">{ativoSelecionadoInfo.codigoAtivo}</h3>
-                <p className={cn(tipografia.corpo, "text-muted-foreground truncate")}>
+                <p className={cn(typography.body, "text-muted-foreground truncate")}>
                   {ativoSelecionadoInfo.nomeAtivo !== ativoSelecionadoInfo.codigoAtivo
                     ? ativoSelecionadoInfo.nomeAtivo
                     : ativoSelecionadoInfo.estrategia}
@@ -234,7 +234,7 @@ export function GridAtivosCarteira({
       ) : (
         <Card className="hover:bg-accent cursor-pointer transition-colors" onClick={abrirDialog}>
           <CardContent className="flex items-center justify-center gap-2 p-4">
-            <Search className={icone.botao} />
+            <Search className={icon.button} />
             <span className="font-medium">Selecionar Ativo</span>
           </CardContent>
         </Card>
@@ -251,14 +251,14 @@ export function GridAtivosCarteira({
       >
         <div className="border-b px-6 py-4">
           <div className="mx-auto flex max-w-7xl items-center justify-between">
-            <h2 className={tipografia.h2}>Selecionar Ativo</h2>
+            <h2 className={typography.h2}>Selecionar Ativo</h2>
             <Button
               size="sm"
               variant="ghost"
               onClick={fecharDialog}
               className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
             >
-              <X className={icone.botao} />
+              <X className={icon.button} />
               <span className="sr-only">Fechar</span>
             </Button>
           </div>
@@ -268,7 +268,7 @@ export function GridAtivosCarteira({
           {/* Busca externa */}
           <div className="flex gap-2">
             <div className="relative flex-1">
-              <Search className={cn(icone.botao, "text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2")} />
+              <Search className={cn(icon.button, "text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2")} />
               <Input
                 placeholder="Buscar ativo no mercado (ex: PETR4, ITUB4)..."
                 value={termoBusca}
@@ -289,8 +289,8 @@ export function GridAtivosCarteira({
           {/* Estado vazio */}
           {ativosCarteira.length === 0 && (
             <Card>
-              <CardContent className={layout.estadoVazioCard}>
-                <Search className={icone.estadoVazio} />
+              <CardContent className={layout.emptyStateCard}>
+                <Search className={icon.emptyState} />
                 <p className="text-muted-foreground text-center">
                   Nenhum ativo na carteira. Use a busca acima para explorar ativos do mercado.
                 </p>
@@ -313,10 +313,10 @@ export function GridAtivosCarteira({
                         <div className="flex flex-1 items-center justify-between gap-4">
                           <div className="flex items-center gap-2">
                             <span className="text-lg">{grupo.emoji}</span>
-                            <span className="text-sm font-semibold">{grupo.rotulo}</span>
+                            <span className="text-sm font-semibold">{grupo.label}</span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className={tipografia.auxiliar}>
+                            <span className={typography.helper}>
                               {grupo.ativos.length} {grupo.ativos.length === 1 ? "ativo" : "ativos"}
                             </span>
                             {grupo.mediaRentabilidade !== null && (
@@ -330,7 +330,7 @@ export function GridAtivosCarteira({
                             )}
                           </div>
                         </div>
-                        <ChevronDown className={cn(icone.botao, "shrink-0 transition-transform duration-200")} />
+                        <ChevronDown className={cn(icon.button, "shrink-0 transition-transform duration-200")} />
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <div className="grid gap-3 pt-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -355,27 +355,27 @@ export function GridAtivosCarteira({
                                         {ativo.codigoAtivo}
                                       </h4>
                                       {ativoTemTicker && (
-                                        <p className={cn(tipografia.auxiliar, "truncate")}>
+                                        <p className={cn(typography.helper, "truncate")}>
                                           {ativo.nomeAtivo}
                                         </p>
                                       )}
-                                      <p className={cn(tipografia.auxiliar, "mt-1")}>
+                                      <p className={cn(typography.helper, "mt-1")}>
                                         {ativo.estrategia}
                                       </p>
                                     </div>
                                     {ativo.rentabilidade12Meses !== null && (
                                       <div className="flex flex-col items-end gap-1">
                                         {ativo.rentabilidade12Meses > 0 ? (
-                                          <TrendingUp className={cn(icone.botao, corIconeTendencia(ativo.rentabilidade12Meses))} />
+                                          <TrendingUp className={cn(icon.button, trendIconColor(ativo.rentabilidade12Meses))} />
                                         ) : ativo.rentabilidade12Meses < 0 ? (
-                                          <TrendingDown className={cn(icone.botao, corIconeTendencia(ativo.rentabilidade12Meses))} />
+                                          <TrendingDown className={cn(icon.button, trendIconColor(ativo.rentabilidade12Meses))} />
                                         ) : (
-                                          <Minus className={cn(icone.botao, corIconeTendencia(null))} />
+                                          <Minus className={cn(icon.button, trendIconColor(null))} />
                                         )}
                                         <span
                                           className={cn(
                                             "text-xs font-semibold",
-                                            corValor(ativo.rentabilidade12Meses),
+                                            valueColor(ativo.rentabilidade12Meses),
                                           )}
                                         >
                                           {ativo.rentabilidade12Meses > 0 ? "+" : ""}

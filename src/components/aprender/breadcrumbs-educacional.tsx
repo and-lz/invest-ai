@@ -3,7 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Breadcrumb {
-  readonly rotulo: string;
+  readonly label: string;
   readonly href?: string;
 }
 
@@ -25,13 +25,13 @@ export function BreadcrumbsEducacional({ items, className }: BreadcrumbsEducacio
                 href={item.href}
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >
-                {item.rotulo}
+                {item.label}
               </Link>
             ) : (
               <span
                 className={cn(ehUltimo ? "text-foreground font-medium" : "text-muted-foreground")}
               >
-                {item.rotulo}
+                {item.label}
               </span>
             )}
 

@@ -100,7 +100,7 @@ export async function executarTarefaEmBackground(
         titulo: `${descricaoTarefa} — concluida!`,
         descricao: resultado.descricaoResultado,
         acao: resultado.urlRedirecionamento
-          ? { rotulo: "Ver resultado", url: resultado.urlRedirecionamento }
+          ? { label: "Ver resultado", url: resultado.urlRedirecionamento }
           : undefined,
       });
 
@@ -159,7 +159,7 @@ export async function executarTarefaEmBackground(
         tipo: "error",
         titulo: `${descricaoTarefa} — erro`,
         descricao: mensagemErro,
-        acao: urlRetry ? { rotulo: "Tentar novamente", url: urlRetry } : undefined,
+        acao: urlRetry ? { label: "Tentar novamente", url: urlRetry } : undefined,
       });
 
       console.error(

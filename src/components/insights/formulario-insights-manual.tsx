@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, XCircle, Loader2, ArrowLeft, Send } from "lucide-react";
 import type { InsightsResponse } from "@/schemas/insights.schema";
-import { tipografia } from "@/lib/design-system";
+import { typography } from "@/lib/design-system";
 
 interface FormularioInsightsManualProps {
   identificadorRelatorio: string;
@@ -71,7 +71,7 @@ export function FormularioInsightsManual({
           <div className="flex flex-col items-center gap-4 py-8">
             <CheckCircle className="text-success h-12 w-12" />
             <div className="text-center">
-              <h3 className={tipografia.h3}>Análise salva!</h3>
+              <h3 className={typography.h3}>Análise salva!</h3>
               <p className="text-muted-foreground text-sm">
                 A análise foi validada e salva com sucesso.
               </p>
@@ -86,7 +86,7 @@ export function FormularioInsightsManual({
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className={tipografia.h3}>Passo 2: Colar a resposta da IA</h3>
+          <h3 className={typography.h3}>Passo 2: Colar a resposta da IA</h3>
           <p className="text-muted-foreground text-sm">
             Cole abaixo o JSON que o chat de IA retornou com a análise da sua carteira.
           </p>

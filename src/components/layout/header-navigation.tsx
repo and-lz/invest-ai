@@ -32,16 +32,16 @@ import packageJson from "../../../package.json";
 const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
 
 const itensNavegacaoPrincipais = [
-  { href: "/", rotulo: "Dashboard", icone: LayoutDashboard },
-  { href: "/reports", rotulo: "Relatorios", icone: FileText },
-  { href: "/insights", rotulo: "Análises", icone: Lightbulb },
-  { href: "/desempenho", rotulo: "Desempenho", icone: BarChart3 },
+  { href: "/", label: "Dashboard", icone: LayoutDashboard },
+  { href: "/reports", label: "Relatorios", icone: FileText },
+  { href: "/insights", label: "Análises", icone: Lightbulb },
+  { href: "/desempenho", label: "Desempenho", icone: BarChart3 },
 ];
 
 const itensNavegacaoSecundarios = [
-  { href: "/trends", rotulo: "Tendencias", icone: TrendingUp },
-  { href: "/plano-acao", rotulo: "Plano de Ação", icone: ClipboardList },
-  { href: "/aprender", rotulo: "Aprender", icone: BookOpen },
+  { href: "/trends", label: "Tendencias", icone: TrendingUp },
+  { href: "/plano-acao", label: "Plano de Ação", icone: ClipboardList },
+  { href: "/aprender", label: "Aprender", icone: BookOpen },
 ];
 
 const todosItensNavegacao = [...itensNavegacaoPrincipais, ...itensNavegacaoSecundarios];
@@ -104,7 +104,7 @@ export function HeaderNavigation() {
                       )}
                     >
                       <Icone className="h-4 w-4" />
-                      {item.rotulo}
+                      {item.label}
                     </Link>
                   );
                 })}
@@ -148,7 +148,7 @@ export function HeaderNavigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  title={item.rotulo}
+                  title={item.label}
                   className={cn(
                     "group relative flex items-center gap-2 overflow-hidden rounded-lg px-2 py-2 text-sm font-medium transition-all duration-200",
                     estaAtivo
@@ -170,7 +170,7 @@ export function HeaderNavigation() {
                         : "max-w-0 opacity-0 group-hover:max-w-[100px] group-hover:opacity-100",
                     )}
                   >
-                    {item.rotulo}
+                    {item.label}
                   </span>
                   {estaAtivo && (
                     <>
@@ -223,7 +223,7 @@ export function HeaderNavigation() {
                         )}
                       >
                         <Icone className="h-4 w-4" />
-                        {item.rotulo}
+                        {item.label}
                       </Link>
                     </DropdownMenuItem>
                   );

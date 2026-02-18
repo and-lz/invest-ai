@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, FileText, Upload, MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { notificar } from "@/lib/notificar";
-import { tipografia, icone, layout, dialog } from "@/lib/design-system";
+import { typography, icon, layout, dialog } from "@/lib/design-system";
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -88,17 +88,17 @@ export default function ReportsPage() {
   );
 
   return (
-    <div className={layout.espacamentoPagina}>
+    <div className={layout.pageSpacing}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className={layout.headerPagina}>
+        <div className={layout.pageHeader}>
           <FileText
-            className={cn(icone.tituloPagina, "text-muted-foreground")}
+            className={cn(icon.pageTitle, "text-muted-foreground")}
             aria-hidden="true"
           />
           <Header titulo="Relatorios" descricao="Historico de relatorios importados" />
         </div>
         <Button onClick={abrirDialog} className="gap-2">
-          <Upload className={icone.botao} />
+          <Upload className={icon.button} />
           Importar Novo Relatorio
         </Button>
       </div>
@@ -121,9 +121,9 @@ export default function ReportsPage() {
         }}
       >
         <div className="flex items-center justify-between border-b p-6">
-          <h2 className={tipografia.h3}>Importar Relatorio</h2>
+          <h2 className={typography.h3}>Importar Relatorio</h2>
           <Button variant="ghost" size="icon" onClick={fecharDialog}>
-            <X className={icone.botao} />
+            <X className={icon.button} />
             <span className="sr-only">Fechar</span>
           </Button>
         </div>
@@ -136,7 +136,7 @@ export default function ReportsPage() {
               onClick={() => setMetodoUploadSelecionado("automatico")}
               className="gap-1.5"
             >
-              <Upload className={icone.botao} />
+              <Upload className={icon.button} />
               Upload Direto
               <span className="bg-background/80 rounded px-1 py-0.5 text-[9px] leading-none font-medium">
                 REC
@@ -148,7 +148,7 @@ export default function ReportsPage() {
               onClick={() => setMetodoUploadSelecionado("manual")}
               className="gap-1.5"
             >
-              <MessageSquare className={icone.botao} />
+              <MessageSquare className={icon.button} />
               Via Chat
             </Button>
           </div>
@@ -168,8 +168,8 @@ export default function ReportsPage() {
 
         {!estaCarregando && relatorios.length === 0 && (
           <Card>
-            <CardContent className={layout.estadoVazioCard}>
-              <FileText className={icone.estadoVazio} />
+            <CardContent className={layout.emptyStateCard}>
+              <FileText className={icon.emptyState} />
               <p className="text-muted-foreground mb-4">Nenhum relatorio encontrado.</p>
               <Button onClick={abrirDialog}>Importar Primeiro Relatorio</Button>
             </CardContent>
@@ -219,7 +219,7 @@ export default function ReportsPage() {
                             size="sm"
                             onClick={() => void handleRemover(relatorio.identificador)}
                           >
-                            <Trash2 className={icone.botao} />
+                            <Trash2 className={icon.button} />
                           </Button>
                         </TableCell>
                       </TableRow>

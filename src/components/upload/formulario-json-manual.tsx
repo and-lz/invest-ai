@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { XCircle, Loader2, ArrowLeft, Send, Circle } from "lucide-react";
 import { useImportacaoManual } from "@/hooks/use-importacao-manual";
 import { ResultadoUpload } from "./resultado-upload";
-import { tipografia } from "@/lib/design-system";
+import { typography } from "@/lib/design-system";
 
 interface FormularioJsonManualProps {
   onImportacaoSucesso?: (identificador: string) => void;
@@ -58,7 +58,7 @@ export function FormularioJsonManual({ onImportacaoSucesso, onVoltar }: Formular
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className={tipografia.h3}>Colar a resposta da IA</h3>
+          <h3 className={typography.h3}>Colar a resposta da IA</h3>
           <p className="text-muted-foreground text-sm">
             Cole abaixo o JSON que o chat de IA retornou apos processar seu relatorio.
           </p>

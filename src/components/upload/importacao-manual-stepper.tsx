@@ -25,12 +25,12 @@ export function ImportacaoManualStepper({ onImportacaoSucesso }: ImportacaoManua
   const passosIndicador = [
     {
       numero: 1,
-      rotulo: "Copiar prompt",
+      label: "Copiar prompt",
       status: passoAtual === "copiar-prompt" ? ("ativo" as const) : ("concluido" as const),
     },
     {
       numero: 2,
-      rotulo: "Colar resposta",
+      label: "Colar resposta",
       status: passoAtual === "colar-json" ? ("ativo" as const) : ("pendente" as const),
     },
   ];

@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { icone } from "@/lib/design-system";
+import { icon } from "@/lib/design-system";
 import { notificar } from "@/lib/notificar";
 import { formatarMesAno, validarMesAno } from "@/lib/format-date";
 import type { InsightsResponse, Insight, StatusAcao } from "@/schemas/insights.schema";
@@ -245,11 +245,11 @@ function InsightCard({
               aria-label="Adicionar ao plano de ação"
             >
               {planStatus === "loading" ? (
-                <Loader2 className={cn(icone.botao, "animate-spin")} />
+                <Loader2 className={cn(icon.button, "animate-spin")} />
               ) : planStatus === "added" ? (
-                <Check className={icone.botao} />
+                <Check className={icon.button} />
               ) : (
-                <ListPlus className={icone.botao} />
+                <ListPlus className={icon.button} />
               )}
             </button>
           </div>

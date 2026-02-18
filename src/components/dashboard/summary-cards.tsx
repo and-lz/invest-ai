@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
 import { formatarDataBrasileira } from "@/lib/format-date";
-import { tipografia, icone, layout, corValor } from "@/lib/design-system";
+import { typography, icon, layout, valueColor } from "@/lib/design-system";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
   GLOSSARIO_PATRIMONIO_TOTAL,
@@ -37,9 +37,9 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
     <div className={layout.gridCards}>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
+          <CardTitle className={cn("flex items-center gap-1", typography.label)}>
             <DollarSign
-              className={cn(icone.tituloCard, "text-muted-foreground")}
+              className={cn(icon.cardTitle, "text-muted-foreground")}
               aria-hidden="true"
             />
             Patrimonio Total
@@ -47,14 +47,14 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={tipografia.valorPrincipal}>
+          <div className={typography.mainValue}>
             {formatarMoeda(resumo.patrimonioTotal.valorEmCentavos)}
           </div>
           {variacaoPatrimonialCentavos !== null && (
             <p
               className={cn(
                 "flex items-center gap-1 text-xs",
-                corValor(variacaoPatrimonialCentavos),
+                valueColor(variacaoPatrimonialCentavos),
               )}
             >
               {variacaoPositiva ? (
@@ -74,9 +74,9 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
+          <CardTitle className={cn("flex items-center gap-1", typography.label)}>
             <BarChart3
-              className={cn(icone.tituloCard, "text-muted-foreground")}
+              className={cn(icon.cardTitle, "text-muted-foreground")}
               aria-hidden="true"
             />
             Ganhos no Mes
@@ -84,10 +84,10 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={tipografia.valorPrincipal}>
+          <div className={typography.mainValue}>
             {formatarMoeda(resumo.ganhosFinanceirosNoMes.valorEmCentavos)}
           </div>
-          <p className={cn(tipografia.auxiliar, "flex items-center gap-1")}>
+          <p className={cn(typography.helper, "flex items-center gap-1")}>
             Rentabilidade: {formatarPercentualSimples(resumo.rentabilidadeMensal.valor)}
             <InfoTooltip
               conteudo={GLOSSARIO_RENTABILIDADE_MENSAL.explicacao}
@@ -99,18 +99,18 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
-            <Percent className={cn(icone.tituloCard, "text-muted-foreground")} aria-hidden="true" />
+          <CardTitle className={cn("flex items-center gap-1", typography.label)}>
+            <Percent className={cn(icon.cardTitle, "text-muted-foreground")} aria-hidden="true" />
             Rentabilidade Anual
             <InfoTooltip conteudo={GLOSSARIO_RENTABILIDADE_ANUAL.explicacao} />
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={tipografia.valorPrincipal}>
+          <div className={typography.mainValue}>
             {formatarPercentualSimples(resumo.rentabilidadeAnual.valor)}
           </div>
           {resumo.rentabilidadeAnoAnterior && (
-            <p className={tipografia.auxiliar}>
+            <p className={typography.helper}>
               {formatarPercentualSimples(resumo.rentabilidadeAnoAnterior.valor)} no ano anterior
             </p>
           )}
@@ -119,9 +119,9 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={cn("flex items-center gap-1", tipografia.rotulo)}>
+          <CardTitle className={cn("flex items-center gap-1", typography.label)}>
             <CalendarDays
-              className={cn(icone.tituloCard, "text-muted-foreground")}
+              className={cn(icon.cardTitle, "text-muted-foreground")}
               aria-hidden="true"
             />
             Desde o Inicio
@@ -129,10 +129,10 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={tipografia.valorPrincipal}>
+          <div className={typography.mainValue}>
             {formatarPercentualSimples(resumo.rentabilidadeDesdeInicio.valor)}
           </div>
-          <p className={tipografia.auxiliar}>
+          <p className={typography.helper}>
             Desde {formatarDataBrasileira(resumo.dataInicioCarteira)}
           </p>
         </CardContent>

@@ -14,7 +14,7 @@ import {
   ESTATISTICAS_GLOSSARIO,
   NOMES_CATEGORIAS,
 } from "@/lib/glossario-navegavel";
-import { icone, layout } from "@/lib/design-system";
+import { icon, layout } from "@/lib/design-system";
 import { cn } from "@/lib/utils";
 
 export function GlossarioConteudo() {
@@ -40,7 +40,7 @@ export function GlossarioConteudo() {
       {/* Header */}
       <div className="flex items-center gap-3">
         <BookMarked
-          className={cn(icone.tituloPagina, "text-muted-foreground")}
+          className={cn(icon.pageTitle, "text-muted-foreground")}
           aria-hidden="true"
         />
         <Header
@@ -101,15 +101,15 @@ export function GlossarioConteudo() {
       {/* Grid de Termos */}
       {termosMostrados.length === 0 ? (
         <Card>
-          <CardContent className={cn(layout.estadoVazioCard, "justify-center")}>
-            <BookMarked className={icone.estadoVazio} aria-hidden="true" />
+          <CardContent className={cn(layout.emptyStateCard, "justify-center")}>
+            <BookMarked className={icon.emptyState} aria-hidden="true" />
             <p className="text-muted-foreground text-center">
               Nenhum termo encontrado para &quot;{query}&quot;
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className={layout.gridConteudo}>
+        <div className={layout.gridContent}>
           {termosMostrados.map((termo) => (
             <Card key={termo.slug} id={termo.slug} className="scroll-mt-20">
               <CardHeader>

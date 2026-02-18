@@ -10,7 +10,7 @@ import {
   GLOSSARIO_DOLAR,
 } from "@/lib/glossario-financeiro";
 import { cn } from "@/lib/utils";
-import { tipografia, corValor } from "@/lib/design-system";
+import { typography, valueColor } from "@/lib/design-system";
 import type { IndiceMercado, IndicadorMacro } from "@/schemas/trends.schema";
 
 interface IndicadoresResumoProps {
@@ -49,7 +49,7 @@ interface CardIndicadorProps {
   valor: string;
   subtitulo?: string;
   variacao?: number;
-  icone: React.ReactNode;
+  icon: React.ReactNode;
   glossario: string;
 }
 
@@ -58,25 +58,25 @@ function CardIndicador({
   valor,
   subtitulo,
   variacao,
-  icone,
+  icon,
   glossario,
 }: CardIndicadorProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="flex items-center gap-1 text-sm font-medium">
-          {icone}
+          {icon}
           {titulo}
           <InfoTooltip conteudo={glossario} />
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={tipografia.valorPrincipal}>{valor}</div>
+        <div className={typography.mainValue}>{valor}</div>
         {variacao !== undefined && (
           <p
             className={cn(
               "flex items-center gap-1 text-xs",
-              corValor(variacao),
+              valueColor(variacao),
             )}
           >
             {variacao >= 0 ? (
@@ -105,7 +105,7 @@ export function IndicadoresResumo({ indicesMercado, indicadoresMacro }: Indicado
         titulo="Ibovespa"
         valor={ibovespa ? formatarNumeroCompacto(ibovespa.valor) : "—"}
         variacao={ibovespa?.variacao}
-        icone={<TrendingUp className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
+        icon={<TrendingUp className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_IBOVESPA_INDICE.explicacao}
       />
 
@@ -117,7 +117,7 @@ export function IndicadoresResumo({ indicesMercado, indicadoresMacro }: Indicado
             : "—"
         }
         subtitulo={dolar?.unidade}
-        icone={<DollarSign className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
+        icon={<DollarSign className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_DOLAR.explicacao}
       />
 
@@ -125,7 +125,7 @@ export function IndicadoresResumo({ indicesMercado, indicadoresMacro }: Indicado
         titulo="SELIC Meta"
         valor={selic ? `${formatarNumeroCompacto(selic.valorAtual)}%` : "—"}
         subtitulo={selic?.unidade}
-        icone={<Percent className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
+        icon={<Percent className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_SELIC_META.explicacao}
       />
 
@@ -133,7 +133,7 @@ export function IndicadoresResumo({ indicesMercado, indicadoresMacro }: Indicado
         titulo="IPCA"
         valor={ipca ? `${formatarNumeroCompacto(ipca.valorAtual)}%` : "—"}
         subtitulo={ipca?.unidade}
-        icone={<Percent className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
+        icon={<Percent className="text-muted-foreground h-5 w-5" aria-hidden="true" />}
         glossario={GLOSSARIO_IPCA_INDICE.explicacao}
       />
     </div>

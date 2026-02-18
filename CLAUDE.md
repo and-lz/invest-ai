@@ -236,65 +236,84 @@ All tests use realistic data factories that create valid domain objects:
 - Evitar cor em elementos decorativos ou informativos que nao exigem atencao imediata
 - NUNCA usar cores Tailwind hardcoded (`text-green-600`, `bg-red-50`, etc.) — sempre usar variaveis semanticas
 
-## Design System: Constantes (DS Tokens)
+## Design System: Constants (DS Tokens)
 
-Constantes centralizadas em `src/lib/design-system.ts` — fonte unica de verdade para padroes visuais.
-SEMPRE usar estas constantes em vez de classes Tailwind hardcoded para tipografia, icones e layout.
+Centralized constants in `src/lib/design-system.ts` — single source of truth for visual patterns.
+ALWAYS use these constants instead of hardcoded Tailwind classes for typography, icons, layout, and interactions.
+When creating new UI, ALWAYS check if a DS token exists before writing raw Tailwind classes.
 
-### Uso
+### Usage
 ```typescript
-import { tipografia, icone, layout, corValor } from "@/lib/design-system";
-// Ou objeto agregado:
+import { typography, icon, layout, interaction, valueColor } from "@/lib/design-system";
+// Or aggregate object:
 import { ds } from "@/lib/design-system";
 ```
 
-### Tipografia (`tipografia.*`)
-| Token | Classe | Uso |
-|-------|--------|-----|
-| `h1` | `text-2xl font-bold tracking-tight` | Titulos de pagina |
-| `h1Grande` | `text-3xl font-bold tracking-tight` | Titulos de artigo |
-| `h2` | `text-xl font-semibold tracking-tight` | Titulos de secao, headers |
-| `h3` | `text-lg font-semibold` | Titulos de card (CardTitle) |
-| `rotulo` | `text-sm font-medium` | Labels, nav, botoes, table headers |
-| `corpo` | `text-sm` | Descricoes, paragrafos, conteudo |
-| `auxiliar` | `text-xs text-muted-foreground` | Tooltips, timestamps, hints |
-| `mono` | `text-xs font-mono` | Codigo, erros tecnicos |
+### Typography (`typography.*`)
+| Token | Classes | Usage |
+|-------|---------|-------|
+| `h1` | `text-2xl font-bold tracking-tight` | Page titles |
+| `h1Large` | `text-3xl font-bold tracking-tight` | Article titles |
+| `h2` | `text-xl font-semibold tracking-tight` | Section titles, headers |
+| `h3` | `text-lg font-semibold` | Card titles (CardTitle) |
+| `mainValue` | `text-2xl font-bold` | Highlight numbers in summary cards |
+| `label` | `text-sm font-medium` | Labels, nav, buttons, table headers |
+| `body` | `text-sm` | Descriptions, paragraphs, content |
+| `helper` | `text-xs text-muted-foreground` | Tooltips, timestamps, hints |
+| `mono` | `text-xs font-mono` | Code, technical errors |
+| `monoMedium` | `text-sm font-mono` | Larger code blocks |
 
-### Icones (`icone.*`)
-| Token | Classe | Uso |
-|-------|--------|-----|
-| `tituloCard` | `h-5 w-5` | Icone em CardHeader |
-| `tituloPagina` | `h-6 w-6` | Icone de header de pagina |
-| `botao` | `h-4 w-4` | Icone inline em botao/input |
-| `micro` | `h-3.5 w-3.5` | Indicadores pequenos, badges |
-| `estadoVazio` | `h-12 w-12 text-muted-foreground` | Icone centralizado grande |
-| `carregandoPequeno` | `h-4 w-4 animate-spin` | Loading inline |
-| `carregandoGrande` | `h-8 w-8 animate-spin` | Loading de pagina |
+### Icons (`icon.*`)
+| Token | Classes | Usage |
+|-------|---------|-------|
+| `cardTitle` | `h-5 w-5` | Icon in CardHeader |
+| `pageTitle` | `h-6 w-6` | Page header icon |
+| `button` | `h-4 w-4` | Inline icon in button/input |
+| `micro` | `h-3.5 w-3.5` | Small indicators, badges |
+| `tiny` | `h-3 w-3` | Chart swatches, bullet points (non-interactive) |
+| `emptyState` | `h-12 w-12 text-muted-foreground` | Centered large icon |
+| `loadingSmall` | `h-4 w-4 animate-spin` | Inline loading |
+| `loadingMedium` | `h-8 w-8 animate-spin` | Card/section loading |
+| `loadingLarge` | `h-12 w-12 animate-spin` | Full page loading |
 
 ### Layout (`layout.*`)
-| Token | Classe | Uso |
-|-------|--------|-----|
-| `espacamentoPagina` | `space-y-6` | Entre secoes de pagina |
-| `espacamentoSecao` | `space-y-4` | Dentro de secoes |
-| `gridCards` | `grid gap-4 md:grid-cols-2 lg:grid-cols-4` | Grid de summary cards |
-| `gridConteudo` | `grid gap-4 md:grid-cols-2 lg:grid-cols-3` | Grid de conteudo |
-| `gridCharts` | `grid gap-6 lg:grid-cols-2` | Grid de graficos |
-| `estadoVazio` | `flex flex-col items-center justify-center gap-3 p-6` | Estado vazio |
-| `estadoVazioCard` | `flex flex-col items-center gap-4 py-12` | Estado vazio em card |
-| `headerPagina` | `flex items-center gap-3` | Header com icone + titulo |
+| Token | Classes | Usage |
+|-------|---------|-------|
+| `pageSpacing` | `space-y-6` | Between page sections |
+| `sectionSpacing` | `space-y-4` | Within sections |
+| `gridCards` | `grid gap-4 md:grid-cols-2 lg:grid-cols-4` | Summary cards grid |
+| `gridContent` | `grid gap-4 md:grid-cols-2 lg:grid-cols-3` | Content grid |
+| `gridCharts` | `grid gap-6 lg:grid-cols-2` | Charts grid |
+| `emptyState` | `flex flex-col items-center justify-center gap-3 p-6` | Empty state |
+| `emptyStateCard` | `flex flex-col items-center gap-4 py-12` | Empty state in card |
+| `pageHeader` | `flex items-center gap-3` | Header with icon + title |
+| `cardContent` | `space-y-4 p-6` | Default CardContent padding |
+| `cardTitleRow` | `flex items-center gap-1` | Card title row with icon + tooltip |
 
-### Funcoes utilitarias de cor
-| Funcao | Retorno | Uso |
-|--------|---------|-----|
-| `corValor(n)` | `text-success` ou `text-destructive` | Valores positivos/negativos |
-| `corIconeTendencia(n)` | cor semantica ou `text-muted-foreground` | Icone de tendencia |
-| `corBadge(tipo)` | `bg-*/10 text-* border-*/30` | Badge semantico |
+### Interaction (`interaction.*`)
+| Token | Classes | Usage |
+|-------|---------|-------|
+| `cardHover` | `transition-all duration-200 hover:border-primary/30 hover:shadow-md` | Hoverable card |
+| `hoverReveal` | `opacity-0 transition-opacity group-hover:opacity-100` | Element revealed on hover |
 
-### Combinando com classes extras
-Usar `cn()` de `@/lib/utils`:
+### Dialog (`dialog.*`)
+| Token | Classes | Usage |
+|-------|---------|-------|
+| `backdrop` | `backdrop:bg-background/40` | Native `<dialog>` backdrop |
+
+### Semantic color utilities
+| Function | Returns | Usage |
+|----------|---------|-------|
+| `valueColor(n)` | `text-success` or `text-destructive` | Positive/negative values |
+| `trendIconColor(n)` | semantic color or `text-muted-foreground` | Trend icon |
+| `badgeColor(type)` | `bg-*/10 text-* border-*/30` | Semantic badge |
+
+### Combining with extra classes
+Use `cn()` from `@/lib/utils`:
 ```tsx
-<h1 className={cn(tipografia.h1Grande, "flex-1")}>Titulo</h1>
-<Icon className={cn(icone.tituloCard, "text-muted-foreground")} />
+<h1 className={cn(typography.h1Large, "flex-1")}>Title</h1>
+<Icon className={cn(icon.cardTitle, "text-muted-foreground")} />
+<Card className={interaction.cardHover}>...</Card>
 ```
 
 ## Design System: Paleta Financeira OkLCH

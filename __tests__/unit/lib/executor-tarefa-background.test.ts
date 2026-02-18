@@ -71,7 +71,7 @@ describe("executarTarefaEmBackground", () => {
         tipo: "success",
         titulo: expect.stringContaining("concluida"),
         descricao: "Operacao concluida",
-        acao: { rotulo: "Ver resultado", url: "/resultado" },
+        acao: { label: "Ver resultado", url: "/resultado" },
       }),
     );
   });
@@ -185,7 +185,7 @@ describe("executarTarefaEmBackground", () => {
       expect.objectContaining({
         tipo: "error",
         acao: expect.objectContaining({
-          rotulo: "Tentar novamente",
+          label: "Tentar novamente",
           url: `/api/tasks/${tarefa.identificador}/retry`,
         }),
       }),

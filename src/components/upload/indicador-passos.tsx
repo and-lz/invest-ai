@@ -7,7 +7,7 @@ type StatusPasso = "pendente" | "ativo" | "concluido";
 
 interface Passo {
   readonly numero: number;
-  readonly rotulo: string;
+  readonly label: string;
   readonly status: StatusPasso;
 }
 
@@ -44,7 +44,7 @@ export function IndicadorPassos({ passos, className }: IndicadorPassosProps) {
                   passo.status === "concluido" && "text-muted-foreground",
                 )}
               >
-                {passo.rotulo}
+                {passo.label}
               </span>
             </div>
             {indice < passos.length - 1 && (

@@ -30,7 +30,7 @@ interface SeletorAtivoProps {
 }
 
 interface GrupoAtivos {
-  rotulo: string;
+  label: string;
   ativos: AtivoDaCarteira[];
 }
 
@@ -58,19 +58,19 @@ function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
   const grupos: GrupoAtivos[] = [];
 
   if (excelentes.length > 0) {
-    grupos.push({ rotulo: "🔥 Excelentes (12m ≥ +15%)", ativos: excelentes });
+    grupos.push({ label: "🔥 Excelentes (12m ≥ +15%)", ativos: excelentes });
   }
   if (bons.length > 0) {
-    grupos.push({ rotulo: "📈 Bons (12m +5% a +15%)", ativos: bons });
+    grupos.push({ label: "📈 Bons (12m +5% a +15%)", ativos: bons });
   }
   if (moderados.length > 0) {
-    grupos.push({ rotulo: "📊 Moderados (12m 0% a +5%)", ativos: moderados });
+    grupos.push({ label: "📊 Moderados (12m 0% a +5%)", ativos: moderados });
   }
   if (negativos.length > 0) {
-    grupos.push({ rotulo: "📉 Negativos (12m < 0%)", ativos: negativos });
+    grupos.push({ label: "📉 Negativos (12m < 0%)", ativos: negativos });
   }
   if (semDados.length > 0) {
-    grupos.push({ rotulo: "❓ Sem Dados (12m)", ativos: semDados });
+    grupos.push({ label: "❓ Sem Dados (12m)", ativos: semDados });
   }
 
   return grupos;
@@ -151,7 +151,7 @@ export function SeletorAtivo({
 
             {ativosCarteira.length > 0 &&
               gruposAtivos.map((grupo, indiceGrupo) => (
-                <CommandGroup key={grupo.rotulo} heading={grupo.rotulo}>
+                <CommandGroup key={grupo.label} heading={grupo.label}>
                   {grupo.ativos.map((ativo) => {
                     const ativoTemTicker = ativo.codigoAtivo !== ativo.nomeAtivo;
                     const rentabilidadeTexto =

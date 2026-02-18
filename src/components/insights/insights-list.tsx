@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Trash2, Lightbulb, Layers } from "lucide-react";
 import { notificar } from "@/lib/notificar";
 import { formatarMesAno, validarMesAno } from "@/lib/format-date";
-import { icone, tipografia } from "@/lib/design-system";
+import { icon, typography } from "@/lib/design-system";
 import { cn } from "@/lib/utils";
 import type { InsightsMetadata } from "@/schemas/insights.schema";
 
@@ -52,7 +52,7 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
-          <Lightbulb className={icone.estadoVazio} />
+          <Lightbulb className={icon.emptyState} />
           <p className="text-muted-foreground">
             Nenhuma análise gerada ainda. Gere sua primeira análise para acompanhar sua carteira.
           </p>
@@ -67,8 +67,8 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
   return (
     <Card>
       <CardHeader>
-        <CardTitle className={cn(tipografia.h3, "flex items-center gap-2")}>
-          <Lightbulb className={cn(icone.tituloCard, "text-muted-foreground")} />
+        <CardTitle className={cn(typography.h3, "flex items-center gap-2")}>
+          <Lightbulb className={cn(icon.cardTitle, "text-muted-foreground")} />
           Análises geradas
         </CardTitle>
       </CardHeader>
@@ -97,7 +97,7 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       {item.identificador === "consolidado" && (
-                        <Layers className={cn(icone.micro, "text-muted-foreground")} />
+                        <Layers className={cn(icon.micro, "text-muted-foreground")} />
                       )}
                       {formatPeriodLabel(item)}
                     </div>
@@ -121,7 +121,7 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
                       size="sm"
                       onClick={(e) => void handleDelete(item.identificador, e)}
                     >
-                      <Trash2 className={icone.botao} />
+                      <Trash2 className={icon.button} />
                     </Button>
                   </TableCell>
                 </TableRow>

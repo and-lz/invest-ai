@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
-import { tipografia, icone, layout, dialog as dialogDs } from "@/lib/design-system";
+import { typography, icon, layout } from "@/lib/design-system";
 
 import type { Notificacao } from "@/lib/notificacao";
 
@@ -79,8 +79,8 @@ function TaskCard({ tarefa }: { tarefa: TarefaBackground }) {
       <div className="flex items-start gap-3">
         <Loader2 className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0 animate-spin" />
         <div className="flex-1 space-y-1">
-          <p className={cn(tipografia.rotulo, "leading-snug")}>{descricao}</p>
-          <p className={tipografia.auxiliar}>
+          <p className={cn(typography.label, "leading-snug")}>{descricao}</p>
+          <p className={typography.helper}>
             Iniciado{" "}
             {new Date(tarefa.iniciadoEm).toLocaleString("pt-BR", {
               day: "2-digit",
@@ -98,7 +98,7 @@ function TaskCard({ tarefa }: { tarefa: TarefaBackground }) {
           className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
           title="Cancelar tarefa"
         >
-          <XCircle className={cn(icone.botao, "text-muted-foreground")} />
+          <XCircle className={cn(icon.button, "text-muted-foreground")} />
         </Button>
       </div>
     </div>
@@ -165,11 +165,11 @@ function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: Item
       <div className="flex items-start gap-3">
         <Icone className={cn("mt-0.5 h-5 w-5 shrink-0", corIcone)} />
         <div className="flex-1 space-y-1">
-          <p className={cn(tipografia.rotulo, "leading-snug")}>{notificacao.titulo}</p>
+          <p className={cn(typography.label, "leading-snug")}>{notificacao.titulo}</p>
           {notificacao.descricao && (
-            <p className={cn(tipografia.auxiliar, "leading-relaxed")}>{notificacao.descricao}</p>
+            <p className={cn(typography.helper, "leading-relaxed")}>{notificacao.descricao}</p>
           )}
-          <p className={tipografia.auxiliar}>
+          <p className={typography.helper}>
             {new Date(notificacao.criadaEm).toLocaleString("pt-BR", {
               day: "2-digit",
               month: "short",
@@ -195,10 +195,10 @@ function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: Item
           size="sm"
           onClick={handleAcao}
           disabled={retryEmAndamento}
-          className={cn(tipografia.auxiliar, "mt-3 w-full gap-1.5")}
+          className={cn(typography.helper, "mt-3 w-full gap-1.5")}
         >
           {ehRetry && <RotateCcw className="h-4 w-4" />}
-          {retryEmAndamento ? "Retentando..." : notificacao.acao.rotulo}
+          {retryEmAndamento ? "Retentando..." : notificacao.acao.label}
         </Button>
       )}
     </div>
@@ -257,7 +257,7 @@ export function ActivityCenter() {
     <>
       {estaAberto && (
         <div
-          className={dialogDs.overlay}
+          className="fixed inset-0 z-50 bg-background/40 transition-opacity"
           onClick={fechar}
           aria-hidden="true"
         />
@@ -299,11 +299,11 @@ export function ActivityCenter() {
         {/* Header */}
         <div className="flex items-center justify-between border-b p-6 pb-4">
           <div className="flex items-center gap-2">
-            <h2 className={tipografia.h2}>Atividades</h2>
+            <h2 className={typography.h2}>Atividades</h2>
             <InfoTooltip conteudo="Central de atividades: acompanhe tarefas em andamento e histórico de notificações do sistema." />
           </div>
           <Button variant="ghost" size="icon" onClick={fechar} className="text-muted-foreground">
-            <X className={icone.botao} />
+            <X className={icon.button} />
             <span className="sr-only">Fechar</span>
           </Button>
         </div>
@@ -320,7 +320,7 @@ export function ActivityCenter() {
             )}
           >
             <div className="flex items-center justify-center gap-2">
-              <Bell className={icone.botao} />
+              <Bell className={icon.button} />
               Notificações
               {contagemNaoVisualizadas > 0 && (
                 <Badge variant="destructive" className="h-5 min-w-5 px-1 text-xs">
@@ -342,7 +342,7 @@ export function ActivityCenter() {
             )}
           >
             <div className="flex items-center justify-center gap-2">
-              <Loader2 className={cn(icone.botao, temTarefasAtivas && "animate-spin")} />
+              <Loader2 className={cn(icon.button, temTarefasAtivas && "animate-spin")} />
               Tarefas
               {temTarefasAtivas && (
                 <Badge className="bg-primary text-primary-foreground h-5 min-w-5 px-1 text-xs">
@@ -361,7 +361,7 @@ export function ActivityCenter() {
           <>
             {/* Status and actions */}
             <div className="flex items-center justify-between border-b px-6 py-3">
-              <p className={tipografia.auxiliar}>
+              <p className={typography.helper}>
                 {contagemNaoVisualizadas > 0
                   ? `${contagemNaoVisualizadas} não lida${contagemNaoVisualizadas > 1 ? "s" : ""}`
                   : "Todas lidas"}
@@ -372,9 +372,9 @@ export function ActivityCenter() {
                     variant="ghost"
                     size="sm"
                     onClick={marcarTodasComoLidas}
-                    className={cn(tipografia.auxiliar, "gap-1.5")}
+                    className={cn(typography.helper, "gap-1.5")}
                   >
-                    <CheckCheck className={icone.botao} />
+                    <CheckCheck className={icon.button} />
                     Ler todas
                   </Button>
                 )}
@@ -383,9 +383,9 @@ export function ActivityCenter() {
                     variant="ghost"
                     size="sm"
                     onClick={handleLimparTodas}
-                    className={cn(tipografia.auxiliar, "gap-1.5")}
+                    className={cn(typography.helper, "gap-1.5")}
                   >
-                    <Trash2 className={icone.botao} />
+                    <Trash2 className={icon.button} />
                     Limpar
                   </Button>
                 )}
@@ -400,8 +400,8 @@ export function ActivityCenter() {
               )}
 
               {!estaCarregando && notificacoes.length === 0 && (
-                <div className={layout.estadoVazio}>
-                  <Bell className={icone.estadoVazio} />
+                <div className={layout.emptyState}>
+                  <Bell className={icon.emptyState} />
                   <p className="text-muted-foreground text-center text-sm">Nenhuma notificação</p>
                 </div>
               )}
@@ -432,8 +432,8 @@ export function ActivityCenter() {
             )}
 
             {!tarefasCarregando && tarefasAtivas.length === 0 && (
-              <div className={layout.estadoVazio}>
-                <Inbox className={icone.estadoVazio} />
+              <div className={layout.emptyState}>
+                <Inbox className={icon.emptyState} />
                 <p className="text-muted-foreground text-center text-sm">
                   Nenhuma tarefa em andamento
                 </p>

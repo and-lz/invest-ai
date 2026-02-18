@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { tipografia } from "@/lib/design-system";
+import { typography } from "@/lib/design-system";
 
 // ============================================================
 // Componentes reutilizáveis para estruturar artigos educacionais.
@@ -17,7 +17,7 @@ interface SecaoArtigoProps {
 export function SecaoArtigo({ titulo, children, className }: SecaoArtigoProps) {
   return (
     <section className={cn("mb-12", className)}>
-      <h2 className={cn(tipografia.h2, "mb-4")}>{titulo}</h2>
+      <h2 className={cn(typography.h2, "mb-4")}>{titulo}</h2>
       <div className="space-y-4 text-base leading-relaxed">{children}</div>
     </section>
   );

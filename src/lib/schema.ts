@@ -168,7 +168,7 @@ export const notificacoes = pgTable(
     tipo: tipoNotificacaoEnum("tipo").notNull(),
     titulo: text("titulo").notNull(),
     descricao: text("descricao"),
-    acao: jsonb("acao"), // { rotulo: string, url: string } | null
+    acao: jsonb("acao"), // { label: string, url: string } | null
     visualizada: boolean("visualizada").notNull().default(false),
     criadaEm: timestamp("criada_em", { withTimezone: true }).notNull().defaultNow(),
   },

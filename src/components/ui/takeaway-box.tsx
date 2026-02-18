@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { tipografia, icone } from "@/lib/design-system";
+import { typography, icon } from "@/lib/design-system";
 import { notificar } from "@/lib/notificar";
 import { revalidarTarefasAtivas } from "@/hooks/use-tarefas-ativas";
 import type { TarefaBackground } from "@/lib/tarefa-descricao";
@@ -317,11 +317,11 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                           aria-label="Adicionar ao plano de ação"
                         >
                           {planStatus === "loading" ? (
-                            <Loader2 className={cn(icone.botao, "animate-spin")} />
+                            <Loader2 className={cn(icon.button, "animate-spin")} />
                           ) : planStatus === "added" ? (
-                            <Check className={icone.botao} />
+                            <Check className={icon.button} />
                           ) : (
-                            <ListPlus className={icone.botao} />
+                            <ListPlus className={icon.button} />
                           )}
                         </button>
                       </TooltipTrigger>
@@ -348,7 +348,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                       >
                         <BotIcon
                           className={cn(
-                            icone.botao,
+                            icon.button,
                             "ai-icon-hover",
                             isOpen
                               ? "text-muted-foreground"
@@ -372,11 +372,11 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                   <div className="flex items-center gap-2 py-1">
                     <Loader2
                       className={cn(
-                        icone.micro,
+                        icon.micro,
                         "text-muted-foreground animate-spin",
                       )}
                     />
-                    <span className={tipografia.auxiliar}>
+                    <span className={typography.helper}>
                       Gerando explicação...
                     </span>
                   </div>
@@ -385,7 +385,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                 {state.status === "error" && isOpen && (
                   <div className="flex items-center gap-2 py-1">
                     <span
-                      className={cn(tipografia.auxiliar, "text-destructive")}
+                      className={cn(typography.helper, "text-destructive")}
                     >
                       {state.errorMessage}
                     </span>
@@ -396,11 +396,11 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                         handleRetry(index);
                       }}
                       className={cn(
-                        tipografia.auxiliar,
+                        typography.helper,
                         "text-primary inline-flex cursor-pointer items-center gap-1 hover:underline",
                       )}
                     >
-                      <RefreshCw className={icone.botao} />
+                      <RefreshCw className={icon.button} />
                       Tentar novamente
                     </button>
                   </div>
@@ -408,7 +408,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
 
                 {state.status === "success" && explanation && (
                   <p
-                    className={cn(tipografia.corpo, "text-muted-foreground py-1 leading-relaxed")}
+                    className={cn(typography.body, "text-muted-foreground py-1 leading-relaxed")}
                   >
                     {explanation}
                   </p>

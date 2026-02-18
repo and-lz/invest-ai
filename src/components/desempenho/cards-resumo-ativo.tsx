@@ -5,7 +5,7 @@ import { DollarSign, TrendingUp, TrendingDown, PieChart, BarChart3 } from "lucid
 import { cn } from "@/lib/utils";
 import { formatarMoeda, formatarMoedaCompacta } from "@/domain/value-objects/money";
 import { formatarPercentualSimples } from "@/domain/value-objects/percentage";
-import { tipografia, icone, layout, corValor, corIconeTendencia } from "@/lib/design-system";
+import { typography, icon, layout, valueColor, trendIconColor } from "@/lib/design-system";
 import type { DadosAgregadosAtivo } from "@/schemas/analise-ativo.schema";
 
 interface CardsResumoAtivoProps {
@@ -28,13 +28,13 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       {/* Cotacao / Saldo */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={tipografia.rotulo}>
+          <CardTitle className={typography.label}>
             {cotacao ? "Cotacao" : "Saldo na Carteira"}
           </CardTitle>
-          <DollarSign className={cn(icone.tituloCard, "text-muted-foreground")} />
+          <DollarSign className={cn(icon.cardTitle, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
-          <div className={tipografia.valorPrincipal}>
+          <div className={typography.mainValue}>
             {cotacao
               ? formatarMoeda(Math.round(cotacao.preco * 100))
               : dadosAtivo.saldoAtualCentavos > 0
@@ -42,7 +42,7 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
                 : "N/D"}
           </div>
           {cotacao && (
-            <p className={cn("text-xs", corValor(cotacao.variacaoPercentual))}>
+            <p className={cn("text-xs", valueColor(cotacao.variacaoPercentual))}>
               {cotacao.variacaoPercentual >= 0 ? "+" : ""}
               {formatarPercentualSimples(cotacao.variacaoPercentual)} hoje
             </p>
@@ -53,19 +53,19 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       {/* Rentabilidade no Mes */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={tipografia.rotulo}>Rent. no Mes</CardTitle>
+          <CardTitle className={typography.label}>Rent. no Mes</CardTitle>
           {rentabilidadeMes !== null && rentabilidadeMes >= 0 ? (
-            <TrendingUp className={cn(icone.tituloCard, corIconeTendencia(rentabilidadeMes))} />
+            <TrendingUp className={cn(icon.cardTitle, trendIconColor(rentabilidadeMes))} />
           ) : (
-            <TrendingDown className={cn(icone.tituloCard, corIconeTendencia(rentabilidadeMes))} />
+            <TrendingDown className={cn(icon.cardTitle, trendIconColor(rentabilidadeMes))} />
           )}
         </CardHeader>
         <CardContent>
-          <div className={cn(tipografia.valorPrincipal, corValor(rentabilidadeMes))}>
+          <div className={cn(typography.mainValue, valueColor(rentabilidadeMes))}>
             {rentabilidadeMes !== null ? formatarPercentualSimples(rentabilidadeMes) : "N/D"}
           </div>
           {rentabilidade12Meses !== null && (
-            <p className={tipografia.auxiliar}>
+            <p className={typography.helper}>
               12 meses: {formatarPercentualSimples(rentabilidade12Meses)}
             </p>
           )}
@@ -75,17 +75,17 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       {/* Participacao na Carteira */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={tipografia.rotulo}>% da Carteira</CardTitle>
-          <PieChart className={cn(icone.tituloCard, "text-muted-foreground")} />
+          <CardTitle className={typography.label}>% da Carteira</CardTitle>
+          <PieChart className={cn(icon.cardTitle, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
-          <div className={tipografia.valorPrincipal}>
+          <div className={typography.mainValue}>
             {dadosAtivo.participacaoAtualCarteira > 0
               ? formatarPercentualSimples(dadosAtivo.participacaoAtualCarteira)
               : "N/D"}
           </div>
           {dadosAtivo.saldoAtualCentavos > 0 && (
-            <p className={tipografia.auxiliar}>
+            <p className={typography.helper}>
               Saldo: {formatarMoedaCompacta(dadosAtivo.saldoAtualCentavos)}
             </p>
           )}
@@ -95,14 +95,14 @@ export function CardsResumoAtivo({ dadosAtivo }: CardsResumoAtivoProps) {
       {/* Proventos Recebidos */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className={tipografia.rotulo}>Proventos</CardTitle>
-          <BarChart3 className={cn(icone.tituloCard, "text-muted-foreground")} />
+          <CardTitle className={typography.label}>Proventos</CardTitle>
+          <BarChart3 className={cn(icon.cardTitle, "text-muted-foreground")} />
         </CardHeader>
         <CardContent>
-          <div className={tipografia.valorPrincipal}>
+          <div className={typography.mainValue}>
             {totalEventos > 0 ? formatarMoedaCompacta(totalEventos) : "N/D"}
           </div>
-          <p className={tipografia.auxiliar}>
+          <p className={typography.helper}>
             {dadosAtivo.eventosFinanceirosDoAtivo.length > 0
               ? `${dadosAtivo.eventosFinanceirosDoAtivo.length} eventos registrados`
               : "Nenhum provento registrado"}

@@ -22,7 +22,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { tipografia, icone, layout, corBadge } from "@/lib/design-system";
+import { typography, icon, layout, badgeColor } from "@/lib/design-system";
 import { notificar } from "@/lib/notificar";
 import type { ItemPlanoAcao, TipoConclusaoPlano } from "@/schemas/plano-acao.schema";
 import Link from "next/link";
@@ -40,8 +40,8 @@ const CONCLUSION_COLORS: Record<TipoConclusaoPlano, string> = {
 };
 
 const CONCLUSION_BADGE_STYLES: Record<TipoConclusaoPlano, string> = {
-  positivo: corBadge("success"),
-  atencao: corBadge("warning"),
+  positivo: badgeColor("success"),
+  atencao: badgeColor("warning"),
   neutro: "bg-muted text-muted-foreground border-border",
 };
 
@@ -78,7 +78,7 @@ function ActionItemCard({
           <ConclusionIcon
             className={cn(
               "mt-0.5 shrink-0",
-              icone.tituloCard,
+              icon.cardTitle,
               isInactive
                 ? "text-muted-foreground"
                 : CONCLUSION_COLORS[item.tipoConclusao],
@@ -86,7 +86,7 @@ function ActionItemCard({
             aria-hidden="true"
           />
           <div className="min-w-0 flex-1 space-y-2">
-            <p className={cn(tipografia.corpo, "text-muted-foreground leading-relaxed")}>
+            <p className={cn(typography.body, "text-muted-foreground leading-relaxed")}>
               {item.textoOriginal}
             </p>
           </div>
@@ -95,19 +95,19 @@ function ActionItemCard({
         {/* AI recommendation (or pending enrichment state) */}
         {item.recomendacaoEnriquecida ? (
           <div className="border-primary/20 ml-7 border-l-2 pl-3">
-            <p className={cn(tipografia.corpo, "leading-relaxed")}>
+            <p className={cn(typography.body, "leading-relaxed")}>
               {item.recomendacaoEnriquecida}
             </p>
             {item.fundamentacao && (
-              <p className={cn(tipografia.auxiliar, "mt-1 leading-relaxed")}>
+              <p className={cn(typography.helper, "mt-1 leading-relaxed")}>
                 {item.fundamentacao}
               </p>
             )}
           </div>
         ) : (
           <div className="ml-7 flex items-center gap-2">
-            <Loader2 className={cn(icone.micro, "text-muted-foreground animate-spin")} />
-            <p className={cn(tipografia.auxiliar, "italic")}>
+            <Loader2 className={cn(icon.micro, "text-muted-foreground animate-spin")} />
+            <p className={cn(typography.helper, "italic")}>
               Enriquecimento por IA em andamento...
             </p>
           </div>
@@ -142,7 +142,7 @@ function ActionItemCard({
                   className="text-success hover:text-success h-8 gap-1.5"
                   onClick={() => onUpdateStatus(item.identificador, "concluida")}
                 >
-                  <Check className={icone.botao} />
+                  <Check className={icon.button} />
                   Concluir
                 </Button>
                 <Button
@@ -151,7 +151,7 @@ function ActionItemCard({
                   className="text-muted-foreground h-8 gap-1.5"
                   onClick={() => onUpdateStatus(item.identificador, "ignorada")}
                 >
-                  <X className={icone.botao} />
+                  <X className={icon.button} />
                   Ignorar
                 </Button>
               </>
@@ -164,7 +164,7 @@ function ActionItemCard({
                   className="text-muted-foreground h-8 gap-1.5"
                   onClick={() => onUpdateStatus(item.identificador, "pendente")}
                 >
-                  <Undo2 className={icone.botao} />
+                  <Undo2 className={icon.button} />
                   Desfazer
                 </Button>
                 <Button
@@ -173,7 +173,7 @@ function ActionItemCard({
                   className="text-destructive hover:text-destructive h-8 gap-1.5"
                   onClick={() => onRemove(item.identificador)}
                 >
-                  <Trash2 className={icone.botao} />
+                  <Trash2 className={icon.button} />
                 </Button>
               </>
             )}
@@ -217,10 +217,10 @@ export default function PlanoAcaoPage() {
   };
 
   return (
-    <div className={layout.espacamentoPagina}>
+    <div className={layout.pageSpacing}>
       {/* Header */}
-      <div className={layout.headerPagina}>
-        <ClipboardList className={cn(icone.tituloPagina, "text-muted-foreground")} />
+      <div className={layout.pageHeader}>
+        <ClipboardList className={cn(icon.pageTitle, "text-muted-foreground")} />
         <Header
           titulo="Plano de Ação"
           descricao="Recomendações de investimento enriquecidas por IA a partir do seu dashboard"
@@ -229,7 +229,7 @@ export default function PlanoAcaoPage() {
 
       {/* Loading state */}
       {estaCarregando && (
-        <div className={layout.espacamentoSecao}>
+        <div className={layout.sectionSpacing}>
           <Skeleton className="h-32" />
           <Skeleton className="h-32" />
           <Skeleton className="h-32" />
@@ -239,17 +239,17 @@ export default function PlanoAcaoPage() {
       {/* Empty state */}
       {!estaCarregando && itensPendentes.length === 0 && itensInativos.length === 0 && (
         <Card>
-          <CardContent className={layout.estadoVazioCard}>
-            <ClipboardList className={icone.estadoVazio} />
+          <CardContent className={layout.emptyStateCard}>
+            <ClipboardList className={icon.emptyState} />
             <div className="space-y-1 text-center">
-              <p className={tipografia.rotulo}>Seu plano de ação está vazio</p>
-              <p className={tipografia.auxiliar}>
+              <p className={typography.label}>Seu plano de ação está vazio</p>
+              <p className={typography.helper}>
                 Adicione itens a partir das conclusões do dashboard ou das análises IA
               </p>
             </div>
             <Button asChild variant="outline" className="mt-2 gap-2">
               <Link href="/">
-                <LayoutDashboard className={icone.botao} />
+                <LayoutDashboard className={icon.button} />
                 Ir para o Dashboard
               </Link>
             </Button>
@@ -281,7 +281,7 @@ export default function PlanoAcaoPage() {
 
       {/* Pending items */}
       {!estaCarregando && itensPendentes.length > 0 && (
-        <div className={layout.espacamentoSecao}>
+        <div className={layout.sectionSpacing}>
           {itensPendentes.map((item) => (
             <ActionItemCard
               key={item.identificador}
@@ -295,18 +295,18 @@ export default function PlanoAcaoPage() {
 
       {/* Completed / Dismissed items (collapsible) */}
       {!estaCarregando && itensInativos.length > 0 && (
-        <div className={layout.espacamentoSecao}>
+        <div className={layout.sectionSpacing}>
           <button
             type="button"
             onClick={() => setShowCompleted((prev) => !prev)}
             className={cn(
-              tipografia.rotulo,
+              typography.label,
               "text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 transition-colors",
             )}
           >
             <ChevronDown
               className={cn(
-                icone.botao,
+                icon.button,
                 "transition-transform",
                 showCompleted && "rotate-180",
               )}
@@ -315,7 +315,7 @@ export default function PlanoAcaoPage() {
           </button>
 
           {showCompleted && (
-            <div className={layout.espacamentoSecao}>
+            <div className={layout.sectionSpacing}>
               {itensInativos.map((item) => (
                 <ActionItemCard
                   key={item.identificador}

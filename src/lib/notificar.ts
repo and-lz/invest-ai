@@ -29,7 +29,7 @@ async function persistirNotificacao(
         descricao: opcoes?.description,
         acao: opcoes?.actionUrl
           ? {
-              rotulo: opcoes.actionLabel ?? opcoes.action?.label ?? "Ver resultado",
+              label: opcoes.actionLabel ?? opcoes.action?.label ?? "Ver resultado",
               url: opcoes.actionUrl,
             }
           : undefined,
