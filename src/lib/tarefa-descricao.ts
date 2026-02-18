@@ -10,6 +10,7 @@ export const TipoTarefaEnum = z.enum([
   "gerar-insights",
   "gerar-insights-consolidados",
   "analisar-ativo",
+  "enriquecer-item-plano",
 ]);
 
 export const StatusTarefaEnum = z.enum(["processando", "concluido", "erro", "cancelada"]);
@@ -46,6 +47,7 @@ export const LABELS_TIPO_TAREFA: Record<TipoTarefa, string> = {
   "gerar-insights": "Gerando insights",
   "gerar-insights-consolidados": "Gerando insights consolidados",
   "analisar-ativo": "Analisando ativo",
+  "enriquecer-item-plano": "Enriquecendo item do plano",
 };
 
 /**
@@ -76,6 +78,11 @@ export function descreverTarefa(tarefa: TarefaBackground): string {
   // Analisar ativo: mostrar ticker
   if (tarefa.tipo === "analisar-ativo" && tarefa.parametros?.codigoAtivo) {
     return `${labelBase} — ${tarefa.parametros.codigoAtivo}`;
+  }
+
+  // Enriquecer item do plano: sem contexto adicional
+  if (tarefa.tipo === "enriquecer-item-plano") {
+    return labelBase;
   }
 
   // Fallback: label genérico

@@ -5,8 +5,12 @@ import {
   obterGenerateInsightsUseCase,
   obterGenerateInsightsConsolidadosUseCase,
   obterAnalyzeAssetPerformanceUseCase,
+  obterPlanoAcaoRepository,
+  criarProvedorAi,
 } from "@/lib/container";
 import { salvarAnaliseAtivo } from "@/lib/analise-ativo-storage";
+import { EnriquecimentoAiSchema } from "@/schemas/plano-acao.schema";
+import { SYSTEM_PROMPT_ENRIQUECER_ACAO, buildEnrichUserPrompt } from "@/lib/prompt-enriquecer-acao";
 
 /**
  * Despacha a re-execucao de uma tarefa em background com base no seu tipo.
@@ -85,6 +89,60 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
           return {
             descricaoResultado: `Analise de ${codigoAtivo} concluida`,
             urlRedirecionamento: `/desempenho?ticker=${encodeURIComponent(codigoAtivo)}`,
+          };
+        },
+      }));
+      return true;
+    }
+
+    case "enriquecer-item-plano": {
+      const identificadorItem = tarefa.parametros?.identificadorItem;
+      const textoOriginal = tarefa.parametros?.textoOriginal;
+      const tipoConclusao = tarefa.parametros?.tipoConclusao;
+
+      if (!identificadorItem || !textoOriginal || !tipoConclusao) {
+        console.warn(
+          `[Despachar] Tarefa ${tarefa.identificador} nao tem parametros completos para retry`,
+        );
+        return false;
+      }
+
+      after(executarTarefaEmBackground({
+        tarefa,
+        rotuloLog: "Enriquecer Item Plano (retry)",
+        usuarioId,
+        executarOperacao: async () => {
+          const repository = await obterPlanoAcaoRepository();
+          const provider = criarProvedorAi();
+          const aiResponse = await provider.gerar({
+            instrucaoSistema: SYSTEM_PROMPT_ENRIQUECER_ACAO,
+            mensagens: [
+              {
+                papel: "usuario",
+                partes: [
+                  {
+                    tipo: "texto",
+                    dados: buildEnrichUserPrompt(textoOriginal, tipoConclusao),
+                  },
+                ],
+              },
+            ],
+            temperatura: 0.4,
+            formatoResposta: "json",
+          });
+
+          const parsed: unknown = JSON.parse(aiResponse.texto);
+          const enrichValidation = EnriquecimentoAiSchema.safeParse(parsed);
+
+          if (!enrichValidation.success) {
+            return { descricaoResultado: "Recomendação IA indisponível" };
+          }
+
+          await repository.atualizarEnriquecimento(usuarioId, identificadorItem, enrichValidation.data);
+
+          return {
+            descricaoResultado: "Recomendação IA gerada",
+            urlRedirecionamento: "/plano-acao",
           };
         },
       }));

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { requireAuth } from "@/lib/auth-utils";
 import { obterPlanoAcaoRepository, criarProvedorAi } from "@/lib/container";
 import { CriarItemPlanoSchema, EnriquecimentoAiSchema } from "@/schemas/plano-acao.schema";
@@ -7,7 +7,9 @@ import {
   SYSTEM_PROMPT_ENRIQUECER_ACAO,
   buildEnrichUserPrompt,
 } from "@/lib/prompt-enriquecer-acao";
-import { retryWithBackoff } from "@/lib/retry-with-backoff";
+import { salvarTarefa } from "@/lib/tarefa-background";
+import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
+import type { TarefaBackground } from "@/lib/tarefa-background";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -75,8 +77,66 @@ export async function POST(request: Request) {
     // Save immediately without AI enrichment
     const item = await repository.salvarItem(userId, validation.data, null);
 
-    // Best-effort AI enrichment (fire-and-forget)
-    void enrichItemInBackground(repository, userId, item.identificador, validation.data);
+    // Background AI enrichment via task system (visible in Activity Center)
+    const tarefa: TarefaBackground = {
+      identificador: crypto.randomUUID(),
+      usuarioId: userId,
+      tipo: "enriquecer-item-plano",
+      status: "processando",
+      iniciadoEm: new Date().toISOString(),
+      parametros: {
+        identificadorItem: item.identificador,
+        textoOriginal: validation.data.textoOriginal,
+        tipoConclusao: validation.data.tipoConclusao,
+      },
+    };
+
+    await salvarTarefa(tarefa);
+
+    after(executarTarefaEmBackground({
+      tarefa,
+      rotuloLog: "Enriquecer Item Plano",
+      usuarioId: userId,
+      executarOperacao: async () => {
+        const provider = criarProvedorAi();
+        const aiResponse = await provider.gerar({
+          instrucaoSistema: SYSTEM_PROMPT_ENRIQUECER_ACAO,
+          mensagens: [
+            {
+              papel: "usuario",
+              partes: [
+                {
+                  tipo: "texto",
+                  dados: buildEnrichUserPrompt(
+                    validation.data.textoOriginal,
+                    validation.data.tipoConclusao,
+                  ),
+                },
+              ],
+            },
+          ],
+          temperatura: 0.4,
+          formatoResposta: "json",
+        });
+
+        const parsed: unknown = JSON.parse(aiResponse.texto);
+        const enrichValidation = EnriquecimentoAiSchema.safeParse(parsed);
+
+        if (!enrichValidation.success) {
+          console.warn("[ActionPlan] AI returned invalid JSON structure, skipping enrichment");
+          return {
+            descricaoResultado: "Recomendação IA indisponível",
+          };
+        }
+
+        await repository.atualizarEnriquecimento(userId, item.identificador, enrichValidation.data);
+
+        return {
+          descricaoResultado: "Recomendação IA gerada",
+          urlRedirecionamento: "/plano-acao",
+        };
+      },
+    }));
 
     return NextResponse.json({ item }, { status: 201, ...cabecalhosSemCache() });
   } catch (error) {
@@ -88,48 +148,3 @@ export async function POST(request: Request) {
   }
 }
 
-/**
- * Attempts AI enrichment in background. If it succeeds, updates the item.
- * If it fails, the item remains with null enrichment — no user impact.
- */
-async function enrichItemInBackground(
-  repository: Awaited<ReturnType<typeof obterPlanoAcaoRepository>>,
-  userId: string,
-  identificador: string,
-  dados: { textoOriginal: string; tipoConclusao: string },
-): Promise<void> {
-  try {
-    const provider = criarProvedorAi();
-    const aiResponse = await retryWithBackoff(() =>
-      provider.gerar({
-        instrucaoSistema: SYSTEM_PROMPT_ENRIQUECER_ACAO,
-        mensagens: [
-          {
-            papel: "usuario",
-            partes: [
-              {
-                tipo: "texto",
-                dados: buildEnrichUserPrompt(dados.textoOriginal, dados.tipoConclusao),
-              },
-            ],
-          },
-        ],
-        temperatura: 0.4,
-        formatoResposta: "json",
-      }),
-    );
-
-    const parsed: unknown = JSON.parse(aiResponse.texto);
-    const enrichValidation = EnriquecimentoAiSchema.safeParse(parsed);
-
-    if (!enrichValidation.success) {
-      console.warn("[ActionPlan] AI returned invalid JSON structure, skipping enrichment");
-      return;
-    }
-
-    await repository.atualizarEnriquecimento(userId, identificador, enrichValidation.data);
-    console.info(`[ActionPlan] AI enrichment completed for item ${identificador}`);
-  } catch (error) {
-    console.warn("[ActionPlan] AI enrichment failed (item saved without enrichment):", error);
-  }
-}

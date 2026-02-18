@@ -37,6 +37,7 @@ export const tipoTarefaEnum = pgEnum("tipo_tarefa", [
   "gerar-insights",
   "gerar-insights-consolidados",
   "analisar-ativo",
+  "enriquecer-item-plano",
 ]);
 
 export const statusTarefaEnum = pgEnum("status_tarefa", [
