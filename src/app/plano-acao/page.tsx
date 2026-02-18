@@ -18,6 +18,7 @@ import {
   Trash2,
   ChevronDown,
   LayoutDashboard,
+  Loader2,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -104,7 +105,8 @@ function ActionItemCard({
             )}
           </div>
         ) : (
-          <div className="ml-7">
+          <div className="ml-7 flex items-center gap-2">
+            <Loader2 className={cn(icone.micro, "text-muted-foreground animate-spin")} />
             <p className={cn(tipografia.auxiliar, "italic")}>
               Enriquecimento por IA em andamento...
             </p>

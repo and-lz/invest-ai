@@ -89,6 +89,7 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
     conclusoes.push({
       texto: `Seus investimentos estão com ${formatarMoeda(Math.abs(rendimentosCentavos))} de prejuízo acumulado. Isso pode ser temporário — investimentos de longo prazo costumam se recuperar.`,
       tipo: "atencao",
+      acionavel: true,
     });
   }
 
@@ -113,6 +114,7 @@ function gerarConclusaoEvolucao(evolucao: DashboardData["evolucaoPatrimonial"]):
         texto:
           "Seu patrimônio caiu nos últimos meses consecutivos. Fique atento, mas evite decisões por impulso.",
         tipo: "atencao",
+        acionavel: true,
       });
     }
   }

@@ -33,6 +33,7 @@ type TipoConclusao = "positivo" | "neutro" | "atencao";
 interface Conclusao {
   readonly texto: string;
   readonly tipo: TipoConclusao;
+  readonly acionavel?: boolean;
 }
 
 interface TakeawayBoxProps {
@@ -256,42 +257,44 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
               </CollapsibleTrigger>
 
               <div className="flex shrink-0 items-center gap-1">
-                {/* Add to Plan button */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={(e) => void handleAddToPlan(index, e)}
-                        disabled={planStatus === "loading" || planStatus === "added"}
-                        className={cn(
-                          "mt-0.5 cursor-pointer rounded-sm p-0.5 transition-colors",
-                          planStatus === "added"
-                            ? "text-success"
-                            : planStatus === "loading"
-                              ? "text-muted-foreground"
-                              : "text-muted-foreground/60 hover:text-muted-foreground",
-                        )}
-                        aria-label="Adicionar ao plano de ação"
-                      >
-                        {planStatus === "loading" ? (
-                          <Loader2 className={cn(icone.botao, "animate-spin")} />
-                        ) : planStatus === "added" ? (
-                          <Check className={icone.botao} />
-                        ) : (
-                          <ListPlus className={icone.botao} />
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" sideOffset={4}>
-                      {planStatus === "added"
-                        ? "Já no plano de ação"
-                        : planStatus === "loading"
-                          ? "Adicionando..."
-                          : "Adicionar ao plano de ação"}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {/* Add to Plan button — only for actionable conclusions */}
+                {conclusao.acionavel && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={(e) => void handleAddToPlan(index, e)}
+                          disabled={planStatus === "loading" || planStatus === "added"}
+                          className={cn(
+                            "mt-0.5 cursor-pointer rounded-sm p-0.5 transition-colors",
+                            planStatus === "added"
+                              ? "text-success"
+                              : planStatus === "loading"
+                                ? "text-muted-foreground"
+                                : "text-muted-foreground/60 hover:text-muted-foreground",
+                          )}
+                          aria-label="Adicionar ao plano de ação"
+                        >
+                          {planStatus === "loading" ? (
+                            <Loader2 className={cn(icone.botao, "animate-spin")} />
+                          ) : planStatus === "added" ? (
+                            <Check className={icone.botao} />
+                          ) : (
+                            <ListPlus className={icone.botao} />
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" sideOffset={4}>
+                        {planStatus === "added"
+                          ? "Já no plano de ação"
+                          : planStatus === "loading"
+                            ? "Adicionando..."
+                            : "Adicionar ao plano de ação"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
 
                 {/* AI Explain button */}
                 <TooltipProvider>

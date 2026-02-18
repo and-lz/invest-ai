@@ -28,8 +28,12 @@ import {
   Check,
   Layers,
   ArrowLeft,
+  ListPlus,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { icone } from "@/lib/design-system";
+import { notificar } from "@/lib/notificar";
 import { formatarMesAno, validarMesAno } from "@/lib/format-date";
 import type { InsightsResponse, Insight, StatusAcao } from "@/schemas/insights.schema";
 
@@ -68,6 +72,18 @@ const LABELS_CATEGORIA: Record<string, string> = {
   custos: "Custos",
 };
 
+const INSIGHT_TO_CONCLUSAO: Record<string, string> = {
+  performance_positiva: "positivo",
+  performance_negativa: "atencao",
+  acao_recomendada: "neutro",
+  risco: "atencao",
+  oportunidade: "positivo",
+  diversificacao: "neutro",
+  custos: "atencao",
+};
+
+type AddToPlanStatus = "idle" | "loading" | "added" | "error";
+
 interface InsightCardProps {
   insight: Insight;
   indiceInsight: number;
@@ -81,9 +97,11 @@ function InsightCard({
   identificadorRelatorio,
   onStatusAlterado,
 }: InsightCardProps) {
+  const router = useRouter();
   const Icone = ICONES_CATEGORIA[insight.categoria] ?? Lightbulb;
   const statusAtual = insight.statusAcao ?? "pendente";
   const [estaAtualizando, setEstaAtualizando] = useState(false);
+  const [planStatus, setPlanStatus] = useState<AddToPlanStatus>("idle");
 
   const handleAlterarStatus = useCallback(
     async (novoStatus: StatusAcao) => {
@@ -111,6 +129,54 @@ function InsightCard({
     },
     [identificadorRelatorio, indiceInsight, onStatusAlterado],
   );
+
+  const handleAddToPlan = useCallback(async () => {
+    if (!insight.acaoSugerida || planStatus === "loading" || planStatus === "added") return;
+
+    setPlanStatus("loading");
+    try {
+      const response = await fetch("/api/action-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          textoOriginal: insight.acaoSugerida,
+          tipoConclusao: INSIGHT_TO_CONCLUSAO[insight.categoria] ?? "neutro",
+          origem: "insight-acao-sugerida",
+          ativosRelacionados: insight.ativosRelacionados,
+        }),
+      });
+
+      if (response.status === 409) {
+        notificar.info("Já no plano", {
+          description: "Este item já está no seu plano de ação.",
+        });
+        setPlanStatus("added");
+        return;
+      }
+
+      if (!response.ok) {
+        const errorBody = (await response.json().catch(() => ({}))) as { erro?: string };
+        throw new Error(errorBody.erro ?? "Falha ao adicionar ao plano");
+      }
+
+      notificar.success("Adicionado ao plano", {
+        description: "Ação adicionada com recomendação da IA.",
+        actionUrl: "/plano-acao",
+        actionLabel: "Ver plano",
+        action: {
+          label: "Ver plano",
+          onClick: () => router.push("/plano-acao"),
+        },
+      });
+      setPlanStatus("added");
+    } catch (error) {
+      console.error("[Insights] Error adding to plan:", error);
+      notificar.error("Erro ao adicionar", {
+        description: error instanceof Error ? error.message : "Tente novamente mais tarde.",
+      });
+      setPlanStatus("error");
+    }
+  }, [insight.acaoSugerida, insight.categoria, insight.ativosRelacionados, planStatus, router]);
 
   // Estilos diferentes para cada status
   const estilosBloco = {
@@ -159,10 +225,34 @@ function InsightCard({
             "border-muted-foreground/20 bg-muted/50",
           )}
         >
-          <p className={cn("text-base leading-relaxed", estiloTexto[statusAtual])}>
-            <span className="font-bold">Acao sugerida:</span>{" "}
-            <span className="italic">{insight.acaoSugerida}</span>
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <p className={cn("text-base leading-relaxed", estiloTexto[statusAtual])}>
+              <span className="font-bold">Acao sugerida:</span>{" "}
+              <span className="italic">{insight.acaoSugerida}</span>
+            </p>
+            <button
+              type="button"
+              onClick={() => void handleAddToPlan()}
+              disabled={planStatus === "loading" || planStatus === "added"}
+              className={cn(
+                "mt-0.5 shrink-0 cursor-pointer rounded-sm p-1 transition-colors",
+                planStatus === "added"
+                  ? "text-success"
+                  : planStatus === "loading"
+                    ? "text-muted-foreground"
+                    : "text-muted-foreground/60 hover:text-muted-foreground",
+              )}
+              aria-label="Adicionar ao plano de ação"
+            >
+              {planStatus === "loading" ? (
+                <Loader2 className={cn(icone.botao, "animate-spin")} />
+              ) : planStatus === "added" ? (
+                <Check className={icone.botao} />
+              ) : (
+                <ListPlus className={icone.botao} />
+              )}
+            </button>
+          </div>
         </div>
       )}
 

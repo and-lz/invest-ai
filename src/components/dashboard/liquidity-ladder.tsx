@@ -95,6 +95,7 @@ export function gerarConclusaoLiquidez(faixas: FaixaLiquidez[]): Conclusao[] {
   conclusoes.push({
     texto: `${formatarPercentualSimples(percentualCurtoPrazo)} do seu patrimônio (${formatarMoeda(valorCurtoPrazoCentavos)}) pode ser resgatado em até 5 dias. ${formatarPercentualSimples(percentualAte30Dias)} está acessível em até 30 dias.`,
     tipo: percentualCurtoPrazo >= 15 ? "positivo" : "atencao",
+    acionavel: percentualCurtoPrazo < 15,
   });
 
   const faixasLongoPrazo = faixas.filter((faixa) => faixa.diasMinimo > 90);
@@ -107,6 +108,7 @@ export function gerarConclusaoLiquidez(faixas: FaixaLiquidez[]): Conclusao[] {
     conclusoes.push({
       texto: `${formatarPercentualSimples(percentualLongoPrazo)} do seu patrimônio tem liquidez acima de 90 dias. Certifique-se de manter uma reserva de emergência acessível.`,
       tipo: "atencao",
+      acionavel: true,
     });
   }
 

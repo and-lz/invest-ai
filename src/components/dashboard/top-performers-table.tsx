@@ -105,6 +105,7 @@ function gerarConclusaoPerformers(
       {
         texto: `Seu campeão do mês é ${nomeAtivo} com ${rentabilidade} de retorno. Ele representa ${formatarPercentualSimples(primeiroAtivo.participacaoNaCarteira.valor)} da sua carteira.`,
         tipo: "positivo",
+        acionavel: true,
       },
     ];
   }
@@ -114,6 +115,7 @@ function gerarConclusaoPerformers(
       {
         texto: `${nomeAtivo} teve a maior queda: ${rentabilidade}. Prejuízos pontuais são normais — avalie se a estratégia de longo prazo ainda faz sentido.`,
         tipo: "atencao",
+        acionavel: true,
       },
     ];
   }

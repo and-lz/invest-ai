@@ -141,6 +141,7 @@ function gerarConclusaoGanhos(ganhos: GanhosPorEstrategia[]): Conclusao[] {
     conclusoes.push({
       texto: `${piorEstrategia.nomeEstrategia} teve prejuízo de ${formatarMoeda(Math.abs(piorEstrategia.ganhoNoMes.valorEmCentavos))}.`,
       tipo: "atencao",
+      acionavel: true,
     });
   }
 

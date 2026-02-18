@@ -52,6 +52,7 @@ function gerarConclusaoAlocacao(dadosGrafico: Array<{ nome: string; valor: numbe
     conclusoes.push({
       texto: `${formatarPercentualSimples(maiorCategoria.valor)} do seu dinheiro está em ${maiorCategoria.nome}. Concentrar mais de 50% em um único tipo de investimento aumenta o risco. Considere diversificar.`,
       tipo: "atencao",
+      acionavel: true,
     });
   } else if (quantidadeCategorias >= 4) {
     conclusoes.push({

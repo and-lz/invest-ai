@@ -121,6 +121,7 @@ export function gerarConclusaoTodasPosicoes(posicoes: PosicaoAtivo[]): Conclusao
     conclusoes.push({
       texto: `Maior posição: ${maisConcentrada.codigoAtivo ?? maisConcentrada.nomeAtivo} com ${formatarPercentualSimples(maisConcentrada.participacaoNaCarteira.valor)} da carteira.`,
       tipo: maisConcentrada.participacaoNaCarteira.valor > 25 ? "atencao" : "neutro",
+      acionavel: maisConcentrada.participacaoNaCarteira.valor > 25,
     });
   }
 

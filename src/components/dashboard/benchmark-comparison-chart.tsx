@@ -53,6 +53,7 @@ function gerarConclusaoMensal(dados: DadosComparacao): Conclusao {
   return {
     texto: `No mês, sua carteira (${dados.carteira.toFixed(2)}%) ficou abaixo da inflação (${dados.ipca.toFixed(2)}%). Isso significa que seu dinheiro perdeu poder de compra neste período.`,
     tipo: "atencao",
+    acionavel: true,
   };
 }
 
@@ -85,6 +86,7 @@ function gerarConclusoes(dadosGrafico: DadosComparacao[]): Conclusao[] {
       conclusoes.push({
         texto: `Desde o início, sua carteira acumula ${dadosDesdeInicio.carteira.toFixed(2)}%, abaixo da inflação (${dadosDesdeInicio.ipca.toFixed(2)}%). Atenção: no longo prazo, seu dinheiro está perdendo poder de compra.`,
         tipo: "atencao",
+        acionavel: true,
       });
     }
   }

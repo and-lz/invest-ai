@@ -16,6 +16,11 @@ export function usePlanoAcao() {
     {
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
+      // Poll every 3s while any item is waiting for AI enrichment
+      refreshInterval: (latestData) => {
+        const itens = (latestData as PlanoAcaoApiResponse | undefined)?.itens ?? [];
+        return itens.some((item) => item.recomendacaoEnriquecida === null) ? 3000 : 0;
+      },
     },
   );
 
