@@ -142,15 +142,14 @@ function DesempenhoConteudo() {
             <Button
               onClick={() => void handleAnalisarComIa()}
               disabled={analisandoComIa}
-              variant="outline"
-              className="gap-2"
+              className="ai-gradient-bg ai-button gap-2 border-0 text-white disabled:opacity-60"
             >
               {analisandoComIa ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="relative z-10 h-4 w-4 animate-spin" />
               ) : (
-                <BotIcon className="h-4 w-4" />
+                <BotIcon className="relative z-10 h-4 w-4" />
               )}
-              {analisandoComIa ? "Analisando..." : "Analisar com IA"}
+              <span className="relative z-10">{analisandoComIa ? "Analisando..." : "Analisar com IA"}</span>
             </Button>
           )}
 

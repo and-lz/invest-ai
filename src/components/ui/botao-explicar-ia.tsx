@@ -53,7 +53,7 @@ export function BotaoExplicarIA({ identificadorCard }: BotaoExplicarIAProps) {
             variant="ghost"
             size="icon-xs"
             onClick={handleClick}
-            className="text-muted-foreground/60 hover:text-muted-foreground"
+            className="ai-icon-hover text-muted-foreground/60"
             aria-label="Pedir para a IA explicar este gráfico"
           >
             <BotIcon />

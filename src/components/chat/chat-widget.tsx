@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { MessageCircle, X, Trash2, Menu, Maximize2, Minimize2 } from "lucide-react";
+import { Bot, X, Trash2, Menu, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MensagemChatBolha } from "@/components/chat/mensagem-chat";
 import { CampoEntradaChat } from "@/components/chat/campo-entrada-chat";
@@ -96,17 +96,17 @@ export function ChatWidget() {
   return (
     <>
       {/* Botao flutuante (FAB) */}
-      <Button
+      <button
         onClick={handleAlternarChat}
-        size="icon"
         className={cn(
-          "fixed right-6 bottom-6 z-40 h-14 w-14 rounded-full shadow-lg transition-transform",
-          estaAberto && "scale-0",
+          "ai-gradient-bg ai-fab fixed right-6 bottom-6 z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full",
+          estaAberto && "!scale-0 !animate-none",
         )}
+        type="button"
       >
-        <MessageCircle className="h-6 w-6" />
+        <Bot className="relative z-10 h-6 w-6" />
         <span className="sr-only">Abrir assistente</span>
-      </Button>
+      </button>
 
       {/* Painel de chat */}
       {estaAberto && (
@@ -157,7 +157,7 @@ export function ChatWidget() {
                   <Menu className="h-4 w-4" />
                 </Button>
 
-                <MessageCircle className="text-muted-foreground h-5 w-5" />
+                <Bot className="text-muted-foreground h-5 w-5" />
                 <h3 className="text-sm font-medium">Assistente</h3>
               </div>
               <div className="flex items-center gap-1">
@@ -196,7 +196,7 @@ export function ChatWidget() {
             <div ref={areaScrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
               {mensagens.length === 0 && (
                 <div className="flex h-full flex-col items-center justify-center text-center">
-                  <MessageCircle className="text-muted-foreground mb-3 h-10 w-10" />
+                  <Bot className="text-muted-foreground mb-3 h-10 w-10" />
                   <p className="text-muted-foreground text-sm">
                     Pergunte sobre seus investimentos.
                   </p>

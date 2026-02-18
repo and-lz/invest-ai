@@ -8,10 +8,13 @@ import {
   BotIcon,
   Loader2,
   RefreshCw,
+  ListPlus,
+  Check,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { tipografia, icone } from "@/lib/design-system";
+import { notificar } from "@/lib/notificar";
 import {
   Tooltip,
   TooltipContent,
@@ -59,6 +62,8 @@ const INITIAL_STATE: ExplanationState = {
   status: "idle",
 };
 
+type AddToPlanStatus = "idle" | "loading" | "added" | "error";
+
 async function fetchExplanations(
   conclusions: Conclusao[],
 ): Promise<Record<string, string>> {
@@ -91,6 +96,7 @@ export type { Conclusao, TipoConclusao };
 export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
   const [openIndices, setOpenIndices] = useState<Set<number>>(new Set());
   const [state, setState] = useState<ExplanationState>(INITIAL_STATE);
+  const [addToPlanStatuses, setAddToPlanStatuses] = useState<Record<number, AddToPlanStatus>>({});
   const previousConclusionsRef = useRef(conclusoes);
 
   // Reset cache when conclusions change
@@ -100,6 +106,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
       setState(INITIAL_STATE);
       setOpenIndices(new Set());
     }
+    setAddToPlanStatuses({});
   }
 
   const handleToggle = useCallback(
@@ -146,6 +153,66 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
     [handleToggle],
   );
 
+  const handleAddToPlan = useCallback(
+    async (index: number, event: React.MouseEvent) => {
+      event.stopPropagation();
+      event.preventDefault();
+
+      const conclusao = conclusoes[index];
+      if (!conclusao) return;
+
+      const currentStatus = addToPlanStatuses[index] ?? "idle";
+      if (currentStatus === "loading" || currentStatus === "added") return;
+
+      setAddToPlanStatuses((prev) => ({ ...prev, [index]: "loading" }));
+
+      try {
+        const response = await fetch("/api/action-plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            textoOriginal: conclusao.texto,
+            tipoConclusao: conclusao.tipo,
+            origem: "takeaway-dashboard",
+          }),
+        });
+
+        if (response.status === 409) {
+          notificar.info("Já no plano", {
+            description: "Este item já está no seu plano de ação.",
+          });
+          setAddToPlanStatuses((prev) => ({ ...prev, [index]: "added" }));
+          return;
+        }
+
+        if (!response.ok) {
+          const errorBody = (await response.json().catch(() => ({}))) as {
+            erro?: string;
+          };
+          throw new Error(errorBody.erro ?? "Falha ao adicionar ao plano");
+        }
+
+        notificar.success("Adicionado ao plano", {
+          description: "Ação adicionada com recomendação da IA.",
+          actionUrl: "/plano-acao",
+          actionLabel: "Ver plano",
+        });
+
+        setAddToPlanStatuses((prev) => ({ ...prev, [index]: "added" }));
+      } catch (error) {
+        console.error("[TakeawayBox] Error adding to plan:", error);
+        notificar.error("Erro ao adicionar", {
+          description:
+            error instanceof Error
+              ? error.message
+              : "Tente novamente mais tarde.",
+        });
+        setAddToPlanStatuses((prev) => ({ ...prev, [index]: "error" }));
+      }
+    },
+    [conclusoes, addToPlanStatuses],
+  );
+
   if (conclusoes.length === 0) return null;
 
   return (
@@ -160,6 +227,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
           (state.status === "success" ||
             state.status === "loading" ||
             state.status === "error");
+        const planStatus = addToPlanStatuses[index] ?? "idle";
 
         return (
           <Collapsible
@@ -167,39 +235,87 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
             open={isExpanded}
             onOpenChange={() => void handleToggle(index)}
           >
-            <CollapsibleTrigger className="group flex w-full cursor-pointer items-start gap-2 text-left">
-              <ConclusionIcon
-                className={cn(
-                  "mt-0.5 h-4 w-4 shrink-0",
-                  ICON_COLORS[conclusao.tipo],
-                )}
-                aria-hidden="true"
-              />
-              <span className="text-muted-foreground flex-1 text-sm leading-relaxed">
-                {conclusao.texto}
-              </span>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="shrink-0">
-                      <BotIcon
+            <div className="flex w-full items-start gap-2">
+              <CollapsibleTrigger className="group flex min-w-0 flex-1 cursor-pointer items-start gap-2 text-left">
+                <ConclusionIcon
+                  className={cn(
+                    "mt-0.5 h-4 w-4 shrink-0",
+                    ICON_COLORS[conclusao.tipo],
+                  )}
+                  aria-hidden="true"
+                />
+                <span className="text-muted-foreground flex-1 text-sm leading-relaxed">
+                  {conclusao.texto}
+                </span>
+              </CollapsibleTrigger>
+
+              <div className="flex shrink-0 items-center gap-1">
+                {/* Add to Plan button */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={(e) => void handleAddToPlan(index, e)}
+                        disabled={planStatus === "loading" || planStatus === "added"}
                         className={cn(
-                          icone.botao,
-                          "mt-0.5 transition-colors",
-                          isOpen
-                            ? "text-muted-foreground"
-                            : "text-muted-foreground/60 group-hover:text-muted-foreground",
+                          "mt-0.5 cursor-pointer rounded-sm p-0.5 transition-colors",
+                          planStatus === "added"
+                            ? "text-success"
+                            : planStatus === "loading"
+                              ? "text-muted-foreground"
+                              : "text-muted-foreground/60 hover:text-muted-foreground",
                         )}
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent side="left" sideOffset={4}>
-                    Pedir para a IA explicar
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </CollapsibleTrigger>
+                        aria-label="Adicionar ao plano de ação"
+                      >
+                        {planStatus === "loading" ? (
+                          <Loader2 className={cn(icone.botao, "animate-spin")} />
+                        ) : planStatus === "added" ? (
+                          <Check className={icone.botao} />
+                        ) : (
+                          <ListPlus className={icone.botao} />
+                        )}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={4}>
+                      {planStatus === "added"
+                        ? "Já no plano de ação"
+                        : planStatus === "loading"
+                          ? "Adicionando..."
+                          : "Adicionar ao plano de ação"}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                {/* AI Explain button */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => void handleToggle(index)}
+                        className="mt-0.5 cursor-pointer rounded-sm p-0.5 transition-colors"
+                        aria-label="Pedir para a IA explicar"
+                      >
+                        <BotIcon
+                          className={cn(
+                            icone.botao,
+                            "ai-icon-hover",
+                            isOpen
+                              ? "text-muted-foreground"
+                              : "text-muted-foreground/60",
+                          )}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" sideOffset={4}>
+                      Pedir para a IA explicar
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
 
             <CollapsibleContent>
               <div className="ml-6 mt-1.5 border-l-2 border-primary/30 pl-3">
