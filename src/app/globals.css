@@ -464,10 +464,15 @@ dialog::backdrop {
   );
 }
 
-/* ── FAB: animated glow ring ── */
+/* ── FAB: glow + shimmer on hover only ── */
 .ai-fab {
-  animation: ai-fab-glow 3s ease-in-out infinite;
+  box-shadow: 0 4px 12px oklch(0 0 0 / 20%);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.ai-fab:hover {
+  transform: scale(1.1);
+  animation: ai-fab-glow 3s ease-in-out infinite;
 }
 
 @keyframes ai-fab-glow {
@@ -475,16 +480,13 @@ dialog::backdrop {
   50% { box-shadow: var(--ai-glow-pulse-50); }
 }
 
-.ai-fab:hover {
-  transform: scale(1.1);
-  box-shadow: var(--ai-glow-pulse-50);
-}
-
 .ai-fab:active {
   transform: scale(0.95);
+  animation: none;
+  box-shadow: var(--ai-glow-pulse-0);
 }
 
-/* Shimmer overlay — pseudo-element approach */
+/* Shimmer overlay — only on hover */
 .ai-fab::after {
   content: "";
   position: absolute;
@@ -497,8 +499,12 @@ dialog::backdrop {
     transparent 75%
   );
   background-size: 200% 100%;
-  animation: ai-shimmer 3s ease-in-out infinite;
+  background-position: 200% 0;
   pointer-events: none;
+}
+
+.ai-fab:hover::after {
+  animation: ai-shimmer 3s ease-in-out infinite;
 }
 
 /* ── Medium AI button (e.g. "Analisar com IA") ── */
