@@ -226,7 +226,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
 
                 {state.status === "success" && explanation && (
                   <p
-                    className={cn(tipografia.auxiliar, "py-1 leading-relaxed")}
+                    className={cn(tipografia.corpo, "text-muted-foreground py-1 leading-relaxed")}
                   >
                     {explanation}
                   </p>
