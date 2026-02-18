@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { executarTarefaEmBackground } from "@/lib/executor-tarefa-background";
 import type { TarefaBackground } from "@/lib/tarefa-background";
 import {
@@ -16,7 +17,7 @@ import { salvarAnaliseAtivo } from "@/lib/analise-ativo-storage";
 export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: string): boolean {
   switch (tarefa.tipo) {
     case "gerar-insights-consolidados":
-      void executarTarefaEmBackground({
+      after(executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights Consolidados (retry)",
         usuarioId,
@@ -28,7 +29,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
             urlRedirecionamento: "/insights?mesAno=consolidado",
           };
         },
-      });
+      }));
       return true;
 
     case "gerar-insights": {
@@ -44,7 +45,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
       const identificadorRelatorioAnterior =
         tarefa.parametros?.identificadorRelatorioAnterior || undefined;
 
-      void executarTarefaEmBackground({
+      after(executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights (retry)",
         usuarioId,
@@ -59,7 +60,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
             urlRedirecionamento: `/insights?mesAno=${encodeURIComponent(identificadorRelatorio)}`,
           };
         },
-      });
+      }));
       return true;
     }
 
@@ -73,7 +74,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
         return false;
       }
 
-      void executarTarefaEmBackground({
+      after(executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Analise Ativo (retry)",
         usuarioId,
@@ -86,7 +87,7 @@ export function despacharTarefaPorTipo(tarefa: TarefaBackground, usuarioId: stri
             urlRedirecionamento: `/desempenho?ticker=${encodeURIComponent(codigoAtivo)}`,
           };
         },
-      });
+      }));
       return true;
     }
 

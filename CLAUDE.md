@@ -437,13 +437,13 @@ Paleta de 5 cores com hues espacados: navy (250), teal (165), gold (75), purple 
 - SEMPRE usar `text-muted-foreground` em helper text para hierarquia visual
 - O logo `font-serif` e a UNICA excecao permitida ao sistema de headings
 
-## Background Tasks Pattern (Fire-and-Forget)
+## Background Tasks Pattern (after + Fire-and-Forget)
 
-Operacoes longas (upload PDF, geracao de insights via Gemini) usam fire-and-forget para nao bloquear a UI.
+Operacoes longas (upload PDF, geracao de insights via Gemini) usam `after()` do Next.js para nao bloquear a UI.
 
 ### Fluxo
 1. API route valida request, cria tarefa em `data/tasks/{uuid}.json`, retorna `202 Accepted`
-2. Processamento continua em background via `void asyncFunction()` no event loop do Node.js
+2. Processamento continua em background via `after()` de `next/server` (keeps serverless alive until done)
 3. Frontend salva `identificadorTarefa` no `localStorage` e navega normalmente
 4. `IndicadorTarefaAtiva` no header faz polling via SWR (2s) e exibe toast ao concluir/falhar
 
@@ -465,11 +465,10 @@ Operacoes longas (upload PDF, geracao de insights via Gemini) usam fire-and-forg
 - Evento `tarefa-background-concluida` — Notifica paginas para recarregar dados
 
 ### Decisoes de design
-- Fire-and-forget em vez de job queue: Node.js mantem promises vivas apos enviar response
-- Sem retry automatico: usuario pode re-tentar manualmente (uso esporadico)
+- `after()` de `next/server` em vez de `void`: garante que Vercel nao mata a funcao antes de completar
+- Retry automatico com backoff exponencial via `executarTarefaEmBackground` para erros transientes
 - Timeout de 5 minutos: tarefas "processando" por mais de 5min sao consideradas falhas
 - Sem cancel: operacoes de 30-60s nao justificam cancelamento
-- `next/after` nao disponivel no Next.js 15.5.12 instalado
 
 ## Notification Center Pattern
 

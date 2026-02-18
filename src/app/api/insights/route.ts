@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import {
   obterGenerateInsightsUseCase,
   obterGenerateInsightsConsolidadosUseCase,
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
     await salvarTarefa(tarefa);
 
     if (ehConsolidado) {
-      void executarTarefaEmBackground({
+      after(executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights Consolidados",
         usuarioId: authCheck.session.user.userId,
@@ -148,12 +148,12 @@ export async function POST(request: Request) {
             urlRedirecionamento: "/insights?mesAno=consolidado",
           };
         },
-      });
+      }));
     } else {
       const identificadorRelatorio = resultado.data.identificadorRelatorio;
       const identificadorRelatorioAnterior = resultado.data.identificadorRelatorioAnterior;
 
-      void executarTarefaEmBackground({
+      after(executarTarefaEmBackground({
         tarefa,
         rotuloLog: "Insights",
         usuarioId: authCheck.session.user.userId,
@@ -168,7 +168,7 @@ export async function POST(request: Request) {
             urlRedirecionamento: `/insights?mesAno=${encodeURIComponent(identificadorRelatorio)}`,
           };
         },
-      });
+      }));
     }
 
     return NextResponse.json(

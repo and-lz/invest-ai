@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { obterUploadReportUseCase, obterListReportsUseCase } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
 import { descriptografarPdf } from "@/lib/pdf-decrypt";
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     // Invalidar cache do dashboard para o usuario (dados serao atualizados apos processamento)
     cacheGlobal.invalidarPorPrefixo(`dashboard:${authCheck.session.user.userId}`);
 
-    void executarTarefaEmBackground({
+    after(executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Upload",
       usuarioId: authCheck.session.user.userId,
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
           urlRedirecionamento: "/",
         };
       },
-    });
+    }));
 
     return NextResponse.json(
       { identificadorTarefa, status: "processando" },

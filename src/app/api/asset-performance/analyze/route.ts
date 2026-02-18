@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { z } from "zod/v4";
 import { obterAnalyzeAssetPerformanceUseCase } from "@/lib/container";
 import { salvarTarefa } from "@/lib/tarefa-background";
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     await salvarTarefa(tarefa);
 
-    void executarTarefaEmBackground({
+    after(executarTarefaEmBackground({
       tarefa,
       rotuloLog: "Analise Ativo",
       usuarioId,
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
           urlRedirecionamento: `/desempenho?ticker=${encodeURIComponent(codigoAtivo)}`,
         };
       },
-    });
+    }));
 
     return NextResponse.json(
       { identificadorTarefa, status: "processando" },
