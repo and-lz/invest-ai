@@ -184,7 +184,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                     <span className="shrink-0">
                       <BotIcon
                         className={cn(
-                          icone.micro,
+                          icone.botao,
                           "mt-0.5 transition-colors",
                           isOpen
                             ? "text-muted-foreground"
@@ -235,7 +235,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                         "text-primary inline-flex cursor-pointer items-center gap-1 hover:underline",
                       )}
                     >
-                      <RefreshCw className={icone.micro} />
+                      <RefreshCw className={icone.botao} />
                       Tentar novamente
                     </button>
                   </div>

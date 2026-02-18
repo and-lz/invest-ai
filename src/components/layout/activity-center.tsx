@@ -366,7 +366,7 @@ export function ActivityCenter() {
                     onClick={marcarTodasComoLidas}
                     className={cn(tipografia.auxiliar, "gap-1.5")}
                   >
-                    <CheckCheck className={icone.micro} />
+                    <CheckCheck className={icone.botao} />
                     Ler todas
                   </Button>
                 )}
@@ -377,7 +377,7 @@ export function ActivityCenter() {
                     onClick={handleLimparTodas}
                     className={cn(tipografia.auxiliar, "gap-1.5")}
                   >
-                    <Trash2 className={icone.micro} />
+                    <Trash2 className={icone.botao} />
                     Limpar
                   </Button>
                 )}

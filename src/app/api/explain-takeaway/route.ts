@@ -9,8 +9,10 @@ import {
 } from "@/lib/prompt-explicacao-conclusao";
 import { ExplainTakeawayRequestSchema } from "@/schemas/explain-takeaway.schema";
 import { AiApiTransientError } from "@/domain/errors/app-errors";
+import { retryWithBackoff } from "@/lib/retry-with-backoff";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 const ExplanationsResponseSchema = z.record(z.string(), z.string());
 
@@ -39,17 +41,19 @@ export async function POST(request: Request) {
     const userPrompt = buildExplanationUserPrompt(conclusions);
 
     const provider = criarProvedorAi();
-    const response = await provider.gerar({
-      instrucaoSistema: SYSTEM_PROMPT_EXPLANATION,
-      mensagens: [
-        {
-          papel: "usuario",
-          partes: [{ tipo: "texto", dados: userPrompt }],
-        },
-      ],
-      temperatura: 0.4,
-      formatoResposta: "json",
-    });
+    const response = await retryWithBackoff(() =>
+      provider.gerar({
+        instrucaoSistema: SYSTEM_PROMPT_EXPLANATION,
+        mensagens: [
+          {
+            papel: "usuario",
+            partes: [{ tipo: "texto", dados: userPrompt }],
+          },
+        ],
+        temperatura: 0.4,
+        formatoResposta: "json",
+      }),
+    );
 
     const parsed: unknown = JSON.parse(response.texto);
     const explanationsValidation = ExplanationsResponseSchema.safeParse(parsed);
