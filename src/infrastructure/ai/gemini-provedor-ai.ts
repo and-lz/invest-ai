@@ -1,5 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import type { Content, Part } from "@google/generative-ai";
+import { GoogleGenerativeAI, DynamicRetrievalMode } from "@google/generative-ai";
+import type { Content, Part, Tool } from "@google/generative-ai";
 import type {
   ProvedorAi,
   ConfiguracaoGeracao,
@@ -8,6 +8,7 @@ import type {
 } from "@/domain/interfaces/provedor-ai";
 import { AiApiError, AiApiTransientError } from "@/domain/errors/app-errors";
 import { ehErroTransienteDeAi } from "@/lib/classificar-erro-ai";
+import { formatarFontesGrounding } from "@/lib/formatar-fontes-grounding";
 
 const MODELO_PADRAO = "models/gemini-2.5-flash";
 
@@ -66,18 +67,41 @@ export class GeminiProvedorAi implements ProvedorAi {
 
   async *transmitir(configuracao: ConfiguracaoGeracao): AsyncGenerator<string, void, unknown> {
     try {
-      const model = this.client.getGenerativeModel({
-        model: this.modelo,
-        systemInstruction: configuracao.instrucaoSistema,
-        generationConfig: {
-          temperature: configuracao.temperatura,
-          responseMimeType:
-            configuracao.formatoResposta === "json" ? "application/json" : undefined,
+      const requestOptions = configuracao.pesquisaWeb
+        ? { apiVersion: "v1beta" as const }
+        : undefined;
+
+      const model = this.client.getGenerativeModel(
+        {
+          model: this.modelo,
+          systemInstruction: configuracao.instrucaoSistema,
+          generationConfig: {
+            temperature: configuracao.temperatura,
+            responseMimeType:
+              configuracao.formatoResposta === "json" ? "application/json" : undefined,
+          },
         },
-      });
+        requestOptions,
+      );
+
+      const searchTools: Tool[] | undefined = configuracao.pesquisaWeb
+        ? [
+            {
+              googleSearchRetrieval: {
+                dynamicRetrievalConfig: {
+                  mode: DynamicRetrievalMode.MODE_DYNAMIC,
+                  dynamicThreshold: 0.3,
+                },
+              },
+            },
+          ]
+        : undefined;
 
       const contents = this.converterMensagensParaContents(configuracao);
-      const resultadoStream = await model.generateContentStream({ contents });
+      const resultadoStream = await model.generateContentStream({
+        contents,
+        ...(searchTools && { tools: searchTools }),
+      });
 
       for await (const chunk of resultadoStream.stream) {
         const textoChunk = chunk.text();
@@ -95,6 +119,15 @@ export class GeminiProvedorAi implements ProvedorAi {
         console.info(
           `[ProvedorAi] Stream concluido | Tokens: ${tokensEntrada} entrada, ${tokensSaida} saida`,
         );
+      }
+
+      // Yield grounding sources as formatted markdown at the end of the stream
+      if (configuracao.pesquisaWeb) {
+        const groundingMetadata = respostaFinal.candidates?.[0]?.groundingMetadata;
+        const sourcesMarkdown = formatarFontesGrounding(groundingMetadata);
+        if (sourcesMarkdown) {
+          yield sourcesMarkdown;
+        }
       }
     } catch (erro) {
       throw this.classificarErro(erro);

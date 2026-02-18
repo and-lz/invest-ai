@@ -37,6 +37,7 @@ export interface ConfiguracaoGeracao {
   readonly mensagens: readonly MensagemAi[];
   readonly temperatura?: number;
   readonly formatoResposta?: "json" | "texto";
+  readonly pesquisaWeb?: boolean;
 }
 
 // ---- Resposta ----

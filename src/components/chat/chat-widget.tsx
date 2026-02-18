@@ -38,6 +38,20 @@ export function ChatWidget() {
     }
   }, [mensagens]);
 
+  // Close chat on ESC key
+  useEffect(() => {
+    function handleKeyDown(evento: KeyboardEvent) {
+      if (evento.key === "Escape" && estaAberto) {
+        setEstaAberto(false);
+        setMostrarSidebar(false);
+        setTelaCheia(false);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [estaAberto]);
+
   // Listen for external "ask AI to explain" events from chart card buttons
   useEffect(() => {
     function handleAbrirComPergunta(evento: Event) {

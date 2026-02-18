@@ -45,6 +45,7 @@ export async function POST(request: Request): Promise<Response> {
       mensagens: mensagensAi,
       temperatura: 0.7,
       formatoResposta: "texto",
+      pesquisaWeb: true,
     });
 
     const codificadorTexto = new TextEncoder();
