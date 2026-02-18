@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState } from "react";
+import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { useRouter } from "next/navigation";
 import {
   Inbox,
@@ -26,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
-import { typography, icon, layout } from "@/lib/design-system";
+import { typography, icon, layout, dialog } from "@/lib/design-system";
 
 import type { Notificacao } from "@/lib/notificacao";
 
@@ -208,8 +209,6 @@ function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: Item
 type AbaAtiva = "notificacoes" | "tarefas";
 
 export function ActivityCenter() {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const [estaAberto, setEstaAberto] = useState(false);
   const [abaAtiva, setAbaAtiva] = useState<AbaAtiva>("notificacoes");
 
   const {
@@ -223,45 +222,22 @@ export function ActivityCenter() {
 
   const { tarefasAtivas, estaCarregando: tarefasCarregando } = useTarefasAtivas();
 
-  const abrir = useCallback(() => {
-    dialogRef.current?.showModal();
-    setEstaAberto(true);
-  }, []);
-
-  const fechar = useCallback(() => {
-    dialogRef.current?.close();
-    setEstaAberto(false);
-  }, []);
+  const {
+    dialogRef,
+    open: abrir,
+    close: fechar,
+    handleBackdropClick,
+  } = useNativeDialog();
 
   const handleLimparTodas = useCallback(async () => {
     await limparTodas();
   }, [limparTodas]);
-
-  // Close on backdrop click
-  const handleClickDialog = useCallback(
-    (evento: React.MouseEvent<HTMLDialogElement>) => {
-      const dialog = dialogRef.current;
-      if (!dialog) return;
-
-      if (evento.target === dialog) {
-        fechar();
-      }
-    },
-    [fechar],
-  );
 
   const temTarefasAtivas = tarefasAtivas.length > 0;
   const temAtividade = contagemNaoVisualizadas > 0 || temTarefasAtivas;
 
   return (
     <>
-      {estaAberto && (
-        <div
-          className="fixed inset-0 z-50 bg-background/40 transition-opacity"
-          onClick={fechar}
-          aria-hidden="true"
-        />
-      )}
       <Button variant="ghost" size="icon" className="relative" onClick={abrir}>
         <Inbox className="h-5 w-5" />
         {temAtividade && (
@@ -283,9 +259,9 @@ export function ActivityCenter() {
 
       <dialog
         ref={dialogRef}
-        onClick={handleClickDialog}
+        onClick={handleBackdropClick}
         aria-label="Central de atividades"
-        className="bg-background relative z-60 flex h-full flex-col border-l p-0 shadow-lg backdrop:hidden"
+        className={cn("bg-background relative z-60 flex h-full flex-col border-l p-0 shadow-lg", dialog.backdrop, dialog.drawerRight)}
         style={{
           position: "fixed",
           top: 0,

@@ -235,8 +235,40 @@ dialog:not([open]) {
   }
 }
 
-dialog[open] {
+/* Centered modal: fade + subtle scale (positioned via translate(-50%,-50%)) */
+@keyframes dialogScaleIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Slide from left (mobile nav drawer) */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Per-variant open animations */
+dialog[open].dialog-centered {
+  animation: dialogScaleIn 0.2s ease-out;
+}
+dialog[open].dialog-drawer-right {
   animation: slideInFromRight 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+dialog[open].dialog-drawer-left {
+  animation: slideInFromLeft 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+dialog[open].dialog-fullscreen {
+  animation: fadeIn 0.15s ease-out;
 }
 
 dialog::backdrop {

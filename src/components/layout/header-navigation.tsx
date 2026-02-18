@@ -19,14 +19,14 @@ import { ActivityCenter } from "@/components/layout/activity-center";
 import { UserProfileMenu } from "@/components/auth/user-profile-menu";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useNativeDialog } from "@/hooks/use-native-dialog";
+import { dialog } from "@/lib/design-system";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
 import packageJson from "../../../package.json";
 
 const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
@@ -48,69 +48,90 @@ const todosItensNavegacao = [...itensNavegacaoPrincipais, ...itensNavegacaoSecun
 
 export function HeaderNavigation() {
   const pathname = usePathname();
-  const [menuMobileAberto, setMenuMobileAberto] = useState(false);
+  const {
+    dialogRef: navDialogRef,
+    open: abrirNav,
+    close: fecharNav,
+    handleBackdropClick: handleNavBackdrop,
+  } = useNativeDialog();
 
   return (
     <div className="sticky top-0 z-50">
+      {/* Mobile nav dialog */}
+      <dialog
+        ref={navDialogRef}
+        onClick={handleNavBackdrop}
+        aria-label="Menu de navegação"
+        className={cn(
+          "bg-background flex flex-col border-r p-0 shadow-lg",
+          dialog.backdrop,
+          dialog.drawerLeft,
+        )}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: "min(288px, 75vw)",
+          height: "100dvh",
+          margin: 0,
+        }}
+      >
+        <div className="border-b px-6 py-4">
+          <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+            <Link href="/" onClick={fecharNav} className="hover:opacity-80 transition-opacity">
+              <Logo />
+            </Link>
+            <Link href="/" onClick={fecharNav} className="hover:text-foreground/80 transition-colors">
+              Investimentos
+            </Link>{" "}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="text-muted-foreground cursor-default text-xs font-normal">
+                    v{packageJson.version}
+                  </span>
+                </TooltipTrigger>
+                {lastCommitMessage && (
+                  <TooltipContent>
+                    {lastCommitMessage}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
+          </h2>
+        </div>
+        <nav className="flex flex-col gap-1 p-4">
+          {todosItensNavegacao.map((item) => {
+            const estaAtivo = pathname === item.href;
+            const Icone = item.icone;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={fecharNav}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  estaAtivo
+                    ? "bg-secondary/50 text-foreground"
+                    : "text-muted-foreground hover:bg-secondary/30 hover:text-foreground",
+                )}
+              >
+                <Icone className="h-4 w-4" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </dialog>
+
       <header className="border-border/20 relative h-14 border-b">
         <div className="flex h-14 items-center justify-between gap-2 px-3 sm:gap-4 sm:px-4">
-          {/* Mobile menu */}
-          <Sheet open={menuMobileAberto} onOpenChange={setMenuMobileAberto}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-72 p-0">
-              <SheetHeader className="border-b px-6 py-4">
-                <SheetTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-                  <Link href="/" onClick={() => setMenuMobileAberto(false)} className="hover:opacity-80 transition-opacity">
-                    <Logo />
-                  </Link>
-                  <Link href="/" onClick={() => setMenuMobileAberto(false)} className="hover:text-foreground/80 transition-colors">
-                    Investimentos
-                  </Link>{" "}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="text-muted-foreground cursor-default text-xs font-normal">
-                          v{packageJson.version}
-                        </span>
-                      </TooltipTrigger>
-                      {lastCommitMessage && (
-                        <TooltipContent>
-                          {lastCommitMessage}
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </TooltipProvider>
-                </SheetTitle>
-              </SheetHeader>
-              <nav className="flex flex-col gap-1 p-4">
-                {todosItensNavegacao.map((item) => {
-                  const estaAtivo = pathname === item.href;
-                  const Icone = item.icone;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setMenuMobileAberto(false)}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                        estaAtivo
-                          ? "bg-secondary/50 text-foreground"
-                          : "text-muted-foreground hover:bg-secondary/30 hover:text-foreground",
-                      )}
-                    >
-                      <Icone className="h-4 w-4" />
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </nav>
-            </SheetContent>
-          </Sheet>
+          {/* Mobile menu trigger */}
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={abrirNav}>
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Menu</span>
+          </Button>
 
           {/* Logo */}
           <div className="hidden items-center gap-2 md:flex">

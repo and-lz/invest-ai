@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo, useRef, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { Search, TrendingUp, TrendingDown, Minus, ChevronDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -130,15 +131,13 @@ export function GridAtivosCarteira({
 }: GridAtivosCarteiraProps) {
   const [termoBusca, setTermoBusca] = useState("");
   const [gruposAbertos, setGruposAbertos] = useState<Record<string, boolean>>({});
-  const dialogRef = useRef<HTMLDialogElement>(null);
 
-  const abrirDialog = useCallback(() => {
-    dialogRef.current?.showModal();
-  }, []);
-
-  const fecharDialog = useCallback(() => {
-    dialogRef.current?.close();
-  }, []);
+  const {
+    dialogRef,
+    open: abrirDialog,
+    close: fecharDialog,
+    handleBackdropClick,
+  } = useNativeDialog();
 
   const gruposAtivos = useMemo(() => agruparAtivosPorPerformance(ativosCarteira), [ativosCarteira]);
 
@@ -243,10 +242,12 @@ export function GridAtivosCarteira({
       {/* Dialog de seleção de ativo */}
       <dialog
         ref={dialogRef}
+        onClick={handleBackdropClick}
         aria-label="Selecionar ativo da carteira"
         className={cn(
           "bg-background fixed inset-0 m-0 h-screen w-screen overflow-y-auto border-0 p-0",
           dialog.backdrop,
+          dialog.fullscreen,
         )}
       >
         <div className="border-b px-6 py-4">

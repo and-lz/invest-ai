@@ -9,16 +9,17 @@ import { CampoEntradaChat } from "@/components/chat/campo-entrada-chat";
 import { ListaConversas } from "@/components/chat/lista-conversas";
 import { useChatAssistente } from "@/hooks/use-chat-assistente";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
+import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { stripMarkdown } from "@/lib/strip-markdown";
 import {
   EVENTO_ABRIR_CHAT_COM_PERGUNTA,
   type EventoAbrirChatDetalhe,
 } from "@/components/ui/botao-explicar-ia";
 import { cn } from "@/lib/utils";
+import { dialog } from "@/lib/design-system";
 
 
 export function ChatWidget() {
-  const [estaAberto, setEstaAberto] = useState(false);
   const [telaCheia, setTelaCheia] = useState(false);
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
@@ -39,6 +40,24 @@ export function ChatWidget() {
     criarNovaConversa,
     carregarConversa,
   } = useChatAssistente();
+
+  const [estaAberto, setEstaAberto] = useState(false);
+
+  const handleFechar = useCallback(() => {
+    stopSpeech();
+    setMostrarSidebar(false);
+    setTelaCheia(false);
+    setEstaAberto(false);
+  }, [stopSpeech]);
+
+  const { dialogRef, open: _abrirDialog, close: fecharChat, handleBackdropClick } = useNativeDialog({
+    onClose: handleFechar,
+  });
+
+  const abrirChat = useCallback(() => {
+    _abrirDialog();
+    setEstaAberto(true);
+  }, [_abrirDialog]);
 
   // Auto-scroll ao receber novas mensagens
   useEffect(() => {
@@ -61,32 +80,13 @@ export function ChatWidget() {
     }
   }, [estaTransmitindo, ttsEnabled, mensagens, speak]);
 
-  // Stop speech when chat closes
-  useEffect(() => {
-    if (!estaAberto) stopSpeech();
-  }, [estaAberto, stopSpeech]);
-
-  // Close chat on ESC key
-  useEffect(() => {
-    function handleKeyDown(evento: KeyboardEvent) {
-      if (evento.key === "Escape" && estaAberto) {
-        setEstaAberto(false);
-        setMostrarSidebar(false);
-        setTelaCheia(false);
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [estaAberto]);
-
   // Listen for external "ask AI to explain" events from chart card buttons
   useEffect(() => {
     function handleAbrirComPergunta(evento: Event) {
       const { pergunta } = (evento as CustomEvent<EventoAbrirChatDetalhe>).detail;
-      setEstaAberto(true);
+      abrirChat();
       criarNovaConversa();
-      // Small delay to let React render the open state before sending
+      // Small delay to let React render before sending
       setTimeout(() => {
         void enviarMensagem(pergunta);
       }, 100);
@@ -96,13 +96,7 @@ export function ChatWidget() {
     return () => {
       window.removeEventListener(EVENTO_ABRIR_CHAT_COM_PERGUNTA, handleAbrirComPergunta);
     };
-  }, [criarNovaConversa, enviarMensagem]);
-
-  const handleAlternarChat = useCallback(() => {
-    setEstaAberto((anterior) => !anterior);
-    setMostrarSidebar(false);
-    setTelaCheia(false);
-  }, []);
+  }, [abrirChat, criarNovaConversa, enviarMensagem]);
 
   const handleSelecionarConversa = useCallback(
     async (identificador: string) => {
@@ -125,7 +119,7 @@ export function ChatWidget() {
     <>
       {/* Botao flutuante (FAB) */}
       <button
-        onClick={handleAlternarChat}
+        onClick={abrirChat}
         className={cn(
           "ai-gradient-bg ai-fab fixed right-6 bottom-6 z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full",
           estaAberto && "!scale-0 !animate-none",
@@ -136,20 +130,23 @@ export function ChatWidget() {
         <span className="sr-only">Abrir assistente</span>
       </button>
 
-      {/* Backdrop */}
-      {estaAberto && (
-        <div
-          className="fixed inset-0 z-50 bg-background/40 transition-opacity"
-          onClick={handleAlternarChat}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Painel de chat */}
-      {estaAberto && (
+      {/* Chat dialog — transparent container fills viewport; inner div is the visible panel */}
+      <dialog
+        ref={dialogRef}
+        onClick={handleBackdropClick}
+        className={cn(dialog.backdrop, "bg-transparent p-0")}
+        style={{
+          position: "fixed",
+          inset: 0,
+          width: "100vw",
+          height: "100dvh",
+          margin: 0,
+        }}
+      >
+        {/* Painel de chat */}
         <div
           className={cn(
-            "bg-background fixed z-60 flex overflow-hidden border shadow-xl",
+            "bg-background absolute flex overflow-hidden border shadow-xl",
             telaCheia
               ? "inset-0 h-dvh w-dvw"
               : "left-0 top-0 h-dvh w-dvw md:inset-auto md:right-6 md:bottom-6 md:left-auto md:top-auto md:h-[85vh] md:max-h-[calc(100vh-3rem)] md:w-[420px] md:rounded-2xl",
@@ -253,7 +250,7 @@ export function ChatWidget() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleAlternarChat}
+                  onClick={fecharChat}
                   className="h-8 w-8"
                 >
                   <X className="text-muted-foreground h-4 w-4" />
@@ -303,7 +300,7 @@ export function ChatWidget() {
             />
           </div>
         </div>
-      )}
+      </dialog>
     </>
   );
 }

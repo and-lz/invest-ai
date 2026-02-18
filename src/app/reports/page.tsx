@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useRef, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
+import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { useContextoPaginaChat } from "@/contexts/contexto-pagina-chat";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
@@ -36,15 +37,12 @@ export default function ReportsPage() {
   const [metodoUploadSelecionado, setMetodoUploadSelecionado] = useState<"automatico" | "manual">(
     "automatico",
   );
-  const dialogRef = useRef<HTMLDialogElement>(null);
-
-  const abrirDialog = useCallback(() => {
-    dialogRef.current?.showModal();
-  }, []);
-
-  const fecharDialog = useCallback(() => {
-    dialogRef.current?.close();
-  }, []);
+  const {
+    dialogRef,
+    open: abrirDialog,
+    close: fecharDialog,
+    handleBackdropClick,
+  } = useNativeDialog();
 
   const handleUploadAceito = useCallback(() => {
     notificar.success("Upload aceito!", {
@@ -105,10 +103,12 @@ export default function ReportsPage() {
 
       <dialog
         ref={dialogRef}
+        onClick={handleBackdropClick}
         aria-label="Importar relatório"
         className={cn(
           "bg-background max-h-[85vh] overflow-y-auto rounded-lg border p-0 shadow-lg",
           dialog.backdrop,
+          dialog.centered,
         )}
         style={{
           maxWidth: "42rem",

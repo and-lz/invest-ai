@@ -85,6 +85,14 @@ export const icon = {
 export const dialog = {
   /** Backdrop for native <dialog>. Uses semantic --background at 40% opacity. */
   backdrop: "backdrop:bg-background/40",
+  /** Centered modal animation (scale + fade). Use with translate(-50%,-50%) positioning. */
+  centered: "dialog-centered",
+  /** Right-side drawer animation (slide from right). */
+  drawerRight: "dialog-drawer-right",
+  /** Left-side drawer animation (slide from left). */
+  drawerLeft: "dialog-drawer-left",
+  /** Fullscreen dialog animation (fade). */
+  fullscreen: "dialog-fullscreen",
 } as const;
 
 // ─── Layout ─────────────────────────────────────────────────────
