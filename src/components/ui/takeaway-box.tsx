@@ -12,6 +12,7 @@ import {
   Check,
   type LucideIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { tipografia, icone } from "@/lib/design-system";
 import { notificar } from "@/lib/notificar";
@@ -94,6 +95,7 @@ async function fetchExplanations(
 export type { Conclusao, TipoConclusao };
 
 export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
+  const router = useRouter();
   const [openIndices, setOpenIndices] = useState<Set<number>>(new Set());
   const [state, setState] = useState<ExplanationState>(INITIAL_STATE);
   const [addToPlanStatuses, setAddToPlanStatuses] = useState<Record<number, AddToPlanStatus>>({});
@@ -196,6 +198,10 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
           description: "Ação adicionada com recomendação da IA.",
           actionUrl: "/plano-acao",
           actionLabel: "Ver plano",
+          action: {
+            label: "Ver plano",
+            onClick: () => router.push("/plano-acao"),
+          },
         });
 
         setAddToPlanStatuses((prev) => ({ ...prev, [index]: "added" }));
@@ -210,7 +216,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
         setAddToPlanStatuses((prev) => ({ ...prev, [index]: "error" }));
       }
     },
-    [conclusoes, addToPlanStatuses],
+    [conclusoes, addToPlanStatuses, router],
   );
 
   if (conclusoes.length === 0) return null;
