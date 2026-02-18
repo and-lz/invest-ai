@@ -61,7 +61,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BotIcon className="text-muted-foreground h-5 w-5" />
-              <CardTitle className="text-lg">Analise IA</CardTitle>
+              <CardTitle>Analise IA</CardTitle>
             </div>
             <Badge
               variant="outline"
@@ -97,7 +97,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <CardHeader>
           <div className="flex items-center gap-2">
             <TrendingUp className="text-muted-foreground h-5 w-5" />
-            <CardTitle className="text-lg">Performance</CardTitle>
+            <CardTitle>Performance</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -157,7 +157,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Wallet className="text-muted-foreground h-5 w-5" />
-              <CardTitle className="text-lg">Renda Passiva</CardTitle>
+              <CardTitle>Renda Passiva</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -208,7 +208,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <BarChart3 className="text-muted-foreground h-5 w-5" />
-              <CardTitle className="text-lg">Fundamentos</CardTitle>
+              <CardTitle>Fundamentos</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -274,7 +274,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Shield className="text-muted-foreground h-5 w-5" />
-              <CardTitle className="text-lg">Riscos</CardTitle>
+              <CardTitle>Riscos</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -305,7 +305,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Globe className="text-muted-foreground h-5 w-5" />
-              <CardTitle className="text-lg">Cenario Macro</CardTitle>
+              <CardTitle>Cenario Macro</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
@@ -321,7 +321,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <AlertTriangle className="text-muted-foreground h-5 w-5" />
-                <CardTitle className="text-lg">Timing</CardTitle>
+                <CardTitle>Timing</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-2">
@@ -345,7 +345,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Eye className="text-muted-foreground h-5 w-5" />
-              <CardTitle className="text-lg">Pontos de Atencao</CardTitle>
+              <CardTitle>Pontos de Atencao</CardTitle>
             </div>
           </CardHeader>
           <CardContent>

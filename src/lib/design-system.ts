@@ -28,6 +28,9 @@ export const tipografia = {
   /** H3 — Títulos de card (CardTitle). Ex: "Patrimônio Total" */
   h3: "text-lg font-semibold",
 
+  /** Valor principal — Número de destaque em summary cards. Ex: "R$ 42.000", "3,4%" */
+  valorPrincipal: "text-2xl font-bold",
+
   /** Rótulo — Labels, nav links, botões, table headers */
   rotulo: "text-sm font-medium",
 
@@ -57,8 +60,11 @@ export const icone = {
   /** Ícone inline em botão, input, badge */
   botao: "h-4 w-4",
 
-  /** Ícone micro — indicadores pequenos, badges */
+  /** Ícone micro — indicadores pequenos, badges, chart legends */
   micro: "h-3.5 w-3.5",
+
+  /** Ícone tiny — chart swatches, bullet points (não interativo) */
+  tiny: "h-3 w-3",
 
   /** Ícone de estado vazio — centralizado, grande */
   estadoVazio: "h-12 w-12 text-muted-foreground",
@@ -66,8 +72,11 @@ export const icone = {
   /** Ícone de loading pequeno — inline em botões */
   carregandoPequeno: "h-4 w-4 animate-spin",
 
-  /** Ícone de loading grande — estados de carregamento de página */
-  carregandoGrande: "h-8 w-8 animate-spin",
+  /** Ícone de loading médio — estados de loading de card/section */
+  carregandoMedio: "h-8 w-8 animate-spin",
+
+  /** Ícone de loading grande — estados de carregamento de página inteira */
+  carregandoGrande: "h-12 w-12 animate-spin",
 } as const;
 
 // ─── Dialog ──────────────────────────────────────────────────────
@@ -110,6 +119,9 @@ export const layout = {
 
   /** Header de página — flex com ícone + título */
   headerPagina: "flex items-center gap-3",
+
+  /** Padding padrão de CardContent */
+  cardContent: "space-y-4 p-6",
 } as const;
 
 // ─── Utilitários de cor semântica ────────────────────────────────

@@ -2,6 +2,7 @@
 
 import { Check, Circle, Loader2, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { tipografia } from "@/lib/design-system";
 
 type StatusEtapa = "pendente" | "ativa" | "concluida";
 
@@ -76,7 +77,7 @@ export function EtapasProcessamento({
   return (
     <div className="flex flex-col items-center gap-6 py-4">
       <div className="space-y-1 text-center">
-        <h3 className="text-lg font-semibold">Processando seu relatorio</h3>
+        <h3 className={tipografia.h3}>Processando seu relatorio</h3>
         <p className="text-muted-foreground text-sm">{nomeArquivo}</p>
       </div>
 

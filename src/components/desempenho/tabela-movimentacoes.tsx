@@ -44,7 +44,7 @@ export function TabelaMovimentacoes({ movimentacoes, nomeAtivo }: TabelaMoviment
       <CardHeader>
         <div className="flex items-center gap-2">
           <Receipt className="text-muted-foreground h-5 w-5" />
-          <CardTitle className="text-lg">Movimentacoes</CardTitle>
+          <CardTitle>Movimentacoes</CardTitle>
         </div>
         <CardDescription>Historico de compras, vendas e eventos de {nomeAtivo}</CardDescription>
       </CardHeader>

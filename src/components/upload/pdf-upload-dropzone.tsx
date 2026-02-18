@@ -9,6 +9,7 @@ import { Upload, FileText, Lock, Loader2 } from "lucide-react";
 import { useUploadReport } from "@/hooks/use-upload-report";
 import { ResultadoUpload } from "./resultado-upload";
 import { cn } from "@/lib/utils";
+import { tipografia, icone } from "@/lib/design-system";
 
 interface PdfUploadDropzoneProps {
   onUploadSucesso?: (identificadorTarefa: string) => void;
@@ -130,7 +131,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
     return (
       <Card>
         <CardContent className="flex flex-col items-center gap-4 p-6 py-12">
-          <Loader2 className="text-muted-foreground h-12 w-12 animate-spin" />
+          <Loader2 className={cn(icone.carregandoGrande, "text-muted-foreground")} />
           <p className="text-muted-foreground text-sm">Enviando arquivo...</p>
         </CardContent>
       </Card>
@@ -144,7 +145,7 @@ export function PdfUploadDropzone({ onUploadSucesso }: PdfUploadDropzoneProps) {
           <div className="flex flex-col items-center gap-6 py-8">
             <FileText className="text-primary h-12 w-12" />
             <div className="space-y-2 text-center">
-              <h3 className="text-lg font-semibold">Arquivo selecionado</h3>
+              <h3 className={tipografia.h3}>Arquivo selecionado</h3>
               <p className="text-muted-foreground text-sm">{arquivoSelecionado.name}</p>
             </div>
             <div className="w-full max-w-sm space-y-4">

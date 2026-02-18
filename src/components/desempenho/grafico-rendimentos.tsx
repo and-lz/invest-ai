@@ -66,7 +66,7 @@ export function GraficoRendimentos({ eventos, nomeAtivo }: GraficoRendimentosPro
       <CardHeader>
         <div className="flex items-center gap-2">
           <Wallet className="text-muted-foreground h-5 w-5" />
-          <CardTitle className="text-lg">Proventos Recebidos</CardTitle>
+          <CardTitle>Proventos Recebidos</CardTitle>
         </div>
         <CardDescription>
           Dividendos, JCP e outros eventos de {nomeAtivo}. Total: {formatarMoeda(totalCentavos)}

@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, Loader2, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { tipografia, icone } from "@/lib/design-system";
 
 interface PromptInsightsCopiavelProps {
   identificadorRelatorio: string;
@@ -55,7 +57,7 @@ export function PromptInsightsCopiavel({
     return (
       <Card>
         <CardContent className="flex items-center justify-center gap-3 p-12">
-          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          <Loader2 className={cn(icone.carregandoMedio, "text-muted-foreground")} />
           <p className="text-muted-foreground text-sm">
             Preparando prompt com dados do relatorio...
           </p>
@@ -78,7 +80,7 @@ export function PromptInsightsCopiavel({
     <Card>
       <CardContent className="space-y-4 p-6">
         <div>
-          <h3 className="text-lg font-semibold">Passo 1: Copiar o prompt com dados do relatorio</h3>
+          <h3 className={tipografia.h3}>Passo 1: Copiar o prompt com dados do relatorio</h3>
           <p className="text-muted-foreground text-sm">
             O prompt abaixo ja inclui os dados do seu relatorio. Copie e cole no chat de IA para
             gerar a análise.

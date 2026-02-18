@@ -60,7 +60,7 @@ export function GraficoEvolucaoAtivo({ historico, nomeAtivo }: GraficoEvolucaoAt
       <CardHeader>
         <div className="flex items-center gap-2">
           <TrendingUp className="text-muted-foreground h-5 w-5" />
-          <CardTitle className="text-lg">Evolucao do Saldo</CardTitle>
+          <CardTitle>Evolucao do Saldo</CardTitle>
         </div>
         <CardDescription>Historico do saldo de {nomeAtivo} na sua carteira</CardDescription>
         <CardAction>
