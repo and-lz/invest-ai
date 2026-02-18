@@ -7,7 +7,6 @@ import {
   SYSTEM_PROMPT_ENRIQUECER_ACAO,
   buildEnrichUserPrompt,
 } from "@/lib/prompt-enriquecer-acao";
-import { AiApiTransientError } from "@/domain/errors/app-errors";
 import { retryWithBackoff } from "@/lib/retry-with-backoff";
 
 export const dynamic = "force-dynamic";
@@ -39,8 +38,9 @@ export async function GET() {
 
 /**
  * POST /api/action-plan
- * Creates a new action plan item with AI enrichment.
- * Returns 409 if the same text already exists.
+ * Creates a new action plan item. AI enrichment is best-effort:
+ * the item is saved immediately, and AI enrichment is attempted
+ * afterwards. If AI fails, the item remains with null enrichment.
  */
 export async function POST(request: Request) {
   const authCheck = await requireAuth();
@@ -72,7 +72,33 @@ export async function POST(request: Request) {
       );
     }
 
-    // AI enrichment
+    // Save immediately without AI enrichment
+    const item = await repository.salvarItem(userId, validation.data, null);
+
+    // Best-effort AI enrichment (fire-and-forget)
+    void enrichItemInBackground(repository, userId, item.identificador, validation.data);
+
+    return NextResponse.json({ item }, { status: 201, ...cabecalhosSemCache() });
+  } catch (error) {
+    console.error("[ActionPlan] Unexpected error:", error);
+    return NextResponse.json(
+      { erro: "Falha ao criar item do plano" },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * Attempts AI enrichment in background. If it succeeds, updates the item.
+ * If it fails, the item remains with null enrichment — no user impact.
+ */
+async function enrichItemInBackground(
+  repository: Awaited<ReturnType<typeof obterPlanoAcaoRepository>>,
+  userId: string,
+  identificador: string,
+  dados: { textoOriginal: string; tipoConclusao: string },
+): Promise<void> {
+  try {
     const provider = criarProvedorAi();
     const aiResponse = await retryWithBackoff(() =>
       provider.gerar({
@@ -83,10 +109,7 @@ export async function POST(request: Request) {
             partes: [
               {
                 tipo: "texto",
-                dados: buildEnrichUserPrompt(
-                  validation.data.textoOriginal,
-                  validation.data.tipoConclusao,
-                ),
+                dados: buildEnrichUserPrompt(dados.textoOriginal, dados.tipoConclusao),
               },
             ],
           },
@@ -100,32 +123,13 @@ export async function POST(request: Request) {
     const enrichValidation = EnriquecimentoAiSchema.safeParse(parsed);
 
     if (!enrichValidation.success) {
-      console.error("[ActionPlan] AI returned invalid JSON structure");
-      return NextResponse.json(
-        { erro: "Resposta da IA em formato inesperado" },
-        { status: 502 },
-      );
+      console.warn("[ActionPlan] AI returned invalid JSON structure, skipping enrichment");
+      return;
     }
 
-    const item = await repository.salvarItem(
-      userId,
-      validation.data,
-      enrichValidation.data,
-    );
-
-    return NextResponse.json({ item }, { status: 201, ...cabecalhosSemCache() });
+    await repository.atualizarEnriquecimento(userId, identificador, enrichValidation.data);
+    console.info(`[ActionPlan] AI enrichment completed for item ${identificador}`);
   } catch (error) {
-    if (error instanceof AiApiTransientError) {
-      return NextResponse.json(
-        { erro: "Servico de IA temporariamente indisponivel. Tente novamente." },
-        { status: 503 },
-      );
-    }
-
-    console.error("[ActionPlan] Unexpected error:", error);
-    return NextResponse.json(
-      { erro: "Falha ao criar item do plano" },
-      { status: 500 },
-    );
+    console.warn("[ActionPlan] AI enrichment failed (item saved without enrichment):", error);
   }
 }

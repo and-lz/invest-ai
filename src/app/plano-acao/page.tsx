@@ -91,15 +91,25 @@ function ActionItemCard({
           </div>
         </div>
 
-        {/* AI recommendation */}
-        <div className="border-primary/20 ml-7 border-l-2 pl-3">
-          <p className={cn(tipografia.corpo, "leading-relaxed")}>
-            {item.recomendacaoEnriquecida}
-          </p>
-          <p className={cn(tipografia.auxiliar, "mt-1 leading-relaxed")}>
-            {item.fundamentacao}
-          </p>
-        </div>
+        {/* AI recommendation (or pending enrichment state) */}
+        {item.recomendacaoEnriquecida ? (
+          <div className="border-primary/20 ml-7 border-l-2 pl-3">
+            <p className={cn(tipografia.corpo, "leading-relaxed")}>
+              {item.recomendacaoEnriquecida}
+            </p>
+            {item.fundamentacao && (
+              <p className={cn(tipografia.auxiliar, "mt-1 leading-relaxed")}>
+                {item.fundamentacao}
+              </p>
+            )}
+          </div>
+        ) : (
+          <div className="ml-7">
+            <p className={cn(tipografia.auxiliar, "italic")}>
+              Enriquecimento por IA em andamento...
+            </p>
+          </div>
+        )}
 
         {/* Badges + actions */}
         <div className="ml-7 flex flex-wrap items-center justify-between gap-2">

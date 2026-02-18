@@ -245,8 +245,8 @@ export const itensPlanoAcao = pgTable(
     textoOriginal: text("texto_original").notNull(),
     tipoConclusao: tipoConclusaoPlanoEnum("tipo_conclusao").notNull(),
     origem: origemItemPlanoEnum("origem").notNull(),
-    recomendacaoEnriquecida: text("recomendacao_enriquecida").notNull(),
-    fundamentacao: text("fundamentacao").notNull(),
+    recomendacaoEnriquecida: text("recomendacao_enriquecida"),
+    fundamentacao: text("fundamentacao"),
     ativosRelacionados: jsonb("ativos_relacionados").notNull().default("[]"), // string[]
     status: statusItemPlanoEnum("status").notNull().default("pendente"),
     criadoEm: timestamp("criado_em", { withTimezone: true }).notNull().defaultNow(),

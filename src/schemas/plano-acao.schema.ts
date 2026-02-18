@@ -34,9 +34,9 @@ export const ItemPlanoAcaoSchema = z.object({
   tipoConclusao: TipoConclusaoPlanoEnum,
   origem: OrigemItemPlanoEnum,
 
-  // AI-enriched recommendation
-  recomendacaoEnriquecida: z.string().min(1).max(1000),
-  fundamentacao: z.string().min(1).max(500),
+  // AI-enriched recommendation (nullable — AI enrichment is best-effort)
+  recomendacaoEnriquecida: z.string().min(1).max(1000).nullable().default(null),
+  fundamentacao: z.string().min(1).max(500).nullable().default(null),
 
   // Related context
   ativosRelacionados: z.array(z.string()).default([]),

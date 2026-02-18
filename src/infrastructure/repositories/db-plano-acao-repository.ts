@@ -15,7 +15,7 @@ export class DbPlanoAcaoRepository implements PlanoAcaoRepository {
   async salvarItem(
     usuarioId: string,
     item: CriarItemPlano,
-    enriquecimento: EnriquecimentoAi,
+    enriquecimento: EnriquecimentoAi | null,
   ): Promise<ItemPlanoAcao> {
     const novoItem: ItemPlanoAcao = {
       identificador: crypto.randomUUID(),
@@ -23,8 +23,8 @@ export class DbPlanoAcaoRepository implements PlanoAcaoRepository {
       textoOriginal: item.textoOriginal,
       tipoConclusao: item.tipoConclusao,
       origem: item.origem,
-      recomendacaoEnriquecida: enriquecimento.recomendacaoEnriquecida,
-      fundamentacao: enriquecimento.fundamentacao,
+      recomendacaoEnriquecida: enriquecimento?.recomendacaoEnriquecida ?? null,
+      fundamentacao: enriquecimento?.fundamentacao ?? null,
       ativosRelacionados: item.ativosRelacionados ?? [],
       status: "pendente",
       criadoEm: new Date().toISOString(),
@@ -48,6 +48,26 @@ export class DbPlanoAcaoRepository implements PlanoAcaoRepository {
     });
 
     return novoItem;
+  }
+
+  async atualizarEnriquecimento(
+    usuarioId: string,
+    identificador: string,
+    enriquecimento: EnriquecimentoAi,
+  ): Promise<void> {
+    await db
+      .update(itensPlanoAcao)
+      .set({
+        recomendacaoEnriquecida: enriquecimento.recomendacaoEnriquecida,
+        fundamentacao: enriquecimento.fundamentacao,
+        atualizadoEm: new Date(),
+      })
+      .where(
+        and(
+          eq(itensPlanoAcao.usuarioId, usuarioId),
+          eq(itensPlanoAcao.identificador, identificador),
+        ),
+      );
   }
 
   async listarItensDoUsuario(usuarioId: string): Promise<ItemPlanoAcao[]> {

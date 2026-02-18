@@ -7,19 +7,30 @@ import type {
 
 /**
  * Abstract repository for action plan items.
- * Each item is a takeaway conclusion enriched by AI
+ * Each item is a takeaway conclusion optionally enriched by AI
  * with contextual investment recommendations.
  */
 export interface PlanoAcaoRepository {
   /**
-   * Saves a new action plan item with AI enrichment data.
+   * Saves a new action plan item, optionally with AI enrichment data.
    * Auto-generates: UUID, timestamps.
+   * When enrichment is null, the item is saved without AI recommendation.
    */
   salvarItem(
     usuarioId: string,
     item: CriarItemPlano,
-    enriquecimento: EnriquecimentoAi,
+    enriquecimento: EnriquecimentoAi | null,
   ): Promise<ItemPlanoAcao>;
+
+  /**
+   * Updates only the AI enrichment fields of an existing item.
+   * Used for best-effort AI enrichment after initial save.
+   */
+  atualizarEnriquecimento(
+    usuarioId: string,
+    identificador: string,
+    enriquecimento: EnriquecimentoAi,
+  ): Promise<void>;
 
   /**
    * Lists all action plan items for a user.

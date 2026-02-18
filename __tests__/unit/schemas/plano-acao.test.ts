@@ -193,6 +193,42 @@ describe("Action Plan Schemas", () => {
       expect(result.success).toBe(true);
     });
 
+    it("Given item with null enrichment / When parsed / Then should succeed (graceful fallback)", () => {
+      const result = ItemPlanoAcaoSchema.safeParse({
+        ...validItem,
+        recomendacaoEnriquecida: null,
+        fundamentacao: null,
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.recomendacaoEnriquecida).toBeNull();
+        expect(result.data.fundamentacao).toBeNull();
+      }
+    });
+
+    it("Given item without enrichment fields / When parsed / Then should default to null", () => {
+      const itemSemEnriquecimento = {
+        identificador: validItem.identificador,
+        usuarioId: validItem.usuarioId,
+        textoOriginal: validItem.textoOriginal,
+        tipoConclusao: validItem.tipoConclusao,
+        origem: validItem.origem,
+        ativosRelacionados: validItem.ativosRelacionados,
+        status: validItem.status,
+        criadoEm: validItem.criadoEm,
+        atualizadoEm: validItem.atualizadoEm,
+        concluidoEm: validItem.concluidoEm,
+      };
+      const result = ItemPlanoAcaoSchema.safeParse(itemSemEnriquecimento);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.recomendacaoEnriquecida).toBeNull();
+        expect(result.data.fundamentacao).toBeNull();
+      }
+    });
+
     it("Given invalid UUID / When parsed / Then should fail", () => {
       const result = ItemPlanoAcaoSchema.safeParse({
         ...validItem,
