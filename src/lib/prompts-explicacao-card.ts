@@ -2,43 +2,45 @@
  * Static prompts for the "Ask AI to explain" button on each chart/table card.
  * Keys match the card identifier (used for both prompt routing and chat-highlight).
  * Values are the user message auto-sent to the chat.
+ *
+ * Focus: analyze the user's ACTUAL RESULTS, not explain what the chart is.
  */
 export const PROMPTS_EXPLICACAO_CARD: Record<string, string> = {
   // Dashboard
   "patrimonio-total":
-    "Explique de forma simples o gráfico de Evolução Patrimonial. O que significa a diferença entre as duas áreas? Meus investimentos estão indo bem?",
+    "Analise minha evolução patrimonial. Meu patrimônio está crescendo bem? Como estão meus rendimentos em relação ao que eu aportei?",
   benchmark:
-    "Me ajude a entender o gráfico de Carteira vs Benchmarks. O que são CDI, Ibovespa e IPCA? Minha carteira está indo bem comparada a eles?",
+    "Analise meus resultados comparados aos benchmarks. Estou superando o CDI, Ibovespa e IPCA? O que isso diz sobre minha carteira?",
   "alocacao-ativos":
-    "Explique o gráfico de Alocação por Estratégia. Meu dinheiro está bem distribuído? O que significa diversificação?",
+    "Analise a distribuição atual da minha carteira por estratégia. Meu dinheiro está bem diversificado ou concentrado demais em algo?",
   "evolucao-alocacao":
-    "Explique o gráfico de Evolução da Alocação. Como a distribuição dos meus investimentos mudou ao longo do tempo?",
+    "Analise como a distribuição da minha carteira mudou ao longo do tempo. Alguma estratégia cresceu ou encolheu de forma relevante?",
   "rentabilidade-categoria":
-    "Explique o gráfico de Rentabilidade por Categoria. Quais tipos de investimento renderam mais? O que isso significa?",
+    "Analise a rentabilidade das minhas categorias de investimento. Quais renderam mais e quais ficaram abaixo do esperado?",
   "retornos-mensais":
-    "Explique a tabela de Retornos Mensais. Como devo interpretar as cores e os percentuais? O que é % CDI?",
+    "Analise meus retornos mensais. Em quais meses fui melhor e pior? Estou sendo consistente ao longo do tempo?",
   "escada-liquidez":
-    "Explique o gráfico da Escada de Liquidez. O que é liquidez e por que é importante saber quando posso resgatar meu dinheiro?",
+    "Analise minha liquidez. Tenho dinheiro suficiente disponível para emergências ou está tudo preso em investimentos de longo prazo?",
   "top-performers":
-    "Explique a tabela dos Melhores e Piores ativos. O que significam rentabilidade e participação? Devo me preocupar com os piores?",
+    "Analise meus melhores e piores ativos. Quais se destacaram positivamente e quais merecem atenção? Devo me preocupar?",
   "ganhos-estrategia":
-    "Explique a tabela de Ganhos por Estratégia. O que significam os valores no mês, no ano e desde o início?",
+    "Analise os ganhos das minhas estratégias. Quais estão performando melhor no mês, no ano e desde o início?",
   "eventos-financeiros":
-    "Explique os Eventos Financeiros. O que são dividendos, JCP e rendimentos? Esse dinheiro já é meu?",
+    "Analise meus eventos financeiros recentes. Estou recebendo bons dividendos e proventos? Como está minha renda passiva?",
   "comparacao-periodos":
-    "Explique a Comparação por Período. O que significam volatilidade e % CDI? Como devo interpretar esses números?",
+    "Analise meu desempenho em diferentes períodos. Estou batendo o CDI consistentemente? Minha volatilidade está aceitável?",
   "risco-consistencia":
-    "Explique o card de Risco e Consistência. O que significam os indicadores mostrados? Minha carteira é arriscada?",
+    "Analise meu perfil de risco e consistência. Minha carteira está arriscada demais? Com que frequência supero o CDI?",
 
   // Desempenho
   "evolucao-ativo":
-    "Explique o gráfico de Evolução do Saldo deste ativo. O que a linha mostra e como interpretar a tendência?",
+    "Analise a evolução do saldo deste ativo. A tendência é de alta ou queda? Como ele se comportou nos últimos meses?",
   "rendimentos-ativo":
-    "Explique o gráfico de Proventos Recebidos deste ativo. O que são proventos e com que frequência recebo?",
+    "Analise os proventos que recebi deste ativo. A frequência e os valores estão bons? A tendência é de aumento ou queda?",
 
   // Trends
   "indicadores-macro":
-    "Explique o gráfico de Indicadores Macroeconômicos. O que são Selic, IPCA e IGP-M? Como eles afetam meus investimentos?",
+    "Analise os indicadores macroeconômicos atuais. Como Selic, IPCA e IGP-M estão se comportando e o que isso pode significar para meus investimentos?",
   "heatmap-setores":
-    "Explique o mapa de calor por Setor. O que significam as cores e os percentuais? Como os setores afetam minha carteira?",
+    "Analise o desempenho dos setores do mercado. Quais setores estão indo bem e quais estão em queda? Algum impacta minha carteira?",
 };
