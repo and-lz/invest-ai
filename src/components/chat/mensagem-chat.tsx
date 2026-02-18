@@ -14,21 +14,22 @@ export function MensagemChatBolha({ mensagem, estaTransmitindo }: MensagemChatBo
   const ehUsuario = mensagem.papel === "usuario";
 
   return (
-    <div className={cn("flex gap-1.5", ehUsuario ? "flex-row-reverse" : "flex-row")}>
+    <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       <div
         className={cn(
-          "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full",
+          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
           ehUsuario ? "bg-primary/10" : "bg-secondary",
         )}
       >
-        {ehUsuario ? <User className="h-2.5 w-2.5" /> : <Bot className="h-2.5 w-2.5" />}
+        {ehUsuario ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
       </div>
 
       {/* Bolha de mensagem */}
       <div
+        data-chat-bubble
         className={cn(
-          "max-w-[85%] rounded-lg px-2.5 py-1 text-xs leading-relaxed",
+          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
           ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
         )}
       >

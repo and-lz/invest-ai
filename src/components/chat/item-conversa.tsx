@@ -22,21 +22,21 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar }: I
   return (
     <div
       className={cn(
-        "group hover:bg-muted/50 relative rounded-md border p-2 transition-colors",
+        "group hover:bg-muted/50 relative rounded-lg border p-3 transition-colors",
         estaAtiva && "border-primary bg-muted",
       )}
     >
-      <button onClick={onSelecionar} className="w-full text-left pr-6">
+      <button onClick={onSelecionar} className="w-full text-left pr-7">
         {/* Titulo */}
-        <h4 className="line-clamp-1 text-xs font-medium">{conversa.titulo}</h4>
+        <h4 className="line-clamp-1 text-sm font-medium">{conversa.titulo}</h4>
 
         {/* Preview */}
-        <p className="text-muted-foreground mt-0.5 line-clamp-1 text-xs">
+        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
           {conversa.previewMensagem}
         </p>
 
         {/* Footer: timestamp + contagem */}
-        <div className="text-muted-foreground mt-1 flex items-center gap-1.5 text-xs">
+        <div className="text-muted-foreground mt-2 flex items-center gap-2 text-xs">
           <MessageSquare className="h-3 w-3" />
           <span>{conversa.contagemMensagens}</span>
           <span>•</span>
