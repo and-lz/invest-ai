@@ -271,4 +271,84 @@ describe("executarTarefaEmBackground", () => {
     // Padrao: 2 tentativas
     expect(operacaoMock).toHaveBeenCalledTimes(2);
   });
+
+  describe("aoFalharDefinitivo callback", () => {
+    it("Given a permanent failure, When aoFalharDefinitivo is provided, Then it is called before saving error status", async () => {
+      const tarefa = criarTarefaBase();
+      const cleanupMock = vi.fn();
+
+      await executarTarefaEmBackground({
+        tarefa,
+        rotuloLog: "Test",
+        usuarioId: "user-test-123",
+        executarOperacao: async () => {
+          throw new AppError("Permanent failure", "AI_API_ERROR");
+        },
+        aoFalharDefinitivo: cleanupMock,
+      });
+
+      expect(cleanupMock).toHaveBeenCalledTimes(1);
+      expect(mockSalvarTarefa).toHaveBeenCalledWith(
+        expect.objectContaining({ status: "erro" }),
+      );
+    });
+
+    it("Given a transient failure that exhausts retries, When aoFalharDefinitivo is provided, Then it is called once", async () => {
+      const tarefa = criarTarefaBase({ maximoTentativas: 2 });
+      const cleanupMock = vi.fn();
+
+      await executarTarefaEmBackground({
+        tarefa,
+        rotuloLog: "Test",
+        usuarioId: "user-test-123",
+        executarOperacao: async () => {
+          throw new AiApiTransientError("503 Service Unavailable");
+        },
+        aoFalharDefinitivo: cleanupMock,
+      });
+
+      expect(cleanupMock).toHaveBeenCalledTimes(1);
+    });
+
+    it("Given a successful operation, When aoFalharDefinitivo is provided, Then it is NOT called", async () => {
+      const tarefa = criarTarefaBase();
+      const cleanupMock = vi.fn();
+
+      await executarTarefaEmBackground({
+        tarefa,
+        rotuloLog: "Test",
+        usuarioId: "user-test-123",
+        executarOperacao: async () => ({
+          descricaoResultado: "OK",
+        }),
+        aoFalharDefinitivo: cleanupMock,
+      });
+
+      expect(cleanupMock).not.toHaveBeenCalled();
+    });
+
+    it("Given aoFalharDefinitivo throws, When task fails permanently, Then error is logged but task still saved as erro", async () => {
+      const tarefa = criarTarefaBase();
+
+      await executarTarefaEmBackground({
+        tarefa,
+        rotuloLog: "Test",
+        usuarioId: "user-test-123",
+        executarOperacao: async () => {
+          throw new AppError("Main failure", "AI_API_ERROR");
+        },
+        aoFalharDefinitivo: async () => {
+          throw new Error("Cleanup failed");
+        },
+      });
+
+      // Task should still be saved as error despite cleanup failure
+      expect(mockSalvarTarefa).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "erro",
+          erro: "Main failure",
+        }),
+      );
+    });
+  });
 });

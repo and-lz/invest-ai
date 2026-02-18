@@ -16,10 +16,17 @@ export function usePlanoAcao() {
     {
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
-      // Poll every 3s while any item is waiting for AI enrichment
+      // Poll every 3s while any item is waiting for AI enrichment (with 2min safety timeout)
       refreshInterval: (latestData) => {
         const itens = (latestData as PlanoAcaoApiResponse | undefined)?.itens ?? [];
-        return itens.some((item) => item.recomendacaoEnriquecida === null) ? 3000 : 0;
+        const ENRICHMENT_TIMEOUT_MS = 2 * 60 * 1000;
+        const now = Date.now();
+        const hasRecentPendingEnrichment = itens.some(
+          (item) =>
+            item.recomendacaoEnriquecida === null &&
+            now - new Date(item.criadoEm).getTime() < ENRICHMENT_TIMEOUT_MS,
+        );
+        return hasRecentPendingEnrichment ? 3000 : 0;
       },
     },
   );

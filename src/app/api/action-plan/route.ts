@@ -123,7 +123,14 @@ export async function POST(request: Request) {
         const enrichValidation = EnriquecimentoAiSchema.safeParse(parsed);
 
         if (!enrichValidation.success) {
-          console.warn("[ActionPlan] AI returned invalid JSON structure, skipping enrichment");
+          console.warn(
+            "[ActionPlan] AI returned invalid JSON structure, writing fallback enrichment",
+            enrichValidation.error.issues,
+          );
+          await repository.atualizarEnriquecimento(userId, item.identificador, {
+            recomendacaoEnriquecida: validation.data.textoOriginal,
+            fundamentacao: "Recomendação automática indisponível no momento.",
+          });
           return {
             descricaoResultado: "Recomendação IA indisponível",
           };
@@ -135,6 +142,12 @@ export async function POST(request: Request) {
           descricaoResultado: "Recomendação IA gerada",
           urlRedirecionamento: "/plano-acao",
         };
+      },
+      aoFalharDefinitivo: async () => {
+        await repository.atualizarEnriquecimento(userId, item.identificador, {
+          recomendacaoEnriquecida: validation.data.textoOriginal,
+          fundamentacao: "Recomendação automática indisponível no momento.",
+        });
       },
     }));
 

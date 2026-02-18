@@ -25,6 +25,8 @@ export interface ConfiguracaoExecutorTarefa {
   readonly rotuloLog: string;
   readonly usuarioId: string;
   readonly executarOperacao: () => Promise<ResultadoTarefaSucesso>;
+  /** Called when the task fails permanently (all retries exhausted). Use for cleanup. */
+  readonly aoFalharDefinitivo?: () => Promise<void>;
 }
 
 const ATRASO_BASE_MILISSEGUNDOS = 2000;
@@ -58,7 +60,7 @@ async function tarefaFoiCancelada(identificadorTarefa: string): Promise<boolean>
 export async function executarTarefaEmBackground(
   configuracao: ConfiguracaoExecutorTarefa,
 ): Promise<void> {
-  const { tarefa, rotuloLog, usuarioId, executarOperacao } = configuracao;
+  const { tarefa, rotuloLog, usuarioId, executarOperacao, aoFalharDefinitivo } = configuracao;
   const maximoTentativas = tarefa.maximoTentativas ?? 2;
   let tentativaAtual = tarefa.tentativaAtual ?? 0;
 
@@ -133,6 +135,15 @@ export async function executarTarefaEmBackground(
 
       // Falha definitiva
       const urlRetry = ehRecuperavel ? `/api/tasks/${tarefa.identificador}/retry` : undefined;
+
+      // Allow caller to do cleanup (e.g. write fallback data so frontend stops polling)
+      if (aoFalharDefinitivo) {
+        try {
+          await aoFalharDefinitivo();
+        } catch (erroCleanup) {
+          console.error(`[${rotuloLog}] Cleanup callback failed:`, erroCleanup);
+        }
+      }
 
       await salvarTarefa({
         ...tarefa,
