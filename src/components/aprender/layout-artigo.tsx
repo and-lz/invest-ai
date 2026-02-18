@@ -4,7 +4,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BreadcrumbsEducacional } from "./breadcrumbs-educacional";
-import { BarraProgressoLeitura } from "./barra-progresso-leitura";
 import { BotaoLerArtigo } from "./botao-ler-artigo";
 import { cn } from "@/lib/utils";
 import { tipografia, icone } from "@/lib/design-system";
@@ -50,10 +49,7 @@ export function LayoutArtigo({
   const categoriaInfo = INFORMACOES_CATEGORIAS.find((c) => c.slug === metadata.categoria);
 
   return (
-    <>
-      <BarraProgressoLeitura />
-
-      <article className={cn("mx-auto max-w-3xl space-y-8", className)}>
+    <article className={cn("mx-auto max-w-3xl space-y-8", className)}>
         {/* Breadcrumbs */}
         <BreadcrumbsEducacional
           items={[
@@ -173,6 +169,5 @@ export function LayoutArtigo({
           </Link>
         </div>
       </article>
-    </>
   );
 }
