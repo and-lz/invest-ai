@@ -81,12 +81,16 @@ function criarServicoInsights(modelo?: string): InsightsService {
 
 /**
  * Resolves the concrete model ID for a given user based on their settings.
- * Returns undefined if user has no preference (will use default).
+ * Falls back to the default model if the DB query fails (never breaks AI calls).
  */
 export async function resolverModeloDoUsuario(userId: string): Promise<string> {
-  const repo = obterUserSettingsRepository();
-  const settings = await repo.getUserSettings(userId);
-  return resolveModelId(settings?.modelTier);
+  try {
+    const repo = obterUserSettingsRepository();
+    const settings = await repo.getUserSettings(userId);
+    return resolveModelId(settings?.modelTier);
+  } catch {
+    return resolveModelId(undefined);
+  }
 }
 
 export async function obterUploadReportUseCase(modelo?: string) {

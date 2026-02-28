@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Cpu, Loader2, Zap } from "lucide-react";
 import { toast } from "sonner";
@@ -22,6 +22,11 @@ interface ModelTierSelectorProps {
 export function ModelTierSelector({ currentTier, onTierChange }: ModelTierSelectorProps) {
   const [selectedTier, setSelectedTier] = useState<ModelTier>(currentTier);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Sync with parent when API loads the saved preference
+  useEffect(() => {
+    setSelectedTier(currentTier);
+  }, [currentTier]);
 
   async function handleSelect(tier: ModelTier) {
     if (tier === selectedTier || isSaving) return;
