@@ -10,6 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { PROMPTS_EXPLICACAO_CARD } from "@/lib/card-explanation-prompts";
+import { isAiEnabled } from "@/lib/ai-features";
 
 /** Custom event name — listened by ChatWidget to open + auto-send */
 export const EVENTO_ABRIR_CHAT_COM_PERGUNTA = "abrir-chat-com-pergunta";
@@ -44,6 +45,8 @@ export function BotaoExplicarIA({ identificadorCard }: BotaoExplicarIAProps) {
       "Explique este gráfico de forma simples para alguém que está começando a investir.";
     abrirChatComPergunta(pergunta);
   }, [identificadorCard]);
+
+  if (!isAiEnabled()) return null;
 
   return (
     <TooltipProvider>

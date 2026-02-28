@@ -51,11 +51,15 @@ async function criarRepositorio() {
   return new DbReportRepository(usuarioId, obterPdfStorage());
 }
 
+export function isAiConfigured(): boolean {
+  return !!process.env.GOOGLE_API_KEY;
+}
+
 function obterGoogleApiKey(): string {
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "GOOGLE_API_KEY não configurada. Obtenha em https://aistudio.google.com/apikey",
+      "AI features are not available. Set the GOOGLE_API_KEY environment variable to enable them.",
     );
   }
   return apiKey;

@@ -16,6 +16,7 @@ import { LogOut, Monitor, Moon, Sun, Check, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { isAiEnabled } from "@/lib/ai-features";
 
 const OPCOES_TEMA = [
   { valor: "light", rotulo: "Claro", icone: Sun },
@@ -75,12 +76,14 @@ export function UserProfileMenu() {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/settings" className="flex items-center">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Configurações</span>
-          </Link>
-        </DropdownMenuItem>
+        {isAiEnabled() && (
+          <DropdownMenuItem asChild>
+            <Link href="/settings" className="flex items-center">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Configurações</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/auth/signin" })}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sair</span>

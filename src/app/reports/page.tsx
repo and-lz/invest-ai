@@ -24,6 +24,7 @@ import { Trash2, FileText, Upload, MessageSquare, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { notificar as notify } from "@/lib/notifier";
 import { typography, icon, layout, dialog } from "@/lib/design-system";
+import { isAiEnabled } from "@/lib/ai-features";
 
 export default function ReportsPage() {
   const router = useRouter();
@@ -34,8 +35,9 @@ export default function ReportsPage() {
   useEffect(() => {
     definirContexto("reports");
   }, [definirContexto]);
+  const aiEnabled = isAiEnabled();
   const [metodoUploadSelecionado, setMetodoUploadSelecionado] = useState<"automatico" | "manual">(
-    "automatico",
+    aiEnabled ? "automatico" : "manual",
   );
   const {
     dialogRef,
@@ -129,29 +131,31 @@ export default function ReportsPage() {
         </div>
 
         <div className="space-y-4 p-6">
-          <div className="flex gap-2">
-            <Button
-              variant={metodoUploadSelecionado === "automatico" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setMetodoUploadSelecionado("automatico")}
-              className="gap-1.5"
-            >
-              <Upload className={icon.button} />
-              Upload Direto
-              <span className="bg-background/80 rounded px-1 py-0.5 text-[9px] leading-none font-medium">
-                REC
-              </span>
-            </Button>
-            <Button
-              variant={metodoUploadSelecionado === "manual" ? "default" : "outline"}
-              size="sm"
-              onClick={() => setMetodoUploadSelecionado("manual")}
-              className="gap-1.5"
-            >
-              <MessageSquare className={icon.button} />
-              Via Chat
-            </Button>
-          </div>
+          {aiEnabled && (
+            <div className="flex gap-2">
+              <Button
+                variant={metodoUploadSelecionado === "automatico" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setMetodoUploadSelecionado("automatico")}
+                className="gap-1.5"
+              >
+                <Upload className={icon.button} />
+                Upload Direto
+                <span className="bg-background/80 rounded px-1 py-0.5 text-[9px] leading-none font-medium">
+                  REC
+                </span>
+              </Button>
+              <Button
+                variant={metodoUploadSelecionado === "manual" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setMetodoUploadSelecionado("manual")}
+                className="gap-1.5"
+              >
+                <MessageSquare className={icon.button} />
+                Via Chat
+              </Button>
+            </div>
+          )}
 
           {metodoUploadSelecionado === "automatico" && (
             <PdfUploadDropzone onUploadSucesso={handleUploadAceito} />

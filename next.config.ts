@@ -20,6 +20,7 @@ const cabecalhosSeguranca = [
 const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_LAST_COMMIT_MESSAGE: getLastCommitMessage(),
+    NEXT_PUBLIC_AI_ENABLED: process.env.GOOGLE_API_KEY ? "true" : "false",
   },
   poweredByHeader: false,
   eslint: {

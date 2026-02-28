@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { serializarContextoInsights } from "@/lib/serialize-chat-context";
 import { Header } from "@/components/layout/header";
+import { isAiEnabled } from "@/lib/ai-features";
 import { useReports } from "@/hooks/use-reports";
 import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
 import { Card, CardContent } from "@/components/ui/card";
@@ -513,6 +514,28 @@ export default function InsightsPage() {
     },
     [insights],
   );
+
+  if (!isAiEnabled()) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Lightbulb className="text-muted-foreground h-6 w-6" aria-hidden="true" />
+          <Header
+            titulo="Análises IA"
+            descricao="Analise inteligente da sua carteira de investimentos"
+          />
+        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
+            <Lightbulb className="text-muted-foreground h-12 w-12" />
+            <p className="text-muted-foreground">
+              Funcionalidade indisponível. Configure a variável de ambiente <code className="text-xs font-mono">GOOGLE_API_KEY</code> para habilitar análises com IA.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

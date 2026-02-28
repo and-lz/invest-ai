@@ -27,23 +27,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { isAiEnabled } from "@/lib/ai-features";
 import packageJson from "../../../package.json";
 
 const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
 
-const itensNavegacaoPrincipais = [
+const AI_ONLY_ROUTES = new Set(["/insights"]);
+
+const todosItensPrincipais = [
   { href: "/", label: "Dashboard", icone: LayoutDashboard },
   { href: "/reports", label: "Relatorios", icone: FileText },
   { href: "/insights", label: "Análises", icone: Lightbulb },
   { href: "/desempenho", label: "Desempenho", icone: BarChart3 },
 ];
 
-const itensNavegacaoSecundarios = [
+const todosItensSecundarios = [
   { href: "/trends", label: "Tendencias", icone: TrendingUp },
   { href: "/plano-acao", label: "Plano de Ação", icone: ClipboardList },
   { href: "/aprender", label: "Aprender", icone: BookOpen },
 ];
 
+const aiEnabled = isAiEnabled();
+const itensNavegacaoPrincipais = aiEnabled
+  ? todosItensPrincipais
+  : todosItensPrincipais.filter((item) => !AI_ONLY_ROUTES.has(item.href));
+const itensNavegacaoSecundarios = aiEnabled
+  ? todosItensSecundarios
+  : todosItensSecundarios.filter((item) => !AI_ONLY_ROUTES.has(item.href));
 const todosItensNavegacao = [...itensNavegacaoPrincipais, ...itensNavegacaoSecundarios];
 
 export function HeaderNavigation() {

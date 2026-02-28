@@ -16,6 +16,7 @@ import { GridAtivosCarteira } from "@/components/desempenho/portfolio-assets-gri
 import { CardsResumoAtivo } from "@/components/desempenho/asset-summary-cards";
 import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
 import { notificar } from "@/lib/notifier";
+import { isAiEnabled } from "@/lib/ai-features";
 
 // Lazy-load chart-heavy components to reduce initial bundle size
 const GraficoEvolucaoAtivo = dynamic(
@@ -38,6 +39,8 @@ const AnaliseIaAtivo = dynamic(
   () => import("@/components/desempenho/asset-ai-analysis").then((m) => m.AnaliseIaAtivo),
   { loading: () => <Skeleton className="h-96" /> },
 );
+
+const aiEnabled = isAiEnabled();
 
 function DesempenhoConteudo() {
   const searchParams = useSearchParams();
@@ -135,8 +138,8 @@ function DesempenhoConteudo() {
         estaCarregando={carregandoLista}
       />
 
-      {/* Botões de Ação */}
-      {tickerSelecionado && dadosAtivo && (
+      {/* Botões de Ação (AI only) */}
+      {aiEnabled && tickerSelecionado && dadosAtivo && (
         <div className="flex flex-wrap items-center gap-3">
           {!analise && (
             <Button
@@ -206,9 +209,9 @@ function DesempenhoConteudo() {
           />
 
           {/* Analise IA */}
-          {carregandoAnalise && tickerSelecionado && <Skeleton className="h-96" />}
+          {aiEnabled && carregandoAnalise && tickerSelecionado && <Skeleton className="h-96" />}
 
-          {analise && <AnaliseIaAtivo analise={analise} />}
+          {aiEnabled && analise && <AnaliseIaAtivo analise={analise} />}
 
           {/* Estado sem dados (busca livre sem resultados) */}
           {!dadosAtivo.estaNaCarteira &&

@@ -7,6 +7,7 @@ import { ChatPageProvider } from "@/contexts/chat-page-context";
 import { ChatWidget } from "@/components/chat/chat-widget";
 import { ProvedorSwr } from "@/components/providers/swr-provider";
 import { PwaRegistration } from "@/components/providers/pwa-registration";
+import { isAiEnabled } from "@/lib/ai-features";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -46,6 +47,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const aiEnabled = isAiEnabled();
+
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <body
@@ -64,7 +67,7 @@ export default function RootLayout({
                   <HeaderNavigation />
                   <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
                 </div>
-                <ChatWidget />
+                {aiEnabled && <ChatWidget />}
                 <Toaster />
               </ChatPageProvider>
             </ProvedorSwr>
