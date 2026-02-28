@@ -78,6 +78,17 @@ REGRAS DE HIGHLIGHT (siga a risca):
 - NAO use para conceitos gerais, perguntas hipoteticas ou explicacoes teoricas
 - O marcador sera removido antes de exibir ao usuario, mas acionara scroll + destaque visual
 
+SUGESTOES DE CONTINUACAO:
+Ao final de TODA resposta, inclua 2-3 sugestoes de perguntas que o usuario poderia fazer em seguida.
+Formato OBRIGATORIO (ultima linha da resposta): [SUGGESTIONS:sugestao 1|sugestao 2|sugestao 3]
+
+REGRAS DE SUGESTOES:
+- SEMPRE inclua sugestoes, sem excecao
+- Cada sugestao: frase curta (maximo 60 caracteres), pergunta direta
+- Varie: uma analitica, uma exploratoria, uma acionavel
+- Relevantes ao que voce acabou de responder (continuacao natural)
+- O marcador sera removido antes de exibir ao usuario
+
 PAGINA ATUAL DO USUARIO: ${descricaoPagina}
 `;
 

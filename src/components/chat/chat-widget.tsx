@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Bot, X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MensagemChatBolha } from "@/components/chat/chat-message";
 import { CampoEntradaChat } from "@/components/chat/chat-input-field";
+import { SuggestionChips } from "@/components/chat/suggestion-chips";
 import { ListaConversas } from "@/components/chat/conversations-list";
 import { useChatAssistant } from "@/hooks/use-chat-assistant";
+import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { stripMarkdown } from "@/lib/strip-markdown";
+import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
 import {
   EVENTO_ABRIR_CHAT_COM_PERGUNTA,
   type EventoAbrirChatDetalhe,
@@ -24,8 +27,11 @@ export function ChatWidget() {
   const [telaCheia, setTelaCheia] = useState(false);
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const areaScrollRef = useRef<HTMLDivElement>(null);
   const prevTransmitindoRef = useRef(false);
+
+  const { identificadorPagina } = useChatPageContext();
 
   const { data: session } = useSession();
 
@@ -54,7 +60,24 @@ export function ChatWidget() {
     conversaAtualId,
     criarNovaConversa,
     carregarConversa,
+    followUpSuggestions,
+    reenviarUltimaMensagem,
   } = useChatAssistant();
+
+  const activeSuggestions = useMemo(() => {
+    if (mensagens.length === 0) {
+      return INITIAL_SUGGESTIONS[identificadorPagina] ?? [];
+    }
+    return followUpSuggestions;
+  }, [mensagens.length, identificadorPagina, followUpSuggestions]);
+
+  const handleSuggestionSelect = useCallback(
+    (text: string) => {
+      setInputValue("");
+      void enviarMensagem(text);
+    },
+    [enviarMensagem],
+  );
 
   const [estaAberto, setEstaAberto] = useState(false);
 
@@ -277,14 +300,21 @@ export function ChatWidget() {
             {/* Area de mensagens */}
             <div ref={areaScrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
               {mensagens.length === 0 && (
-                <div className="flex h-full flex-col items-center justify-center text-center">
-                  <Bot className="text-muted-foreground mb-3 h-10 w-10" />
-                  <p className="text-muted-foreground text-sm">
-                    Pergunte sobre seus investimentos.
-                  </p>
-                  <p className="text-muted-foreground mt-1 text-xs">
-                    A Fortuna tem acesso aos dados da pagina atual.
-                  </p>
+                <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+                  <Bot className="text-muted-foreground h-10 w-10" />
+                  <div>
+                    <p className="text-muted-foreground text-sm">
+                      Pergunte sobre seus investimentos.
+                    </p>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      A Fortuna tem acesso aos dados da pagina atual.
+                    </p>
+                  </div>
+                  <SuggestionChips
+                    suggestions={activeSuggestions}
+                    onSelect={handleSuggestionSelect}
+                    variant="empty-state"
+                  />
                 </div>
               )}
               {mensagens.map((mensagem, indice) => (
@@ -298,6 +328,11 @@ export function ChatWidget() {
                   }
                   userImageUrl={userImageUrl}
                   userInitials={userInitials}
+                  onRetry={
+                    mensagem.papel === "assistente" && indice === mensagens.length - 1
+                      ? reenviarUltimaMensagem
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -309,11 +344,23 @@ export function ChatWidget() {
               </div>
             )}
 
+            {/* Follow-up suggestions */}
+            {mensagens.length > 0 && activeSuggestions.length > 0 && !estaTransmitindo && (
+              <SuggestionChips
+                suggestions={activeSuggestions}
+                onSelect={handleSuggestionSelect}
+                filterText={inputValue}
+                variant="follow-up"
+              />
+            )}
+
             {/* Campo de entrada */}
             <CampoEntradaChat
               onEnviar={enviarMensagem}
               onParar={pararTransmissao}
               estaTransmitindo={estaTransmitindo}
+              value={inputValue}
+              onValueChange={setInputValue}
             />
           </div>
         </div>

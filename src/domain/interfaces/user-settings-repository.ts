@@ -10,6 +10,7 @@ export interface UserSettingsRepository {
     identificador: string;
     usuarioId: string;
     geminiApiKey?: string;
+    modelTier?: string;
     criadaEm: Date;
     atualizadaEm: Date;
   } | null>;
@@ -19,6 +20,12 @@ export interface UserSettingsRepository {
    * Cria configuracoes se nao existirem
    */
   updateGeminiApiKey(userId: string, geminiApiKey: string): Promise<void>;
+
+  /**
+   * Atualiza o tier de modelo AI do usuario
+   * Cria configuracoes se nao existirem
+   */
+  updateModelTier(userId: string, modelTier: string): Promise<void>;
 
   /**
    * Deleta a chave de API Gemini do usuario

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth-utils";
-import { obterGetUserSettingsUseCase, obterUpdateGeminiApiKeyUseCase } from "@/lib/container";
-import { UpdateGeminiApiKeySchema } from "@/schemas/user-settings.schema";
+import {
+  obterGetUserSettingsUseCase,
+  obterUpdateGeminiApiKeyUseCase,
+  obterUpdateModelTierUseCase,
+} from "@/lib/container";
+import { UpdateUserSettingsSchema } from "@/schemas/user-settings.schema";
 
 /**
  * GET /api/settings
@@ -26,7 +30,7 @@ export async function GET() {
 
 /**
  * PATCH /api/settings
- * Atualiza as configuracoes do usuario (chave API Gemini)
+ * Atualiza as configuracoes do usuario (chave API e/ou tier de modelo)
  */
 export async function PATCH(request: NextRequest) {
   const auth = await requireAuth();
@@ -36,15 +40,20 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json();
+    const validated = UpdateUserSettingsSchema.parse(body);
+    const userId = auth.session.user.userId;
 
-    // Valida o body
-    const validated = UpdateGeminiApiKeySchema.parse(body);
+    if (validated.geminiApiKey) {
+      const useCase = obterUpdateGeminiApiKeyUseCase();
+      await useCase.executar(userId, validated.geminiApiKey);
+    }
 
-    // Executa o use case
-    const useCase = obterUpdateGeminiApiKeyUseCase();
-    await useCase.executar(auth.session.user.userId, validated.geminiApiKey);
+    if (validated.modelTier) {
+      const useCase = obterUpdateModelTierUseCase();
+      await useCase.executar(userId, validated.modelTier);
+    }
 
-    return NextResponse.json({ sucesso: true, mensagem: "Chave de API atualizada com sucesso" });
+    return NextResponse.json({ sucesso: true, mensagem: "Configurações atualizadas com sucesso" });
   } catch (error) {
     if (error instanceof SyntaxError) {
       return NextResponse.json({ erro: "JSON invalido" }, { status: 400 });

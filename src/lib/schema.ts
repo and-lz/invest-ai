@@ -296,6 +296,7 @@ export const configuracoesUsuario = pgTable(
     identificador: text("identificador").notNull().primaryKey(),
     usuarioId: text("usuario_id").notNull(),
     chaveApiGemini: text("chave_api_gemini"), // Criptografada
+    modeloTier: text("modelo_tier"), // "economic" | "capable"
     criadaEm: timestamp("criada_em", { withTimezone: true }).notNull().defaultNow(),
     atualizadaEm: timestamp("atualizada_em", { withTimezone: true }).notNull().defaultNow(),
   },

@@ -10,6 +10,8 @@ interface CampoEntradaChatProps {
   readonly estaTransmitindo: boolean;
   readonly desabilitado?: boolean;
   readonly autoFocus?: boolean;
+  readonly value?: string;
+  readonly onValueChange?: (value: string) => void;
 }
 
 function ehDispositivoTouch(): boolean {
@@ -23,8 +25,22 @@ export function CampoEntradaChat({
   estaTransmitindo,
   desabilitado,
   autoFocus = true,
+  value: controlledValue,
+  onValueChange,
 }: CampoEntradaChatProps) {
-  const [valor, setValor] = useState("");
+  const [internalValue, setInternalValue] = useState("");
+  const isControlled = controlledValue !== undefined;
+  const valor = isControlled ? controlledValue : internalValue;
+  const setValor = useCallback(
+    (v: string) => {
+      if (isControlled) {
+        onValueChange?.(v);
+      } else {
+        setInternalValue(v);
+      }
+    },
+    [isControlled, onValueChange],
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-focus quando componente monta (apenas em desktop, nao abre teclado no mobile)
@@ -42,7 +58,7 @@ export function CampoEntradaChat({
         textareaRef.current.style.height = "auto";
       }
     }
-  }, [valor, estaTransmitindo, onEnviar]);
+  }, [valor, estaTransmitindo, onEnviar, setValor]);
 
   const handleKeyDown = useCallback(
     (evento: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -54,12 +70,15 @@ export function CampoEntradaChat({
     [handleEnviar],
   );
 
-  const handleInput = useCallback((evento: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValor(evento.target.value);
-    const textarea = evento.target;
-    textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
-  }, []);
+  const handleInput = useCallback(
+    (evento: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setValor(evento.target.value);
+      const textarea = evento.target;
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+    },
+    [setValor],
+  );
 
   return (
     <div className="flex items-end gap-2 border-t p-3">

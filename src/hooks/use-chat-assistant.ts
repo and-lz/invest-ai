@@ -4,6 +4,11 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import type { MensagemChat, MensagemParaServidor } from "@/schemas/chat.schema";
 import { destacarElemento } from "@/lib/chat-highlight";
+import {
+  parseSuggestionsFromResponse,
+  stripPartialSuggestionMarker,
+  type ChatSuggestion,
+} from "@/lib/chat-suggestions";
 
 /** Envia apenas as ultimas N mensagens para a API, controlando uso de tokens */
 const LIMITE_MENSAGENS_PARA_API = 20;
@@ -21,6 +26,8 @@ interface UseChatAssistenteRetorno {
   readonly conversaAtualId: string | null;
   readonly criarNovaConversa: () => void;
   readonly carregarConversa: (identificador: string) => Promise<void>;
+  readonly followUpSuggestions: readonly ChatSuggestion[];
+  readonly reenviarUltimaMensagem: () => void;
 }
 
 export function useChatAssistant(): UseChatAssistenteRetorno {
@@ -29,8 +36,10 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
   const [erro, setErro] = useState<string | null>(null);
   const [conversaAtualId, setConversaAtualId] = useState<string | null>(null);
   const [estaCarregando, setEstaCarregando] = useState(false);
+  const [followUpSuggestions, setFollowUpSuggestions] = useState<ChatSuggestion[]>([]);
   const controladorAbortRef = useRef<AbortController | null>(null);
   const timeoutAutoSaveRef = useRef<NodeJS.Timeout | null>(null);
+  const retryContentRef = useRef<string | null>(null);
 
   const { identificadorPagina, dadosContexto } = useChatPageContext();
 
@@ -116,6 +125,7 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
 
       setErro(null);
       setEstaTransmitindo(true);
+      setFollowUpSuggestions([]);
 
       const mensagemUsuario: MensagemChat = {
         identificador: crypto.randomUUID(),
@@ -177,8 +187,12 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
 
           textoAcumulado += decodificadorTexto.decode(value, { stream: true });
 
+          // Strip complete suggestion markers + partial ones (streaming)
+          const { cleanText: textoSemSugestoes } = parseSuggestionsFromResponse(textoAcumulado);
+          const textoSemParciais = stripPartialSuggestionMarker(textoSemSugestoes);
+
           // Processar highlights e remover marcadores
-          const textoLimpo = processarHighlights(textoAcumulado);
+          const textoLimpo = processarHighlights(textoSemParciais);
 
           // Atualizar mensagem do assistente progressivamente
           setMensagens((anteriores) =>
@@ -190,6 +204,11 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
           );
         }
 
+        // Extract follow-up suggestions from completed response
+        const { cleanText: textoFinalSemSugestoes, suggestions } =
+          parseSuggestionsFromResponse(textoAcumulado);
+        setFollowUpSuggestions(suggestions);
+
         // Auto-save debounced: aguardar 2s apos streaming concluir
         if (timeoutAutoSaveRef.current) {
           clearTimeout(timeoutAutoSaveRef.current);
@@ -197,7 +216,7 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
 
         timeoutAutoSaveRef.current = setTimeout(() => {
           // Processar highlights uma última vez para garantir texto limpo
-          const textoFinalLimpo = processarHighlights(textoAcumulado);
+          const textoFinalLimpo = processarHighlights(textoFinalSemSugestoes);
           const mensagensFinais = [
             ...mensagens,
             mensagemUsuario,
@@ -210,7 +229,8 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
           // Usuario cancelou - manter resposta parcial
           return;
         }
-        const mensagemErro = erroCatch instanceof Error ? erroCatch.message : "Erro inesperado";
+        const mensagemErro =
+          erroCatch instanceof Error ? erroCatch.message : "Algo deu errado. Tente novamente.";
         setErro(mensagemErro);
         // Remover placeholder vazio em caso de erro
         setMensagens((anteriores) =>
@@ -264,7 +284,57 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
     setMensagens([]);
     setConversaAtualId(null);
     setErro(null);
+    setFollowUpSuggestions([]);
   }, []);
+
+  // Keep a ref to enviarMensagem so the retry effect always calls the latest version
+  const enviarMensagemRef = useRef(enviarMensagem);
+  enviarMensagemRef.current = enviarMensagem;
+
+  // Retry: when content is pending and messages have been cleaned, re-send
+  useEffect(() => {
+    if (retryContentRef.current && !estaTransmitindo) {
+      const content = retryContentRef.current;
+      retryContentRef.current = null;
+      void enviarMensagemRef.current(content);
+    }
+  }, [mensagens, estaTransmitindo]);
+
+  // Remove the failed user+assistant pair and re-send the last user message
+  const reenviarUltimaMensagem = useCallback(() => {
+    if (estaTransmitindo) return;
+
+    // Find last user message content
+    let lastUserContent: string | null = null;
+    for (let i = mensagens.length - 1; i >= 0; i--) {
+      const msg = mensagens[i];
+      if (msg?.papel === "usuario") {
+        lastUserContent = msg.conteudo;
+        break;
+      }
+    }
+    if (!lastUserContent) return;
+
+    retryContentRef.current = lastUserContent;
+
+    // Remove last assistant, then last user message
+    setMensagens((prev) => {
+      const result = [...prev];
+      for (let i = result.length - 1; i >= 0; i--) {
+        if (result[i]?.papel === "assistente") {
+          result.splice(i, 1);
+          break;
+        }
+      }
+      for (let i = result.length - 1; i >= 0; i--) {
+        if (result[i]?.papel === "usuario") {
+          result.splice(i, 1);
+          break;
+        }
+      }
+      return result;
+    });
+  }, [estaTransmitindo, mensagens]);
 
   return {
     mensagens,
@@ -276,5 +346,7 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
     conversaAtualId,
     criarNovaConversa,
     carregarConversa,
+    followUpSuggestions,
+    reenviarUltimaMensagem,
   };
 }

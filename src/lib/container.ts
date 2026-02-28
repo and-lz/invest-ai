@@ -19,6 +19,7 @@ import { ListInsightsUseCase } from "@/application/use-cases/list-insights";
 import { DeleteInsightsUseCase } from "@/application/use-cases/delete-insights";
 import { GetUserSettingsUseCase } from "@/application/use-cases/get-user-settings";
 import { UpdateGeminiApiKeyUseCase } from "@/application/use-cases/update-gemini-api-key";
+import { UpdateModelTierUseCase } from "@/application/use-cases/update-model-tier";
 import { TestGeminiApiKeyUseCase } from "@/application/use-cases/test-gemini-api-key";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
@@ -27,6 +28,7 @@ import type { ConversaRepository } from "@/domain/interfaces/conversation-reposi
 import type { PlanoAcaoRepository } from "@/domain/interfaces/action-plan-repository";
 import type { UserSettingsRepository } from "@/domain/interfaces/user-settings-repository";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-ai-provider";
+import { resolveModelId } from "@/lib/model-tiers";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
@@ -65,21 +67,31 @@ function obterGoogleApiKey(): string {
   return apiKey;
 }
 
-export function criarProvedorAi(): ProvedorAi {
-  return new GeminiProvedorAi(obterGoogleApiKey());
+export function criarProvedorAi(modelo?: string): ProvedorAi {
+  return new GeminiProvedorAi(obterGoogleApiKey(), modelo);
 }
 
-function criarServicoExtracao(): ExtractionService {
-  return new GeminiPdfExtractionService(criarProvedorAi());
+function criarServicoExtracao(modelo?: string): ExtractionService {
+  return new GeminiPdfExtractionService(criarProvedorAi(modelo));
 }
 
-function criarServicoInsights(): InsightsService {
-  return new GeminiInsightsService(criarProvedorAi());
+function criarServicoInsights(modelo?: string): InsightsService {
+  return new GeminiInsightsService(criarProvedorAi(modelo));
 }
 
-export async function obterUploadReportUseCase() {
+/**
+ * Resolves the concrete model ID for a given user based on their settings.
+ * Returns undefined if user has no preference (will use default).
+ */
+export async function resolverModeloDoUsuario(userId: string): Promise<string> {
+  const repo = obterUserSettingsRepository();
+  const settings = await repo.getUserSettings(userId);
+  return resolveModelId(settings?.modelTier);
+}
+
+export async function obterUploadReportUseCase(modelo?: string) {
   const repository = await criarRepositorio();
-  return new UploadReportUseCase(repository, criarServicoExtracao());
+  return new UploadReportUseCase(repository, criarServicoExtracao(modelo));
 }
 
 export async function obterListReportsUseCase() {
@@ -97,9 +109,9 @@ export async function obterGetDashboardDataUseCase() {
   return new GetDashboardDataUseCase(repository);
 }
 
-export async function obterGenerateInsightsUseCase() {
+export async function obterGenerateInsightsUseCase(modelo?: string) {
   const repository = await criarRepositorio();
-  return new GenerateInsightsUseCase(repository, criarServicoInsights());
+  return new GenerateInsightsUseCase(repository, criarServicoInsights(modelo));
 }
 
 export async function obterDeleteReportUseCase() {
@@ -122,9 +134,9 @@ export async function obterUpdateInsightConclusionUseCase() {
   return new UpdateInsightConclusionUseCase(repository);
 }
 
-export async function obterGenerateConsolidatedInsightsUseCase() {
+export async function obterGenerateConsolidatedInsightsUseCase(modelo?: string) {
   const repository = await criarRepositorio();
-  return new GenerateConsolidatedInsightsUseCase(repository, criarServicoInsights());
+  return new GenerateConsolidatedInsightsUseCase(repository, criarServicoInsights(modelo));
 }
 
 export async function obterListInsightsUseCase() {
@@ -204,6 +216,13 @@ export function obterGetUserSettingsUseCase(): GetUserSettingsUseCase {
  */
 export function obterUpdateGeminiApiKeyUseCase(): UpdateGeminiApiKeyUseCase {
   return new UpdateGeminiApiKeyUseCase(obterUserSettingsRepository());
+}
+
+/**
+ * Obtem o use case para atualizar o tier de modelo do usuario.
+ */
+export function obterUpdateModelTierUseCase(): UpdateModelTierUseCase {
+  return new UpdateModelTierUseCase(obterUserSettingsRepository());
 }
 
 /**

@@ -40,28 +40,46 @@ export function useSpeechSynthesis(
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  // Score a voice by quality — higher is better
+  // Score a voice by quality — higher is better.
+  // Goal: always pick the most powerful/natural voice the OS provides.
   const scoreVoice = useCallback((voice: SpeechSynthesisVoice): number => {
     const name = voice.name.toLowerCase();
     let score = 0;
 
-    // Exact pt-BR match is strongly preferred over pt-PT or generic pt
+    // — Language match —
+    // Exact pt-BR is strongly preferred over pt-PT or generic pt
     if (voice.lang === "pt-BR" || voice.lang === "pt_BR") score += 100;
     else if (voice.lang.startsWith("pt")) score += 10;
 
-    // Quality indicators in voice name (macOS/iOS labels)
+    // — Apple platform voices (macOS/iOS) —
+    // Tier: premium > enhanced > compact (com.apple.voice.{tier})
     if (name.includes("premium")) score += 50;
     if (name.includes("enhanced")) score += 40;
-    if (name.includes("natural")) score += 35;
+    // Siri voices are Apple's highest-quality neural voices
+    if (name.includes("siri")) score += 48;
 
-    // Google neural voices (Chrome) — network-based but highest quality
+    // — Google neural voices (Chrome/Android) —
     if (name.includes("google")) score += 45;
 
-    // Microsoft neural voices (Edge)
-    if (name.includes("microsoft") && name.includes("online")) score += 40;
+    // — Microsoft neural voices (Edge/Windows) —
+    // "Online (Natural)" voices are the best tier on Edge
+    if (name.includes("microsoft") && name.includes("natural")) score += 48;
+    else if (name.includes("microsoft") && name.includes("online")) score += 40;
+
+    // — Samsung voices (Android) —
+    if (name.includes("samsung")) score += 30;
+
+    // — Generic quality indicators (cross-platform) —
+    if (name.includes("neural")) score += 35;
+    if (name.includes("natural") && !name.includes("microsoft")) score += 35;
 
     // Network voices are generally neural/high-quality
     if (!voice.localService) score += 5;
+
+    // — Penalize low-quality voices —
+    if (name.includes("compact")) score -= 30;
+    if (name.includes("eloquence")) score -= 20;
+    if (name.includes("espeak")) score -= 40;
 
     return score;
   }, []);

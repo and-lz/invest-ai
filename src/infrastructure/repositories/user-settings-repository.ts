@@ -12,6 +12,7 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
     identificador: string;
     usuarioId: string;
     geminiApiKey?: string;
+    modelTier?: string;
     criadaEm: Date;
     atualizadaEm: Date;
   } | null> {
@@ -30,19 +31,26 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
       return null;
     }
 
-    const settings = {
+    const settings: {
+      identificador: string;
+      usuarioId: string;
+      geminiApiKey?: string;
+      modelTier?: string;
+      criadaEm: Date;
+      atualizadaEm: Date;
+    } = {
       identificador: row.identificador,
       usuarioId: row.usuarioId,
       criadaEm: row.criadaEm,
       atualizadaEm: row.atualizadaEm,
     };
 
-    // Descriptografa a chave se existir
     if (row.chaveApiGemini) {
-      return {
-        ...settings,
-        geminiApiKey: decryptData(row.chaveApiGemini),
-      };
+      settings.geminiApiKey = decryptData(row.chaveApiGemini);
+    }
+
+    if (row.modeloTier) {
+      settings.modelTier = row.modeloTier;
     }
 
     return settings;
@@ -52,7 +60,6 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
     const encryptedKey = encryptData(geminiApiKey);
     const now = new Date();
 
-    // Verifica se ja existe configuracao
     const existing = await db
       .select()
       .from(configuracoesUsuario)
@@ -60,7 +67,6 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
       .limit(1);
 
     if (existing.length > 0) {
-      // Atualiza
       await db
         .update(configuracoesUsuario)
         .set({
@@ -69,11 +75,38 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
         })
         .where(eq(configuracoesUsuario.usuarioId, userId));
     } else {
-      // Insere
       await db.insert(configuracoesUsuario).values({
         identificador: randomUUID(),
         usuarioId: userId,
         chaveApiGemini: encryptedKey,
+        criadaEm: now,
+        atualizadaEm: now,
+      });
+    }
+  }
+
+  async updateModelTier(userId: string, modelTier: string): Promise<void> {
+    const now = new Date();
+
+    const existing = await db
+      .select()
+      .from(configuracoesUsuario)
+      .where(eq(configuracoesUsuario.usuarioId, userId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      await db
+        .update(configuracoesUsuario)
+        .set({
+          modeloTier: modelTier,
+          atualizadaEm: now,
+        })
+        .where(eq(configuracoesUsuario.usuarioId, userId));
+    } else {
+      await db.insert(configuracoesUsuario).values({
+        identificador: randomUUID(),
+        usuarioId: userId,
+        modeloTier: modelTier,
         criadaEm: now,
         atualizadaEm: now,
       });

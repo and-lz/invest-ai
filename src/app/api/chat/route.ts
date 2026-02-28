@@ -59,8 +59,8 @@ export async function POST(request: Request): Promise<Response> {
         } catch (erroStream) {
           const mensagemErro =
             erroStream instanceof AiApiTransientError
-              ? "Servico temporariamente indisponivel. Tente novamente em alguns segundos."
-              : "Erro ao processar sua mensagem. Tente novamente.";
+              ? "A Fortuna esta com dificuldades para responder no momento. Isso costuma ser passageiro."
+              : "Algo deu errado ao gerar a resposta. Voce pode tentar novamente.";
           controlador.enqueue(codificadorTexto.encode(`\n\n[ERRO]: ${mensagemErro}`));
           controlador.close();
         }
