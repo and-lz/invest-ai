@@ -123,7 +123,7 @@ export function GeminiApiKeyForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {isKeyConfigured && (keyHealth || isCheckingHealth) && (
+        {isKeyConfigured && (
           <div className="mb-4">
             <KeyHealthStatusBanner
               status={keyHealth ?? null}

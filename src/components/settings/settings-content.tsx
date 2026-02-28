@@ -25,11 +25,14 @@ export function SettingsContent({ initialKeyConfigured, initialModelTier }: Sett
     setIsCheckingHealth(true);
     try {
       const response = await fetch("/api/settings/check-key-health");
-      if (!response.ok) return;
+      if (!response.ok) {
+        setKeyHealth("error");
+        return;
+      }
       const data = await response.json();
       setKeyHealth(data.status);
     } catch {
-      // Silently fail
+      setKeyHealth("error");
     } finally {
       setIsCheckingHealth(false);
     }

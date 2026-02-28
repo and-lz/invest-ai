@@ -1,6 +1,7 @@
 import type { UserSettingsRepository } from "@/domain/interfaces/user-settings-repository";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { isQuotaExhaustedError } from "@/lib/classify-ai-error";
+import { resolveModelId } from "@/lib/model-tiers";
 import type { KeyHealthResponse } from "@/schemas/user-settings.schema";
 
 export class CheckKeyHealthUseCase {
@@ -13,9 +14,11 @@ export class CheckKeyHealthUseCase {
       return { status: "not_configured", message: "Nenhuma chave de API configurada." };
     }
 
+    const modelId = resolveModelId(settings.modelTier);
+
     try {
       const client = new GoogleGenerativeAI(settings.geminiApiKey);
-      const model = client.getGenerativeModel({ model: "models/gemini-2.5-flash" });
+      const model = client.getGenerativeModel({ model: modelId });
       await model.generateContent("test");
 
       return { status: "healthy", message: "Sua chave de API está funcionando." };

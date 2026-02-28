@@ -2,13 +2,15 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CheckKeyHealthUseCase } from "@/application/use-cases/check-key-health";
 import type { UserSettingsRepository } from "@/domain/interfaces/user-settings-repository";
 
-const { mockGenerateContent } = vi.hoisted(() => ({
+const { mockGenerateContent, mockGetGenerativeModel } = vi.hoisted(() => ({
   mockGenerateContent: vi.fn(),
+  mockGetGenerativeModel: vi.fn(),
 }));
 
 vi.mock("@google/generative-ai", () => ({
   GoogleGenerativeAI: class MockGoogleGenerativeAI {
-    getGenerativeModel() {
+    getGenerativeModel(opts: { model: string }) {
+      mockGetGenerativeModel(opts);
       return { generateContent: mockGenerateContent };
     }
   },
@@ -113,6 +115,51 @@ describe("CheckKeyHealthUseCase", () => {
       const result = await useCase.execute("user-1");
 
       expect(result.status).toBe("quota_exhausted");
+    });
+  });
+
+  describe("Given a key with 'capable' model tier", () => {
+    it("When health check runs, Then uses the capable model ID", async () => {
+      mockGenerateContent.mockResolvedValue({ response: { text: () => "ok" } });
+
+      const repo = createMockRepository({ geminiApiKey: "valid-key", modelTier: "capable" });
+      const useCase = new CheckKeyHealthUseCase(repo);
+
+      await useCase.execute("user-1");
+
+      expect(mockGetGenerativeModel).toHaveBeenCalledWith(
+        expect.objectContaining({ model: "models/gemini-2.5-pro" }),
+      );
+    });
+  });
+
+  describe("Given a key with 'economic' model tier", () => {
+    it("When health check runs, Then uses the economic model ID", async () => {
+      mockGenerateContent.mockResolvedValue({ response: { text: () => "ok" } });
+
+      const repo = createMockRepository({ geminiApiKey: "valid-key", modelTier: "economic" });
+      const useCase = new CheckKeyHealthUseCase(repo);
+
+      await useCase.execute("user-1");
+
+      expect(mockGetGenerativeModel).toHaveBeenCalledWith(
+        expect.objectContaining({ model: "models/gemini-2.5-flash" }),
+      );
+    });
+  });
+
+  describe("Given a key with no model tier set", () => {
+    it("When health check runs, Then defaults to economic model", async () => {
+      mockGenerateContent.mockResolvedValue({ response: { text: () => "ok" } });
+
+      const repo = createMockRepository({ geminiApiKey: "valid-key" });
+      const useCase = new CheckKeyHealthUseCase(repo);
+
+      await useCase.execute("user-1");
+
+      expect(mockGetGenerativeModel).toHaveBeenCalledWith(
+        expect.objectContaining({ model: "models/gemini-2.5-flash" }),
+      );
     });
   });
 
