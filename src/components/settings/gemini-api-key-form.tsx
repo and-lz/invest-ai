@@ -9,13 +9,24 @@ import { AlertCircle, Check, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { typography, icon } from "@/lib/design-system";
+import { KeyHealthStatusBanner } from "@/components/settings/key-health-status";
+import type { KeyHealthStatus } from "@/schemas/user-settings.schema";
 
 interface GeminiApiKeyFormProps {
   onSuccess?: () => void;
   isKeyConfigured?: boolean;
+  keyHealth?: KeyHealthStatus | null;
+  isCheckingHealth?: boolean;
+  onRefreshHealth?: () => void;
 }
 
-export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiApiKeyFormProps) {
+export function GeminiApiKeyForm({
+  onSuccess,
+  isKeyConfigured = false,
+  keyHealth,
+  isCheckingHealth = false,
+  onRefreshHealth,
+}: GeminiApiKeyFormProps) {
   const [apiKey, setApiKey] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -112,6 +123,15 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {isKeyConfigured && (keyHealth || isCheckingHealth) && (
+          <div className="mb-4">
+            <KeyHealthStatusBanner
+              status={keyHealth ?? null}
+              isLoading={isCheckingHealth}
+              onRefresh={onRefreshHealth ?? (() => {})}
+            />
+          </div>
+        )}
         <form onSubmit={handleSubmit} ref={formRef} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="apiKey" className={typography.label}>

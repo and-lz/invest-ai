@@ -1,53 +1,29 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Settings } from "lucide-react";
-import { GeminiApiKeyForm } from "@/components/settings/gemini-api-key-form";
-import { ApiKeyInfo } from "@/components/settings/api-key-info";
-import { ModelTierSelector } from "@/components/settings/model-tier-selector";
-import { typography, icon, layout } from "@/lib/design-system";
-import { cn } from "@/lib/utils";
+import { auth } from "@/auth";
+import { obterGetUserSettingsUseCase } from "@/lib/container";
 import { DEFAULT_MODEL_TIER } from "@/lib/model-tiers";
 import type { ModelTier } from "@/lib/model-tiers";
+import { SettingsContent } from "@/components/settings/settings-content";
 
-export default function SettingsPage() {
-  const [isKeyConfigured, setIsKeyConfigured] = useState(false);
-  const [modelTier, setModelTier] = useState<ModelTier>(DEFAULT_MODEL_TIER);
+export default async function SettingsPage() {
+  let isKeyConfigured = false;
+  let modelTier: ModelTier = DEFAULT_MODEL_TIER;
 
-  useEffect(() => {
-    async function loadSettings() {
-      try {
-        const response = await fetch("/api/settings");
-        if (!response.ok) return;
-        const data = await response.json();
-        setIsKeyConfigured(data.geminiApiKeyConfigured);
-        if (data.modelTier) {
-          setModelTier(data.modelTier);
-        }
-      } catch {
-        // Silently fail — page still works without loading status
-      }
+  try {
+    const session = await auth();
+    if (session?.user?.userId) {
+      const useCase = obterGetUserSettingsUseCase();
+      const settings = await useCase.executar(session.user.userId);
+      isKeyConfigured = settings.geminiApiKeyConfigured;
+      modelTier = (settings.modelTier as ModelTier) || DEFAULT_MODEL_TIER;
     }
-
-    loadSettings();
-  }, []);
-
-  function handleApiKeySuccess() {
-    setIsKeyConfigured(true);
+  } catch {
+    // Silently fail — page still works with defaults
   }
 
   return (
-    <div className={cn(layout.pageSpacing, "max-w-2xl mx-auto py-6")}>
-      <div className={cn(layout.pageHeader, "mb-6")}>
-        <Settings className={cn(icon.pageTitle, "text-primary")} />
-        <h1 className={typography.h1}>Configurações</h1>
-      </div>
-
-      <div className={cn(layout.sectionSpacing)}>
-        <GeminiApiKeyForm onSuccess={handleApiKeySuccess} isKeyConfigured={isKeyConfigured} />
-        <ModelTierSelector currentTier={modelTier} onTierChange={setModelTier} />
-        <ApiKeyInfo />
-      </div>
-    </div>
+    <SettingsContent
+      initialKeyConfigured={isKeyConfigured}
+      initialModelTier={modelTier}
+    />
   );
 }

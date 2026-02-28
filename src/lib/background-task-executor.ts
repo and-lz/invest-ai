@@ -6,7 +6,7 @@ import {
 } from "@/lib/background-task";
 import { addNotification } from "@/lib/notification";
 import type { CriarNotificacao } from "@/lib/notification";
-import { AppError } from "@/domain/errors/app-errors";
+import { AppError, AiApiQuotaError } from "@/domain/errors/app-errors";
 
 // ============================================================
 // Executor generico de tarefas em background com retry e notificacoes.
@@ -134,6 +134,7 @@ export async function executeBackgroundTask(
       }
 
       // Falha definitiva
+      const ehQuotaError = erro instanceof AiApiQuotaError;
       const urlRetry = ehRecuperavel ? `/api/tasks/${tarefa.identificador}/retry` : undefined;
 
       // Allow caller to do cleanup (e.g. write fallback data so frontend stops polling)
@@ -155,11 +156,20 @@ export async function executeBackgroundTask(
       });
 
       const descricaoTarefa = descreverTarefa(tarefa);
+      const descricaoNotificacao = ehQuotaError
+        ? "Sua chave de API Gemini está sem créditos. Verifique em Configurações."
+        : mensagemErro;
+      const acaoNotificacao = ehQuotaError
+        ? { label: "Ir para Configurações", url: "/settings" }
+        : urlRetry
+          ? { label: "Tentar novamente", url: urlRetry }
+          : undefined;
+
       await criarNotificacaoSilenciosa(usuarioId, {
         tipo: "error",
         titulo: `${descricaoTarefa} — erro`,
-        descricao: mensagemErro,
-        acao: urlRetry ? { label: "Tentar novamente", url: urlRetry } : undefined,
+        descricao: descricaoNotificacao,
+        acao: acaoNotificacao,
       });
 
       console.error(

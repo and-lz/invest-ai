@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ehErroTransienteDeAi } from "@/lib/classify-ai-error";
+import { ehErroTransienteDeAi, isQuotaExhaustedError } from "@/lib/classify-ai-error";
 
 describe("ehErroTransienteDeAi", () => {
   describe("erros transientes (retornam true)", () => {
@@ -46,5 +46,42 @@ describe("ehErroTransienteDeAi", () => {
         expect(ehErroTransienteDeAi(mensagem)).toBe(false);
       },
     );
+  });
+});
+
+describe("isQuotaExhaustedError", () => {
+  describe("Given messages indicating quota/credit exhaustion, When checked, Then returns true", () => {
+    const quotaCases = [
+      "Resource has been exhausted (e.g. check quota).",
+      "Quota exceeded for aiplatform.googleapis.com",
+      "exceeded quota for model",
+      "billing account not active",
+      "insufficient quota remaining",
+      "out of quota for this billing period",
+      "402 Payment Required",
+      "payment required to continue",
+    ];
+
+    it.each(quotaCases)("detects '%s' as quota exhausted", (message) => {
+      expect(isQuotaExhaustedError(message)).toBe(true);
+    });
+  });
+
+  describe("Given messages NOT about quota exhaustion, When checked, Then returns false", () => {
+    const nonQuotaCases = [
+      "429 Too Many Requests",
+      "Rate limit exceeded",
+      "API key invalid",
+      "401 Unauthorized",
+      "503 Service Unavailable",
+      "network error",
+      "timeout",
+      "",
+      "Generic error message",
+    ];
+
+    it.each(nonQuotaCases)("does not detect '%s' as quota exhausted", (message) => {
+      expect(isQuotaExhaustedError(message)).toBe(false);
+    });
   });
 });

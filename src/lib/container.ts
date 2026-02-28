@@ -21,6 +21,7 @@ import { GetUserSettingsUseCase } from "@/application/use-cases/get-user-setting
 import { UpdateGeminiApiKeyUseCase } from "@/application/use-cases/update-gemini-api-key";
 import { UpdateModelTierUseCase } from "@/application/use-cases/update-model-tier";
 import { TestGeminiApiKeyUseCase } from "@/application/use-cases/test-gemini-api-key";
+import { CheckKeyHealthUseCase } from "@/application/use-cases/check-key-health";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
@@ -234,4 +235,11 @@ export function obterUpdateModelTierUseCase(): UpdateModelTierUseCase {
  */
 export function obterTestGeminiApiKeyUseCase(): TestGeminiApiKeyUseCase {
   return new TestGeminiApiKeyUseCase();
+}
+
+/**
+ * Obtem o use case para verificar a saude da chave de API armazenada.
+ */
+export function obterCheckKeyHealthUseCase(): CheckKeyHealthUseCase {
+  return new CheckKeyHealthUseCase(obterUserSettingsRepository());
 }

@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 function classificarMensagemErroChat(erro: unknown): string {
   if (erro instanceof AiApiQuotaError) {
-    return "A cota da API de IA foi esgotada. Verifique seu plano ou aguarde a renovacao.";
+    return "Sua chave de API Gemini está sem créditos. Verifique em Configurações e adicione créditos no Google AI Studio.";
   }
   if (erro instanceof AiApiTransientError) {
     return "A Fortuna esta com dificuldades para responder no momento. Isso costuma ser passageiro.";

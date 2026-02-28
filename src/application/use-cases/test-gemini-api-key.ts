@@ -1,6 +1,7 @@
 import { TestGeminiApiKeySchema, TestGeminiKeyResponseSchema } from "@/schemas/user-settings.schema";
 import type { TestGeminiKeyResponse } from "@/schemas/user-settings.schema";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { isQuotaExhaustedError } from "@/lib/classify-ai-error";
 
 export class TestGeminiApiKeyUseCase {
   async executar(geminiApiKey: string): Promise<TestGeminiKeyResponse> {
@@ -27,6 +28,13 @@ export class TestGeminiApiKeyUseCase {
         return TestGeminiKeyResponseSchema.parse({
           valid: false,
           message: "Chave de API inválida. Verifique e tente novamente.",
+        });
+      }
+
+      if (isQuotaExhaustedError(message)) {
+        return TestGeminiKeyResponseSchema.parse({
+          valid: false,
+          message: "Esta chave está sem créditos. Adicione créditos no Google AI Studio.",
         });
       }
 
