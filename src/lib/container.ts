@@ -1,6 +1,7 @@
 import { DbReportRepository } from "@/infrastructure/repositories/db-report-repository";
 import { DbConversaRepository } from "@/infrastructure/repositories/db-conversation-repository";
 import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-action-plan-repository";
+import { DbUserSettingsRepository } from "@/infrastructure/repositories/user-settings-repository";
 import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
 import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
@@ -16,11 +17,15 @@ import { GenerateConsolidatedInsightsUseCase } from "@/application/use-cases/gen
 import { AnalyzeAssetPerformanceUseCase } from "@/application/use-cases/analyze-asset-performance";
 import { ListInsightsUseCase } from "@/application/use-cases/list-insights";
 import { DeleteInsightsUseCase } from "@/application/use-cases/delete-insights";
+import { GetUserSettingsUseCase } from "@/application/use-cases/get-user-settings";
+import { UpdateGeminiApiKeyUseCase } from "@/application/use-cases/update-gemini-api-key";
+import { TestGeminiApiKeyUseCase } from "@/application/use-cases/test-gemini-api-key";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
 import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
 import type { ConversaRepository } from "@/domain/interfaces/conversation-repository";
 import type { PlanoAcaoRepository } from "@/domain/interfaces/action-plan-repository";
+import type { UserSettingsRepository } from "@/domain/interfaces/user-settings-repository";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-ai-provider";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
@@ -174,4 +179,32 @@ export async function obterConversaRepository(): Promise<ConversaRepository> {
  */
 export async function obterPlanoAcaoRepository(): Promise<PlanoAcaoRepository> {
   return new DbPlanoAcaoRepository();
+}
+
+/**
+ * Obtem o repository de configuracoes de usuario (DB-backed).
+ */
+function obterUserSettingsRepository(): UserSettingsRepository {
+  return new DbUserSettingsRepository();
+}
+
+/**
+ * Obtem o use case para obter configuracoes de usuario.
+ */
+export function obterGetUserSettingsUseCase(): GetUserSettingsUseCase {
+  return new GetUserSettingsUseCase(obterUserSettingsRepository());
+}
+
+/**
+ * Obtem o use case para atualizar chave de API Gemini.
+ */
+export function obterUpdateGeminiApiKeyUseCase(): UpdateGeminiApiKeyUseCase {
+  return new UpdateGeminiApiKeyUseCase(obterUserSettingsRepository());
+}
+
+/**
+ * Obtem o use case para testar chave de API Gemini.
+ */
+export function obterTestGeminiApiKeyUseCase(): TestGeminiApiKeyUseCase {
+  return new TestGeminiApiKeyUseCase();
 }

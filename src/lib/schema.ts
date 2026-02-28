@@ -283,3 +283,24 @@ export const analiseAtivos = pgTable(
     index("idx_analise_data_analise").on(table.dataAnalise),
   ],
 );
+
+// ============================================================
+// Tabela: configuracoes_usuario
+// Armazena configuracoes sensíveis do usuario (ex: chaves de API)
+// Chaves sao criptografadas antes de armazenar
+// ============================================================
+
+export const configuracoesUsuario = pgTable(
+  "configuracoes_usuario",
+  {
+    identificador: text("identificador").notNull().primaryKey(),
+    usuarioId: text("usuario_id").notNull(),
+    chaveApiGemini: text("chave_api_gemini"), // Criptografada
+    criadaEm: timestamp("criada_em", { withTimezone: true }).notNull().defaultNow(),
+    atualizadaEm: timestamp("atualizada_em", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_configuracoes_usuario_id").on(table.usuarioId),
+    index("idx_configuracoes_criada").on(table.criadaEm),
+  ],
+);

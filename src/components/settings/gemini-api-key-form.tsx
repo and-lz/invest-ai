@@ -1,0 +1,192 @@
+"use client";
+
+import { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, Check, Eye, EyeOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { typography, icon } from "@/lib/design-system";
+
+interface GeminiApiKeyFormProps {
+  onSuccess?: () => void;
+  isKeyConfigured?: boolean;
+}
+
+export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiApiKeyFormProps) {
+  const [apiKey, setApiKey] = useState("");
+  const [showKey, setShowKey] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ valid: boolean; message: string } | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  async function handleTestKey() {
+    if (!apiKey.trim()) {
+      toast.error("Please enter an API key first");
+      return;
+    }
+
+    setIsTesting(true);
+    setTestResult(null);
+
+    try {
+      const response = await fetch("/api/settings/test-gemini-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ geminiApiKey: apiKey }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        setTestResult({
+          valid: false,
+          message: error.erro || "Failed to test API key",
+        });
+        return;
+      }
+
+      const result = await response.json();
+      setTestResult(result);
+
+      if (result.valid) {
+        toast.success("API key is valid");
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      setTestResult({
+        valid: false,
+        message: `Error: ${message}`,
+      });
+      toast.error("Failed to test API key");
+    } finally {
+      setIsTesting(false);
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!apiKey.trim()) {
+      toast.error("Please enter an API key");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const response = await fetch("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ geminiApiKey: apiKey }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error(error.erro || "Failed to save API key");
+        return;
+      }
+
+      toast.success("API key saved successfully");
+      setApiKey("");
+      onSuccess?.();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to save API key");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Gemini API Key</CardTitle>
+        <CardDescription>
+          {isKeyConfigured
+            ? "You have already configured an API key. Enter a new one to update it."
+            : "Enter your Gemini API key to enable AI-powered features like PDF analysis and insights generation."}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} ref={formRef} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="apiKey" className={typography.label}>
+              API Key
+            </Label>
+            <div className="relative">
+              <Input
+                id="apiKey"
+                type={showKey ? "text" : "password"}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Enter your Gemini API key..."
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey(!showKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showKey ? <EyeOff className={cn(icon.button)} /> : <Eye className={cn(icon.button)} />}
+              </button>
+            </div>
+            <p className={cn(typography.helper, "text-muted-foreground")}>
+              Get your API key from{" "}
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                Google AI Studio
+              </a>
+            </p>
+          </div>
+
+          {testResult && (
+            <div
+              className={cn(
+                "flex items-start gap-3 p-3 rounded-md",
+                testResult.valid ? "bg-success/10 border border-success/30" : "bg-destructive/10 border border-destructive/30",
+              )}
+            >
+              {testResult.valid ? (
+                <Check className={cn(icon.button, "text-success flex-shrink-0 mt-0.5")} />
+              ) : (
+                <AlertCircle className={cn(icon.button, "text-destructive flex-shrink-0 mt-0.5")} />
+              )}
+              <p
+                className={cn(
+                  typography.body,
+                  testResult.valid ? "text-success" : "text-destructive",
+                )}
+              >
+                {testResult.message}
+              </p>
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleTestKey}
+              disabled={!apiKey.trim() || isTesting || isSaving}
+              className="flex-1"
+            >
+              {isTesting && <Loader2 className={cn(icon.button, "mr-2 animate-spin")} />}
+              {isTesting ? "Testing..." : "Test Key"}
+            </Button>
+            <Button
+              type="submit"
+              disabled={!apiKey.trim() || isSaving || isTesting}
+              className="flex-1"
+            >
+              {isSaving && <Loader2 className={cn(icon.button, "mr-2 animate-spin")} />}
+              {isSaving ? "Saving..." : "Save Key"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
