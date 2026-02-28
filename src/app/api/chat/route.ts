@@ -8,11 +8,12 @@ import type { MensagemAi, ConfiguracaoGeracao } from "@/domain/interfaces/ai-pro
 export const dynamic = "force-dynamic";
 
 function classificarMensagemErroChat(erro: unknown): string {
-  if (erro instanceof AiApiQuotaError) {
-    return "Sua chave de API Gemini está sem créditos. Verifique em Configurações e adicione créditos no Google AI Studio.";
-  }
-  if (erro instanceof AiApiTransientError) {
-    return "A Fortuna esta com dificuldades para responder no momento. Isso costuma ser passageiro.";
+  // Quota and transient errors share the same user-facing message because
+  // Gemini uses "Quota exceeded" for both per-minute rate limits AND actual
+  // credit exhaustion — we can't reliably distinguish them. The /settings
+  // health check is the authoritative source for key health diagnosis.
+  if (erro instanceof AiApiQuotaError || erro instanceof AiApiTransientError) {
+    return "A Fortuna esta com dificuldades para responder no momento. Tente novamente em alguns segundos.";
   }
   return "Algo deu errado ao gerar a resposta. Voce pode tentar novamente.";
 }
