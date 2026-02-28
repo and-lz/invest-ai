@@ -44,6 +44,13 @@ export class AiApiTransientError extends AiApiError {
   }
 }
 
+export class AiApiQuotaError extends AiApiError {
+  constructor(message: string) {
+    super(message, /* recuperavel */ false);
+    this.name = "AiApiQuotaError";
+  }
+}
+
 export class PdfDecryptionError extends AppError {
   constructor(message: string) {
     super(message, "PDF_DECRYPTION_ERROR");

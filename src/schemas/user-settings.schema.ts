@@ -51,3 +51,24 @@ export const TestGeminiKeyResponseSchema = z.object({
 });
 
 export type TestGeminiKeyResponse = z.infer<typeof TestGeminiKeyResponseSchema>;
+
+// ============================================================
+// Key Health Check
+// ============================================================
+
+export const KeyHealthStatusSchema = z.enum([
+  "healthy",
+  "invalid",
+  "quota_exhausted",
+  "error",
+  "not_configured",
+]);
+
+export type KeyHealthStatus = z.infer<typeof KeyHealthStatusSchema>;
+
+export const KeyHealthResponseSchema = z.object({
+  status: KeyHealthStatusSchema,
+  message: z.string(),
+});
+
+export type KeyHealthResponse = z.infer<typeof KeyHealthResponseSchema>;

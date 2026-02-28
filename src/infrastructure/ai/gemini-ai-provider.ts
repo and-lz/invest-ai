@@ -6,8 +6,8 @@ import type {
   RespostaAi,
   ParteConteudo,
 } from "@/domain/interfaces/ai-provider";
-import { AiApiError, AiApiTransientError } from "@/domain/errors/app-errors";
-import { ehErroTransienteDeAi } from "@/lib/classify-ai-error";
+import { AiApiError, AiApiTransientError, AiApiQuotaError } from "@/domain/errors/app-errors";
+import { ehErroTransienteDeAi, isQuotaExhaustedError } from "@/lib/classify-ai-error";
 import { formatarFontesGrounding } from "@/lib/format-grounding-sources";
 
 const MODELO_PADRAO = "models/gemini-2.5-flash";
@@ -162,6 +162,10 @@ export class GeminiProvedorAi implements ProvedorAi {
     if (erro instanceof AiApiError) return erro;
 
     const mensagem = erro instanceof Error ? erro.message : String(erro);
+
+    if (isQuotaExhaustedError(mensagem)) {
+      return new AiApiQuotaError(`Quota da API Gemini esgotada: ${mensagem}`);
+    }
 
     if (ehErroTransienteDeAi(mensagem)) {
       return new AiApiTransientError(`Falha transiente na API Gemini: ${mensagem}`);

@@ -22,6 +22,25 @@ const PADROES_ERRO_TRANSIENTE: readonly RegExp[] = [
   /ENOTFOUND/,
 ];
 
+/**
+ * Patterns that indicate quota/credit exhaustion (permanent until user takes action).
+ * More specific than generic transient errors — should be checked first.
+ */
+const PADROES_QUOTA_ESGOTADA: readonly RegExp[] = [
+  /resource.*exhausted/i,
+  /quota.*exceeded/i,
+  /exceeded.*quota/i,
+  /billing/i,
+  /insufficient.*quota/i,
+  /out of.*quota/i,
+  /payment required/i,
+  /402/,
+];
+
 export function ehErroTransienteDeAi(mensagem: string): boolean {
   return PADROES_ERRO_TRANSIENTE.some((padrao) => padrao.test(mensagem));
+}
+
+export function isQuotaExhaustedError(message: string): boolean {
+  return PADROES_QUOTA_ESGOTADA.some((pattern) => pattern.test(message));
 }

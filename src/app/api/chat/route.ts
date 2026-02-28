@@ -2,10 +2,20 @@ import { requireAuth } from "@/lib/auth-utils";
 import { criarProvedorAi, resolverModeloDoUsuario } from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
-import { AiApiTransientError } from "@/domain/errors/app-errors";
-import type { MensagemAi } from "@/domain/interfaces/ai-provider";
+import { AiApiTransientError, AiApiQuotaError } from "@/domain/errors/app-errors";
+import type { MensagemAi, ConfiguracaoGeracao } from "@/domain/interfaces/ai-provider";
 
 export const dynamic = "force-dynamic";
+
+function classificarMensagemErroChat(erro: unknown): string {
+  if (erro instanceof AiApiQuotaError) {
+    return "A cota da API de IA foi esgotada. Verifique seu plano ou aguarde a renovacao.";
+  }
+  if (erro instanceof AiApiTransientError) {
+    return "A Fortuna esta com dificuldades para responder no momento. Isso costuma ser passageiro.";
+  }
+  return "Algo deu errado ao gerar a resposta. Voce pode tentar novamente.";
+}
 
 export async function POST(request: Request): Promise<Response> {
   const verificacaoAuth = await requireAuth();
@@ -41,28 +51,56 @@ export async function POST(request: Request): Promise<Response> {
 
     const modelo = await resolverModeloDoUsuario(verificacaoAuth.session.user.userId);
     const provedor = criarProvedorAi(modelo);
-    const geradorStream = provedor.transmitir({
+
+    const configBase: ConfiguracaoGeracao = {
       instrucaoSistema,
       mensagens: mensagensAi,
       temperatura: 0.7,
       formatoResposta: "texto",
       pesquisaWeb: true,
-    });
+    };
 
     const codificadorTexto = new TextEncoder();
     const streamResposta = new ReadableStream({
       async start(controlador) {
+        // Try with web search first; if it fails before sending any chunks,
+        // retry without web search as fallback.
+        let chunksEnviados = 0;
+
         try {
+          const geradorStream = provedor.transmitir(configBase);
           for await (const pedacoTexto of geradorStream) {
+            controlador.enqueue(codificadorTexto.encode(pedacoTexto));
+            chunksEnviados++;
+          }
+          controlador.close();
+          return;
+        } catch (erroPrimario) {
+          console.error("[Chat] Erro durante streaming (pesquisaWeb=true):", erroPrimario);
+
+          // If we already sent chunks or error is not recoverable by retrying, report inline
+          if (chunksEnviados > 0 || erroPrimario instanceof AiApiQuotaError) {
+            controlador.enqueue(
+              codificadorTexto.encode(`\n\n[ERRO]: ${classificarMensagemErroChat(erroPrimario)}`),
+            );
+            controlador.close();
+            return;
+          }
+        }
+
+        // Fallback: retry without web search
+        try {
+          console.info("[Chat] Tentando fallback sem pesquisaWeb...");
+          const geradorFallback = provedor.transmitir({ ...configBase, pesquisaWeb: false });
+          for await (const pedacoTexto of geradorFallback) {
             controlador.enqueue(codificadorTexto.encode(pedacoTexto));
           }
           controlador.close();
-        } catch (erroStream) {
-          const mensagemErro =
-            erroStream instanceof AiApiTransientError
-              ? "A Fortuna esta com dificuldades para responder no momento. Isso costuma ser passageiro."
-              : "Algo deu errado ao gerar a resposta. Voce pode tentar novamente.";
-          controlador.enqueue(codificadorTexto.encode(`\n\n[ERRO]: ${mensagemErro}`));
+        } catch (erroFallback) {
+          console.error("[Chat] Erro no fallback (pesquisaWeb=false):", erroFallback);
+          controlador.enqueue(
+            codificadorTexto.encode(`\n\n[ERRO]: ${classificarMensagemErroChat(erroFallback)}`),
+          );
           controlador.close();
         }
       },
