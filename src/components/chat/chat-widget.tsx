@@ -142,7 +142,7 @@ export function ChatWidget() {
         type="button"
       >
         <Bot className="relative z-10 h-6 w-6" />
-        <span className="sr-only">Abrir assistente</span>
+        <span className="sr-only">Abrir Fortuna</span>
       </button>
 
       {/* Chat dialog — transparent container fills viewport; inner div is the visible panel */}
@@ -207,7 +207,7 @@ export function ChatWidget() {
                 </Button>
 
                 <Bot className="text-muted-foreground h-5 w-5" />
-                <h3 className="text-sm font-medium">Assistente</h3>
+                <h3 className="text-sm font-medium">Fortuna</h3>
               </div>
               <div className="flex items-center gap-1">
                 {ttsSupported && (
@@ -269,7 +269,7 @@ export function ChatWidget() {
                   className="h-8 w-8"
                 >
                   <X className="text-muted-foreground h-4 w-4" />
-                  <span className="sr-only">Fechar assistente</span>
+                  <span className="sr-only">Fechar Fortuna</span>
                 </Button>
               </div>
             </div>
@@ -283,7 +283,7 @@ export function ChatWidget() {
                     Pergunte sobre seus investimentos.
                   </p>
                   <p className="text-muted-foreground mt-1 text-xs">
-                    O assistente tem acesso aos dados da pagina atual.
+                    A Fortuna tem acesso aos dados da pagina atual.
                   </p>
                 </div>
               )}
