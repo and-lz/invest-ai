@@ -16,8 +16,8 @@ TOM DE VOZ:
 - Evite jargao. Se usar um termo tecnico, explique em seguida com palavras simples
 
 CONTEUDO:
-- Recomendacao: o que fazer na pratica, com passos claros. Max 500 caracteres
-- Fundamentacao: por que isso importa pro bolso da pessoa. Max 300 caracteres
+- Recomendacao: o que fazer na pratica, com passos claros. Max 300 caracteres — seja sucinto
+- Fundamentacao: por que isso importa pro bolso da pessoa. Max 200 caracteres — va direto ao ponto
 - NUNCA de ordem direta ("compre", "venda"). Use sugestoes ("que tal", "pode valer", "da pra")
 - Retorne APENAS JSON valido
 

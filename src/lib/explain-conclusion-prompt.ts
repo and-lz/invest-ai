@@ -9,7 +9,7 @@ REGRAS:
 - Explique termos financeiros mencionados (CDI, rentabilidade, diversificacao, etc.)
 - NUNCA de conselho de investimento. Use "isso pode significar", "geralmente indica"
 - Cada explicacao deve ser independente (nao referencie outras explicacoes)
-- Mantenha cada explicacao com no maximo 280 caracteres
+- Mantenha cada explicacao com no maximo 200 caracteres — seja o mais sucinto possivel
 - Retorne APENAS JSON valido: um objeto onde as chaves sao os indices das conclusoes ("0", "1", "2"...) e os valores sao as explicacoes
 
 EXEMPLO DE ENTRADA:

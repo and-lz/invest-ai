@@ -85,7 +85,7 @@ DIRETRIZES:
 7. Considere o cenario macroeconomico brasileiro (Selic, inflacao)
 8. Avalie o risco-retorno dos ativos
 9. Para recomendacoes de longo prazo, considere horizonte de 12-36 meses
-10. Seja direto e pratico. Evite jargao excessivo.
+10. Seja ULTRA SUCINTO em todos os campos de texto. Cada frase deve carregar informacao nova — zero enrolacao
 11. Priorize insights por impacto financeiro potencial.
 12. Responda em portugues brasileiro.
 13. IMPORTANTE: Os campos "concluida" e "statusAcao" sao de controle do usuario. SEMPRE retorne concluida=false e statusAcao="pendente" para TODOS os insights.
@@ -156,7 +156,7 @@ DIRETRIZES PARA ANALISE CONSOLIDADA:
 8. Sugira acoes concretas baseadas no historico completo, nao apenas no ultimo mes
 9. Considere o cenario macroeconomico brasileiro (Selic, inflacao) e como impactou as decisoes ao longo do tempo
 10. Para recomendacoes de longo prazo, use o historico para embasar projecoes de 12-36 meses
-11. Seja direto e pratico. Evite jargao excessivo.
+11. Seja ULTRA SUCINTO em todos os campos de texto. Cada frase deve carregar informacao nova — zero enrolacao
 12. Priorize insights por impacto financeiro potencial.
 13. Responda em portugues brasileiro.
 14. No campo mesReferencia, use "consolidado" como valor.

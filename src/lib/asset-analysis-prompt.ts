@@ -22,6 +22,7 @@ DIRETRIZES DE ANALISE:
 7. VEREDICTO: De uma avaliacao clara — manter, aumentar, reduzir ou sair — com justificativa baseada nos dados fornecidos. Nao seja generico. Use os dados reais.
 
 REGRAS:
+- Seja ULTRA SUCINTO em todos os campos de texto. Cada frase deve carregar informacao nova — zero enrolacao
 - Linguagem acessivel, explicando termos tecnicos na primeira vez que aparecem
 - Valores monetarios em BRL formatados (R$ X.XXX,XX)
 - Percentuais com 2 casas decimais
