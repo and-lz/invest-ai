@@ -63,8 +63,8 @@ describe("Action Plan AI Enrichment Prompt", () => {
     });
 
     it("Given the system prompt / Then should include character limits", () => {
-      expect(SYSTEM_PROMPT_ENRIQUECER_ACAO).toContain("500");
       expect(SYSTEM_PROMPT_ENRIQUECER_ACAO).toContain("300");
+      expect(SYSTEM_PROMPT_ENRIQUECER_ACAO).toContain("200");
     });
   });
 });
