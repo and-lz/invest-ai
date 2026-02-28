@@ -2,16 +2,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { CheckKeyHealthUseCase } from "@/application/use-cases/check-key-health";
 import type { UserSettingsRepository } from "@/domain/interfaces/user-settings-repository";
 
-const { mockGenerateContent, MockGoogleGenerativeAI } = vi.hoisted(() => {
-  const mockGenerateContent = vi.fn();
-  const MockGoogleGenerativeAI = vi.fn().mockImplementation(() => ({
-    getGenerativeModel: () => ({ generateContent: mockGenerateContent }),
-  }));
-  return { mockGenerateContent, MockGoogleGenerativeAI };
-});
+const { mockGenerateContent } = vi.hoisted(() => ({
+  mockGenerateContent: vi.fn(),
+}));
 
 vi.mock("@google/generative-ai", () => ({
-  GoogleGenerativeAI: MockGoogleGenerativeAI,
+  GoogleGenerativeAI: class MockGoogleGenerativeAI {
+    getGenerativeModel() {
+      return { generateContent: mockGenerateContent };
+    }
+  },
 }));
 
 function createMockRepository(settings: {

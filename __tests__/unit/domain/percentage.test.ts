@@ -1,11 +1,20 @@
 import { describe, it, expect } from "vitest";
 import {
+  criarPercentual,
   formatarPercentual,
   formatSimplePercentage,
   calculatePercentageChange,
 } from "@/domain/value-objects/percentage";
 
 describe("Percentage value object", () => {
+  describe("criarPercentual", () => {
+    it("Given a numeric value, When created, Then returns percentage object", () => {
+      const pct = criarPercentual(14.56);
+
+      expect(pct.valor).toBe(14.56);
+    });
+  });
+
   describe("formatarPercentual", () => {
     it("deve formatar percentual positivo", () => {
       expect(formatarPercentual(14.56)).toBe("14,56%");

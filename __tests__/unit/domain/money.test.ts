@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  criarMoney,
   formatarMoeda,
   formatCompactCurrency,
   somarMoney,
@@ -9,6 +10,22 @@ import {
 } from "@/domain/value-objects/money";
 
 describe("Money value object", () => {
+  describe("criarMoney", () => {
+    it("Given a value in cents, When created, Then returns money object", () => {
+      const money = criarMoney(15000);
+
+      expect(money.valorEmCentavos).toBe(15000);
+      expect(money.moeda).toBe("BRL");
+    });
+
+    it("Given a custom currency, When created, Then uses that currency", () => {
+      const money = criarMoney(5000, "USD");
+
+      expect(money.valorEmCentavos).toBe(5000);
+      expect(money.moeda).toBe("USD");
+    });
+  });
+
   describe("formatarMoeda", () => {
     it("deve formatar valor positivo em BRL", () => {
       expect(formatarMoeda(41533291)).toBe("R$\u00A0415.332,91");
