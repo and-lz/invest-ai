@@ -78,8 +78,11 @@ export async function POST(request: Request): Promise<Response> {
         } catch (erroPrimario) {
           console.error("[Chat] Erro durante streaming (pesquisaWeb=true):", erroPrimario);
 
-          // If we already sent chunks or error is not recoverable by retrying, report inline
-          if (chunksEnviados > 0 || erroPrimario instanceof AiApiQuotaError) {
+          // If we already sent chunks, report inline (can't retry mid-stream).
+          // Quota errors from web search should still fall through to the
+          // non-web-search fallback — Google Search grounding has its own quota
+          // separate from the generative model quota.
+          if (chunksEnviados > 0) {
             controlador.enqueue(
               codificadorTexto.encode(`\n\n[ERRO]: ${classificarMensagemErroChat(erroPrimario)}`),
             );
