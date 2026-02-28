@@ -132,14 +132,14 @@ export async function POST(request: Request) {
             fundamentacao: "Recomendação automática indisponível no momento.",
           });
           return {
-            descricaoResultado: "Recomendação IA indisponível",
+            descricaoResultado: "Recomendação Fortuna indisponível",
           };
         }
 
         await repository.atualizarEnriquecimento(userId, item.identificador, enrichValidation.data);
 
         return {
-          descricaoResultado: "Recomendação IA gerada",
+          descricaoResultado: "Recomendação Fortuna gerada",
           urlRedirecionamento: "/plano-acao",
         };
       },

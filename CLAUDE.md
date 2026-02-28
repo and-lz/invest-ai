@@ -48,7 +48,7 @@ Todas as rotas tem titulos dinamicos no formato "[Pagina] | Investimentos":
 - `/` - "Dashboard | Investimentos" (route group `(dashboard)`)
 - `/auth/signin` - "Login | Investimentos"
 - `/reports` - "Relatorios | Investimentos"
-- `/insights` - "Insights | Investimentos"
+- `/insights` - "Análises Fortuna | Investimentos"
 - `/trends` - "Tendencias de Mercado | Investimentos"
 - `/desempenho` - "Desempenho de Ativos | Investimentos"
 - `/aprender` - "Centro de Aprendizado | Investimentos"

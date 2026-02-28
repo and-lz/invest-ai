@@ -95,7 +95,7 @@ function DesempenhoConteudo() {
       await dispararAnaliseIaAtivo(tickerSelecionado);
       revalidarTarefasAtivas();
       notificar.info("Analise iniciada", {
-        description: `Analisando ${tickerSelecionado} com IA...`,
+        description: `Analisando ${tickerSelecionado} com a Fortuna...`,
       });
 
       // Polling para verificar quando a analise esta pronta
@@ -152,7 +152,7 @@ function DesempenhoConteudo() {
               ) : (
                 <BotIcon className="relative z-10 h-4 w-4" />
               )}
-              <span className="relative z-10">{analisandoComIa ? "Analisando..." : "Analisar com IA"}</span>
+              <span className="relative z-10">{analisandoComIa ? "Analisando..." : "Analisar com a Fortuna"}</span>
             </Button>
           )}
 

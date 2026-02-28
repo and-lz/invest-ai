@@ -108,7 +108,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
         <CardDescription>
           {isKeyConfigured
             ? "Você já configurou uma chave de API. Insira uma nova para atualizá-la."
-            : "Insira sua chave de API Gemini para habilitar recursos com IA, como análise de PDFs e geração de insights."}
+            : "Insira sua chave de API Gemini para habilitar a Fortuna, incluindo análise de PDFs e geração de insights."}
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -161,7 +161,7 @@ function InsightCard({
       }
 
       notify.success("Adicionado ao plano", {
-        description: "Ação adicionada com recomendação da IA.",
+        description: "Ação adicionada com recomendação da Fortuna.",
         actionUrl: "/plano-acao",
         actionLabel: "Ver plano",
         action: {
@@ -521,7 +521,7 @@ export default function InsightsPage() {
         <div className="flex items-center gap-3">
           <Lightbulb className="text-muted-foreground h-6 w-6" aria-hidden="true" />
           <Header
-            titulo="Análises IA"
+            titulo="Análises Fortuna"
             descricao="Analise inteligente da sua carteira de investimentos"
           />
         </div>
@@ -529,7 +529,7 @@ export default function InsightsPage() {
           <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
             <Lightbulb className="text-muted-foreground h-12 w-12" />
             <p className="text-muted-foreground">
-              Funcionalidade indisponível. Configure a variável de ambiente <code className="text-xs font-mono">GOOGLE_API_KEY</code> para habilitar análises com IA.
+              Funcionalidade indisponível. Configure a variável de ambiente <code className="text-xs font-mono">GOOGLE_API_KEY</code> para habilitar a Fortuna.
             </p>
           </CardContent>
         </Card>
@@ -549,7 +549,7 @@ export default function InsightsPage() {
           )}
           <Lightbulb className="text-muted-foreground h-6 w-6" aria-hidden="true" />
           <Header
-            titulo="Análises IA"
+            titulo="Análises Fortuna"
             descricao="Analise inteligente da sua carteira de investimentos"
           />
         </div>

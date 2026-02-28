@@ -22,7 +22,7 @@ export function ApiKeyInfo() {
           <div>
             <h4 className={cn(typography.label, "font-semibold mb-1")}>Extração de Relatórios PDF</h4>
             <p className={cn(typography.body, "text-muted-foreground")}>
-              Extrai automaticamente os dados dos seus relatórios de investimento em PDF usando IA
+              Extrai automaticamente os dados dos seus relatórios de investimento em PDF pela Fortuna
             </p>
           </div>
 

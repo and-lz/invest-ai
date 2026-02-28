@@ -116,7 +116,7 @@ async function fetchExplanations(
     if (tarefa.status === "concluido" && tarefa.descricaoResultado) {
       const parsed: unknown = JSON.parse(tarefa.descricaoResultado);
       if (parsed && typeof parsed === "object" && "error" in parsed) {
-        throw new Error("IA retornou formato inesperado");
+        throw new Error("Fortuna retornou formato inesperado");
       }
       return parsed as Record<string, string>;
     }
@@ -236,7 +236,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
         }
 
         notify.success("Adicionado ao plano", {
-          description: "Ação adicionada com recomendação da IA.",
+          description: "Ação adicionada com recomendação da Fortuna.",
           actionUrl: "/plano-acao",
           actionLabel: "Ver plano",
           action: {
@@ -344,7 +344,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                         type="button"
                         onClick={() => void handleToggle(index)}
                         className="mt-0.5 cursor-pointer rounded-sm p-0.5 transition-colors"
-                        aria-label="Pedir para a IA explicar"
+                        aria-label="Pedir para a Fortuna explicar"
                       >
                         <BotIcon
                           className={cn(
@@ -359,7 +359,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                       </button>
                     </TooltipTrigger>
                     <TooltipContent side="left" sideOffset={4}>
-                      Pedir para a IA explicar
+                      Pedir para a Fortuna explicar
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

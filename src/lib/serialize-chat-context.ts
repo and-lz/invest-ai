@@ -289,9 +289,9 @@ export function serializarContextoDesempenho(dados: DadosAgregadosAtivo): string
   if (dados.analiseCacheada.existe) {
     linhas.push("");
     linhas.push(
-      `### Analise IA (gerada em ${dados.analiseCacheada.dataAnalise ?? "data desconhecida"})`,
+      `### Análise Fortuna (gerada em ${dados.analiseCacheada.dataAnalise ?? "data desconhecida"})`,
     );
-    linhas.push("Existe uma analise completa de IA disponivel para este ativo.");
+    linhas.push("Existe uma análise completa da Fortuna disponível para este ativo.");
   }
 
   return truncar(linhas.join("\n"));

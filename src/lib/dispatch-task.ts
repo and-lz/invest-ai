@@ -143,13 +143,13 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
               recomendacaoEnriquecida: textoOriginal,
               fundamentacao: "Recomendação automática indisponível no momento.",
             });
-            return { descricaoResultado: "Recomendação IA indisponível" };
+            return { descricaoResultado: "Recomendação Fortuna indisponível" };
           }
 
           await repository.atualizarEnriquecimento(usuarioId, identificadorItem, enrichValidation.data);
 
           return {
-            descricaoResultado: "Recomendação IA gerada",
+            descricaoResultado: "Recomendação Fortuna gerada",
             urlRedirecionamento: "/plano-acao",
           };
         },

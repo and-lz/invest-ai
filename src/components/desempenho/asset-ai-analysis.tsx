@@ -63,7 +63,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BotIcon className={cn(icon.cardTitle, "text-muted-foreground")} />
-              <CardTitle>Analise IA</CardTitle>
+              <CardTitle>Análise Fortuna</CardTitle>
             </div>
             <Badge
               variant="outline"

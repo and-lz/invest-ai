@@ -6,7 +6,7 @@ const DESCRICOES_PAGINA: Record<IdentificadorPagina, string> = {
     "Dashboard principal com resumo patrimonial, alocacao por categoria, comparacao com benchmarks (CDI, Ibovespa, IPCA), melhores e piores ativos, e evolucao historica.",
   reports: "Pagina de gerenciamento de relatorios importados (PDFs da corretora Inter Prime).",
   insights:
-    "Análises geradas por IA sobre a carteira do usuario, organizadas por categorias como performance, riscos, oportunidades e diversificacao.",
+    "Análises geradas pela Fortuna sobre a carteira do usuario, organizadas por categorias como performance, riscos, oportunidades e diversificacao.",
   trends:
     "Tendencias de mercado em tempo real: maiores altas e baixas da bolsa, indices (Ibovespa), taxa SELIC, inflacao (IPCA), e cambio.",
   desempenho:
@@ -24,7 +24,7 @@ export function construirInstrucaoSistemaChat(
 ): string {
   const descricaoPagina = DESCRICOES_PAGINA[identificadorPagina];
 
-  let instrucao = `Voce e um analista financeiro pessoal integrado a um dashboard de investimentos. O usuario ja investe e quer analises uteis, nao avisos genericos.
+  let instrucao = `Voce e a Fortuna, a assistente de investimentos integrada a este dashboard. O usuario ja investe e quer analises uteis, nao avisos genericos.
 
 POSTURA:
 - Aja como um analista que CONHECE a carteira do usuario — porque voce realmente tem os dados dele no contexto

@@ -53,7 +53,7 @@ const CONCLUSION_LABELS: Record<TipoConclusaoPlano, string> = {
 
 const ORIGIN_LABELS: Record<string, string> = {
   "takeaway-dashboard": "Dashboard",
-  "insight-acao-sugerida": "Análise IA",
+  "insight-acao-sugerida": "Análise Fortuna",
 };
 
 function ActionItemCard({
@@ -108,7 +108,7 @@ function ActionItemCard({
           <div className="ml-7 flex items-center gap-2">
             <Loader2 className={cn(icon.micro, "text-muted-foreground animate-spin")} />
             <p className={cn(typography.helper, "italic")}>
-              Enriquecimento por IA em andamento...
+              Enriquecimento pela Fortuna em andamento...
             </p>
           </div>
         )}
@@ -223,7 +223,7 @@ export default function PlanoAcaoPage() {
         <ClipboardList className={cn(icon.pageTitle, "text-muted-foreground")} />
         <Header
           titulo="Plano de Ação"
-          descricao="Recomendações de investimento enriquecidas por IA a partir do seu dashboard"
+          descricao="Recomendações de investimento enriquecidas pela Fortuna a partir do seu dashboard"
         />
       </div>
 
@@ -244,7 +244,7 @@ export default function PlanoAcaoPage() {
             <div className="space-y-1 text-center">
               <p className={typography.label}>Seu plano de ação está vazio</p>
               <p className={typography.helper}>
-                Adicione itens a partir das conclusões do dashboard ou das análises IA
+                Adicione itens a partir das conclusões do dashboard ou das análises da Fortuna
               </p>
             </div>
             <Button asChild variant="outline" className="mt-2 gap-2">

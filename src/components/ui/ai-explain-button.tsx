@@ -57,13 +57,13 @@ export function BotaoExplicarIA({ identificadorCard }: BotaoExplicarIAProps) {
             size="icon-xs"
             onClick={handleClick}
             className="ai-icon-hover text-muted-foreground/60"
-            aria-label="Pedir para a IA explicar este gráfico"
+            aria-label="Pedir para a Fortuna explicar este gráfico"
           >
             <BotIcon />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left" sideOffset={4}>
-          Pedir para a IA explicar
+          Pedir para a Fortuna explicar
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
