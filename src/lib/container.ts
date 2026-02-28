@@ -173,11 +173,11 @@ export function obterBrapiAssetDetailService(): BrapiAssetDetailService {
   return new BrapiAssetDetailService(obterBrapiToken());
 }
 
-export async function obterAnalyzeAssetPerformanceUseCase() {
+export async function obterAnalyzeAssetPerformanceUseCase(modelo?: string) {
   const repository = await criarRepositorio();
   return new AnalyzeAssetPerformanceUseCase(
     repository,
-    new GeminiAssetAnalysisService(criarProvedorAi()),
+    new GeminiAssetAnalysisService(criarProvedorAi(modelo)),
     obterBrapiAssetDetailService(),
     obterBcbMacroDataService(),
   );

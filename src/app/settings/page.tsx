@@ -4,11 +4,15 @@ import { useEffect, useState } from "react";
 import { Settings } from "lucide-react";
 import { GeminiApiKeyForm } from "@/components/settings/gemini-api-key-form";
 import { ApiKeyInfo } from "@/components/settings/api-key-info";
+import { ModelTierSelector } from "@/components/settings/model-tier-selector";
 import { typography, icon, layout } from "@/lib/design-system";
 import { cn } from "@/lib/utils";
+import { DEFAULT_MODEL_TIER } from "@/lib/model-tiers";
+import type { ModelTier } from "@/lib/model-tiers";
 
 export default function SettingsPage() {
   const [isKeyConfigured, setIsKeyConfigured] = useState(false);
+  const [modelTier, setModelTier] = useState<ModelTier>(DEFAULT_MODEL_TIER);
 
   useEffect(() => {
     async function loadSettings() {
@@ -17,6 +21,9 @@ export default function SettingsPage() {
         if (!response.ok) return;
         const data = await response.json();
         setIsKeyConfigured(data.geminiApiKeyConfigured);
+        if (data.modelTier) {
+          setModelTier(data.modelTier);
+        }
       } catch {
         // Silently fail — page still works without loading status
       }
@@ -25,7 +32,7 @@ export default function SettingsPage() {
     loadSettings();
   }, []);
 
-  function handleSuccess() {
+  function handleApiKeySuccess() {
     setIsKeyConfigured(true);
   }
 
@@ -37,7 +44,8 @@ export default function SettingsPage() {
       </div>
 
       <div className={cn(layout.sectionSpacing)}>
-        <GeminiApiKeyForm onSuccess={handleSuccess} isKeyConfigured={isKeyConfigured} />
+        <GeminiApiKeyForm onSuccess={handleApiKeySuccess} isKeyConfigured={isKeyConfigured} />
+        <ModelTierSelector currentTier={modelTier} onTierChange={setModelTier} />
         <ApiKeyInfo />
       </div>
     </div>

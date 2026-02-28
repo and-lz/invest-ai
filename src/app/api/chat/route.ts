@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi } from "@/lib/container";
+import { criarProvedorAi, resolverModeloDoUsuario } from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { AiApiTransientError } from "@/domain/errors/app-errors";
@@ -39,7 +39,8 @@ export async function POST(request: Request): Promise<Response> {
       partes: [{ tipo: "texto" as const, dados: mensagem.conteudo }],
     }));
 
-    const provedor = criarProvedorAi();
+    const modelo = await resolverModeloDoUsuario(verificacaoAuth.session.user.userId);
+    const provedor = criarProvedorAi(modelo);
     const geradorStream = provedor.transmitir({
       instrucaoSistema,
       mensagens: mensagensAi,

@@ -1,5 +1,5 @@
 import { NextResponse, after } from "next/server";
-import { obterUploadReportUseCase, obterListReportsUseCase } from "@/lib/container";
+import { obterUploadReportUseCase, obterListReportsUseCase, resolverModeloDoUsuario } from "@/lib/container";
 import { AppError } from "@/domain/errors/app-errors";
 import { descriptografarPdf } from "@/lib/pdf-decrypt";
 import { salvarTarefa } from "@/lib/background-task";
@@ -87,7 +87,8 @@ export async function POST(request: Request) {
       rotuloLog: "Upload",
       usuarioId: authCheck.session.user.userId,
       executarOperacao: async () => {
-        const useCase = await obterUploadReportUseCase();
+        const modelo = await resolverModeloDoUsuario(authCheck.session.user.userId);
+        const useCase = await obterUploadReportUseCase(modelo);
         const resultado = await useCase.executar({ nomeArquivoOriginal, pdfBuffer });
         return {
           descricaoResultado: `Relatorio ${resultado.metadados.mesReferencia} processado`,

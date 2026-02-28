@@ -1,6 +1,6 @@
 import { NextResponse, after } from "next/server";
 import { z } from "zod/v4";
-import { obterAnalyzeAssetPerformanceUseCase } from "@/lib/container";
+import { obterAnalyzeAssetPerformanceUseCase, resolverModeloDoUsuario } from "@/lib/container";
 import { salvarTarefa } from "@/lib/background-task";
 import { executeBackgroundTask } from "@/lib/background-task-executor";
 import { salvarAnaliseAtivo } from "@/lib/asset-analysis-storage";
@@ -55,7 +55,8 @@ export async function POST(request: Request) {
       rotuloLog: "Analise Ativo",
       usuarioId,
       executarOperacao: async () => {
-        const useCase = await obterAnalyzeAssetPerformanceUseCase();
+        const modelo = await resolverModeloDoUsuario(usuarioId);
+        const useCase = await obterAnalyzeAssetPerformanceUseCase(modelo);
         const analise = await useCase.executar({ codigoAtivo });
 
         // Persistir resultado para cache
