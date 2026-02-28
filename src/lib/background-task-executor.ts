@@ -6,7 +6,12 @@ import {
 } from "@/lib/background-task";
 import { addNotification } from "@/lib/notification";
 import type { CriarNotificacao } from "@/lib/notification";
-import { AppError, AiApiQuotaError } from "@/domain/errors/app-errors";
+import {
+  AppError,
+  AiApiError,
+  AiApiTransientError,
+  AiApiQuotaError,
+} from "@/domain/errors/app-errors";
 
 // ============================================================
 // Executor generico de tarefas em background com retry e notificacoes.
@@ -27,6 +32,27 @@ export interface ConfiguracaoExecutorTarefa {
   readonly executarOperacao: () => Promise<ResultadoTarefaSucesso>;
   /** Called when the task fails permanently (all retries exhausted). Use for cleanup. */
   readonly aoFalharDefinitivo?: () => Promise<void>;
+}
+
+/**
+ * Translates raw error objects into user-friendly messages.
+ * Raw technical details are already logged to console — the user only sees this.
+ */
+function friendlyErrorMessage(erro: unknown): string {
+  if (erro instanceof AiApiQuotaError) {
+    return "Sua chave de API Gemini está sem créditos. Verifique em Configurações e adicione créditos no Google AI Studio.";
+  }
+  if (erro instanceof AiApiTransientError) {
+    return "A API Gemini está indisponível no momento. Tente novamente em alguns minutos.";
+  }
+  if (erro instanceof AiApiError) {
+    return "Falha na comunicação com a API Gemini. Tente novamente.";
+  }
+  // Non-AI errors (PdfParsingError, ValidationError, etc.) already have structured messages
+  if (erro instanceof AppError) {
+    return erro.message;
+  }
+  return "Algo deu errado. Tente novamente.";
 }
 
 const ATRASO_BASE_MILISSEGUNDOS = 2000;
@@ -136,6 +162,7 @@ export async function executeBackgroundTask(
       // Falha definitiva
       const ehQuotaError = erro instanceof AiApiQuotaError;
       const urlRetry = ehRecuperavel ? `/api/tasks/${tarefa.identificador}/retry` : undefined;
+      const erroAmigavel = friendlyErrorMessage(erro);
 
       // Allow caller to do cleanup (e.g. write fallback data so frontend stops polling)
       if (aoFalharDefinitivo) {
@@ -150,15 +177,12 @@ export async function executeBackgroundTask(
         ...tarefa,
         status: "erro",
         concluidoEm: new Date().toISOString(),
-        erro: mensagemErro,
+        erro: erroAmigavel,
         tentativaAtual,
         erroRecuperavel: ehRecuperavel,
       });
 
       const descricaoTarefa = descreverTarefa(tarefa);
-      const descricaoNotificacao = ehQuotaError
-        ? "Sua chave de API Gemini está sem créditos. Verifique em Configurações."
-        : mensagemErro;
       const acaoNotificacao = ehQuotaError
         ? { label: "Ir para Configurações", url: "/settings" }
         : urlRetry
@@ -168,7 +192,7 @@ export async function executeBackgroundTask(
       await criarNotificacaoSilenciosa(usuarioId, {
         tipo: "error",
         titulo: `${descricaoTarefa} — erro`,
-        descricao: descricaoNotificacao,
+        descricao: erroAmigavel,
         acao: acaoNotificacao,
       });
 
