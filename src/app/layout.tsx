@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { HeaderNavigation } from "@/components/layout/header-navigation";
 import { AuthProvider } from "@/contexts/auth-provider";
 import { ChatPageProvider } from "@/contexts/chat-page-context";
-import { ChatWidget } from "@/components/chat/chat-widget";
+import { LazyChatWidget } from "@/components/chat/lazy-chat-widget";
 import { ProvedorSwr } from "@/components/providers/swr-provider";
 import { PwaRegistration } from "@/components/providers/pwa-registration";
 import { isAiEnabled } from "@/lib/ai-features";
@@ -67,7 +67,7 @@ export default function RootLayout({
                   <HeaderNavigation />
                   <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
                 </div>
-                {aiEnabled && <ChatWidget />}
+                {aiEnabled && <LazyChatWidget />}
                 <Toaster />
               </ChatPageProvider>
             </ProvedorSwr>

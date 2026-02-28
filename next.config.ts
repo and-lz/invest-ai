@@ -29,7 +29,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   experimental: {
-    optimizePackageImports: ["recharts"],
+    optimizePackageImports: ["recharts", "lucide-react"],
   },
   outputFileTracingIncludes: {
     "/api/reports": ["./node_modules/@neslinesli93/qpdf-wasm/dist/*.wasm"],
