@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Bot, X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MensagemChatBolha } from "@/components/chat/chat-message";
@@ -25,6 +26,20 @@ export function ChatWidget() {
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const areaScrollRef = useRef<HTMLDivElement>(null);
   const prevTransmitindoRef = useRef(false);
+
+  const { data: session } = useSession();
+
+  // Derive user initials from session name
+  const userInitials = session?.user?.name
+    ? session.user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : undefined;
+
+  const userImageUrl = session?.user?.image ?? undefined;
 
   const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
     useSpeechSynthesis();
@@ -281,6 +296,8 @@ export function ChatWidget() {
                     mensagem.papel === "assistente" &&
                     indice === mensagens.length - 1
                   }
+                  userImageUrl={userImageUrl}
+                  userInitials={userInitials}
                 />
               ))}
             </div>
