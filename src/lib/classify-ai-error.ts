@@ -27,7 +27,6 @@ const PADROES_ERRO_TRANSIENTE: readonly RegExp[] = [
  * More specific than generic transient errors — should be checked first.
  */
 const PADROES_QUOTA_ESGOTADA: readonly RegExp[] = [
-  /resource.*exhausted/i,
   /quota.*exceeded/i,
   /exceeded.*quota/i,
   /billing/i,

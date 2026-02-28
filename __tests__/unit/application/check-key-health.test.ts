@@ -94,7 +94,7 @@ describe("CheckKeyHealthUseCase", () => {
   });
 
   describe("Given a key with exhausted quota", () => {
-    it("When error contains 'Resource has been exhausted', Then returns quota_exhausted", async () => {
+    it("When error contains 'Resource has been exhausted', Then returns generic error (ambiguous — could be rate limit)", async () => {
       mockGenerateContent.mockRejectedValue(new Error("Resource has been exhausted (e.g. check quota)."));
 
       const repo = createMockRepository({ geminiApiKey: "quota-exhausted-key" });
@@ -102,8 +102,7 @@ describe("CheckKeyHealthUseCase", () => {
 
       const result = await useCase.execute("user-1");
 
-      expect(result.status).toBe("quota_exhausted");
-      expect(result.message).toContain("créditos");
+      expect(result.status).toBe("error");
     });
 
     it("When error contains 'quota exceeded', Then returns quota_exhausted", async () => {

@@ -52,7 +52,6 @@ describe("ehErroTransienteDeAi", () => {
 describe("isQuotaExhaustedError", () => {
   describe("Given messages indicating quota/credit exhaustion, When checked, Then returns true", () => {
     const quotaCases = [
-      "Resource has been exhausted (e.g. check quota).",
       "Quota exceeded for aiplatform.googleapis.com",
       "exceeded quota for model",
       "billing account not active",
@@ -69,6 +68,7 @@ describe("isQuotaExhaustedError", () => {
 
   describe("Given messages NOT about quota exhaustion, When checked, Then returns false", () => {
     const nonQuotaCases = [
+      "Resource has been exhausted (e.g. check quota).",
       "429 Too Many Requests",
       "Rate limit exceeded",
       "API key invalid",

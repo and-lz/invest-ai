@@ -4,8 +4,8 @@
   "description": "Dashboard pessoal de investimentos - Inter Prime",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0c14",
-  "theme_color": "#0d0c14",
+  "background_color": "#00030e",
+  "theme_color": "#00030e",
   "orientation": "portrait-primary",
   "icons": [
     {
