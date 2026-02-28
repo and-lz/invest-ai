@@ -11,6 +11,7 @@ import { SuggestionChips } from "@/components/chat/suggestion-chips";
 import { ListaConversas } from "@/components/chat/conversations-list";
 import { useChatAssistant } from "@/hooks/use-chat-assistant";
 import { useChatPageContext } from "@/contexts/chat-page-context";
+import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { stripMarkdown } from "@/lib/strip-markdown";
@@ -64,12 +65,30 @@ export function ChatWidget() {
     reenviarUltimaMensagem,
   } = useChatAssistant();
 
+  // Recent message texts for AI suggestions context (last 4, truncated)
+  const recentMessages = useMemo(
+    () => mensagens.slice(-4).map((m) => m.conteudo.slice(0, 200)),
+    [mensagens],
+  );
+
+  // AI-powered type-ahead suggestions (debounced, only when user is typing 3+ chars)
+  const { suggestions: aiSuggestions, isLoading: aiSuggestionsLoading } = useChatSuggestions({
+    input: inputValue,
+    pageId: identificadorPagina,
+    recentMessages,
+    enabled: mensagens.length > 0 && !estaTransmitindo && inputValue.trim().length >= 3,
+  });
+
   const activeSuggestions = useMemo(() => {
     if (mensagens.length === 0) {
       return INITIAL_SUGGESTIONS[identificadorPagina] ?? [];
     }
+    // AI suggestions take priority when user is typing
+    if (aiSuggestions.length > 0) {
+      return aiSuggestions;
+    }
     return followUpSuggestions;
-  }, [mensagens.length, identificadorPagina, followUpSuggestions]);
+  }, [mensagens.length, identificadorPagina, followUpSuggestions, aiSuggestions]);
 
   const handleSuggestionSelect = useCallback(
     (text: string) => {
@@ -344,13 +363,14 @@ export function ChatWidget() {
               </div>
             )}
 
-            {/* Follow-up suggestions */}
-            {mensagens.length > 0 && activeSuggestions.length > 0 && !estaTransmitindo && (
+            {/* Follow-up / AI suggestions */}
+            {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
               <SuggestionChips
                 suggestions={activeSuggestions}
                 onSelect={handleSuggestionSelect}
-                filterText={inputValue}
+                filterText={aiSuggestions.length > 0 ? undefined : inputValue}
                 variant="follow-up"
+                isLoading={aiSuggestionsLoading}
               />
             )}
 

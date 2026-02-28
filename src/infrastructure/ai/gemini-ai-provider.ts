@@ -36,6 +36,7 @@ export class GeminiProvedorAi implements ProvedorAi {
           temperature: configuracao.temperatura,
           responseMimeType:
             configuracao.formatoResposta === "json" ? "application/json" : undefined,
+          maxOutputTokens: configuracao.maxOutputTokens,
         },
       });
 

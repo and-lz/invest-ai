@@ -38,6 +38,7 @@ export interface ConfiguracaoGeracao {
   readonly temperatura?: number;
   readonly formatoResposta?: "json" | "texto";
   readonly pesquisaWeb?: boolean;
+  readonly maxOutputTokens?: number;
 }
 
 // ---- Resposta ----
