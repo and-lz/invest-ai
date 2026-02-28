@@ -25,7 +25,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
 
   async function handleTestKey() {
     if (!apiKey.trim()) {
-      toast.error("Please enter an API key first");
+      toast.error("Insira uma chave de API primeiro");
       return;
     }
 
@@ -43,7 +43,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
         const error = await response.json();
         setTestResult({
           valid: false,
-          message: error.erro || "Failed to test API key",
+          message: error.erro || "Falha ao testar chave de API",
         });
         return;
       }
@@ -52,17 +52,17 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
       setTestResult(result);
 
       if (result.valid) {
-        toast.success("API key is valid");
+        toast.success("Chave de API válida");
       } else {
         toast.error(result.message);
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
+      const message = error instanceof Error ? error.message : "Erro desconhecido";
       setTestResult({
         valid: false,
-        message: `Error: ${message}`,
+        message: `Erro: ${message}`,
       });
-      toast.error("Failed to test API key");
+      toast.error("Falha ao testar chave de API");
     } finally {
       setIsTesting(false);
     }
@@ -72,7 +72,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
     e.preventDefault();
 
     if (!apiKey.trim()) {
-      toast.error("Please enter an API key");
+      toast.error("Insira uma chave de API");
       return;
     }
 
@@ -87,15 +87,15 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
 
       if (!response.ok) {
         const error = await response.json();
-        toast.error(error.erro || "Failed to save API key");
+        toast.error(error.erro || "Falha ao salvar chave de API");
         return;
       }
 
-      toast.success("API key saved successfully");
+      toast.success("Chave de API salva com sucesso");
       setApiKey("");
       onSuccess?.();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to save API key");
+      toast.error(error instanceof Error ? error.message : "Falha ao salvar chave de API");
     } finally {
       setIsSaving(false);
     }
@@ -104,18 +104,18 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Gemini API Key</CardTitle>
+        <CardTitle>Chave de API Gemini</CardTitle>
         <CardDescription>
           {isKeyConfigured
-            ? "You have already configured an API key. Enter a new one to update it."
-            : "Enter your Gemini API key to enable AI-powered features like PDF analysis and insights generation."}
+            ? "Você já configurou uma chave de API. Insira uma nova para atualizá-la."
+            : "Insira sua chave de API Gemini para habilitar recursos com IA, como análise de PDFs e geração de insights."}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} ref={formRef} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="apiKey" className={typography.label}>
-              API Key
+              Chave de API
             </Label>
             <div className="relative">
               <Input
@@ -123,7 +123,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
                 type={showKey ? "text" : "password"}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your Gemini API key..."
+                placeholder="Insira sua chave de API Gemini..."
                 className="pr-10"
               />
               <button
@@ -135,7 +135,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
               </button>
             </div>
             <p className={cn(typography.helper, "text-muted-foreground")}>
-              Get your API key from{" "}
+              Obtenha sua chave em{" "}
               <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                 Google AI Studio
               </a>
@@ -174,7 +174,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
               className="flex-1"
             >
               {isTesting && <Loader2 className={cn(icon.button, "mr-2 animate-spin")} />}
-              {isTesting ? "Testing..." : "Test Key"}
+              {isTesting ? "Testando..." : "Testar Chave"}
             </Button>
             <Button
               type="submit"
@@ -182,7 +182,7 @@ export function GeminiApiKeyForm({ onSuccess, isKeyConfigured = false }: GeminiA
               className="flex-1"
             >
               {isSaving && <Loader2 className={cn(icon.button, "mr-2 animate-spin")} />}
-              {isSaving ? "Saving..." : "Save Key"}
+              {isSaving ? "Salvando..." : "Salvar Chave"}
             </Button>
           </div>
         </form>

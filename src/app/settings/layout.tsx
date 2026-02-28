@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Settings | Investimentos",
-  description: "Manage your account settings and API keys",
+  title: "Configurações | Investimentos",
+  description: "Gerencie suas configurações e chaves de API",
 };
 
 export default function SettingsLayout({

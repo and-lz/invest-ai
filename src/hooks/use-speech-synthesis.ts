@@ -31,9 +31,12 @@ export function useSpeechSynthesis(
 
   const [status, setStatus] = useState<SpeechStatus>("idle");
   const [error, setError] = useState<Error | null>(null);
-  const [isSupported] = useState(
-    () => typeof window !== "undefined" && "speechSynthesis" in window,
-  );
+  const [isSupported, setIsSupported] = useState(false);
+
+  // Detect support only on client to avoid hydration mismatch
+  useEffect(() => {
+    setIsSupported("speechSynthesis" in window);
+  }, []);
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 

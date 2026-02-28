@@ -17,22 +17,22 @@ export class TestGeminiApiKeyUseCase {
 
       return TestGeminiKeyResponseSchema.parse({
         valid: true,
-        message: "API key is valid",
+        message: "Chave de API válida",
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
+      const message = error instanceof Error ? error.message : "Erro desconhecido";
 
       // Diferencia entre erro de autenticacao e outros erros
       if (message.includes("401") || message.includes("Invalid API Key") || message.includes("authentication")) {
         return TestGeminiKeyResponseSchema.parse({
           valid: false,
-          message: "Invalid API key. Please check and try again.",
+          message: "Chave de API inválida. Verifique e tente novamente.",
         });
       }
 
       return TestGeminiKeyResponseSchema.parse({
         valid: false,
-        message: `Error testing API key: ${message}`,
+        message: `Erro ao testar chave de API: ${message}`,
       });
     }
   }
