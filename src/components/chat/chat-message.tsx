@@ -40,14 +40,14 @@ export function MensagemChatBolha({
     <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       {ehUsuario ? (
-        <Avatar className={cn("shrink-0", fs ? "h-10 w-10" : "h-8 w-8")}>
+        <Avatar className={cn("shrink-0", fs ? "h-9 w-9" : "h-8 w-8")}>
           <AvatarImage src={userImageUrl} alt="Você" />
-          <AvatarFallback className={cn("bg-primary/10", fs ? "text-base" : "text-xs")}>
-            {userInitials ?? <User className={fs ? "h-6 w-6" : "h-4 w-4"} />}
+          <AvatarFallback className={cn("bg-primary/10", fs ? "text-sm" : "text-xs")}>
+            {userInitials ?? <User className={fs ? "h-5 w-5" : "h-4 w-4"} />}
           </AvatarFallback>
         </Avatar>
       ) : (
-        <Avatar className={cn("shrink-0 border border-border/50", fs ? "h-10 w-10" : "h-8 w-8")}>
+        <Avatar className={cn("shrink-0 border border-border/50", fs ? "h-9 w-9" : "h-8 w-8")}>
           <AvatarImage src="/fortuna-icon.png" alt="Fortuna" />
           <AvatarFallback className="bg-primary/10 text-xs">F</AvatarFallback>
         </Avatar>
@@ -58,7 +58,7 @@ export function MensagemChatBolha({
         className={cn(
           "rounded-2xl leading-relaxed",
           fs
-            ? "max-w-[80ch] px-5 py-3 text-lg"
+            ? "max-w-[80ch] px-4 py-2.5 text-base"
             : "max-w-[80%] px-4 py-2.5 text-sm",
           ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
         )}

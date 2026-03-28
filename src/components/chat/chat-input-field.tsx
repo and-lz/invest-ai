@@ -79,7 +79,7 @@ export function CampoEntradaChat({
       setValor(evento.target.value);
       const textarea = evento.target;
       textarea.style.height = "auto";
-      textarea.style.height = `${Math.min(textarea.scrollHeight, fs ? 200 : 120)}px`;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, fs ? 180 : 120)}px`;
     },
     [setValor, fs],
   );
@@ -87,7 +87,7 @@ export function CampoEntradaChat({
   return (
     <div className={cn(
       "flex items-end border-t",
-      fs ? "mx-auto w-full max-w-4xl gap-4 p-6" : "gap-2 p-3",
+      fs ? "mx-auto w-full max-w-4xl gap-3 p-5" : "gap-2 p-3",
     )}>
       <textarea
         ref={textareaRef}
@@ -99,7 +99,7 @@ export function CampoEntradaChat({
         rows={1}
         className={cn(
           "bg-background placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none rounded-lg border focus:ring-1 focus:outline-none disabled:opacity-50",
-          fs ? "px-5 py-4 text-lg" : "px-3 py-2 text-sm",
+          fs ? "px-4 py-3 text-base" : "px-3 py-2 text-sm",
         )}
       />
       {estaTransmitindo ? (

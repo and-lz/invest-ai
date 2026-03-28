@@ -54,26 +54,26 @@ export function ChatBody({
   }, [mensagens]);
 
   return (
-    <div className={cn("flex flex-1 flex-col", fs && "chat-fullscreen mx-auto w-full max-w-[80ch]")}>
+    <div className={cn("flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen mx-auto w-full max-w-[80ch]")}>
       {/* Messages area */}
       <div
         ref={areaScrollRef}
         className={cn(
-          "flex-1 overflow-y-auto",
-          fs ? "space-y-5 p-6" : "space-y-4 p-4",
+          "min-h-0 flex-1 overflow-y-auto",
+          fs ? "space-y-4 p-5" : "space-y-4 p-4",
         )}
       >
         {mensagens.length === 0 && (
           <div className={cn(
             "flex h-full flex-col items-center justify-center text-center",
-            fs ? "mx-auto max-w-4xl gap-8" : "gap-4",
+            fs ? "mx-auto max-w-4xl gap-6" : "gap-4",
           )}>
-            <Image src="/fortuna-icon.png" alt="Fortuna" width={64} height={64} className={cn("rounded-full", fs ? "h-16 w-16" : "h-10 w-10")} />
+            <Image src="/fortuna-icon.png" alt="Fortuna" width={64} height={64} className={cn("rounded-full", fs ? "h-12 w-12" : "h-10 w-10")} />
             <div>
-              <p className={cn("text-muted-foreground", fs ? "text-lg" : "text-sm")}>
+              <p className={cn("text-muted-foreground", fs ? "text-base" : "text-sm")}>
                 Pergunte sobre seus investimentos.
               </p>
-              <p className={cn("text-muted-foreground mt-1", fs ? "text-base" : "text-xs")}>
+              <p className={cn("text-muted-foreground mt-1", fs ? "text-sm" : "text-xs")}>
                 A Fortuna tem acesso aos dados da pagina atual.
               </p>
             </div>
