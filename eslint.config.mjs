@@ -20,6 +20,7 @@ const eslintConfig = [
       "coverage/**",
       "next-env.d.ts",
       "electron/dist/**",
+      "electron-dist/**",
     ],
   },
 ];
