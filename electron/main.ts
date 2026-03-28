@@ -167,6 +167,9 @@ function buildChildEnv(port: number): NodeJS.ProcessEnv {
     HOSTNAME: "localhost",
     NODE_ENV: "production",
     CLAUDE_PROXY_URL: `http://localhost:${PROXY_PORT}`,
+    // CRITICAL: When packaged, process.execPath is the Electron binary.
+    // Without this flag, spawning it runs main.js again → infinite fork bomb.
+    ELECTRON_RUN_AS_NODE: "1",
   };
 }
 
@@ -194,6 +197,31 @@ function startDevServer(): void {
   });
   proc.on("exit", (code) => {
     console.log(`[next-dev] exited with code ${code}`);
+  });
+}
+
+function startDevProxy(): void {
+  const projectRoot = path.resolve(__dirname, "..", "..");
+  const proxyScript = path.join(projectRoot, "scripts", "claude-proxy.ts");
+
+  const proc = spawn("npx", ["tsx", proxyScript], {
+    cwd: projectRoot,
+    shell: true,
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"],
+    env: { ...process.env, PROXY_PORT: String(PROXY_PORT) },
+  });
+
+  trackProcess(proc);
+
+  proc.stdout?.on("data", (data: Buffer) => {
+    process.stdout.write(`[proxy-dev] ${data}`);
+  });
+  proc.stderr?.on("data", (data: Buffer) => {
+    process.stderr.write(`[proxy-dev] ${data}`);
+  });
+  proc.on("exit", (code) => {
+    console.log(`[proxy-dev] exited with code ${code}`);
   });
 }
 
@@ -239,7 +267,7 @@ function startProxy(): void {
     return;
   }
 
-  const env = { ...process.env, ...loadEnvFile(getEnvPath()), PROXY_PORT: String(PROXY_PORT) };
+  const env = { ...process.env, ...loadEnvFile(getEnvPath()), PROXY_PORT: String(PROXY_PORT), ELECTRON_RUN_AS_NODE: "1" };
 
   const proc = spawn(process.execPath, [proxyPath], {
     detached: true,
@@ -337,6 +365,19 @@ function createWindow(): void {
 
 app.name = "Fortuna";
 
+// Prevent multiple instances (safety net against fork bombs)
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+
+app.on("second-instance", () => {
+  if (mainWindow) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+
 app.whenReady().then(async () => {
   createWindow();
 
@@ -349,10 +390,11 @@ app.whenReady().then(async () => {
     startProdServer(serverPort);
     startProxy();
   } else {
-    // Development: run next dev (proxy is started separately or via npm run dev)
+    // Development: run next dev + proxy (mirrors npm run dev:raw)
     serverPort = DEV_PORT;
     console.log("[electron] Development mode");
     startDevServer();
+    startDevProxy();
   }
 
   try {
@@ -389,3 +431,5 @@ app.on("activate", () => {
     mainWindow!.loadURL(`http://localhost:${DEV_PORT}`);
   }
 });
+
+} // end of single-instance lock
