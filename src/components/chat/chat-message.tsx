@@ -15,6 +15,7 @@ interface MensagemChatBolhaProps {
   readonly userImageUrl?: string;
   readonly userInitials?: string;
   readonly onRetry?: () => void;
+  readonly fullscreen?: boolean;
 }
 
 export function MensagemChatBolha({
@@ -23,8 +24,10 @@ export function MensagemChatBolha({
   userImageUrl,
   userInitials,
   onRetry,
+  fullscreen,
 }: MensagemChatBolhaProps) {
   const ehUsuario = mensagem.papel === "usuario";
+  const fs = fullscreen;
 
   // Detect stream errors embedded in assistant messages
   const errorMatch = !ehUsuario ? mensagem.conteudo.match(STREAM_ERROR_REGEX) : null;
@@ -37,34 +40,35 @@ export function MensagemChatBolha({
     <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       {ehUsuario ? (
-        <Avatar data-chat-avatar className="h-8 w-8 shrink-0">
+        <Avatar className={cn("shrink-0", fs ? "h-10 w-10" : "h-8 w-8")}>
           <AvatarImage src={userImageUrl} alt="Você" />
-          <AvatarFallback className="bg-primary/10 text-xs">
-            {userInitials ?? <User className="h-4 w-4" />}
+          <AvatarFallback className={cn("bg-primary/10", fs ? "text-sm" : "text-xs")}>
+            {userInitials ?? <User className={fs ? "h-5 w-5" : "h-4 w-4"} />}
           </AvatarFallback>
         </Avatar>
       ) : (
         <div
-          data-chat-avatar
           className={cn(
-            "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-            "bg-secondary",
+            "flex shrink-0 items-center justify-center rounded-full bg-secondary",
+            fs ? "h-10 w-10" : "h-8 w-8",
           )}
         >
-          <Bot className="h-4 w-4" />
+          <Bot className={fs ? "h-5 w-5" : "h-4 w-4"} />
         </div>
       )}
 
       {/* Bolha de mensagem */}
       <div
-        data-chat-bubble
         className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
+          "rounded-2xl leading-relaxed",
+          fs
+            ? "max-w-[80ch] px-6 py-3.5 text-base"
+            : "max-w-[80%] px-4 py-2.5 text-sm",
           ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
         )}
       >
         {cleanContent ? (
-          <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} />
+          <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} fullscreen={fs} />
         ) : (
           estaTransmitindo &&
           !streamError && (

@@ -10,6 +10,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface TabelaMarkdownProps {
   readonly children?: ReactNode;
@@ -43,18 +44,20 @@ export function LinhaMarkdown({ children }: LinhaMarkdownProps) {
 
 interface CelulaCabecalhoMarkdownProps {
   readonly children?: ReactNode;
+  readonly fullscreen?: boolean;
 }
 
-export function CelulaCabecalhoMarkdown({ children }: CelulaCabecalhoMarkdownProps) {
-  return <TableHead className="text-xs">{children}</TableHead>;
+export function CelulaCabecalhoMarkdown({ children, fullscreen }: CelulaCabecalhoMarkdownProps) {
+  return <TableHead className={fullscreen ? "text-sm" : "text-xs"}>{children}</TableHead>;
 }
 
 interface CelulaMarkdownProps {
   readonly children?: ReactNode;
+  readonly fullscreen?: boolean;
 }
 
-export function CelulaMarkdown({ children }: CelulaMarkdownProps) {
-  return <TableCell className="text-xs">{children}</TableCell>;
+export function CelulaMarkdown({ children, fullscreen }: CelulaMarkdownProps) {
+  return <TableCell className={fullscreen ? "text-sm" : "text-xs"}>{children}</TableCell>;
 }
 
 interface LinkMarkdownProps {
@@ -81,11 +84,12 @@ export function SeparadorMarkdown() {
 
 interface CodigoInlineMarkdownProps {
   readonly children?: ReactNode;
+  readonly fullscreen?: boolean;
 }
 
-export function CodigoInlineMarkdown({ children }: CodigoInlineMarkdownProps) {
+export function CodigoInlineMarkdown({ children, fullscreen }: CodigoInlineMarkdownProps) {
   return (
-    <code className="bg-muted text-foreground rounded px-1 py-0.5 font-mono text-xs">
+    <code className={cn("bg-muted text-foreground rounded px-1 py-0.5 font-mono", fullscreen ? "text-sm" : "text-xs")}>
       {children}
     </code>
   );

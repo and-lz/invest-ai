@@ -11,6 +11,7 @@ interface SuggestionChipsProps {
   readonly filterText?: string;
   readonly variant: "empty-state" | "follow-up";
   readonly isLoading?: boolean;
+  readonly fullscreen?: boolean;
 }
 
 export function SuggestionChips({
@@ -19,6 +20,7 @@ export function SuggestionChips({
   filterText,
   variant,
   isLoading,
+  fullscreen,
 }: SuggestionChipsProps) {
   const filtered = useMemo(() => {
     if (!filterText || filterText.length < 2) return suggestions;
@@ -28,15 +30,16 @@ export function SuggestionChips({
     );
   }, [suggestions, filterText]);
 
+  const fs = fullscreen;
+
   if (filtered.length === 0 && !isLoading) return null;
 
   return (
     <div
-      data-chat-suggestions
       className={cn(
         "flex flex-wrap items-center gap-2",
         variant === "empty-state" && "justify-center px-4",
-        variant === "follow-up" && "px-3 pt-2",
+        variant === "follow-up" && cn(fs ? "mx-auto max-w-4xl px-4 pt-2" : "px-3 pt-2"),
       )}
       role="group"
       aria-label="Sugestoes de perguntas"
@@ -50,10 +53,10 @@ export function SuggestionChips({
           type="button"
           onClick={() => onSelect(suggestion.text)}
           className={cn(
-            "text-xs",
-            "bg-secondary hover:bg-secondary/80 rounded-full border px-3 py-1.5",
+            "bg-secondary hover:bg-secondary/80 rounded-full border",
             "cursor-pointer transition-colors",
             "text-foreground hover:border-primary/30",
+            fs ? "text-sm px-4 py-2" : "text-xs px-3 py-1.5",
           )}
         >
           {suggestion.label}

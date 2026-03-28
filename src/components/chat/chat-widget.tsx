@@ -172,6 +172,9 @@ export function ChatWidget() {
     setMostrarSidebar(false);
   }, []);
 
+  // Shorthand for fullscreen conditional classes
+  const fs = telaCheia;
+
   return (
     <>
       {/* Botao flutuante (FAB) */}
@@ -222,36 +225,39 @@ export function ChatWidget() {
           {/* Sidebar de conversas (overlay, aberta apenas ao clicar) */}
           <div
             className={cn(
-              "bg-background absolute z-10 h-full w-64 border-r transition-transform",
-              telaCheia && "w-80",
+              "bg-background absolute z-10 h-full border-r transition-transform",
+              fs ? "w-80" : "w-64",
               mostrarSidebar ? "translate-x-0" : "-translate-x-full",
             )}
-            {...(telaCheia ? { "data-chat-sidebar-fullscreen": true } : {})}
           >
             <ListaConversas
               conversaAtualId={conversaAtualId}
               onSelecionarConversa={handleSelecionarConversa}
               onNovaConversa={handleNovaConversa}
+              fullscreen={fs}
             />
           </div>
 
           {/* Area principal do chat */}
-          <div className={cn("flex flex-1 flex-col", telaCheia && "chat-fullscreen")}>
+          <div className={cn("flex flex-1 flex-col", fs && "chat-fullscreen")}>
             {/* Cabecalho */}
-            <div data-chat-header className="flex items-center justify-between border-b px-4 py-3">
+            <div className={cn(
+              "flex items-center justify-between border-b",
+              fs ? "px-5 py-4" : "px-4 py-3",
+            )}>
               <div className="flex items-center gap-2">
                 {/* Botao toggle sidebar (historico de conversas) */}
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setMostrarSidebar(!mostrarSidebar)}
-                  className="h-8 w-8"
+                  className={fs ? "h-9 w-9" : "h-8 w-8"}
                 >
-                  <Menu className="h-4 w-4" />
+                  <Menu className={fs ? "h-5 w-5" : "h-4 w-4"} />
                 </Button>
 
-                <Bot data-chat-header-icon className="text-muted-foreground h-5 w-5" />
-                <h3 className="text-sm font-medium">Fortuna</h3>
+                <Bot className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-5 w-5")} />
+                <h3 className={cn("font-medium", fs ? "text-base" : "text-sm")}>Fortuna</h3>
               </div>
               <div className="flex items-center gap-1">
                 {ttsSupported && (
@@ -267,17 +273,17 @@ export function ChatWidget() {
                               return !v;
                             });
                           }}
-                          className={cn("h-8 w-8", ttsEnabled && "text-primary")}
+                          className={cn(fs ? "h-9 w-9" : "h-8 w-8", ttsEnabled && "text-primary")}
                         >
                           {ttsEnabled ? (
                             <Volume2
                               className={cn(
-                                "h-4 w-4",
+                                fs ? "h-5 w-5" : "h-4 w-4",
                                 speechStatus === "speaking" && "animate-pulse",
                               )}
                             />
                           ) : (
-                            <VolumeX className="text-muted-foreground h-4 w-4" />
+                            <VolumeX className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
                           )}
                         </Button>
                       </TooltipTrigger>
@@ -288,8 +294,8 @@ export function ChatWidget() {
                   </TooltipProvider>
                 )}
                 {mensagens.length > 0 && (
-                  <Button variant="ghost" size="icon" onClick={limparHistorico} className="h-8 w-8">
-                    <Trash2 className="text-muted-foreground h-4 w-4" />
+                  <Button variant="ghost" size="icon" onClick={limparHistorico} className={fs ? "h-9 w-9" : "h-8 w-8"}>
+                    <Trash2 className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
                     <span className="sr-only">Limpar historico</span>
                   </Button>
                 )}
@@ -297,12 +303,12 @@ export function ChatWidget() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setTelaCheia((v) => !v)}
-                  className="hidden h-8 w-8 md:inline-flex"
+                  className={cn("hidden md:inline-flex", fs ? "h-9 w-9" : "h-8 w-8")}
                 >
                   {telaCheia ? (
-                    <Minimize2 className="text-muted-foreground h-4 w-4" />
+                    <Minimize2 className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
                   ) : (
-                    <Maximize2 className="text-muted-foreground h-4 w-4" />
+                    <Maximize2 className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
                   )}
                   <span className="sr-only">{telaCheia ? "Sair da tela cheia" : "Tela cheia"}</span>
                 </Button>
@@ -310,24 +316,33 @@ export function ChatWidget() {
                   variant="ghost"
                   size="icon"
                   onClick={fecharChat}
-                  className="h-8 w-8"
+                  className={fs ? "h-9 w-9" : "h-8 w-8"}
                 >
-                  <X className="text-muted-foreground h-4 w-4" />
+                  <X className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
                   <span className="sr-only">Fechar Fortuna</span>
                 </Button>
               </div>
             </div>
 
             {/* Area de mensagens */}
-            <div ref={areaScrollRef} data-chat-messages className="flex-1 space-y-4 overflow-y-auto p-4">
+            <div
+              ref={areaScrollRef}
+              className={cn(
+                "flex-1 overflow-y-auto",
+                fs ? "space-y-6 p-6" : "space-y-4 p-4",
+              )}
+            >
               {mensagens.length === 0 && (
-                <div data-chat-empty className="flex h-full flex-col items-center justify-center gap-4 text-center">
-                  <Bot className="text-muted-foreground h-10 w-10" />
+                <div className={cn(
+                  "flex h-full flex-col items-center justify-center text-center",
+                  fs ? "mx-auto max-w-4xl gap-6" : "gap-4",
+                )}>
+                  <Bot className={cn("text-muted-foreground", fs ? "h-14 w-14" : "h-10 w-10")} />
                   <div>
-                    <p className="text-muted-foreground text-sm">
+                    <p className={cn("text-muted-foreground", fs ? "text-base" : "text-sm")}>
                       Pergunte sobre seus investimentos.
                     </p>
-                    <p className="text-muted-foreground mt-1 text-xs">
+                    <p className={cn("text-muted-foreground mt-1", fs ? "text-sm" : "text-xs")}>
                       A Fortuna tem acesso aos dados da pagina atual.
                     </p>
                   </div>
@@ -335,33 +350,36 @@ export function ChatWidget() {
                     suggestions={activeSuggestions}
                     onSelect={handleSuggestionSelect}
                     variant="empty-state"
+                    fullscreen={fs}
                   />
                 </div>
               )}
               {mensagens.map((mensagem, indice) => (
-                <MensagemChatBolha
-                  key={mensagem.identificador}
-                  mensagem={mensagem}
-                  estaTransmitindo={
-                    estaTransmitindo &&
-                    mensagem.papel === "assistente" &&
-                    indice === mensagens.length - 1
-                  }
-                  userImageUrl={userImageUrl}
-                  userInitials={userInitials}
-                  onRetry={
-                    mensagem.papel === "assistente" && indice === mensagens.length - 1
-                      ? reenviarUltimaMensagem
-                      : undefined
-                  }
-                />
+                <div key={mensagem.identificador} className={cn(fs && "mx-auto max-w-4xl")}>
+                  <MensagemChatBolha
+                    mensagem={mensagem}
+                    estaTransmitindo={
+                      estaTransmitindo &&
+                      mensagem.papel === "assistente" &&
+                      indice === mensagens.length - 1
+                    }
+                    userImageUrl={userImageUrl}
+                    userInitials={userInitials}
+                    onRetry={
+                      mensagem.papel === "assistente" && indice === mensagens.length - 1
+                        ? reenviarUltimaMensagem
+                        : undefined
+                    }
+                    fullscreen={fs}
+                  />
+                </div>
               ))}
             </div>
 
             {/* Banner de erro */}
             {erro && (
-              <div data-chat-error className="bg-destructive/5 border-t px-4 py-2">
-                <p className="text-destructive text-xs">{erro}</p>
+              <div className="bg-destructive/5 border-t px-4 py-2">
+                <p className={cn("text-destructive", fs ? "text-sm" : "text-xs")}>{erro}</p>
               </div>
             )}
 
@@ -373,6 +391,7 @@ export function ChatWidget() {
                 filterText={aiSuggestions.length > 0 ? undefined : inputValue}
                 variant="follow-up"
                 isLoading={aiSuggestionsLoading}
+                fullscreen={fs}
               />
             )}
 
@@ -383,6 +402,7 @@ export function ChatWidget() {
               estaTransmitindo={estaTransmitindo}
               value={inputValue}
               onValueChange={setInputValue}
+              fullscreen={fs}
             />
           </div>
         </div>

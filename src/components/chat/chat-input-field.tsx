@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Square } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CampoEntradaChatProps {
   readonly onEnviar: (conteudo: string) => void;
@@ -12,6 +13,7 @@ interface CampoEntradaChatProps {
   readonly autoFocus?: boolean;
   readonly value?: string;
   readonly onValueChange?: (value: string) => void;
+  readonly fullscreen?: boolean;
 }
 
 function ehDispositivoTouch(): boolean {
@@ -27,6 +29,7 @@ export function CampoEntradaChat({
   autoFocus = true,
   value: controlledValue,
   onValueChange,
+  fullscreen,
 }: CampoEntradaChatProps) {
   const [internalValue, setInternalValue] = useState("");
   const isControlled = controlledValue !== undefined;
@@ -42,6 +45,7 @@ export function CampoEntradaChat({
     [isControlled, onValueChange],
   );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fs = fullscreen;
 
   // Auto-focus quando componente monta (apenas em desktop, nao abre teclado no mobile)
   useEffect(() => {
@@ -75,13 +79,16 @@ export function CampoEntradaChat({
       setValor(evento.target.value);
       const textarea = evento.target;
       textarea.style.height = "auto";
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, fs ? 200 : 120)}px`;
     },
-    [setValor],
+    [setValor, fs],
   );
 
   return (
-    <div data-chat-input className="flex items-end gap-2 border-t p-3">
+    <div className={cn(
+      "flex items-end border-t",
+      fs ? "mx-auto w-full max-w-4xl gap-3 p-4" : "gap-2 p-3",
+    )}>
       <textarea
         ref={textareaRef}
         value={valor}
@@ -90,7 +97,10 @@ export function CampoEntradaChat({
         placeholder="Pergunte algo sobre seus investimentos..."
         disabled={desabilitado}
         rows={1}
-        className="bg-background placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none disabled:opacity-50"
+        className={cn(
+          "bg-background placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none rounded-lg border focus:ring-1 focus:outline-none disabled:opacity-50",
+          fs ? "px-4 py-3 text-base" : "px-3 py-2 text-sm",
+        )}
       />
       {estaTransmitindo ? (
         <Button variant="ghost" size="icon" onClick={onParar} className="shrink-0">

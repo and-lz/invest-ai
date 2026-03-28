@@ -16,27 +16,30 @@ interface ItemConversaProps {
   readonly estaAtiva: boolean;
   readonly onSelecionar: () => void;
   readonly onDeletar: () => void;
+  readonly fullscreen?: boolean;
 }
 
-export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar }: ItemConversaProps) {
+export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, fullscreen }: ItemConversaProps) {
+  const fs = fullscreen;
   return (
     <div
       className={cn(
-        "group hover:bg-muted/50 relative rounded-lg border p-3 transition-colors",
+        "group hover:bg-muted/50 relative rounded-lg border transition-colors",
+        fs ? "p-4" : "p-3",
         estaAtiva && "border-primary bg-muted",
       )}
     >
       <button onClick={onSelecionar} className="w-full text-left pr-7">
         {/* Titulo */}
-        <h4 className="line-clamp-1 text-sm font-medium">{conversa.titulo}</h4>
+        <h4 className={cn("line-clamp-1 font-medium", fs ? "text-base" : "text-sm")}>{conversa.titulo}</h4>
 
         {/* Preview */}
-        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">
+        <p className={cn("text-muted-foreground mt-1 line-clamp-2", fs ? "text-sm" : "text-xs")}>
           {conversa.previewMensagem}
         </p>
 
         {/* Footer: timestamp + contagem */}
-        <div className="text-muted-foreground mt-2 flex items-center gap-2 text-xs">
+        <div className={cn("text-muted-foreground mt-2 flex items-center gap-2", fs ? "text-sm" : "text-xs")}>
           <MessageSquare className="h-3 w-3" />
           <span>{conversa.contagemMensagens}</span>
           <span>•</span>
