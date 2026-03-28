@@ -35,7 +35,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
 
   return (
     <div className={layout.gridCards}>
-      <Card>
+      <Card className="md:col-span-2 lg:col-span-2">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className={cn("flex items-center gap-1", typography.label)}>
             <DollarSign
