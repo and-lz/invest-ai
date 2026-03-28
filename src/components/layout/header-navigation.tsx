@@ -14,6 +14,9 @@ import {
   Menu,
   MoreHorizontal,
   Bot,
+  Zap,
+  Cpu,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
@@ -31,6 +34,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import { isAiEnabled } from "@/lib/ai-features";
+import { useUserSettings } from "@/hooks/use-user-settings";
+import { icon } from "@/lib/design-system";
 
 const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
 
@@ -62,9 +67,22 @@ const itensNavegacaoSecundarios = aiEnabled
   : todosItensSecundarios.filter((item) => !AI_ONLY_ROUTES.has(item.href));
 const todosItensNavegacao = [...itensNavegacaoPrincipais, ...itensNavegacaoSecundarios];
 
+const TIER_ICONS = {
+  haiku: Zap,
+  sonnet: Cpu,
+  opus: Sparkles,
+} as const;
+
+const TIER_LABELS = {
+  haiku: "Haiku",
+  sonnet: "Sonnet",
+  opus: "Opus",
+} as const;
+
 export function HeaderNavigation() {
   const pathname = usePathname();
   const [version, setVersion] = useState("");
+  const { claudeModelTier } = useUserSettings();
   const {
     dialogRef: navDialogRef,
     open: abrirNav,
@@ -276,6 +294,22 @@ export function HeaderNavigation() {
 
           {/* Actions */}
           <div className="flex items-center gap-1">
+            {aiEnabled && claudeModelTier && (() => {
+              const TierIcon = TIER_ICONS[claudeModelTier];
+              const tierLabel = TIER_LABELS[claudeModelTier];
+              return (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href="/settings">
+                        <TierIcon className={icon.button} />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Modelo: {tierLabel}</TooltipContent>
+                </Tooltip>
+              );
+            })()}
             <ActivityCenter />
             <UserProfileMenu />
           </div>
