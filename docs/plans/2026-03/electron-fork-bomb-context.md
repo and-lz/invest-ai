@@ -10,6 +10,7 @@ Running `desktop:package` and opening the resulting packaged app causes a fork b
 - [ ] Opening the resulting `.app` starts exactly one GUI Electron window
 - [ ] The Next.js standalone server and proxy start correctly (as Node.js processes, not as Electron GUI)
 - [ ] No fork bomb when opening the packaged app, even if `server.js` or the proxy spawn internal child processes
+- [ ] If a fork bomb IS somehow triggered (detection), it is immediately stopped: all children killed, all Fortuna processes killed, app quits
 - [ ] Dev mode (`npm run desktop`) continues to work unchanged
 
 ### Out of Scope
@@ -21,6 +22,36 @@ Running `desktop:package` and opening the resulting packaged app causes a fork b
 - `ELECTRON_RUN_AS_NODE` missing from a grandchild process env → should still not trigger GUI
 - `requestSingleInstanceLock` returning true for a directly-spawned binary → should be prevented at env level
 - Packaged app opened while dev mode is running → single instance lock should focus existing window
+
+### Detection + Emergency Stop Design
+
+**Problem:** If a fork bomb occurs, hundreds of Electron GUI instances spawn faster than the user can react.
+
+**Detection strategy:** At startup, before doing anything else, count how many processes named "Fortuna" are already running. If count > 1, a fork bomb is either happening or a stale instance is running. Kill all of them and quit immediately.
+
+```typescript
+// At top of app.whenReady(), before createWindow() or any spawn:
+const { execSync } = require("child_process");
+try {
+  const count = parseInt(execSync("pgrep -c Fortuna || echo 0").toString().trim(), 10);
+  if (count > 2) {  // threshold: 2 allows for normal double-launch scenarios
+    execSync("pkill -9 -x Fortuna || true");
+    app.quit();
+    return;
+  }
+} catch { /* ignore */ }
+```
+
+**Kill-all on detection:**
+- `pkill -9 -x Fortuna` — kills ALL processes named exactly "Fortuna" (macOS)
+- This stops the exponential growth immediately
+- Then `app.quit()` exits the current instance
+
+**Secondary guard (PID lock file):**
+- Write `/tmp/fortuna-main.pid` with the current PID when the main GUI instance starts
+- On startup, check if the PID file exists and the PID is still alive → if so, this is a duplicate, kill everything and quit
+- On `before-quit`, remove the PID file
+- This is independent of Electron's user data dir, so it works even when `requestSingleInstanceLock` fails
 
 ## Q&A Record
 - Q: Does the fork bomb happen during `electron-builder --mac` or when opening the resulting `.app`?

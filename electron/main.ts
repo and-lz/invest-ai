@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from "electron";
-import { spawn, ChildProcess } from "child_process";
+import { spawn, execSync, ChildProcess } from "child_process";
 import * as path from "path";
 import * as fs from "fs";
 import * as net from "net";
@@ -41,6 +41,85 @@ function killAllChildren(): void {
     }
   }
   childProcesses.length = 0;
+}
+
+// ---------------------------------------------------------------------------
+// Fork bomb detection + emergency stop
+// ---------------------------------------------------------------------------
+
+const PID_LOCK_FILE = "/tmp/fortuna-main.pid";
+
+/**
+ * Detects a fork bomb by counting running "Fortuna" processes.
+ * If more than 2 are found (threshold for brief overlap at startup),
+ * kills ALL Fortuna processes and quits immediately.
+ * Returns true if a fork bomb was detected (caller should stop).
+ */
+function detectAndKillForkBomb(): boolean {
+  if (!app.isPackaged) return false;
+  try {
+    const raw = execSync("pgrep -c -x Fortuna 2>/dev/null || echo 0", {
+      encoding: "utf8",
+    }).trim();
+    const count = parseInt(raw, 10);
+    if (count > 2) {
+      console.error(
+        `[electron] Fork bomb detected (${count} instances). Killing all.`
+      );
+      try {
+        execSync("pkill -9 -x Fortuna 2>/dev/null || true");
+      } catch {}
+      app.quit();
+      return true;
+    }
+  } catch {}
+  return false;
+}
+
+/**
+ * Acquires a PID lock file at a fixed path — independent of Electron's user
+ * data directory so it works even when requestSingleInstanceLock fails.
+ * Returns false if another live instance holds the lock (caller should stop).
+ */
+function acquirePidLock(): boolean {
+  if (!app.isPackaged) return true;
+  try {
+    if (fs.existsSync(PID_LOCK_FILE)) {
+      const existing = parseInt(fs.readFileSync(PID_LOCK_FILE, "utf-8").trim(), 10);
+      if (!isNaN(existing)) {
+        try {
+          process.kill(existing, 0); // throws if process is dead
+          // Process is alive — another instance is running
+          console.error(
+            `[electron] Duplicate instance detected (PID ${existing}). Killing all and quitting.`
+          );
+          try {
+            execSync("pkill -9 -x Fortuna 2>/dev/null || true");
+          } catch {}
+          app.quit();
+          return false;
+        } catch {
+          // Stale PID — process is dead, safe to overwrite
+        }
+      }
+    }
+    fs.writeFileSync(PID_LOCK_FILE, String(process.pid), "utf-8");
+  } catch {
+    // Fail open — don't block launch if lock file write fails
+  }
+  return true;
+}
+
+function releasePidLock(): void {
+  if (!app.isPackaged) return;
+  try {
+    if (fs.existsSync(PID_LOCK_FILE)) {
+      const stored = parseInt(fs.readFileSync(PID_LOCK_FILE, "utf-8").trim(), 10);
+      if (stored === process.pid) {
+        fs.unlinkSync(PID_LOCK_FILE);
+      }
+    }
+  } catch {}
 }
 
 // ---------------------------------------------------------------------------
@@ -379,11 +458,19 @@ app.on("second-instance", () => {
 });
 
 app.whenReady().then(async () => {
+  // --- Fork bomb guards (must run before any spawn) ---
+  if (detectAndKillForkBomb()) return;
+  if (!acquirePidLock()) return;
+
   createWindow();
 
   let serverPort: number;
 
   if (app.isPackaged) {
+    // Propagate ELECTRON_RUN_AS_NODE to ALL descendant processes so even
+    // grandchildren (e.g. Next.js internal workers) run as Node.js, not GUI.
+    process.env.ELECTRON_RUN_AS_NODE = "1";
+
     // Production: run standalone Next.js server + proxy
     serverPort = await findFreePort(DEV_PORT);
     console.log(`[electron] Production mode — port ${serverPort}`);
@@ -423,6 +510,7 @@ app.on("window-all-closed", () => {
 
 app.on("before-quit", () => {
   killAllChildren();
+  releasePidLock();
 });
 
 app.on("activate", () => {
