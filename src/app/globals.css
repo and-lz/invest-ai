@@ -449,9 +449,13 @@ dialog[data-closing]::backdrop {
   @apply h-5 w-5;
 }
 
-/* Message area */
+/* Message area — centered column for wide screens */
 .chat-fullscreen [data-chat-messages] {
   @apply space-y-6 p-6;
+}
+
+.chat-fullscreen [data-chat-messages] > * {
+  @apply mx-auto max-w-4xl;
 }
 
 /* Message bubbles */
@@ -497,7 +501,7 @@ dialog[data-closing]::backdrop {
 
 /* Input area */
 .chat-fullscreen [data-chat-input] {
-  @apply p-4 gap-3;
+  @apply p-4 gap-3 mx-auto w-full max-w-4xl;
 }
 
 .chat-fullscreen textarea {
@@ -505,6 +509,10 @@ dialog[data-closing]::backdrop {
 }
 
 /* Suggestion chips */
+.chat-fullscreen [data-chat-suggestions] {
+  @apply mx-auto max-w-4xl;
+}
+
 .chat-fullscreen [data-chat-suggestions] button {
   @apply text-sm px-4 py-2;
 }
