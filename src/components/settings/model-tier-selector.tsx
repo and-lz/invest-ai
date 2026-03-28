@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Cpu, Loader2, Zap, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { mutate } from "swr";
 import { cn } from "@/lib/utils";
 import { typography, icon } from "@/lib/design-system";
 import { CLAUDE_MODEL_TIER_OPTIONS } from "@/lib/model-tiers";
@@ -47,6 +48,7 @@ export function ModelTierSelector({ currentTier }: ModelTierSelectorProps) {
         return;
       }
 
+      mutate("/api/settings");
       toast.success("Modelo atualizado");
     } catch {
       setSelectedTier(previous);

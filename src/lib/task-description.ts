@@ -12,6 +12,7 @@ export const TipoTarefaEnum = z.enum([
   "analisar-ativo",
   "enriquecer-item-plano",
   "explicar-conclusoes",
+  "reextrair-relatorio",
 ]);
 
 export const StatusTarefaEnum = z.enum(["processando", "concluido", "erro", "cancelada"]);
@@ -50,6 +51,7 @@ export const LABELS_TIPO_TAREFA: Record<TipoTarefa, string> = {
   "analisar-ativo": "Analisando ativo",
   "enriquecer-item-plano": "Enriquecendo item do plano",
   "explicar-conclusoes": "Explicando conclusões",
+  "reextrair-relatorio": "Reextraindo relatório",
 };
 
 /**
@@ -90,6 +92,11 @@ export function descreverTarefa(tarefa: TarefaBackground): string {
   // Explicar conclusoes: sem contexto adicional
   if (tarefa.tipo === "explicar-conclusoes") {
     return labelBase;
+  }
+
+  // Reextrair relatorio: mostrar mês/ano do relatório
+  if (tarefa.tipo === "reextrair-relatorio" && tarefa.parametros?.identificadorRelatorio) {
+    return `${labelBase} — ${tarefa.parametros.identificadorRelatorio}`;
   }
 
   // Fallback: label genérico
