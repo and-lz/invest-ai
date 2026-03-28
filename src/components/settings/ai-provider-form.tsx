@@ -150,14 +150,15 @@ export function AiProviderForm({
             </div>
 
             {/* Info box */}
-            <div className="rounded-md border border-warning/30 bg-warning/5 p-3 text-sm text-muted-foreground">
+            <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm text-muted-foreground">
               <p>
                 <span className="font-medium text-foreground">Requisitos:</span> claude CLI instalado
                 e proxy rodando localmente (<code className="text-xs font-mono">npm run proxy</code>
                 ).
               </p>
               <p className="mt-1">
-                Sem streaming — respostas aparecem completas após processamento.
+                Quando Claude não está disponível, Gemini é usado automaticamente como fallback (se
+                chave de API configurada).
               </p>
             </div>
 
