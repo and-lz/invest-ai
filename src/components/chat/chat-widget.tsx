@@ -5,9 +5,7 @@ import { Bot, X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lu
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { MensagemChatBolha } from "@/components/chat/chat-message";
-import { CampoEntradaChat } from "@/components/chat/chat-input-field";
-import { SuggestionChips } from "@/components/chat/suggestion-chips";
+import { ChatBody } from "@/components/chat/chat-body";
 import { ListaConversas } from "@/components/chat/conversations-list";
 import { useChatAssistant } from "@/hooks/use-chat-assistant";
 import { useChatPageContext } from "@/contexts/chat-page-context";
@@ -29,7 +27,6 @@ export function ChatWidget() {
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const areaScrollRef = useRef<HTMLDivElement>(null);
   const prevTransmitindoRef = useRef(false);
 
   const { identificadorPagina } = useChatPageContext();
@@ -115,13 +112,6 @@ export function ChatWidget() {
     _abrirDialog();
     setEstaAberto(true);
   }, [_abrirDialog]);
-
-  // Auto-scroll ao receber novas mensagens
-  useEffect(() => {
-    if (areaScrollRef.current) {
-      areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
-    }
-  }, [mensagens]);
 
   // Auto-read: when streaming ends and TTS is enabled, read the last assistant message
   useEffect(() => {
@@ -239,7 +229,7 @@ export function ChatWidget() {
           </div>
 
           {/* Area principal do chat */}
-          <div className={cn("flex flex-1 flex-col", fs && "chat-fullscreen mx-auto w-full max-w-[80ch]")}>
+          <div className="flex flex-1 flex-col">
             {/* Cabecalho */}
             <div className={cn(
               "flex items-center justify-between border-b",
@@ -324,85 +314,22 @@ export function ChatWidget() {
               </div>
             </div>
 
-            {/* Area de mensagens */}
-            <div
-              ref={areaScrollRef}
-              className={cn(
-                "flex-1 overflow-y-auto",
-                fs ? "space-y-8 p-8" : "space-y-4 p-4",
-              )}
-            >
-              {mensagens.length === 0 && (
-                <div className={cn(
-                  "flex h-full flex-col items-center justify-center text-center",
-                  fs ? "mx-auto max-w-4xl gap-8" : "gap-4",
-                )}>
-                  <Bot className={cn("text-muted-foreground", fs ? "h-16 w-16" : "h-10 w-10")} />
-                  <div>
-                    <p className={cn("text-muted-foreground", fs ? "text-lg" : "text-sm")}>
-                      Pergunte sobre seus investimentos.
-                    </p>
-                    <p className={cn("text-muted-foreground mt-1", fs ? "text-base" : "text-xs")}>
-                      A Fortuna tem acesso aos dados da pagina atual.
-                    </p>
-                  </div>
-                  <SuggestionChips
-                    suggestions={activeSuggestions}
-                    onSelect={handleSuggestionSelect}
-                    variant="empty-state"
-                    fullscreen={fs}
-                  />
-                </div>
-              )}
-              {mensagens.map((mensagem, indice) => (
-                <div key={mensagem.identificador} className={cn(fs && "mx-auto max-w-4xl")}>
-                  <MensagemChatBolha
-                    mensagem={mensagem}
-                    estaTransmitindo={
-                      estaTransmitindo &&
-                      mensagem.papel === "assistente" &&
-                      indice === mensagens.length - 1
-                    }
-                    userImageUrl={userImageUrl}
-                    userInitials={userInitials}
-                    onRetry={
-                      mensagem.papel === "assistente" && indice === mensagens.length - 1
-                        ? reenviarUltimaMensagem
-                        : undefined
-                    }
-                    fullscreen={fs}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Banner de erro */}
-            {erro && (
-              <div className="bg-destructive/5 border-t px-4 py-2">
-                <p className={cn("text-destructive", fs ? "text-sm" : "text-xs")}>{erro}</p>
-              </div>
-            )}
-
-            {/* Follow-up / AI suggestions */}
-            {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
-              <SuggestionChips
-                suggestions={activeSuggestions}
-                onSelect={handleSuggestionSelect}
-                filterText={aiSuggestions.length > 0 ? undefined : inputValue}
-                variant="follow-up"
-                isLoading={aiSuggestionsLoading}
-                fullscreen={fs}
-              />
-            )}
-
-            {/* Campo de entrada */}
-            <CampoEntradaChat
-              onEnviar={enviarMensagem}
-              onParar={pararTransmissao}
+            <ChatBody
+              mensagens={mensagens}
               estaTransmitindo={estaTransmitindo}
-              value={inputValue}
-              onValueChange={setInputValue}
+              erro={erro}
+              enviarMensagem={enviarMensagem}
+              pararTransmissao={pararTransmissao}
+              reenviarUltimaMensagem={reenviarUltimaMensagem}
               fullscreen={fs}
+              userImageUrl={userImageUrl}
+              userInitials={userInitials}
+              activeSuggestions={activeSuggestions}
+              aiSuggestionsLoading={aiSuggestionsLoading}
+              inputValue={inputValue}
+              onInputValueChange={setInputValue}
+              onSuggestionSelect={handleSuggestionSelect}
+              aiSuggestions={aiSuggestions}
             />
           </div>
         </div>
