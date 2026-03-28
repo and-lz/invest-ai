@@ -62,7 +62,7 @@ export function MensagemChatBolha({
         className={cn(
           "rounded-2xl leading-relaxed",
           fs
-            ? "max-w-[80ch] px-7 py-4 text-lg"
+            ? "max-w-[80ch] px-7 py-4 text-2xl"
             : "max-w-[80%] px-4 py-2.5 text-sm",
           ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
         )}
