@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { InsightsManualStepper } from "@/components/insights/manual-insights-stepper";
 import { InsightsList } from "@/components/insights/insights-list";
 import { PeriodSelector } from "@/components/dashboard/period-selector";
 import {
@@ -23,11 +22,9 @@ import {
   Target,
   Shield,
   Loader2,
-  MessageSquare,
   CheckCircle2,
   X,
   Check,
-  Layers,
   ArrowLeft,
   ListPlus,
 } from "lucide-react";
@@ -332,7 +329,7 @@ function InsightCard({
   );
 }
 
-type ModoVisualizacao = "lista" | "gerar" | "manual" | "insights";
+type ModoVisualizacao = "lista" | "insights";
 
 export default function InsightsPage() {
   const { relatorios, estaCarregando: carregandoRelatorios, erro: erroRelatorios } = useReports();
@@ -401,18 +398,17 @@ export default function InsightsPage() {
     setInsights(null);
   }, []);
 
-  const entrarModoGerar = useCallback(() => {
-    if (!periodoSelecionado && relatorios.length > 0) {
+  const gerarInsightsViaApi = useCallback(async () => {
+    // Auto-select most recent period if none selected
+    let periodo = periodoSelecionado;
+    if (!periodo && relatorios.length > 0) {
       const relatorioRecente = relatorios[0];
       if (relatorioRecente) {
-        setPeriodoSelecionado(relatorioRecente.mesReferencia);
+        periodo = relatorioRecente.mesReferencia;
+        setPeriodoSelecionado(periodo);
       }
     }
-    setModoVisualizacao("gerar");
-  }, [periodoSelecionado, relatorios]);
-
-  const gerarInsightsViaApi = useCallback(async () => {
-    if (relatorios.length === 0 || !periodoSelecionado) return;
+    if (relatorios.length === 0 || !periodo) return;
 
     setEstaGerando(true);
     setErroInsights(null);
@@ -420,8 +416,10 @@ export default function InsightsPage() {
     try {
       let corpo: Record<string, string | boolean>;
 
+      const consolidado = periodo === "consolidado";
+
       // Modo consolidado: gerar com todos os meses
-      if (ehConsolidado) {
+      if (consolidado) {
         const primeiroRelatorio = relatorios[0];
         if (!primeiroRelatorio) return;
 
@@ -432,7 +430,7 @@ export default function InsightsPage() {
       } else {
         // Encontrar relatório do período selecionado
         const relatorioDoPerido = relatorios.find(
-          (relatorio) => relatorio.mesReferencia === periodoSelecionado,
+          (relatorio) => relatorio.mesReferencia === periodo,
         );
         if (!relatorioDoPerido) return;
 
@@ -476,16 +474,7 @@ export default function InsightsPage() {
     } finally {
       setEstaGerando(false);
     }
-  }, [relatorios, periodoSelecionado, ehConsolidado]);
-
-  const handleInsightsManualSalvos = useCallback((insightsSalvos: InsightsResponse) => {
-    setInsights(insightsSalvos);
-    setModoVisualizacao("insights");
-  }, []);
-
-  const handleCancelarManual = useCallback(() => {
-    setModoVisualizacao("gerar");
-  }, []);
+  }, [relatorios, periodoSelecionado]);
 
   const handleInsightsDeleted = useCallback(
     (identificador: string) => {
@@ -553,16 +542,6 @@ export default function InsightsPage() {
             descricao="Analise inteligente da sua carteira de investimentos"
           />
         </div>
-        {(modoVisualizacao === "gerar" || modoVisualizacao === "manual") &&
-          !carregandoRelatorios &&
-          periodosDisponiveis.length > 0 &&
-          periodoSelecionado && (
-            <PeriodSelector
-              periodosDisponiveis={periodosDisponiveis}
-              periodoSelecionado={periodoSelecionado}
-              onPeriodoChange={setPeriodoSelecionado}
-            />
-          )}
       </div>
 
       {/* --- Loading --- */}
@@ -605,71 +584,23 @@ export default function InsightsPage() {
               onSelectPeriod={(id) => void handleSelectInsight(id)}
               selectedPeriod=""
               onInsightsDeleted={handleInsightsDeleted}
-              onGenerateNew={entrarModoGerar}
+              onGenerateNew={() => void gerarInsightsViaApi()}
             />
-            <div className="flex justify-center">
-              <Button variant="outline" onClick={entrarModoGerar}>
-                <Lightbulb className="mr-2 h-4 w-4" />
-                Gerar novas análises
+            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <PeriodSelector
+                periodosDisponiveis={periodosDisponiveis}
+                periodoSelecionado={periodoSelecionado}
+                onPeriodoChange={setPeriodoSelecionado}
+              />
+              <Button onClick={() => void gerarInsightsViaApi()} disabled={estaGerando}>
+                {estaGerando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {estaGerando ? "Gerando análise..." : "Gerar análise"}
               </Button>
             </div>
+            {erroInsights && (
+              <p className="text-destructive text-center text-sm">{erroInsights}</p>
+            )}
           </>
-        )}
-
-      {/* === GENERATE MODE === */}
-      {!carregandoRelatorios &&
-        relatorios.length > 0 &&
-        modoVisualizacao === "gerar" && (
-          <Card>
-            <CardContent className="flex flex-col items-center gap-4 py-12">
-              {ehConsolidado ? (
-                <Layers className="text-muted-foreground h-12 w-12" />
-              ) : (
-                <Lightbulb className="text-muted-foreground h-12 w-12" />
-              )}
-              <p className="text-muted-foreground text-center">
-                {ehConsolidado
-                  ? `Gere uma análise consolidada de todos os ${relatorios.length} meses disponíveis.`
-                  : `Gere uma análise baseada no período selecionado (${relatorioSelecionado?.mesReferencia ?? periodoSelecionado}).`}
-              </p>
-              <div className="flex items-center gap-3">
-                <Button onClick={() => void gerarInsightsViaApi()} disabled={estaGerando}>
-                  {estaGerando && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {estaGerando
-                    ? "Gerando análise..."
-                    : ehConsolidado
-                      ? "Gerar analise consolidada"
-                      : "Gerar via API"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setModoVisualizacao("manual")}
-                  disabled={estaGerando}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Gerar via Chat
-                </Button>
-              </div>
-              {erroInsights && <p className="text-destructive text-sm">{erroInsights}</p>}
-            </CardContent>
-          </Card>
-        )}
-
-      {/* === MANUAL MODE === */}
-      {!carregandoRelatorios &&
-        relatorios.length > 0 &&
-        modoVisualizacao === "manual" &&
-        (relatorioSelecionado || ehConsolidado) && (
-          <InsightsManualStepper
-            identificadorRelatorio={
-              ehConsolidado
-                ? (relatorios[0]?.identificador ?? "")
-                : (relatorioSelecionado?.identificador ?? "")
-            }
-            consolidado={ehConsolidado}
-            onInsightsSalvos={handleInsightsManualSalvos}
-            onCancelar={handleCancelarManual}
-          />
         )}
 
       {/* === DETAIL MODE === */}

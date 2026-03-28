@@ -1,13 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { Header } from "@/components/layout/header";
 import { useReports } from "@/hooks/use-reports";
 import { PdfUploadDropzone } from "@/components/upload/pdf-upload-dropzone";
-import { ImportacaoManualStepper } from "@/components/upload/manual-import-stepper";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -20,12 +19,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trash2, FileText, Upload, MessageSquare, X } from "lucide-react";
+import { Trash2, FileText, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { notificar as notify } from "@/lib/notifier";
 import { typography, icon, layout, dialog } from "@/lib/design-system";
-import { isAiEnabled } from "@/lib/ai-features";
-
 export default function ReportsPage() {
   const router = useRouter();
   const { relatorios, estaCarregando, revalidar } = useReports();
@@ -35,10 +32,6 @@ export default function ReportsPage() {
   useEffect(() => {
     definirContexto("reports");
   }, [definirContexto]);
-  const aiEnabled = isAiEnabled();
-  const [metodoUploadSelecionado, setMetodoUploadSelecionado] = useState<"automatico" | "manual">(
-    aiEnabled ? "automatico" : "manual",
-  );
   const {
     dialogRef,
     open: abrirDialog,
@@ -56,19 +49,6 @@ export default function ReportsPage() {
     fecharDialog();
     router.push("/");
   }, [router, fecharDialog]);
-
-  const handleImportacaoManualSucesso = useCallback(
-    (identificador: string) => {
-      notify.success("Relatorio importado com sucesso!", {
-        description: `Referencia: ${identificador}`,
-        actionUrl: "/",
-        actionLabel: "Ver dashboard",
-      });
-      fecharDialog();
-      router.push("/");
-    },
-    [router, fecharDialog],
-  );
 
   const handleRemover = useCallback(
     async (identificador: string) => {
@@ -130,39 +110,8 @@ export default function ReportsPage() {
           </Button>
         </div>
 
-        <div className="space-y-4 p-6">
-          {aiEnabled && (
-            <div className="flex gap-2">
-              <Button
-                variant={metodoUploadSelecionado === "automatico" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setMetodoUploadSelecionado("automatico")}
-                className="gap-1.5"
-              >
-                <Upload className={icon.button} />
-                Upload Direto
-                <span className="bg-background/80 rounded px-1 py-0.5 text-[9px] leading-none font-medium">
-                  REC
-                </span>
-              </Button>
-              <Button
-                variant={metodoUploadSelecionado === "manual" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setMetodoUploadSelecionado("manual")}
-                className="gap-1.5"
-              >
-                <MessageSquare className={icon.button} />
-                Via Chat
-              </Button>
-            </div>
-          )}
-
-          {metodoUploadSelecionado === "automatico" && (
-            <PdfUploadDropzone onUploadSucesso={handleUploadAceito} />
-          )}
-          {metodoUploadSelecionado === "manual" && (
-            <ImportacaoManualStepper onImportacaoSucesso={handleImportacaoManualSucesso} />
-          )}
+        <div className="p-6">
+          <PdfUploadDropzone onUploadSucesso={handleUploadAceito} />
         </div>
       </dialog>
 

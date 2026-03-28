@@ -1,7 +1,8 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.117",
+  "version": "0.1.118",
   "private": true,
+  "main": "electron/dist/main.js",
   "scripts": {
     "dev": "concurrently --kill-others -n next,proxy -c blue,magenta \"next dev --turbopack\" \"npx tsx scripts/claude-proxy.ts\"",
     "build": "next build",
@@ -18,7 +19,25 @@
     "db:studio": "drizzle-kit studio",
     "proxy": "npx tsx scripts/claude-proxy.ts",
     "db:migrate-blob": "tsx scripts/migrate-blob-to-db.ts",
-    "prepare": "husky"
+    "prepare": "husky",
+    "desktop:build-main": "tsc -p electron/tsconfig.json",
+    "desktop": "npm run desktop:build-main && npx electron electron/dist/main.js",
+    "desktop:package": "npm run desktop:build-main && electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.investimentos.dev",
+    "productName": "Investimentos Dev",
+    "mac": {
+      "target": "dir",
+      "icon": "public/icon-512.png"
+    },
+    "files": [
+      "electron/dist/**/*",
+      "electron/icons/**/*"
+    ],
+    "directories": {
+      "output": "electron-dist"
+    }
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -61,6 +80,8 @@
     "@vitest/coverage-v8": "^4.0.18",
     "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.9",
+    "electron": "^41.1.0",
+    "electron-builder": "^26.8.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.12",
     "husky": "^9.1.7",

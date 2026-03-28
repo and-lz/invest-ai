@@ -1,73 +1,7 @@
-import { toJSONSchema } from "zod/v4";
-import type { RelatorioExtraido } from "@/schemas/report-extraction.schema";
-import { InsightsResponseSchema } from "@/schemas/insights.schema";
-import {
-  serializarRelatorioMarkdown,
-  serializarRelatoriosConsolidadoMarkdown,
-} from "@/lib/serialize-report-markdown";
-
 // ============================================================
-// Prompts compartilhados entre geracao de insights via API e manual.
-// Fonte unica de verdade para instrucoes de insights.
+// Shared prompts for AI-driven insights generation.
+// Single source of truth for insights instructions.
 // ============================================================
-
-// ---- Constante de exemplo de saida ----
-
-const EXEMPLO_SAIDA_INSIGHTS = `EXEMPLO MINIMO DE RESPOSTA VALIDA:
-
-\`\`\`json
-{
-  "mesReferencia": "2026-01",
-  "dataGeracao": "YYYY-MM-DD (data atual)",
-  "resumoExecutivo": "Carteira de R$ 445.700 apresentou rentabilidade de 3,14% no mes, superando CDI (1,16%). Diversificacao adequada entre renda fixa e variavel.",
-  "insights": [
-    {
-      "titulo": "Rentabilidade acima do CDI no mes",
-      "descricao": "A carteira rendeu 3,14% contra 1,16% do CDI, impulsionada por fundos de acoes.",
-      "categoria": "performance_positiva",
-      "prioridade": "alta",
-      "ativosRelacionados": ["FUNDO ABC FIC FIA"],
-      "acaoSugerida": "Manter alocacao atual em fundos de acoes.",
-      "impactoEstimado": "Potencial de ganho adicional de R$ 12.000 em 12 meses.",
-      "concluida": false,
-      "statusAcao": "pendente"
-    },
-    {
-      "titulo": "Ativo com performance negativa persistente",
-      "descricao": "Fundo XYZ caiu -5,24% em 12 meses.",
-      "categoria": "performance_negativa",
-      "prioridade": "media",
-      "ativosRelacionados": ["FUNDO XYZ FIA BDR"],
-      "acaoSugerida": null,
-      "impactoEstimado": null,
-      "concluida": false,
-      "statusAcao": "pendente"
-    }
-  ],
-  "alertas": [
-    {
-      "tipo": "atencao",
-      "mensagem": "Concentracao de 33% em FIIs com rendimento abaixo do CDI."
-    },
-    {
-      "tipo": "informativo",
-      "mensagem": "Rentabilidade mensal foi a melhor dos ultimos 6 meses."
-    }
-  ],
-  "recomendacoesLongoPrazo": [
-    "Aumentar gradualmente exposicao a renda variavel para 30-35% nos proximos 12 meses.",
-    "Reduzir posicoes em FIIs enquanto Selic permanecer acima de 10%."
-  ]
-}
-\`\`\`
-
-VALORES VALIDOS PARA ENUMS:
-- "categoria": "performance_positiva" | "performance_negativa" | "acao_recomendada" | "risco" | "oportunidade" | "diversificacao" | "custos"
-- "prioridade": "alta" | "media" | "baixa"
-- "tipo" (alertas): "urgente" | "atencao" | "informativo"
-- "acaoSugerida" e "impactoEstimado" podem ser null quando nao aplicavel
-- "concluida" DEVE ser false e "statusAcao" DEVE ser "pendente" para TODOS os insights
-- "ativosRelacionados" pode ser array vazio [] quando o insight e sobre a carteira em geral`;
 
 // ---- System prompts ----
 
@@ -97,48 +31,9 @@ Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 export const INSTRUCAO_USUARIO_INSIGHTS =
   "Analise a seguinte carteira de investimentos e gere insights detalhados. Retorne APENAS JSON valido:";
 
-export function gerarPromptInsightsManual(
-  relatorioAtual: RelatorioExtraido,
-  relatorioAnterior: RelatorioExtraido | null,
-): string {
-  const jsonSchema = toJSONSchema(InsightsResponseSchema);
-  const schemaFormatado = JSON.stringify(jsonSchema, null, 2);
-
-  const dadosAtualMarkdown = serializarRelatorioMarkdown(relatorioAtual);
-  const dadosAnteriorMarkdown = relatorioAnterior
-    ? serializarRelatorioMarkdown(relatorioAnterior)
-    : "Nao disponivel (primeiro relatorio)";
-
-  return `${SYSTEM_PROMPT_INSIGHTS}
-
----
-
-JSON Schema esperado para a resposta:
-
-\`\`\`json
-${schemaFormatado}
-\`\`\`
-
----
-
-${EXEMPLO_SAIDA_INSIGHTS}
-
----
-
-${INSTRUCAO_USUARIO_INSIGHTS}
-
-## Relatorio Atual:
-
-${dadosAtualMarkdown}
-
-## Relatorio Anterior:
-
-${dadosAnteriorMarkdown}`;
-}
-
 // ============================================================
-// Prompts para analise CONSOLIDADA (todos os meses disponiveis).
-// Foco em tendencias temporais, evolucao e decisoes historicas.
+// Prompts for CONSOLIDATED analysis (all available months).
+// Focus on temporal trends, evolution and historical decisions.
 // ============================================================
 
 export const SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO = `Voce e um consultor financeiro especializado em investimentos brasileiros, com profundo conhecimento do mercado de capitais brasileiro, renda fixa, fundos imobiliarios e fundos de investimento.
@@ -168,30 +63,3 @@ Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 
 export const INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO =
   "Analise o HISTORICO COMPLETO da seguinte carteira de investimentos (todos os meses disponiveis) e gere insights detalhados sobre evolucao, tendencias e decisoes. Retorne APENAS JSON valido:";
-
-export function gerarPromptInsightsConsolidadoManual(todosRelatorios: RelatorioExtraido[]): string {
-  const jsonSchema = toJSONSchema(InsightsResponseSchema);
-  const schemaFormatado = JSON.stringify(jsonSchema, null, 2);
-
-  const dadosMarkdown = serializarRelatoriosConsolidadoMarkdown(todosRelatorios);
-
-  return `${SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO}
-
----
-
-JSON Schema esperado para a resposta:
-
-\`\`\`json
-${schemaFormatado}
-\`\`\`
-
----
-
-${EXEMPLO_SAIDA_INSIGHTS}
-
----
-
-${INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO}
-
-${dadosMarkdown}`;
-}

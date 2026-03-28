@@ -40,7 +40,7 @@ export default defineConfig({
         "src/lib/asset-analysis-prompt.ts",
         "src/lib/build-chat-system-prompt.ts",
         "src/lib/manual-extraction-prompt.ts",
-        "src/lib/manual-insights-prompt.ts",
+        "src/lib/insights-prompts.ts",
         "src/lib/enrich-action-prompt.ts",
         "src/lib/explain-conclusion-prompt.ts",
         // Uses GoogleGenerativeAI constructor — untestable mock issue

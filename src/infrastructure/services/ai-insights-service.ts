@@ -10,7 +10,7 @@ import {
   INSTRUCAO_USUARIO_INSIGHTS,
   SYSTEM_PROMPT_INSIGHTS_CONSOLIDADO,
   INSTRUCAO_USUARIO_INSIGHTS_CONSOLIDADO,
-} from "@/lib/manual-insights-prompt";
+} from "@/lib/insights-prompts";
 import {
   serializarRelatorioMarkdown,
   serializarRelatoriosConsolidadoMarkdown,

@@ -11,8 +11,6 @@ import { GetReportDetailUseCase } from "@/application/use-cases/get-report-detai
 import { GetDashboardDataUseCase } from "@/application/use-cases/get-dashboard-data";
 import { GenerateInsightsUseCase } from "@/application/use-cases/generate-insights";
 import { DeleteReportUseCase } from "@/application/use-cases/delete-report";
-import { SaveManualReportUseCase } from "@/application/use-cases/save-manual-report";
-import { SaveManualInsightsUseCase } from "@/application/use-cases/save-manual-insights";
 import { UpdateInsightConclusionUseCase } from "@/application/use-cases/update-insight-conclusion";
 import { GenerateConsolidatedInsightsUseCase } from "@/application/use-cases/generate-consolidated-insights";
 import { AnalyzeAssetPerformanceUseCase } from "@/application/use-cases/analyze-asset-performance";
@@ -187,16 +185,6 @@ export async function obterGenerateInsightsUseCase(config: AiConfig) {
 export async function obterDeleteReportUseCase() {
   const repository = await criarRepositorio();
   return new DeleteReportUseCase(repository);
-}
-
-export async function obterSaveManualReportUseCase() {
-  const repository = await criarRepositorio();
-  return new SaveManualReportUseCase(repository);
-}
-
-export async function obterSaveManualInsightsUseCase() {
-  const repository = await criarRepositorio();
-  return new SaveManualInsightsUseCase(repository);
 }
 
 export async function obterUpdateInsightConclusionUseCase() {
