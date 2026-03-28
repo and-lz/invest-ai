@@ -60,7 +60,7 @@ export function ChatBody({
         ref={areaScrollRef}
         className={cn(
           "flex-1 overflow-y-auto",
-          fs ? "space-y-8 p-8" : "space-y-4 p-4",
+          fs ? "space-y-5 p-6" : "space-y-4 p-4",
         )}
       >
         {mensagens.length === 0 && (

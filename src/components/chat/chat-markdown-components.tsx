@@ -19,11 +19,17 @@ interface TabelaMarkdownProps {
 export function TabelaMarkdown({ children }: TabelaMarkdownProps) {
   return (
     <div className="my-2 overflow-x-auto rounded-lg border">
-      <Table>
-        <TableBody>{children}</TableBody>
-      </Table>
+      <Table>{children}</Table>
     </div>
   );
+}
+
+interface CorpoTabelaMarkdownProps {
+  readonly children?: ReactNode;
+}
+
+export function CorpoTabelaMarkdown({ children }: CorpoTabelaMarkdownProps) {
+  return <TableBody>{children}</TableBody>;
 }
 
 interface CabecalhoTabelaMarkdownProps {

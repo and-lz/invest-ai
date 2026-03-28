@@ -43,6 +43,27 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: cabecalhosSeguranca,
       },
+      // SW must never be cached by browser — always check for updates
+      {
+        source: "/sw.js",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
+      // HTML pages: always revalidate with server
+      {
+        source: "/:path((?!_next|api|sw\\.js|manifest\\.json|.*\\.png$|.*\\.ico$).*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
+      // Immutable hashed static assets (1 year)
       {
         source: "/_next/static/:path*",
         headers: [
@@ -52,6 +73,7 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // Optimized images (1 day + stale-while-revalidate)
       {
         source: "/_next/image/:path*",
         headers: [

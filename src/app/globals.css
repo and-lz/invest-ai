@@ -304,7 +304,7 @@ dialog[data-closing]::backdrop {
 
 /* Markdown Content - Chat Messages */
 .markdown-content {
-  @apply text-sm leading-relaxed;
+  @apply leading-relaxed;
 }
 
 .markdown-content p {

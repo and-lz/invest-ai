@@ -9,6 +9,7 @@ import { schemaSegurancaMarkdown } from "@/lib/markdown-config";
 import {
   TabelaMarkdown,
   CabecalhoTabelaMarkdown,
+  CorpoTabelaMarkdown,
   LinhaMarkdown,
   CelulaCabecalhoMarkdown,
   CelulaMarkdown,
@@ -37,6 +38,7 @@ export const ConteudoMarkdownChat = React.memo(
             // Tables
             table: TabelaMarkdown,
             thead: CabecalhoTabelaMarkdown,
+            tbody: CorpoTabelaMarkdown,
             tr: LinhaMarkdown,
             th: (props) => <CelulaCabecalhoMarkdown {...props} fullscreen={fs} />,
             td: (props) => <CelulaMarkdown {...props} fullscreen={fs} />,

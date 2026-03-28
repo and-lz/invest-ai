@@ -10,9 +10,9 @@ export function Logo({ className }: { className?: string }) {
     <Image
       src="/fortuna-icon.png"
       alt="Fortuna"
-      width={60}
-      height={60}
-      className={cn("size-[60px] mt-2 shrink-0 rounded-full", className)}
+      width={50}
+      height={50}
+      className={cn("size-[50px] shrink-0 rounded-full", className)}
       aria-hidden
     />
   );

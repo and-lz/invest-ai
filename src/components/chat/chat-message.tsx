@@ -2,7 +2,6 @@
 
 import { cn } from "@/lib/utils";
 import { AlertCircle, RefreshCw, User } from "lucide-react";
-import Image from "next/image";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import { ConteudoMarkdownChat } from "@/components/chat/chat-markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,21 +40,17 @@ export function MensagemChatBolha({
     <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       {ehUsuario ? (
-        <Avatar className={cn("shrink-0", fs ? "h-12 w-12" : "h-8 w-8")}>
+        <Avatar className={cn("shrink-0", fs ? "h-10 w-10" : "h-8 w-8")}>
           <AvatarImage src={userImageUrl} alt="Você" />
           <AvatarFallback className={cn("bg-primary/10", fs ? "text-base" : "text-xs")}>
             {userInitials ?? <User className={fs ? "h-6 w-6" : "h-4 w-4"} />}
           </AvatarFallback>
         </Avatar>
       ) : (
-        <div
-          className={cn(
-            "flex shrink-0 items-center justify-center rounded-full bg-secondary",
-            fs ? "h-12 w-12" : "h-8 w-8",
-          )}
-        >
-          <Image src="/fortuna-icon.png" alt="Fortuna" width={24} height={24} className={cn("rounded-full", fs ? "h-6 w-6" : "h-4 w-4")} />
-        </div>
+        <Avatar className={cn("shrink-0 border border-border/50", fs ? "h-10 w-10" : "h-8 w-8")}>
+          <AvatarImage src="/fortuna-icon.png" alt="Fortuna" />
+          <AvatarFallback className="bg-primary/10 text-xs">F</AvatarFallback>
+        </Avatar>
       )}
 
       {/* Bolha de mensagem */}
@@ -63,7 +58,7 @@ export function MensagemChatBolha({
         className={cn(
           "rounded-2xl leading-relaxed",
           fs
-            ? "max-w-[80ch] px-7 py-4 text-2xl"
+            ? "max-w-[80ch] px-5 py-3 text-lg"
             : "max-w-[80%] px-4 py-2.5 text-sm",
           ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
         )}

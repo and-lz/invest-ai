@@ -25,7 +25,7 @@ interface UseChatAssistenteRetorno {
   readonly pararTransmissao: () => void;
   readonly conversaAtualId: string | null;
   readonly criarNovaConversa: () => void;
-  readonly carregarConversa: (identificador: string) => Promise<void>;
+  readonly carregarConversa: (identificador: string) => Promise<boolean>;
   readonly followUpSuggestions: readonly ChatSuggestion[];
   readonly reenviarUltimaMensagem: () => void;
 }
@@ -259,10 +259,17 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
   }, []);
 
   // Carregar conversa existente
-  const carregarConversa = useCallback(async (identificador: string) => {
+  const carregarConversa = useCallback(async (identificador: string): Promise<boolean> => {
     setEstaCarregando(true);
     try {
       const resposta = await fetch(`/api/conversations/${identificador}`);
+      if (resposta.status === 404) {
+        setMensagens([]);
+        setConversaAtualId(null);
+        setErro(null);
+        setFollowUpSuggestions([]);
+        return false;
+      }
       if (!resposta.ok) {
         throw new Error(`Erro ao carregar conversa: ${resposta.status}`);
       }
@@ -271,9 +278,11 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
       setMensagens(dados.conversa.mensagens);
       setConversaAtualId(identificador);
       setErro(null);
+      return true;
     } catch (erroCatch) {
       console.error("Erro ao carregar conversa:", erroCatch);
       setErro("Falha ao carregar conversa");
+      return false;
     } finally {
       setEstaCarregando(false);
     }

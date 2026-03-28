@@ -56,7 +56,7 @@ export function SuggestionChips({
             "bg-secondary hover:bg-secondary/80 rounded-full border",
             "cursor-pointer transition-colors",
             "text-foreground hover:border-primary/30",
-            fs ? "text-base px-5 py-2.5" : "text-xs px-3 py-1.5",
+            fs ? "text-sm px-4 py-2" : "text-xs px-3 py-1.5",
           )}
         >
           {suggestion.label}

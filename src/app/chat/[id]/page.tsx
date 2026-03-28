@@ -64,12 +64,10 @@ export default function ChatPage() {
   useEffect(() => {
     if (conversationId && conversationId !== loadedIdRef.current) {
       loadedIdRef.current = conversationId;
-      void carregarConversa(conversationId).catch(() => {
-        // Invalid conversation — redirect to new chat
-        router.replace("/chat");
-      });
+      // 404 is expected for new conversations (created on first message send)
+      void carregarConversa(conversationId);
     }
-  }, [conversationId, carregarConversa, router]);
+  }, [conversationId, carregarConversa]);
 
   // Suggestions logic (same as ChatWidget)
   const recentMessages = useMemo(
@@ -161,7 +159,7 @@ export default function ChatPage() {
   }, [closeMobileSidebar, criarNovaConversa, router]);
 
   return (
-    <div className="-m-4 sm:-m-6 lg:-m-8 flex h-[calc(100vh-3.5rem)]">
+    <div className="-m-4 sm:-m-6 lg:-m-8 flex h-[calc(100dvh-3.5rem)] overflow-hidden">
       {/* Desktop sidebar */}
       <div
         className={cn(
