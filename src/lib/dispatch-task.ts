@@ -5,6 +5,7 @@ import {
   obterGenerateInsightsUseCase,
   obterGenerateConsolidatedInsightsUseCase,
   obterAnalyzeAssetPerformanceUseCase,
+  obterRegenerateReportUseCase,
   obterPlanoAcaoRepository,
   criarProvedorAi,
   obterAiConfigParaUsuario,
@@ -164,6 +165,33 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
             recomendacaoEnriquecida: textoOriginal,
             fundamentacao: "Recomendação automática indisponível no momento.",
           });
+        },
+      }));
+      return true;
+    }
+
+    case "reextrair-relatorio": {
+      const identificadorRelatorio = tarefa.parametros?.identificadorRelatorio;
+
+      if (!identificadorRelatorio) {
+        console.warn(
+          `[Despachar] Tarefa ${tarefa.identificador} nao tem parametros.identificadorRelatorio para retry`,
+        );
+        return false;
+      }
+
+      after(executeBackgroundTask({
+        tarefa,
+        rotuloLog: "Reextracao (retry)",
+        usuarioId,
+        executarOperacao: async () => {
+          const aiConfig = await obterAiConfigParaUsuario(usuarioId);
+          const useCase = await obterRegenerateReportUseCase(aiConfig);
+          const resultado = await useCase.executar({ identificador: identificadorRelatorio });
+          return {
+            descricaoResultado: `Relatorio ${resultado.metadados.mesReferencia} reextraido`,
+            urlRedirecionamento: "/",
+          };
         },
       }));
       return true;
