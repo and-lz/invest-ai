@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { AlertCircle, Bot, RefreshCw, User } from "lucide-react";
+import { AlertCircle, RefreshCw, User } from "lucide-react";
+import Image from "next/image";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import { ConteudoMarkdownChat } from "@/components/chat/chat-markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -53,7 +54,7 @@ export function MensagemChatBolha({
             fs ? "h-12 w-12" : "h-8 w-8",
           )}
         >
-          <Bot className={fs ? "h-6 w-6" : "h-4 w-4"} />
+          <Image src="/fortuna-icon.png" alt="Fortuna" width={24} height={24} className={cn("rounded-full", fs ? "h-6 w-6" : "h-4 w-4")} />
         </div>
       )}
 

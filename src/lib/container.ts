@@ -1,6 +1,9 @@
 import { DbReportRepository } from "@/infrastructure/repositories/db-report-repository";
 import { DbConversaRepository } from "@/infrastructure/repositories/db-conversation-repository";
 import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-action-plan-repository";
+import { DbUserSettingsRepository } from "@/infrastructure/repositories/user-settings-repository";
+import { GetUserSettingsUseCase } from "@/application/use-cases/get-user-settings";
+import { UpdateClaudeModelTierUseCase } from "@/application/use-cases/update-claude-model-tier";
 import { AiTextPdfExtractionService } from "@/infrastructure/services/ai-text-pdf-extraction-service";
 import { AiInsightsService } from "@/infrastructure/services/ai-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
@@ -163,6 +166,16 @@ export async function obterAnalyzeAssetPerformanceUseCase(config: AiConfig) {
     obterBrapiAssetDetailService(),
     obterBcbMacroDataService(),
   );
+}
+
+// ---- User settings factories ----
+
+export function obterGetUserSettingsUseCase() {
+  return new GetUserSettingsUseCase(new DbUserSettingsRepository());
+}
+
+export function obterUpdateClaudeModelTierUseCase() {
+  return new UpdateClaudeModelTierUseCase(new DbUserSettingsRepository());
 }
 
 /**

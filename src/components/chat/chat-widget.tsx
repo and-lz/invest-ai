@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { Bot, X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
+import { X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
+import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -176,12 +177,12 @@ export function ChatWidget() {
         <button
           onClick={abrirChat}
           className={cn(
-            "ai-gradient-bg ai-fab fixed right-6 bottom-6 z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full",
+            "ai-fab fixed right-6 bottom-6 z-40 flex h-14 w-14 cursor-pointer items-center justify-center overflow-hidden rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95",
             estaAberto && "!scale-0 !animate-none",
           )}
           type="button"
         >
-          <Bot className="relative z-10 h-6 w-6" />
+          <Image src="/fortuna-icon.png" alt="Fortuna" width={56} height={56} className="h-14 w-14 object-cover" />
           <span className="sr-only">Abrir Fortuna</span>
         </button>
       )}
@@ -252,7 +253,7 @@ export function ChatWidget() {
                   <Menu className={fs ? "h-6 w-6" : "h-4 w-4"} />
                 </Button>
 
-                <Bot className={cn("text-muted-foreground", fs ? "h-7 w-7" : "h-5 w-5")} />
+                <Image src="/fortuna-icon.png" alt="Fortuna" width={28} height={28} className={cn("rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
                 <h3 className={cn("font-medium", fs ? "text-lg" : "text-sm")}>Fortuna</h3>
               </div>
               <div className="flex items-center gap-1">

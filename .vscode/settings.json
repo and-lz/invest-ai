@@ -1,19 +1,21 @@
 {
     "workbench.colorCustomizations": {
-        "activityBar.activeBackground": "#d73c61",
-        "activityBar.background": "#d73c61",
-        "activityBar.foreground": "#e7e7e7",
-        "activityBar.inactiveForeground": "#e7e7e799",
-        "sash.hoverBorder": "#d73c61",
-        "editorGroup.border": "#d73c61",
-        "panel.border": "#d73c61",
-        "tab.activeBorder": "#d73c61",
-        "activityBarBadge.background": "#1f4f10",
-        "activityBarBadge.foreground": "#e7e7e7"
+        "activityBar.activeBackground": "#b6c5e0",
+        "activityBar.background": "#b6c5e0",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "sash.hoverBorder": "#b6c5e0",
+        "editorGroup.border": "#b6c5e0",
+        "panel.border": "#b6c5e0",
+        "tab.activeBorder": "#b6c5e0",
+        "activityBarBadge.background": "#bc6283",
+        "activityBarBadge.foreground": "#15202b"
     },
-    "peacock.color": "#bb2649",
+    "peacock.color": "#92a8d1",
     "markdown.preview.openMarkdownLinks": "inPreview",
     "workbench.editorAssociations": {
         "*.md": "vscode.markdown.preview.editor"
-    }
+    },
+    "workbench.preferredDarkColorTheme": "Pantone Serenity (Dark)",
+    "workbench.colorTheme": "Pantone Serenity (Dark)"
 }
