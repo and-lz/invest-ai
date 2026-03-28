@@ -223,8 +223,10 @@ export function ChatWidget() {
           <div
             className={cn(
               "bg-background absolute z-10 h-full w-64 border-r transition-transform",
+              telaCheia && "w-80",
               mostrarSidebar ? "translate-x-0" : "-translate-x-full",
             )}
+            {...(telaCheia ? { "data-chat-sidebar-fullscreen": true } : {})}
           >
             <ListaConversas
               conversaAtualId={conversaAtualId}

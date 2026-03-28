@@ -527,13 +527,11 @@ dialog[data-closing]::backdrop {
   @apply text-sm;
 }
 
-/* Sidebar */
-.chat-fullscreen ~ [data-chat-sidebar] .text-sm,
+/* Sidebar in fullscreen */
 [data-chat-sidebar-fullscreen] .text-sm {
   @apply text-base;
 }
 
-.chat-fullscreen ~ [data-chat-sidebar] .text-xs,
 [data-chat-sidebar-fullscreen] .text-xs {
   @apply text-sm;
 }
