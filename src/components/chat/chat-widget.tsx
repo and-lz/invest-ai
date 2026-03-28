@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
+import { X, Trash2, Menu, Maximize2, Volume2, VolumeX } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChatBody } from "@/components/chat/chat-body";
@@ -26,9 +26,10 @@ import { dialog } from "@/lib/design-system";
 
 export function ChatWidget() {
   const pathname = usePathname();
+  const router = useRouter();
   const isOnChatPage = pathname.startsWith("/chat");
 
-  const [telaCheia, setTelaCheia] = useState(false);
+  const telaCheia = false;
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -105,7 +106,6 @@ export function ChatWidget() {
   const handleFechar = useCallback(() => {
     stopSpeech();
     setMostrarSidebar(false);
-    setTelaCheia(false);
     setEstaAberto(false);
   }, [stopSpeech]);
 
@@ -299,15 +299,11 @@ export function ChatWidget() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setTelaCheia((v) => !v)}
+                  onClick={() => { fecharChat(); router.push(conversaAtualId ? `/chat/${conversaAtualId}` : "/chat"); }}
                   className={cn("hidden md:inline-flex", fs ? "h-10 w-10" : "h-8 w-8")}
                 >
-                  {telaCheia ? (
-                    <Minimize2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
-                  ) : (
-                    <Maximize2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
-                  )}
-                  <span className="sr-only">{telaCheia ? "Sair da tela cheia" : "Tela cheia"}</span>
+                  <Maximize2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
+                  <span className="sr-only">Abrir em tela cheia</span>
                 </Button>
                 <Button
                   variant="ghost"
