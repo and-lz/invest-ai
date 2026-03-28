@@ -239,7 +239,7 @@ export function ChatWidget() {
           </div>
 
           {/* Area principal do chat */}
-          <div className={cn("flex flex-1 flex-col", fs && "chat-fullscreen")}>
+          <div className={cn("flex flex-1 flex-col", fs && "chat-fullscreen mx-auto w-full max-w-[80ch]")}>
             {/* Cabecalho */}
             <div className={cn(
               "flex items-center justify-between border-b",
