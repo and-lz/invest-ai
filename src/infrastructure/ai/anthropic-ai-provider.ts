@@ -23,8 +23,7 @@ interface AnthropicResponse {
 
 /**
  * Implementacao do ProvedorAi usando o proxy local do Claude CLI.
- * Nao suporta streaming real — `transmitir()` delega para `gerar()` e
- * retorna a resposta completa como um unico chunk.
+ * Suporta streaming via SSE (Server-Sent Events) no endpoint /v1/messages.
  */
 export class AnthropicProvedorAi implements ProvedorAi {
   private readonly proxyBaseUrl: string;
@@ -106,9 +105,90 @@ export class AnthropicProvedorAi implements ProvedorAi {
   }
 
   async *transmitir(configuracao: ConfiguracaoGeracao): AsyncGenerator<string, void, unknown> {
-    // Proxy does not support streaming — return full response as single chunk
-    const resposta = await this.gerar(configuracao);
-    yield resposta.texto;
+    const messages: AnthropicMessage[] = configuracao.mensagens.map((mensagem) => ({
+      role: mensagem.papel === "usuario" ? "user" : "assistant",
+      content: mensagem.partes
+        .filter((p) => p.tipo === "texto")
+        .map((p) => (p.tipo === "texto" ? p.dados : ""))
+        .join("\n"),
+    }));
+
+    let httpResponse: Response;
+
+    try {
+      httpResponse = await fetch(`${this.proxyBaseUrl}/v1/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: this.model,
+          system: configuracao.instrucaoSistema,
+          messages,
+          max_tokens: configuracao.maxOutputTokens ?? 8192,
+          stream: true,
+        }),
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new AiApiTransientError(
+        `Nao foi possivel conectar ao proxy Claude em ${this.proxyBaseUrl}. Inicie o proxy com \`npm run proxy\`. Erro: ${message}`,
+      );
+    }
+
+    if (!httpResponse.ok) {
+      const errorText = await httpResponse.text().catch(() => "");
+      if (httpResponse.status >= 500) {
+        throw new AiApiTransientError(
+          `Proxy Claude retornou ${httpResponse.status}. Verifique se o proxy esta rodando com \`npm run proxy\`. Detalhes: ${errorText}`,
+        );
+      }
+      throw new AiApiError(
+        `Proxy Claude retornou ${httpResponse.status}: ${errorText}`,
+      );
+    }
+
+    const body = httpResponse.body;
+    if (!body) {
+      throw new AiApiError("Resposta do proxy Claude nao contem body stream");
+    }
+
+    // Parse SSE stream
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process complete SSE events (separated by double newline)
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? ""; // last element is incomplete
+
+        for (const event of events) {
+          if (!event.trim()) continue;
+
+          const dataLine = event.split("\n").find((l) => l.startsWith("data: "));
+          if (!dataLine) continue;
+
+          const jsonStr = dataLine.slice(6); // strip "data: "
+          let parsed: { type?: string; delta?: { type?: string; text?: string } };
+          try {
+            parsed = JSON.parse(jsonStr) as typeof parsed;
+          } catch {
+            continue; // skip malformed events
+          }
+
+          if (parsed.type === "content_block_delta" && parsed.delta?.type === "text_delta" && parsed.delta.text) {
+            yield parsed.delta.text;
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
   }
 
   private removerFencesMarkdown(texto: string): string {

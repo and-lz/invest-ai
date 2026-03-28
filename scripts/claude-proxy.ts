@@ -55,6 +55,7 @@ interface AnthropicRequest {
   messages: AnthropicMessage[];
   system?: string | ContentBlock[];
   max_tokens?: number;
+  stream?: boolean;
 }
 
 interface ClaudeJsonOutput {
@@ -267,15 +268,46 @@ function sendJson(
 }
 
 // ============================================================
+// SSE streaming helpers
+// ============================================================
+
+function sendSseEvent(
+  res: http.ServerResponse,
+  eventType: string,
+  data: unknown
+): void {
+  res.write(`event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`);
+}
+
+/**
+ * Splits text into chunks for streaming simulation.
+ * Uses word boundaries for natural-feeling output.
+ */
+function splitIntoChunks(text: string, chunkSize = 20): string[] {
+  const chunks: string[] = [];
+  let remaining = text;
+  while (remaining.length > 0) {
+    if (remaining.length <= chunkSize) {
+      chunks.push(remaining);
+      break;
+    }
+    // Find last space within chunkSize range for natural word breaks
+    let end = chunkSize;
+    const spaceIdx = remaining.lastIndexOf(" ", end);
+    if (spaceIdx > chunkSize / 2) {
+      end = spaceIdx + 1; // include the space
+    }
+    chunks.push(remaining.slice(0, end));
+    remaining = remaining.slice(end);
+  }
+  return chunks;
+}
+
+// ============================================================
 // Route handlers
 // ============================================================
 
-async function handleMessages(
-  req: http.IncomingMessage,
-  res: http.ServerResponse
-): Promise<void> {
-  const rawBody = await readBody(req);
-
+function parsePayload(rawBody: string, res: http.ServerResponse): AnthropicRequest | null {
   let payload: AnthropicRequest;
   try {
     payload = JSON.parse(rawBody) as AnthropicRequest;
@@ -283,7 +315,7 @@ async function handleMessages(
     sendJson(res, 400, {
       error: { type: "invalid_request_error", message: "Invalid JSON body" },
     });
-    return;
+    return null;
   }
 
   if (!Array.isArray(payload.messages) || payload.messages.length === 0) {
@@ -293,7 +325,134 @@ async function handleMessages(
         message: "messages must be a non-empty array",
       },
     });
+    return null;
+  }
+
+  return payload;
+}
+
+async function handleMessagesStream(
+  payload: AnthropicRequest,
+  res: http.ServerResponse
+): Promise<void> {
+  const prompt = buildPrompt(payload.messages);
+  const systemPrompt = extractSystemPrompt(payload.system);
+
+  const start = Date.now();
+
+  let cliOutput: ClaudeJsonOutput;
+  try {
+    cliOutput = await invokeClaudeCli(prompt, systemPrompt, payload.model);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${message}`);
+    sendJson(res, 502, {
+      error: { type: "api_error", message: `claude CLI error: ${message}` },
+    });
     return;
+  }
+
+  if (cliOutput.is_error) {
+    console.error(
+      `${COLORS.red}✗ CLI returned error:${COLORS.reset} ${cliOutput.result}`
+    );
+    sendJson(res, 502, {
+      error: { type: "api_error", message: cliOutput.result },
+    });
+    return;
+  }
+
+  const modelName =
+    Object.keys(cliOutput.modelUsage ?? {})[0] ?? "claude-opus-4-6";
+  const messageId = `msg_${randomUUID().replace(/-/g, "").slice(0, 24)}`;
+  const inputTokens = cliOutput.usage?.input_tokens ?? 0;
+  const outputTokens = cliOutput.usage?.output_tokens ?? 0;
+
+  // Start SSE response
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, x-api-key, anthropic-version",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  });
+
+  // message_start
+  sendSseEvent(res, "message_start", {
+    type: "message_start",
+    message: {
+      id: messageId,
+      type: "message",
+      role: "assistant",
+      content: [],
+      model: modelName,
+      stop_reason: null,
+      stop_sequence: null,
+      usage: { input_tokens: inputTokens, output_tokens: 0 },
+    },
+  });
+
+  // content_block_start
+  sendSseEvent(res, "content_block_start", {
+    type: "content_block_start",
+    index: 0,
+    content_block: { type: "text", text: "" },
+  });
+
+  // Emit text deltas in chunks for streaming feel
+  const resultText = cliOutput.result.trim();
+  const chunks = splitIntoChunks(resultText);
+
+  for (const chunk of chunks) {
+    sendSseEvent(res, "content_block_delta", {
+      type: "content_block_delta",
+      index: 0,
+      delta: { type: "text_delta", text: chunk },
+    });
+  }
+
+  // content_block_stop
+  sendSseEvent(res, "content_block_stop", {
+    type: "content_block_stop",
+    index: 0,
+  });
+
+  // message_delta (final usage + stop_reason)
+  sendSseEvent(res, "message_delta", {
+    type: "message_delta",
+    delta: {
+      stop_reason: cliOutput.stop_reason ?? "end_turn",
+      stop_sequence: null,
+    },
+    usage: { output_tokens: outputTokens },
+  });
+
+  // message_stop
+  sendSseEvent(res, "message_stop", { type: "message_stop" });
+
+  res.end();
+
+  const elapsed = Date.now() - start;
+  console.log(
+    `${COLORS.green}→${COLORS.reset} POST /v1/messages ${COLORS.yellow}[stream]${COLORS.reset} ` +
+      `${COLORS.dim}${elapsed}ms${COLORS.reset} ` +
+      `${COLORS.cyan}in:${inputTokens} out:${outputTokens}${COLORS.reset}`
+  );
+}
+
+async function handleMessages(
+  req: http.IncomingMessage,
+  res: http.ServerResponse
+): Promise<void> {
+  const rawBody = await readBody(req);
+  const payload = parsePayload(rawBody, res);
+  if (!payload) return;
+
+  // Dispatch to streaming handler if requested
+  if (payload.stream) {
+    return handleMessagesStream(payload, res);
   }
 
   const prompt = buildPrompt(payload.messages);
