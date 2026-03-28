@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import type { NextConfig } from "next";
+import packageJson from "./package.json" with { type: "json" };
 
 function getLastCommitMessage(): string {
   try {
@@ -20,7 +21,8 @@ const cabecalhosSeguranca = [
 const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_LAST_COMMIT_MESSAGE: getLastCommitMessage(),
-    NEXT_PUBLIC_AI_ENABLED: process.env.GOOGLE_API_KEY ? "true" : "false",
+    NEXT_PUBLIC_AI_ENABLED: process.env.NODE_ENV === "development" ? "true" : "false",
+    NEXT_PUBLIC_APP_VERSION: packageJson.version,
   },
   poweredByHeader: false,
   eslint: {
