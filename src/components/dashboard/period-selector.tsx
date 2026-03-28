@@ -41,11 +41,13 @@ export function PeriodSelector({
 
   // Label do botão
   const labelBotao =
-    periodoSelecionado === "consolidado"
-      ? "Todos os meses"
-      : ehPeriodoMaisRecente
-        ? "Último mês"
-        : formatarMesAno(periodoSelecionado, "abreviado");
+    !periodoSelecionado
+      ? "Selecionar período"
+      : periodoSelecionado === "consolidado"
+        ? "Todos os meses"
+        : ehPeriodoMaisRecente
+          ? "Último mês"
+          : formatarMesAno(periodoSelecionado, "abreviado");
 
   return (
     <DropdownMenu>
