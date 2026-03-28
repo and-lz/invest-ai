@@ -34,6 +34,7 @@ function createMockRepository(settings: {
     ),
     updateGeminiApiKey: vi.fn(),
     updateModelTier: vi.fn(),
+    updateAiProvider: vi.fn(),
     deleteGeminiApiKey: vi.fn(),
   };
 }

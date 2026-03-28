@@ -3,6 +3,7 @@ import { DbConversaRepository } from "@/infrastructure/repositories/db-conversat
 import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-action-plan-repository";
 import { DbUserSettingsRepository } from "@/infrastructure/repositories/user-settings-repository";
 import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
+import { ClaudePdfExtractionService } from "@/infrastructure/services/claude-pdf-extraction-service";
 import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
 import { ListReportsUseCase } from "@/application/use-cases/list-reports";
@@ -20,6 +21,7 @@ import { DeleteInsightsUseCase } from "@/application/use-cases/delete-insights";
 import { GetUserSettingsUseCase } from "@/application/use-cases/get-user-settings";
 import { UpdateGeminiApiKeyUseCase } from "@/application/use-cases/update-gemini-api-key";
 import { UpdateModelTierUseCase } from "@/application/use-cases/update-model-tier";
+import { UpdateAiProviderUseCase } from "@/application/use-cases/update-ai-provider";
 import { TestGeminiApiKeyUseCase } from "@/application/use-cases/test-gemini-api-key";
 import { CheckKeyHealthUseCase } from "@/application/use-cases/check-key-health";
 import type { ExtractionService, InsightsService } from "@/domain/interfaces/extraction-service";
@@ -29,13 +31,24 @@ import type { ConversaRepository } from "@/domain/interfaces/conversation-reposi
 import type { PlanoAcaoRepository } from "@/domain/interfaces/action-plan-repository";
 import type { UserSettingsRepository } from "@/domain/interfaces/user-settings-repository";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-ai-provider";
-import { resolveModelId } from "@/lib/model-tiers";
+import { AnthropicProvedorAi } from "@/infrastructure/ai/anthropic-ai-provider";
+import { resolveModelId, resolveClaudeModelId, DEFAULT_AI_PROVIDER, DEFAULT_CLAUDE_MODEL_TIER } from "@/lib/model-tiers";
+import type { AiProvider } from "@/lib/model-tiers";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
 import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
 import { obterPdfStorage } from "@/infrastructure/storage/pdf-storage-factory";
 import { auth } from "@/auth";
+
+// ---- AI config type ----
+
+export interface AiConfig {
+  provider: AiProvider;
+  modelId: string;
+}
+
+// ---- Auth / session helpers ----
 
 async function obterUsuarioId(): Promise<string> {
   try {
@@ -54,6 +67,8 @@ async function criarRepositorio() {
   return new DbReportRepository(usuarioId, obterPdfStorage());
 }
 
+// ---- AI provider factories ----
+
 export function isAiConfigured(): boolean {
   return !!process.env.GOOGLE_API_KEY;
 }
@@ -68,35 +83,65 @@ function obterGoogleApiKey(): string {
   return apiKey;
 }
 
-export function criarProvedorAi(modelo?: string): ProvedorAi {
-  return new GeminiProvedorAi(obterGoogleApiKey(), modelo);
+export function criarProvedorAi(config: AiConfig): ProvedorAi {
+  if (config.provider === "claude-proxy") {
+    const proxyUrl = process.env.CLAUDE_PROXY_URL ?? "http://localhost:3099";
+    return new AnthropicProvedorAi(proxyUrl, config.modelId);
+  }
+  return new GeminiProvedorAi(obterGoogleApiKey(), config.modelId);
 }
 
-function criarServicoExtracao(modelo?: string): ExtractionService {
-  return new GeminiPdfExtractionService(criarProvedorAi(modelo));
+function criarServicoExtracao(config: AiConfig): ExtractionService {
+  if (config.provider === "claude-proxy") {
+    return new ClaudePdfExtractionService(criarProvedorAi(config));
+  }
+  return new GeminiPdfExtractionService(criarProvedorAi(config));
 }
 
-function criarServicoInsights(modelo?: string): InsightsService {
-  return new GeminiInsightsService(criarProvedorAi(modelo));
+function criarServicoInsights(config: AiConfig): InsightsService {
+  return new GeminiInsightsService(criarProvedorAi(config));
+}
+
+// ---- User AI config resolution ----
+
+function obterUserSettingsRepository(): UserSettingsRepository {
+  return new DbUserSettingsRepository();
 }
 
 /**
- * Resolves the concrete model ID for a given user based on their settings.
- * Falls back to the default model if the DB query fails (never breaks AI calls).
+ * Resolves the AI provider config for a given user based on their settings.
+ * Falls back to Gemini defaults if the DB query fails.
  */
-export async function resolverModeloDoUsuario(userId: string): Promise<string> {
+export async function resolverConfiguracaoAiDoUsuario(userId: string): Promise<AiConfig> {
   try {
     const repo = obterUserSettingsRepository();
     const settings = await repo.getUserSettings(userId);
-    return resolveModelId(settings?.modelTier);
+    const provider = (settings?.aiProvider ?? DEFAULT_AI_PROVIDER) as AiProvider;
+
+    if (provider === "claude-proxy") {
+      const tier = settings?.claudeModelTier ?? DEFAULT_CLAUDE_MODEL_TIER;
+      return { provider: "claude-proxy", modelId: resolveClaudeModelId(tier) };
+    }
+
+    return { provider: "gemini", modelId: resolveModelId(settings?.modelTier) };
   } catch {
-    return resolveModelId(undefined);
+    return { provider: "gemini", modelId: resolveModelId(undefined) };
   }
 }
 
-export async function obterUploadReportUseCase(modelo?: string) {
+/**
+ * @deprecated Use resolverConfiguracaoAiDoUsuario instead.
+ */
+export async function resolverModeloDoUsuario(userId: string): Promise<string> {
+  const config = await resolverConfiguracaoAiDoUsuario(userId);
+  return config.modelId;
+}
+
+// ---- Use case factories ----
+
+export async function obterUploadReportUseCase(config: AiConfig) {
   const repository = await criarRepositorio();
-  return new UploadReportUseCase(repository, criarServicoExtracao(modelo));
+  return new UploadReportUseCase(repository, criarServicoExtracao(config));
 }
 
 export async function obterListReportsUseCase() {
@@ -114,9 +159,9 @@ export async function obterGetDashboardDataUseCase() {
   return new GetDashboardDataUseCase(repository);
 }
 
-export async function obterGenerateInsightsUseCase(modelo?: string) {
+export async function obterGenerateInsightsUseCase(config: AiConfig) {
   const repository = await criarRepositorio();
-  return new GenerateInsightsUseCase(repository, criarServicoInsights(modelo));
+  return new GenerateInsightsUseCase(repository, criarServicoInsights(config));
 }
 
 export async function obterDeleteReportUseCase() {
@@ -139,9 +184,9 @@ export async function obterUpdateInsightConclusionUseCase() {
   return new UpdateInsightConclusionUseCase(repository);
 }
 
-export async function obterGenerateConsolidatedInsightsUseCase(modelo?: string) {
+export async function obterGenerateConsolidatedInsightsUseCase(config: AiConfig) {
   const repository = await criarRepositorio();
-  return new GenerateConsolidatedInsightsUseCase(repository, criarServicoInsights(modelo));
+  return new GenerateConsolidatedInsightsUseCase(repository, criarServicoInsights(config));
 }
 
 export async function obterListInsightsUseCase() {
@@ -178,11 +223,11 @@ export function obterBrapiAssetDetailService(): BrapiAssetDetailService {
   return new BrapiAssetDetailService(obterBrapiToken());
 }
 
-export async function obterAnalyzeAssetPerformanceUseCase(modelo?: string) {
+export async function obterAnalyzeAssetPerformanceUseCase(config: AiConfig) {
   const repository = await criarRepositorio();
   return new AnalyzeAssetPerformanceUseCase(
     repository,
-    new GeminiAssetAnalysisService(criarProvedorAi(modelo)),
+    new GeminiAssetAnalysisService(criarProvedorAi(config)),
     obterBrapiAssetDetailService(),
     obterBcbMacroDataService(),
   );
@@ -200,13 +245,6 @@ export async function obterConversaRepository(): Promise<ConversaRepository> {
  */
 export async function obterPlanoAcaoRepository(): Promise<PlanoAcaoRepository> {
   return new DbPlanoAcaoRepository();
-}
-
-/**
- * Obtem o repository de configuracoes de usuario (DB-backed).
- */
-function obterUserSettingsRepository(): UserSettingsRepository {
-  return new DbUserSettingsRepository();
 }
 
 /**
@@ -228,6 +266,13 @@ export function obterUpdateGeminiApiKeyUseCase(): UpdateGeminiApiKeyUseCase {
  */
 export function obterUpdateModelTierUseCase(): UpdateModelTierUseCase {
   return new UpdateModelTierUseCase(obterUserSettingsRepository());
+}
+
+/**
+ * Obtem o use case para atualizar o provedor de IA.
+ */
+export function obterUpdateAiProviderUseCase(): UpdateAiProviderUseCase {
+  return new UpdateAiProviderUseCase(obterUserSettingsRepository());
 }
 
 /**

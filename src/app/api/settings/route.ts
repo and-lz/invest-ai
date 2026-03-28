@@ -4,6 +4,7 @@ import {
   obterGetUserSettingsUseCase,
   obterUpdateGeminiApiKeyUseCase,
   obterUpdateModelTierUseCase,
+  obterUpdateAiProviderUseCase,
 } from "@/lib/container";
 import { UpdateUserSettingsSchema } from "@/schemas/user-settings.schema";
 
@@ -51,6 +52,19 @@ export async function PATCH(request: NextRequest) {
     if (validated.modelTier) {
       const useCase = obterUpdateModelTierUseCase();
       await useCase.executar(userId, validated.modelTier);
+    }
+
+    if (validated.aiProvider !== undefined) {
+      const useCase = obterUpdateAiProviderUseCase();
+      await useCase.executar(
+        userId,
+        validated.aiProvider,
+        validated.claudeModelTier ?? "sonnet",
+      );
+    } else if (validated.claudeModelTier !== undefined) {
+      const useCase = obterUpdateAiProviderUseCase();
+      const currentSettings = await obterGetUserSettingsUseCase().executar(userId);
+      await useCase.executar(userId, currentSettings.aiProvider, validated.claudeModelTier);
     }
 
     return NextResponse.json({ sucesso: true, mensagem: "Configurações atualizadas com sucesso" });

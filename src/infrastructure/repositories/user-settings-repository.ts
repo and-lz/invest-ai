@@ -13,6 +13,8 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
     usuarioId: string;
     geminiApiKey?: string;
     modelTier?: string;
+    aiProvider?: string;
+    claudeModelTier?: string;
     criadaEm: Date;
     atualizadaEm: Date;
   } | null> {
@@ -36,6 +38,8 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
       usuarioId: string;
       geminiApiKey?: string;
       modelTier?: string;
+      aiProvider?: string;
+      claudeModelTier?: string;
       criadaEm: Date;
       atualizadaEm: Date;
     } = {
@@ -51,6 +55,14 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
 
     if (row.modeloTier) {
       settings.modelTier = row.modeloTier;
+    }
+
+    if (row.provedorAi) {
+      settings.aiProvider = row.provedorAi;
+    }
+
+    if (row.modeloTierClaude) {
+      settings.claudeModelTier = row.modeloTierClaude;
     }
 
     return settings;
@@ -107,6 +119,36 @@ export class DbUserSettingsRepository implements UserSettingsRepository {
         identificador: randomUUID(),
         usuarioId: userId,
         modeloTier: modelTier,
+        criadaEm: now,
+        atualizadaEm: now,
+      });
+    }
+  }
+
+  async updateAiProvider(userId: string, provider: string, claudeModelTier: string): Promise<void> {
+    const now = new Date();
+
+    const existing = await db
+      .select()
+      .from(configuracoesUsuario)
+      .where(eq(configuracoesUsuario.usuarioId, userId))
+      .limit(1);
+
+    if (existing.length > 0) {
+      await db
+        .update(configuracoesUsuario)
+        .set({
+          provedorAi: provider,
+          modeloTierClaude: claudeModelTier,
+          atualizadaEm: now,
+        })
+        .where(eq(configuracoesUsuario.usuarioId, userId));
+    } else {
+      await db.insert(configuracoesUsuario).values({
+        identificador: randomUUID(),
+        usuarioId: userId,
+        provedorAi: provider,
+        modeloTierClaude: claudeModelTier,
         criadaEm: now,
         atualizadaEm: now,
       });

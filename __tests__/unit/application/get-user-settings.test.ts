@@ -17,6 +17,7 @@ function createMockRepository(
     getUserSettings: vi.fn().mockResolvedValue(settings),
     updateGeminiApiKey: vi.fn(),
     updateModelTier: vi.fn(),
+    updateAiProvider: vi.fn(),
     deleteGeminiApiKey: vi.fn(),
   };
 }

@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi, resolverModeloDoUsuario } from "@/lib/container";
+import { criarProvedorAi, resolverConfiguracaoAiDoUsuario } from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { AiApiTransientError, AiApiQuotaError } from "@/domain/errors/app-errors";
@@ -50,15 +50,16 @@ export async function POST(request: Request): Promise<Response> {
       partes: [{ tipo: "texto" as const, dados: mensagem.conteudo }],
     }));
 
-    const modelo = await resolverModeloDoUsuario(verificacaoAuth.session.user.userId);
-    const provedor = criarProvedorAi(modelo);
+    const aiConfig = await resolverConfiguracaoAiDoUsuario(verificacaoAuth.session.user.userId);
+    const provedor = criarProvedorAi(aiConfig);
 
     const configBase: ConfiguracaoGeracao = {
       instrucaoSistema,
       mensagens: mensagensAi,
       temperatura: 0.7,
       formatoResposta: "texto",
-      pesquisaWeb: true,
+      // Claude proxy does not support web search tools
+      pesquisaWeb: aiConfig.provider === "gemini",
     };
 
     const codificadorTexto = new TextEncoder();

@@ -7,7 +7,7 @@ import {
   obterUpdateInsightConclusionUseCase,
   obterListInsightsUseCase,
   obterDeleteInsightsUseCase,
-  resolverModeloDoUsuario,
+  resolverConfiguracaoAiDoUsuario,
 } from "@/lib/container";
 import { AppError, InsightsNotFoundError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
@@ -142,8 +142,8 @@ export async function POST(request: Request) {
         rotuloLog: "Insights Consolidados",
         usuarioId: authCheck.session.user.userId,
         executarOperacao: async () => {
-          const modelo = await resolverModeloDoUsuario(authCheck.session.user.userId);
-          const useCase = await obterGenerateConsolidatedInsightsUseCase(modelo);
+          const aiConfig = await resolverConfiguracaoAiDoUsuario(authCheck.session.user.userId);
+          const useCase = await obterGenerateConsolidatedInsightsUseCase(aiConfig);
           await useCase.executar();
           return {
             descricaoResultado: "Insights consolidados gerados",
@@ -160,8 +160,8 @@ export async function POST(request: Request) {
         rotuloLog: "Insights",
         usuarioId: authCheck.session.user.userId,
         executarOperacao: async () => {
-          const modelo = await resolverModeloDoUsuario(authCheck.session.user.userId);
-          const useCase = await obterGenerateInsightsUseCase(modelo);
+          const aiConfig = await resolverConfiguracaoAiDoUsuario(authCheck.session.user.userId);
+          const useCase = await obterGenerateInsightsUseCase(aiConfig);
           await useCase.executar({
             identificadorRelatorio,
             identificadorRelatorioAnterior,

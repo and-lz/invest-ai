@@ -10,6 +10,7 @@ function createMockRepository(): UserSettingsRepository {
     getUserSettings: vi.fn(),
     updateGeminiApiKey: vi.fn().mockResolvedValue(undefined),
     updateModelTier: vi.fn(),
+    updateAiProvider: vi.fn(),
     deleteGeminiApiKey: vi.fn(),
   };
 }

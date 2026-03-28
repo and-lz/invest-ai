@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod/v4";
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi } from "@/lib/container";
+import { criarProvedorAi, resolverConfiguracaoAiDoUsuario } from "@/lib/container";
 import { IdentificadorPaginaEnum } from "@/schemas/chat.schema";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +39,8 @@ export async function POST(request: Request): Promise<Response> {
       userPrompt += `\nUltimas mensagens da conversa: ${recentMessages.join(" | ")}`;
     }
 
-    const provedor = criarProvedorAi();
+    const aiConfig = await resolverConfiguracaoAiDoUsuario(auth.session.user.userId);
+    const provedor = criarProvedorAi(aiConfig);
     const resposta = await provedor.gerar({
       instrucaoSistema: SYSTEM_PROMPT,
       mensagens: [{ papel: "usuario", partes: [{ tipo: "texto", dados: userPrompt }] }],

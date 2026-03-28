@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { resolveModelId, DEFAULT_MODEL_TIER, MODEL_TIER_OPTIONS } from "@/lib/model-tiers";
+import {
+  resolveModelId,
+  resolveClaudeModelId,
+  DEFAULT_MODEL_TIER,
+  DEFAULT_CLAUDE_MODEL_TIER,
+  MODEL_TIER_OPTIONS,
+  CLAUDE_MODEL_TIER_OPTIONS,
+} from "@/lib/model-tiers";
 
 describe("model-tiers", () => {
   describe("Given the model tier options", () => {
@@ -84,6 +91,64 @@ describe("model-tiers", () => {
         const result = resolveModelId("capable");
         expect(result).toBe("models/gemini-3.0-pro");
       });
+    });
+  });
+
+  describe("resolveClaudeModelId", () => {
+    describe("Given 'haiku' tier", () => {
+      it("Then it returns claude-haiku-4-5", () => {
+        expect(resolveClaudeModelId("haiku")).toBe("claude-haiku-4-5");
+      });
+    });
+
+    describe("Given 'sonnet' tier", () => {
+      it("Then it returns claude-sonnet-4-5", () => {
+        expect(resolveClaudeModelId("sonnet")).toBe("claude-sonnet-4-5");
+      });
+    });
+
+    describe("Given 'opus' tier", () => {
+      it("Then it returns claude-opus-4-6", () => {
+        expect(resolveClaudeModelId("opus")).toBe("claude-opus-4-6");
+      });
+    });
+
+    describe("Given null tier", () => {
+      it("Then it falls back to sonnet (default)", () => {
+        expect(resolveClaudeModelId(null)).toBe("claude-sonnet-4-5");
+      });
+    });
+
+    describe("Given undefined tier", () => {
+      it("Then it falls back to sonnet (default)", () => {
+        expect(resolveClaudeModelId(undefined)).toBe("claude-sonnet-4-5");
+      });
+    });
+
+    describe("Given an unknown tier string", () => {
+      it("Then it falls back to sonnet (default)", () => {
+        expect(resolveClaudeModelId("unknown")).toBe("claude-sonnet-4-5");
+      });
+    });
+  });
+
+  describe("Given the DEFAULT_CLAUDE_MODEL_TIER", () => {
+    it("Then it is 'sonnet'", () => {
+      expect(DEFAULT_CLAUDE_MODEL_TIER).toBe("sonnet");
+    });
+  });
+
+  describe("Given the CLAUDE_MODEL_TIER_OPTIONS", () => {
+    it("Then every option has a non-empty label and description", () => {
+      for (const option of CLAUDE_MODEL_TIER_OPTIONS) {
+        expect(option.label.length).toBeGreaterThan(0);
+        expect(option.description.length).toBeGreaterThan(0);
+      }
+    });
+
+    it("Then it contains exactly 'haiku', 'sonnet', and 'opus' tiers", () => {
+      const values = CLAUDE_MODEL_TIER_OPTIONS.map((o) => o.value);
+      expect(values).toEqual(["haiku", "sonnet", "opus"]);
     });
   });
 });

@@ -7,7 +7,7 @@ import {
   obterAnalyzeAssetPerformanceUseCase,
   obterPlanoAcaoRepository,
   criarProvedorAi,
-  resolverModeloDoUsuario,
+  resolverConfiguracaoAiDoUsuario,
 } from "@/lib/container";
 import { salvarAnaliseAtivo } from "@/lib/asset-analysis-storage";
 import { EnriquecimentoAiSchema } from "@/schemas/action-plan.schema";
@@ -27,8 +27,8 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         rotuloLog: "Insights Consolidados (retry)",
         usuarioId,
         executarOperacao: async () => {
-          const modelo = await resolverModeloDoUsuario(usuarioId);
-          const useCase = await obterGenerateConsolidatedInsightsUseCase(modelo);
+          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const useCase = await obterGenerateConsolidatedInsightsUseCase(aiConfig);
           await useCase.executar();
           return {
             descricaoResultado: "Insights consolidados gerados",
@@ -56,8 +56,8 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         rotuloLog: "Insights (retry)",
         usuarioId,
         executarOperacao: async () => {
-          const modelo = await resolverModeloDoUsuario(usuarioId);
-          const useCase = await obterGenerateInsightsUseCase(modelo);
+          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const useCase = await obterGenerateInsightsUseCase(aiConfig);
           await useCase.executar({
             identificadorRelatorio,
             identificadorRelatorioAnterior,
@@ -86,8 +86,8 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         rotuloLog: "Analise Ativo (retry)",
         usuarioId,
         executarOperacao: async () => {
-          const modelo = await resolverModeloDoUsuario(usuarioId);
-          const useCase = await obterAnalyzeAssetPerformanceUseCase(modelo);
+          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const useCase = await obterAnalyzeAssetPerformanceUseCase(aiConfig);
           const analise = await useCase.executar({ codigoAtivo });
           await salvarAnaliseAtivo(analise, usuarioId);
           return {
@@ -117,8 +117,8 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         usuarioId,
         executarOperacao: async () => {
           const repository = await obterPlanoAcaoRepository();
-          const modelo = await resolverModeloDoUsuario(usuarioId);
-          const provider = criarProvedorAi(modelo);
+          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const provider = criarProvedorAi(aiConfig);
           const aiResponse = await provider.gerar({
             instrucaoSistema: SYSTEM_PROMPT_ENRIQUECER_ACAO,
             mensagens: [

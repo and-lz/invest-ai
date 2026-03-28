@@ -7,6 +7,7 @@ function criarRepositorioMock(): UserSettingsRepository {
     getUserSettings: vi.fn(),
     updateGeminiApiKey: vi.fn(),
     updateModelTier: vi.fn(),
+    updateAiProvider: vi.fn(),
     deleteGeminiApiKey: vi.fn(),
   };
 }

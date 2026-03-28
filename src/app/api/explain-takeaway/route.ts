@@ -1,7 +1,7 @@
 import { NextResponse, after } from "next/server";
 import { z } from "zod/v4";
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi, resolverModeloDoUsuario } from "@/lib/container";
+import { criarProvedorAi, resolverConfiguracaoAiDoUsuario } from "@/lib/container";
 import { cabecalhosSemCache } from "@/lib/cache-headers";
 import {
   SYSTEM_PROMPT_EXPLANATION,
@@ -58,8 +58,8 @@ export async function POST(request: Request) {
       usuarioId: userId,
       executarOperacao: async () => {
         const userPrompt = buildExplanationUserPrompt(conclusions);
-        const modelo = await resolverModeloDoUsuario(userId);
-        const provider = criarProvedorAi(modelo);
+        const aiConfig = await resolverConfiguracaoAiDoUsuario(userId);
+        const provider = criarProvedorAi(aiConfig);
         const response = await provider.gerar({
           instrucaoSistema: SYSTEM_PROMPT_EXPLANATION,
           mensagens: [

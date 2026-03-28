@@ -5,19 +5,28 @@ import { Settings } from "lucide-react";
 import { GeminiApiKeyForm } from "@/components/settings/gemini-api-key-form";
 import { ApiKeyInfo } from "@/components/settings/api-key-info";
 import { ModelTierSelector } from "@/components/settings/model-tier-selector";
+import { AiProviderForm } from "@/components/settings/ai-provider-form";
 import { typography, icon, layout } from "@/lib/design-system";
 import { cn } from "@/lib/utils";
-import type { ModelTier } from "@/lib/model-tiers";
+import type { ModelTier, AiProvider, ClaudeModelTier } from "@/lib/model-tiers";
 import type { KeyHealthStatus } from "@/schemas/user-settings.schema";
 
 interface SettingsContentProps {
   initialKeyConfigured: boolean;
   initialModelTier: ModelTier;
+  initialAiProvider: AiProvider;
+  initialClaudeTier: ClaudeModelTier;
 }
 
-export function SettingsContent({ initialKeyConfigured, initialModelTier }: SettingsContentProps) {
+export function SettingsContent({
+  initialKeyConfigured,
+  initialModelTier,
+  initialAiProvider,
+  initialClaudeTier,
+}: SettingsContentProps) {
   const [isKeyConfigured, setIsKeyConfigured] = useState(initialKeyConfigured);
   const [modelTier, setModelTier] = useState<ModelTier>(initialModelTier);
+  const [aiProvider, setAiProvider] = useState<AiProvider>(initialAiProvider);
   const [keyHealth, setKeyHealth] = useState<KeyHealthStatus | null>(null);
   const [isCheckingHealth, setIsCheckingHealth] = useState(initialKeyConfigured);
 
@@ -57,14 +66,23 @@ export function SettingsContent({ initialKeyConfigured, initialModelTier }: Sett
       </div>
 
       <div className={cn(layout.sectionSpacing)}>
-        <GeminiApiKeyForm
-          onSuccess={handleApiKeySuccess}
-          isKeyConfigured={isKeyConfigured}
-          keyHealth={keyHealth}
-          isCheckingHealth={isCheckingHealth}
-          onRefreshHealth={checkKeyHealth}
+        <AiProviderForm
+          initialProvider={aiProvider}
+          initialClaudeTier={initialClaudeTier}
+          onProviderChange={setAiProvider}
         />
-        <ModelTierSelector currentTier={modelTier} onTierChange={setModelTier} />
+        {aiProvider === "gemini" && (
+          <>
+            <GeminiApiKeyForm
+              onSuccess={handleApiKeySuccess}
+              isKeyConfigured={isKeyConfigured}
+              keyHealth={keyHealth}
+              isCheckingHealth={isCheckingHealth}
+              onRefreshHealth={checkKeyHealth}
+            />
+            <ModelTierSelector currentTier={modelTier} onTierChange={setModelTier} />
+          </>
+        )}
         <ApiKeyInfo />
       </div>
     </div>

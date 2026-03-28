@@ -7,6 +7,12 @@ import { z } from "zod";
 export const ModelTierSchema = z.enum(["economic", "capable"]);
 export type ModelTierValue = z.infer<typeof ModelTierSchema>;
 
+export const AiProviderSchema = z.enum(["gemini", "claude-proxy"]);
+export type AiProviderValue = z.infer<typeof AiProviderSchema>;
+
+export const ClaudeModelTierSchema = z.enum(["haiku", "sonnet", "opus"]);
+export type ClaudeModelTierValue = z.infer<typeof ClaudeModelTierSchema>;
+
 // ============================================================
 // User Settings Schemas
 // ============================================================
@@ -21,10 +27,17 @@ export const UpdateUserSettingsSchema = z
   .object({
     geminiApiKey: z.string().min(1, "API key is required").optional(),
     modelTier: ModelTierSchema.optional(),
+    aiProvider: AiProviderSchema.optional(),
+    claudeModelTier: ClaudeModelTierSchema.optional(),
   })
-  .refine((data) => data.geminiApiKey !== undefined || data.modelTier !== undefined, {
-    message: "At least one field is required",
-  });
+  .refine(
+    (data) =>
+      data.geminiApiKey !== undefined ||
+      data.modelTier !== undefined ||
+      data.aiProvider !== undefined ||
+      data.claudeModelTier !== undefined,
+    { message: "At least one field is required" },
+  );
 
 export type UpdateUserSettings = z.infer<typeof UpdateUserSettingsSchema>;
 
@@ -38,7 +51,9 @@ export const UserSettingsResponseSchema = z.object({
   identificador: z.string(),
   usuarioId: z.string(),
   geminiApiKeyConfigured: z.boolean().describe("Whether user has set a Gemini API key"),
-  modelTier: ModelTierSchema.describe("Selected AI model tier"),
+  modelTier: ModelTierSchema.describe("Selected Gemini model tier"),
+  aiProvider: AiProviderSchema.describe("Selected AI provider"),
+  claudeModelTier: ClaudeModelTierSchema.describe("Selected Claude model tier"),
   criadaEm: z.date(),
   atualizadaEm: z.date(),
 });

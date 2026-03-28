@@ -3,7 +3,7 @@
  *
  * Exposes an Anthropic-compatible HTTP API backed by the local `claude` CLI.
  * Personal use only — routes requests through your Claude Code subscription.
- * Always uses the most capable model (claude opus).
+ * Supports model selection via the `model` field in the request body.
  *
  * Usage:
  *   npm run proxy
@@ -139,12 +139,30 @@ function extractSystemPrompt(
 // CLI invocation
 // ============================================================
 
+/**
+ * Maps an Anthropic model ID to the `claude` CLI --model flag shorthand.
+ * Defaults to "opus" for unknown / missing models.
+ */
+function resolveCliModel(modelId: string | undefined): string {
+  switch (modelId) {
+    case "claude-haiku-4-5":
+      return "haiku";
+    case "claude-sonnet-4-5":
+      return "sonnet";
+    case "claude-opus-4-6":
+    default:
+      return "opus";
+  }
+}
+
 async function invokeClaudeCli(
   prompt: string,
-  systemPrompt: string | null
+  systemPrompt: string | null,
+  modelId?: string
 ): Promise<ClaudeJsonOutput> {
   return new Promise((resolve, reject) => {
-    const args = ["-p", "--output-format", "json", "--model", "opus"];
+    const cliModel = resolveCliModel(modelId);
+    const args = ["-p", "--output-format", "json", "--model", cliModel];
 
     if (systemPrompt) {
       args.push("--system-prompt", systemPrompt);
@@ -285,7 +303,7 @@ async function handleMessages(
 
   let cliOutput: ClaudeJsonOutput;
   try {
-    cliOutput = await invokeClaudeCli(prompt, systemPrompt);
+    cliOutput = await invokeClaudeCli(prompt, systemPrompt, payload.model);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${message}`);
@@ -343,15 +361,13 @@ const server = http.createServer(
     }
 
     if (method === "GET" && url === "/v1/models") {
+      const created = Math.floor(Date.now() / 1000);
       sendJson(res, 200, {
         object: "list",
         data: [
-          {
-            id: "claude-opus-4-6",
-            object: "model",
-            created: Math.floor(Date.now() / 1000),
-            owned_by: "claude-code",
-          },
+          { id: "claude-haiku-4-5", object: "model", created, owned_by: "claude-code" },
+          { id: "claude-sonnet-4-5", object: "model", created, owned_by: "claude-code" },
+          { id: "claude-opus-4-6", object: "model", created, owned_by: "claude-code" },
         ],
       });
       return;
@@ -376,7 +392,7 @@ const server = http.createServer(
 // ============================================================
 
 console.log(
-  `\n${COLORS.bold}Claude Code Local Proxy${COLORS.reset} ${COLORS.dim}(personal use only · always uses claude opus)${COLORS.reset}\n`
+  `\n${COLORS.bold}Claude Code Local Proxy${COLORS.reset} ${COLORS.dim}(personal use only · model selected per request, defaults to opus)${COLORS.reset}\n`
 );
 
 checkClaudeCli();
