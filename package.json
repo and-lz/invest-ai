@@ -1,6 +1,6 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.107",
+  "version": "0.1.109",
   "private": true,
   "scripts": {
     "dev": "concurrently --kill-others -n next,proxy -c blue,magenta \"next dev --turbopack\" \"npx tsx scripts/claude-proxy.ts\"",
