@@ -37,7 +37,7 @@ export function MensagemChatBolha({
     <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       {ehUsuario ? (
-        <Avatar className="h-8 w-8 shrink-0">
+        <Avatar data-chat-avatar className="h-8 w-8 shrink-0">
           <AvatarImage src={userImageUrl} alt="Você" />
           <AvatarFallback className="bg-primary/10 text-xs">
             {userInitials ?? <User className="h-4 w-4" />}
@@ -45,6 +45,7 @@ export function MensagemChatBolha({
         </Avatar>
       ) : (
         <div
+          data-chat-avatar
           className={cn(
             "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
             "bg-secondary",

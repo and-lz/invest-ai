@@ -32,6 +32,7 @@ export function SuggestionChips({
 
   return (
     <div
+      data-chat-suggestions
       className={cn(
         "flex flex-wrap items-center gap-2",
         variant === "empty-state" && "justify-center px-4",

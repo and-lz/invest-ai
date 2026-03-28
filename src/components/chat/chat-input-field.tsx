@@ -81,7 +81,7 @@ export function CampoEntradaChat({
   );
 
   return (
-    <div className="flex items-end gap-2 border-t p-3">
+    <div data-chat-input className="flex items-end gap-2 border-t p-3">
       <textarea
         ref={textareaRef}
         value={valor}

@@ -236,7 +236,7 @@ export function ChatWidget() {
           {/* Area principal do chat */}
           <div className={cn("flex flex-1 flex-col", telaCheia && "chat-fullscreen")}>
             {/* Cabecalho */}
-            <div className="flex items-center justify-between border-b px-4 py-3">
+            <div data-chat-header className="flex items-center justify-between border-b px-4 py-3">
               <div className="flex items-center gap-2">
                 {/* Botao toggle sidebar (historico de conversas) */}
                 <Button
@@ -248,7 +248,7 @@ export function ChatWidget() {
                   <Menu className="h-4 w-4" />
                 </Button>
 
-                <Bot className="text-muted-foreground h-5 w-5" />
+                <Bot data-chat-header-icon className="text-muted-foreground h-5 w-5" />
                 <h3 className="text-sm font-medium">Fortuna</h3>
               </div>
               <div className="flex items-center gap-1">
@@ -317,9 +317,9 @@ export function ChatWidget() {
             </div>
 
             {/* Area de mensagens */}
-            <div ref={areaScrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
+            <div ref={areaScrollRef} data-chat-messages className="flex-1 space-y-4 overflow-y-auto p-4">
               {mensagens.length === 0 && (
-                <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+                <div data-chat-empty className="flex h-full flex-col items-center justify-center gap-4 text-center">
                   <Bot className="text-muted-foreground h-10 w-10" />
                   <div>
                     <p className="text-muted-foreground text-sm">
@@ -358,7 +358,7 @@ export function ChatWidget() {
 
             {/* Banner de erro */}
             {erro && (
-              <div className="bg-destructive/5 border-t px-4 py-2">
+              <div data-chat-error className="bg-destructive/5 border-t px-4 py-2">
                 <p className="text-destructive text-xs">{erro}</p>
               </div>
             )}
