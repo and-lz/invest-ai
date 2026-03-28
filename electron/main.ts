@@ -191,9 +191,9 @@ function updateTrayMenu(): void {
   tray.setContextMenu(buildContextMenu());
 }
 
-app.dock?.hide();
-
 app.whenReady().then(() => {
+  app.dock?.hide();
+
   const icon = nativeImage.createFromPath(getIconPath());
   icon.setTemplateImage(true);
 
