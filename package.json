@@ -1,11 +1,11 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.164",
+  "version": "0.1.165",
   "private": true,
   "main": "electron/dist/main.js",
   "scripts": {
     "dev": "bash scripts/dev-resilient.sh",
-    "dev:raw": "concurrently --kill-others -n \"⚡NEXT\",\"🔌PROXY\" --prefix \"[{name}]\" --prefix-length 10 -c \"bold.blue\",\"bold.magenta\" --timestamp-format \"HH:mm:ss\" \"next dev --turbopack\" \"npx tsx scripts/claude-proxy.ts\"",
+    "dev:raw": "concurrently --kill-others -n \"⚡NEXT\",\"🔌PROXY\" --prefix \"[{name}]\" --prefix-length 10 -c \"bold.blue\",\"bold.magenta\" --timestamp-format \"HH:mm:ss\" \"next dev --turbopack\" \"npx tsx scripts/claude-proxy.ts\" | node scripts/dev-prefix-ruler.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
