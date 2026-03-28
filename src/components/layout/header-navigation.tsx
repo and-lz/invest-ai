@@ -298,16 +298,18 @@ export function HeaderNavigation() {
               const TierIcon = TIER_ICONS[claudeModelTier];
               const tierLabel = TIER_LABELS[claudeModelTier];
               return (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link href="/settings">
-                        <TierIcon className={icon.button} />
-                      </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Modelo: {tierLabel}</TooltipContent>
-                </Tooltip>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href="/settings">
+                          <TierIcon className={icon.button} />
+                        </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Modelo: {tierLabel}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               );
             })()}
             <ActivityCenter />
