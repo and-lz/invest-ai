@@ -274,7 +274,7 @@ function createWindow(): void {
     height: 900,
     minWidth: 800,
     minHeight: 600,
-    title: "Investimentos",
+    title: "Fortuna",
     icon: iconPath,
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 16, y: 16 },
@@ -335,7 +335,7 @@ function createWindow(): void {
 // App lifecycle
 // ---------------------------------------------------------------------------
 
-app.name = "Investimentos";
+app.name = "Fortuna";
 
 app.whenReady().then(async () => {
   createWindow();

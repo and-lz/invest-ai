@@ -325,7 +325,7 @@ describe("serializarRelatorioMarkdown", () => {
   describe("funcao principal", () => {
     it("deve conter heading H1 com mes/ano extenso", () => {
       const resultado = serializarRelatorioMarkdown(criarRelatorioMinimo());
-      expect(resultado).toContain("# Relatorio de Investimentos - janeiro de 2026");
+      expect(resultado).toContain("# Relatório Fortuna - janeiro de 2026");
     });
 
     it("deve conter headings de todas as secoes com dados", () => {

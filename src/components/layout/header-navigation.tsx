@@ -104,7 +104,7 @@ export function HeaderNavigation() {
               <Logo />
             </Link>
             <Link href="/" onClick={fecharNav} className="hover:text-foreground/80 transition-colors">
-              Investimentos
+              Fortuna
             </Link>{" "}
             <TooltipProvider>
               <Tooltip>
@@ -161,7 +161,7 @@ export function HeaderNavigation() {
             </Link>
             <h1 className="text-base font-semibold tracking-tight">
               <Link href="/" className="hover:text-foreground/80 transition-colors">
-                Investimentos
+                Fortuna
               </Link>{" "}
               <TooltipProvider>
                 <Tooltip>

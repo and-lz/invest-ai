@@ -1,6 +1,6 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.153",
+  "version": "0.1.154",
   "private": true,
   "main": "electron/dist/main.js",
   "scripts": {
@@ -27,8 +27,8 @@
     "desktop:package": "npm run build && npm run desktop:build-main && npm run desktop:build-proxy && electron-builder --mac"
   },
   "build": {
-    "appId": "com.investimentos.app",
-    "productName": "Investimentos",
+    "appId": "com.fortuna.app",
+    "productName": "Fortuna",
     "mac": {
       "target": "dir",
       "icon": "public/icon-512.png"

@@ -1,7 +1,7 @@
 {
-  "name": "Investimentos Dashboard",
-  "short_name": "Investimentos",
-  "description": "Dashboard pessoal de investimentos - Inter Prime",
+  "name": "Fortuna",
+  "short_name": "Fortuna",
+  "description": "Dashboard financeiro pessoal - Fortuna",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#00030e",

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dashboard | Investimentos",
+  title: "Dashboard | Fortuna",
   description: "Visao geral dos seus investimentos com analises e graficos detalhados",
 };
 

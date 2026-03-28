@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: CategoriaPageProps): Promise<
   const artigos = obterArtigosPorCategoria(categoria);
 
   return {
-    title: `${categoriaInfo.titulo} | Investimentos`,
+    title: `${categoriaInfo.titulo} | Fortuna`,
     description: `${categoriaInfo.descricao} - ${artigos.length} ${artigos.length === 1 ? "artigo disponível" : "artigos disponíveis"}`,
     openGraph: {
       title: categoriaInfo.titulo,

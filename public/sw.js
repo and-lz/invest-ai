@@ -1,96 +1,112 @@
-// Service Worker para PWA - Cache básico de assets estáticos
-const CACHE_NAME = "investimentos-v1";
+// Service Worker for PWA — selective caching of static assets only
+const CACHE_VERSION = "v2";
+const CACHE_NAME = `fortuna-${CACHE_VERSION}`;
+
 const STATIC_ASSETS = [
-  "/",
   "/manifest.json",
   "/icon-192.png",
   "/icon-512.png",
   "/apple-icon-180.png",
 ];
 
-// Instala o Service Worker e faz cache de assets críticos
-self.addEventListener("install", (evento) => {
-  console.log("[SW] Instalando Service Worker...");
-  evento.waitUntil(
+// Install: pre-cache static assets only (no HTML pages)
+self.addEventListener("install", (event) => {
+  event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => {
-        console.log("[SW] Cache aberto, adicionando assets estáticos");
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .then(() => self.skipWaiting())
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting()),
   );
 });
 
-// Ativa o Service Worker e limpa caches antigos
-self.addEventListener("activate", (evento) => {
-  console.log("[SW] Ativando Service Worker...");
-  evento.waitUntil(
+// Activate: clean up old caches
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
     caches
       .keys()
-      .then((nomesCache) => {
-        return Promise.all(
-          nomesCache.map((nome) => {
-            if (nome !== CACHE_NAME) {
-              console.log("[SW] Removendo cache antigo:", nome);
-              return caches.delete(nome);
+      .then((names) =>
+        Promise.all(
+          names.map((name) => {
+            if (name !== CACHE_NAME) {
+              return caches.delete(name);
             }
-          })
-        );
-      })
-      .then(() => self.clients.claim())
+          }),
+        ),
+      )
+      .then(() => self.clients.claim()),
   );
 });
 
-// Estratégia: Network First com fallback para cache (ideal para app dinâmico)
-self.addEventListener("fetch", (evento) => {
-  // Ignorar requests não-HTTP
-  if (!evento.request.url.startsWith("http")) {
-    return;
-  }
+// Fetch strategy:
+// - Static assets (/_next/static/): cache-first (hashed, immutable)
+// - Navigation (HTML pages): network-only, offline fallback to cached shell
+// - API routes: network-only (HTTP cache headers handle caching)
+// - Everything else: network-only
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
 
-  // Ignorar requests para API externa (Gemini, Auth, etc)
+  // Ignore non-HTTP requests
+  if (!url.protocol.startsWith("http")) return;
+
+  // Ignore external APIs and auth
   if (
-    evento.request.url.includes("/api/auth") ||
-    evento.request.url.includes("googleapis.com")
+    url.pathname.startsWith("/api/auth") ||
+    url.hostname.includes("googleapis.com")
   ) {
     return;
   }
 
-  evento.respondWith(
-    fetch(evento.request)
-      .then((resposta) => {
-        // Clone a resposta para armazenar no cache
-        const respostaClonada = resposta.clone();
+  // Cache-first for immutable Next.js static assets (hashed filenames)
+  if (url.pathname.startsWith("/_next/static/")) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response.ok) {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            }
+            return response;
+          }),
+      ),
+    );
+    return;
+  }
 
-        // Cachear apenas respostas bem-sucedidas (200-299)
-        if (resposta.status >= 200 && resposta.status < 300) {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(evento.request, respostaClonada);
-          });
-        }
+  // Pre-cached static assets: cache-first
+  if (STATIC_ASSETS.includes(url.pathname)) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response.ok) {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            }
+            return response;
+          }),
+      ),
+    );
+    return;
+  }
 
-        return resposta;
-      })
-      .catch(() => {
-        // Se a rede falhar, tenta buscar do cache
-        return caches.match(evento.request).then((respostaCache) => {
-          if (respostaCache) {
-            console.log("[SW] Servindo do cache:", evento.request.url);
-            return respostaCache;
-          }
+  // Navigation requests: network-only with offline fallback
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(() =>
+        caches.match("/manifest.json").then(() =>
+          new Response(
+            "<!DOCTYPE html><html><body><h1>Offline</h1><p>Please check your connection.</p></body></html>",
+            { status: 503, headers: { "Content-Type": "text/html" } },
+          ),
+        ),
+      ),
+    );
+    return;
+  }
 
-          // Se não estiver no cache e for navegação, retorna página offline
-          if (evento.request.mode === "navigate") {
-            return caches.match("/");
-          }
-
-          // Para outros recursos, retorna erro
-          return new Response("Offline", {
-            status: 503,
-            statusText: "Service Unavailable",
-          });
-        });
-      })
-  );
+  // Everything else (API, etc.): network-only, no SW caching
 });

@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: ArtigoPageProps): Promise<Met
   }
 
   return {
-    title: `${artigo.metadata.titulo} | Investimentos`,
+    title: `${artigo.metadata.titulo} | Fortuna`,
     description: artigo.metadata.descricao,
     keywords: artigo.metadata.tags.join(", "),
     openGraph: {

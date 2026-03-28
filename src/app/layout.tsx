@@ -21,13 +21,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Investimentos Dashboard",
-  description: "Dashboard pessoal de investimentos - Inter Prime",
-  applicationName: "Investimentos",
+  title: "Fortuna",
+  description: "Dashboard financeiro pessoal - Fortuna",
+  applicationName: "Fortuna",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Investimentos",
+    title: "Fortuna",
   },
   formatDetection: {
     telephone: false,

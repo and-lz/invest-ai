@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Proxy Monitor | Investimentos",
+  title: "Proxy Monitor | Fortuna",
   description: "Claude proxy health and request monitoring dashboard",
 };
 

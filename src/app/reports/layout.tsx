@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Relatorios | Investimentos",
+  title: "Relatorios | Fortuna",
   description: "Gerencie seus relatorios de investimentos Inter Prime",
 };
 

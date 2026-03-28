@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Configurações | Investimentos",
+  title: "Configurações | Fortuna",
   description: "Gerencie suas configurações de IA",
 };
 

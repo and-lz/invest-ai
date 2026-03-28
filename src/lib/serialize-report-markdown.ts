@@ -62,7 +62,7 @@ function formatarPercent(percentual: Percentual | null): string {
 function serializarMetadados(metadados: RelatorioExtraido["metadados"]): string {
   const mesAnoExtenso = formatarMesAno(metadados.mesReferencia, "extenso");
   const linhas = [
-    `# Relatorio de Investimentos - ${mesAnoExtenso}`,
+    `# Relatório Fortuna - ${mesAnoExtenso}`,
     `- Instituicao: ${metadados.instituicao}`,
     `- Data de geracao: ${formatBrazilianDate(metadados.dataGeracao)}`,
   ];

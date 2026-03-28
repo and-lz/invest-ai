@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Glossario Financeiro | Investimentos",
+  title: "Glossario Financeiro | Fortuna",
   description: "Dicionario de termos financeiros e de investimentos com explicacoes acessiveis",
 };
 
