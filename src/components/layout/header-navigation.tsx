@@ -13,6 +13,7 @@ import {
   Activity,
   Menu,
   MoreHorizontal,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/logo";
@@ -33,13 +34,14 @@ import { isAiEnabled } from "@/lib/ai-features";
 
 const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
 
-const AI_ONLY_ROUTES = new Set(["/insights"]);
+const AI_ONLY_ROUTES = new Set(["/insights", "/chat"]);
 
 const todosItensPrincipais = [
   { href: "/", label: "Dashboard", icone: LayoutDashboard },
   { href: "/reports", label: "Relatorios", icone: FileText },
   { href: "/insights", label: "Análises", icone: Lightbulb },
   { href: "/desempenho", label: "Desempenho", icone: BarChart3 },
+  { href: "/chat", label: "Fortuna", icone: Bot },
 ];
 
 const todosItensSecundarios = [
@@ -122,7 +124,7 @@ export function HeaderNavigation() {
         </div>
         <nav className="flex flex-col gap-1 p-4">
           {todosItensNavegacao.map((item) => {
-            const estaAtivo = pathname === item.href;
+            const estaAtivo = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
             const Icone = item.icone;
             return (
               <Link
@@ -182,7 +184,7 @@ export function HeaderNavigation() {
           <nav className="hidden items-center gap-1 md:flex">
             {/* Principais */}
             {itensNavegacaoPrincipais.map((item) => {
-              const estaAtivo = pathname === item.href;
+              const estaAtivo = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
               const Icone = item.icone;
               return (
                 <Link

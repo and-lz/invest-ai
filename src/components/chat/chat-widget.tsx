@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Bot, X, Trash2, Menu, Maximize2, Minimize2, Volume2, VolumeX } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChatBody } from "@/components/chat/chat-body";
@@ -23,6 +24,9 @@ import { dialog } from "@/lib/design-system";
 
 
 export function ChatWidget() {
+  const pathname = usePathname();
+  const isOnChatPage = pathname.startsWith("/chat");
+
   const [telaCheia, setTelaCheia] = useState(false);
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
@@ -167,18 +171,20 @@ export function ChatWidget() {
 
   return (
     <>
-      {/* Botao flutuante (FAB) */}
-      <button
-        onClick={abrirChat}
-        className={cn(
-          "ai-gradient-bg ai-fab fixed right-6 bottom-6 z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full",
-          estaAberto && "!scale-0 !animate-none",
-        )}
-        type="button"
-      >
-        <Bot className="relative z-10 h-6 w-6" />
-        <span className="sr-only">Abrir Fortuna</span>
-      </button>
+      {/* Botao flutuante (FAB) — hidden on /chat/* pages */}
+      {!isOnChatPage && (
+        <button
+          onClick={abrirChat}
+          className={cn(
+            "ai-gradient-bg ai-fab fixed right-6 bottom-6 z-40 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full",
+            estaAberto && "!scale-0 !animate-none",
+          )}
+          type="button"
+        >
+          <Bot className="relative z-10 h-6 w-6" />
+          <span className="sr-only">Abrir Fortuna</span>
+        </button>
+      )}
 
       {/* Chat dialog — transparent container fills viewport; inner div is the visible panel */}
       <dialog
