@@ -13,6 +13,7 @@
  *   POST /v1/messages  — Anthropic Messages API
  *   GET  /v1/models    — Model listing (static)
  *   GET  /health       — Liveness check
+ *   GET  /stats        — Health + request history (in-memory ring buffer)
  */
 
 import http from "node:http";
@@ -37,6 +38,23 @@ const COLORS = {
 };
 
 // ============================================================
+// Request log (in-memory ring buffer)
+// ============================================================
+
+const MAX_LOG_ENTRIES = 200;
+const requestLog: RequestLogEntry[] = [];
+let totalRequests = 0;
+const startedAt = Date.now();
+
+function recordRequest(entry: RequestLogEntry): void {
+  totalRequests++;
+  requestLog.unshift(entry); // most recent first
+  if (requestLog.length > MAX_LOG_ENTRIES) {
+    requestLog.length = MAX_LOG_ENTRIES;
+  }
+}
+
+// ============================================================
 // Types
 // ============================================================
 
@@ -56,6 +74,17 @@ interface AnthropicRequest {
   system?: string | ContentBlock[];
   max_tokens?: number;
   stream?: boolean;
+}
+
+interface RequestLogEntry {
+  timestamp: string;
+  method: string;
+  url: string;
+  model: string | null;
+  statusCode: number;
+  latencyMs: number;
+  inputTokens: number;
+  outputTokens: number;
 }
 
 interface ClaudeJsonOutput {
@@ -346,6 +375,16 @@ async function handleMessagesStream(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${message}`);
+    recordRequest({
+      timestamp: new Date().toISOString(),
+      method: "POST",
+      url: "/v1/messages",
+      model: payload.model ?? null,
+      statusCode: 502,
+      latencyMs: Date.now() - start,
+      inputTokens: 0,
+      outputTokens: 0,
+    });
     sendJson(res, 502, {
       error: { type: "api_error", message: `claude CLI error: ${message}` },
     });
@@ -356,6 +395,16 @@ async function handleMessagesStream(
     console.error(
       `${COLORS.red}✗ CLI returned error:${COLORS.reset} ${cliOutput.result}`
     );
+    recordRequest({
+      timestamp: new Date().toISOString(),
+      method: "POST",
+      url: "/v1/messages",
+      model: payload.model ?? null,
+      statusCode: 502,
+      latencyMs: Date.now() - start,
+      inputTokens: 0,
+      outputTokens: 0,
+    });
     sendJson(res, 502, {
       error: { type: "api_error", message: cliOutput.result },
     });
@@ -435,6 +484,18 @@ async function handleMessagesStream(
   res.end();
 
   const elapsed = Date.now() - start;
+
+  recordRequest({
+    timestamp: new Date().toISOString(),
+    method: "POST",
+    url: "/v1/messages",
+    model: modelName,
+    statusCode: 200,
+    latencyMs: elapsed,
+    inputTokens,
+    outputTokens,
+  });
+
   console.log(
     `${COLORS.green}→${COLORS.reset} POST /v1/messages ${COLORS.yellow}[stream]${COLORS.reset} ` +
       `${COLORS.dim}${elapsed}ms${COLORS.reset} ` +
@@ -466,6 +527,16 @@ async function handleMessages(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${message}`);
+    recordRequest({
+      timestamp: new Date().toISOString(),
+      method: "POST",
+      url: "/v1/messages",
+      model: payload.model ?? null,
+      statusCode: 502,
+      latencyMs: Date.now() - start,
+      inputTokens: 0,
+      outputTokens: 0,
+    });
     sendJson(res, 502, {
       error: { type: "api_error", message: `claude CLI error: ${message}` },
     });
@@ -476,6 +547,16 @@ async function handleMessages(
     console.error(
       `${COLORS.red}✗ CLI returned error:${COLORS.reset} ${cliOutput.result}`
     );
+    recordRequest({
+      timestamp: new Date().toISOString(),
+      method: "POST",
+      url: "/v1/messages",
+      model: payload.model ?? null,
+      statusCode: 502,
+      latencyMs: Date.now() - start,
+      inputTokens: 0,
+      outputTokens: 0,
+    });
     sendJson(res, 502, {
       error: { type: "api_error", message: cliOutput.result },
     });
@@ -484,11 +565,24 @@ async function handleMessages(
 
   const response = buildAnthropicResponse(cliOutput);
   const elapsed = Date.now() - start;
+  const inputTokens = cliOutput.usage?.input_tokens ?? 0;
+  const outputTokens = cliOutput.usage?.output_tokens ?? 0;
+
+  recordRequest({
+    timestamp: new Date().toISOString(),
+    method: "POST",
+    url: "/v1/messages",
+    model: response.model,
+    statusCode: 200,
+    latencyMs: elapsed,
+    inputTokens,
+    outputTokens,
+  });
 
   console.log(
     `${COLORS.green}→${COLORS.reset} POST /v1/messages ` +
       `${COLORS.dim}${elapsed}ms${COLORS.reset} ` +
-      `${COLORS.cyan}in:${cliOutput.usage?.input_tokens ?? 0} out:${cliOutput.usage?.output_tokens ?? 0}${COLORS.reset}`
+      `${COLORS.cyan}in:${inputTokens} out:${outputTokens}${COLORS.reset}`
   );
 
   sendJson(res, 200, response);
@@ -516,6 +610,18 @@ const server = http.createServer(
 
     if (method === "GET" && url === "/health") {
       sendJson(res, 200, { status: "ok" });
+      return;
+    }
+
+    if (method === "GET" && url === "/stats") {
+      sendJson(res, 200, {
+        status: "ok",
+        startedAt: new Date(startedAt).toISOString(),
+        uptimeMs: Date.now() - startedAt,
+        totalRequests,
+        bufferSize: requestLog.length,
+        requests: requestLog,
+      });
       return;
     }
 
@@ -567,7 +673,10 @@ server.listen(PORT, HOST, () => {
     `${COLORS.dim}  GET  /v1/models     — Model listing${COLORS.reset}`
   );
   console.log(
-    `${COLORS.dim}  GET  /health        — Liveness check${COLORS.reset}\n`
+    `${COLORS.dim}  GET  /health        — Liveness check${COLORS.reset}`
+  );
+  console.log(
+    `${COLORS.dim}  GET  /stats         — Health + request history${COLORS.reset}\n`
   );
 });
 

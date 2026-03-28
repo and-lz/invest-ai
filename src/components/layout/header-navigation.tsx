@@ -10,6 +10,7 @@ import {
   BarChart3,
   BookOpen,
   ClipboardList,
+  Activity,
   Menu,
   MoreHorizontal,
 } from "lucide-react";
@@ -45,6 +46,7 @@ const todosItensSecundarios = [
   { href: "/trends", label: "Tendencias", icone: TrendingUp },
   { href: "/plano-acao", label: "Plano de Ação", icone: ClipboardList },
   { href: "/aprender", label: "Aprender", icone: BookOpen },
+  { href: "/admin/proxy", label: "Proxy", icone: Activity },
 ];
 
 const aiEnabled = isAiEnabled();
