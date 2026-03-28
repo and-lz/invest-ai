@@ -69,44 +69,44 @@ html, body {
 }
 
 :root {
-  /* Luxury Light Mode - Warm White with Navy Accents */
+  /* Luxury Light Mode - Cool White with Rich Navy Accents */
   --radius: 0.625rem;
-  --background: oklch(0.94 0.008 75);
-  --foreground: oklch(0.16 0.025 250);
+  --background: oklch(0.96 0.006 250);
+  --foreground: oklch(0.14 0.032 250);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0.025 250);
+  --card-foreground: oklch(0.14 0.032 250);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0.025 250);
-  --primary: oklch(0.20 0.025 250);
-  --primary-foreground: oklch(0.98 0.008 75);
-  --secondary: oklch(0.95 0.008 250);
-  --secondary-foreground: oklch(0.20 0.025 250);
-  --muted: oklch(0.95 0.008 250);
-  --muted-foreground: oklch(0.48 0.025 250);
-  --accent: oklch(0.95 0.008 250);
-  --accent-foreground: oklch(0.20 0.025 250);
-  --destructive: oklch(0.45 0.18 15);
+  --popover-foreground: oklch(0.14 0.032 250);
+  --primary: oklch(0.18 0.040 250);
+  --primary-foreground: oklch(0.97 0.004 250);
+  --secondary: oklch(0.91 0.010 250);
+  --secondary-foreground: oklch(0.18 0.040 250);
+  --muted: oklch(0.91 0.010 250);
+  --muted-foreground: oklch(0.44 0.030 250);
+  --accent: oklch(0.91 0.010 250);
+  --accent-foreground: oklch(0.18 0.040 250);
+  --destructive: oklch(0.48 0.20 15);
   --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.40 0.14 165);
+  --success: oklch(0.44 0.16 165);
   --success-foreground: oklch(1 0 0);
-  --warning: oklch(0.50 0.14 75);
-  --warning-foreground: oklch(0.16 0.025 250);
-  --border: oklch(0.16 0.025 250 / 10%);
-  --input: oklch(0.16 0.025 250 / 14%);
-  --ring: oklch(0.60 0.10 75);
-  --chart-1: oklch(0.42 0.14 250);
-  --chart-2: oklch(0.52 0.12 165);
-  --chart-3: oklch(0.58 0.14 75);
-  --chart-4: oklch(0.48 0.16 310);
-  --chart-5: oklch(0.50 0.16 15);
-  --sidebar: oklch(0.97 0.008 250);
-  --sidebar-foreground: oklch(0.16 0.025 250);
-  --sidebar-primary: oklch(0.20 0.025 250);
-  --sidebar-primary-foreground: oklch(0.97 0.008 250);
-  --sidebar-accent: oklch(0.94 0.01 250);
-  --sidebar-accent-foreground: oklch(0.20 0.025 250);
-  --sidebar-border: oklch(0.16 0.025 250 / 10%);
-  --sidebar-ring: oklch(0.60 0.10 75);
+  --warning: oklch(0.52 0.16 75);
+  --warning-foreground: oklch(0.12 0.032 250);
+  --border: oklch(0.14 0.032 250 / 16%);
+  --input: oklch(0.14 0.032 250 / 20%);
+  --ring: oklch(0.48 0.14 75);
+  --chart-1: oklch(0.40 0.16 250);
+  --chart-2: oklch(0.50 0.14 165);
+  --chart-3: oklch(0.56 0.16 75);
+  --chart-4: oklch(0.46 0.18 310);
+  --chart-5: oklch(0.48 0.18 15);
+  --sidebar: oklch(0.92 0.010 250);
+  --sidebar-foreground: oklch(0.14 0.032 250);
+  --sidebar-primary: oklch(0.18 0.040 250);
+  --sidebar-primary-foreground: oklch(0.92 0.010 250);
+  --sidebar-accent: oklch(0.88 0.012 250);
+  --sidebar-accent-foreground: oklch(0.18 0.040 250);
+  --sidebar-border: oklch(0.14 0.032 250 / 14%);
+  --sidebar-ring: oklch(0.48 0.14 75);
 }
 
 .dark {
@@ -155,20 +155,20 @@ html, body {
   }
   body {
     @apply bg-background text-foreground;
-    /* Light mode: Subtle warm mesh gradient */
+    /* Light mode: Subtle cool mesh gradient */
     background-image: radial-gradient(
         ellipse 80% 60% at 10% 0%,
-        oklch(0.94 0.05 250 / 70%),
+        oklch(0.94 0.030 250 / 30%),
         transparent
       ),
       radial-gradient(
         ellipse 60% 50% at 90% 10%,
-        oklch(0.92 0.045 75 / 40%),
+        oklch(0.94 0.025 75 / 20%),
         transparent
       ),
       radial-gradient(
         ellipse 70% 40% at 50% 100%,
-        oklch(0.93 0.05 165 / 35%),
+        oklch(0.93 0.025 165 / 15%),
         transparent
       );
     background-attachment: fixed;
@@ -426,7 +426,13 @@ dialog[data-closing]::backdrop {
   @apply mb-0;
 }
 
-/* Chat Fullscreen — all scaling now handled via conditional Tailwind classes in components */
+/* Chat Fullbleed — remove main padding/scroll so the chat fills the entire area */
+main:has(> .chat-fullbleed) {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+}
 
 /* Chat Highlight - Destaque visual de elementos mencionados pelo assistente */
 .chat-highlight-active {
