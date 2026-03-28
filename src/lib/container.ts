@@ -69,6 +69,23 @@ export function obterAiConfig(): AiConfig {
   };
 }
 
+/**
+ * Returns AI config using the user's preferred model tier from DB settings.
+ * Falls back to default tier on error.
+ */
+export async function obterAiConfigParaUsuario(userId: string): Promise<AiConfig> {
+  try {
+    const settings = await obterGetUserSettingsUseCase().executar(userId);
+    return {
+      provider: "claude-proxy",
+      modelId: resolveClaudeModelId(settings.claudeModelTier),
+    };
+  } catch (erro) {
+    console.error("[AiConfig] Failed to load user settings, using default:", erro);
+    return obterAiConfig();
+  }
+}
+
 export function criarProvedorAi(config: AiConfig): ProvedorAi {
   const proxyUrl = process.env.CLAUDE_PROXY_URL ?? "http://localhost:3099";
   return new AnthropicProvedorAi(proxyUrl, config.modelId);

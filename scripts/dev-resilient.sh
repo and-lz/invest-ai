@@ -4,6 +4,9 @@
 RESTART_DELAY=2
 user_interrupted=false
 
+# Always start fresh — stale .next cache causes hydration mismatches
+rm -rf .next
+
 # Track when user presses Ctrl+C
 trap 'user_interrupted=true' SIGINT SIGTERM
 

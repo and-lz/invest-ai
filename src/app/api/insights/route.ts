@@ -7,7 +7,7 @@ import {
   obterUpdateInsightConclusionUseCase,
   obterListInsightsUseCase,
   obterDeleteInsightsUseCase,
-  obterAiConfig,
+  obterAiConfigParaUsuario,
 } from "@/lib/container";
 import { AppError, InsightsNotFoundError } from "@/domain/errors/app-errors";
 import { requireAuth } from "@/lib/auth-utils";
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
         rotuloLog: "Insights Consolidados",
         usuarioId: authCheck.session.user.userId,
         executarOperacao: async () => {
-          const aiConfig = obterAiConfig();
+          const aiConfig = await obterAiConfigParaUsuario(authCheck.session.user.userId);
           const useCase = await obterGenerateConsolidatedInsightsUseCase(aiConfig);
           await useCase.executar();
           return {
@@ -160,7 +160,7 @@ export async function POST(request: Request) {
         rotuloLog: "Insights",
         usuarioId: authCheck.session.user.userId,
         executarOperacao: async () => {
-          const aiConfig = obterAiConfig();
+          const aiConfig = await obterAiConfigParaUsuario(authCheck.session.user.userId);
           const useCase = await obterGenerateInsightsUseCase(aiConfig);
           await useCase.executar({
             identificadorRelatorio,

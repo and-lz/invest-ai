@@ -6,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return <div className="chat-fullbleed flex min-h-0 flex-1">{children}</div>;
 }

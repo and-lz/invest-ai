@@ -23,7 +23,7 @@ export default function ChatPage() {
   const router = useRouter();
   const conversationId = params.id;
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const prevTransmitindoRef = useRef(false);
@@ -159,7 +159,7 @@ export default function ChatPage() {
   }, [closeMobileSidebar, criarNovaConversa, router]);
 
   return (
-    <div className="-m-4 sm:-m-6 lg:-m-8 flex h-[calc(100dvh-3.5rem)] overflow-hidden">
+    <div className="flex min-h-0 flex-1">
       {/* Desktop sidebar */}
       <div
         className={cn(

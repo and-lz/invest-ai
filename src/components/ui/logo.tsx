@@ -12,7 +12,7 @@ export function Logo({ className }: { className?: string }) {
       alt="Fortuna"
       width={50}
       height={50}
-      className={cn("size-[50px] shrink-0 rounded-full", className)}
+      className={cn("shrink-0 rounded-full", className)}
       aria-hidden
     />
   );

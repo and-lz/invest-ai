@@ -22,6 +22,8 @@ import {
 export interface ResultadoTarefaSucesso {
   readonly descricaoResultado: string;
   readonly urlRedirecionamento?: string;
+  /** Human-readable notification message. Falls back to descricaoResultado if not set. */
+  readonly mensagemNotificacao?: string;
 }
 
 /** Configuracao para executar uma tarefa em background */
@@ -124,7 +126,7 @@ export async function executeBackgroundTask(
       await criarNotificacaoSilenciosa(usuarioId, {
         tipo: "success",
         titulo: `${descricaoTarefa} — concluida!`,
-        descricao: resultado.descricaoResultado,
+        descricao: resultado.mensagemNotificacao ?? resultado.descricaoResultado,
         acao: resultado.urlRedirecionamento
           ? { label: "Ver resultado", url: resultado.urlRedirecionamento }
           : undefined,

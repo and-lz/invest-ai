@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi, obterAiConfig, obterGetDashboardDataUseCase } from "@/lib/container";
+import { criarProvedorAi, obterAiConfigParaUsuario, obterGetDashboardDataUseCase } from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { serializarContextoCompletoUsuario } from "@/lib/serialize-chat-context";
@@ -62,7 +62,7 @@ export async function POST(request: Request): Promise<Response> {
       partes: [{ tipo: "texto" as const, dados: mensagem.conteudo }],
     }));
 
-    const aiConfig = obterAiConfig();
+    const aiConfig = await obterAiConfigParaUsuario(verificacaoAuth.session.user.userId);
     const provedor = criarProvedorAi(aiConfig);
 
     const configBase: ConfiguracaoGeracao = {

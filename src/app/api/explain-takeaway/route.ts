@@ -1,7 +1,7 @@
 import { NextResponse, after } from "next/server";
 import { z } from "zod/v4";
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi, obterAiConfig } from "@/lib/container";
+import { criarProvedorAi, obterAiConfigParaUsuario } from "@/lib/container";
 import { cabecalhosSemCache } from "@/lib/cache-headers";
 import {
   SYSTEM_PROMPT_EXPLANATION,
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       usuarioId: userId,
       executarOperacao: async () => {
         const userPrompt = buildExplanationUserPrompt(conclusions);
-        const aiConfig = obterAiConfig();
+        const aiConfig = await obterAiConfigParaUsuario(userId);
         const provider = criarProvedorAi(aiConfig);
         const response = await provider.gerar({
           instrucaoSistema: SYSTEM_PROMPT_EXPLANATION,
@@ -79,11 +79,13 @@ export async function POST(request: Request) {
           console.error("[ExplainTakeaway] AI returned invalid JSON structure");
           return {
             descricaoResultado: JSON.stringify({ error: "invalid_format" }),
+            mensagemNotificacao: "Formato inesperado da IA",
           };
         }
 
         return {
           descricaoResultado: JSON.stringify(explanationsValidation.data),
+          mensagemNotificacao: "Conclusões explicadas com sucesso",
         };
       },
     }));
