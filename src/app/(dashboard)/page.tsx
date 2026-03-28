@@ -19,6 +19,8 @@ import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, LayoutDashboard } from "lucide-react";
+import { isAiEnabled } from "@/lib/ai-features";
+import { abrirChatComPergunta } from "@/components/ui/ai-explain-button";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -84,15 +86,40 @@ function DashboardSkeleton() {
 function EstadoVazio() {
   return (
     <Card className="flex flex-col items-center justify-center p-12">
-      <CardContent className="text-center">
-        <Upload className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-        <h3 className="mb-2 text-lg font-semibold">Nenhum relatorio encontrado</h3>
-        <p className="text-muted-foreground mb-4">
-          Faca upload do seu relatorio Inter Prime para comecar a visualizar seus investimentos.
-        </p>
-        <Link href="/reports">
-          <Button>Fazer Upload</Button>
-        </Link>
+      <CardContent className="space-y-6 text-center">
+        <div>
+          <Upload className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+          <h3 className="mb-2 text-lg font-semibold">Bem-vindo ao Fortuna!</h3>
+          <p className="text-muted-foreground">
+            Veja como seus investimentos estão indo:
+          </p>
+        </div>
+
+        <ul className="text-muted-foreground mx-auto max-w-sm space-y-1 text-left text-sm">
+          <li>✓ Patrimônio total e crescimento mensal</li>
+          <li>✓ Comparação com inflação e renda fixa</li>
+          <li>✓ Análises automáticas em linguagem simples</li>
+          {isAiEnabled() && <li>✓ Fortuna AI responde suas dúvidas sobre investimentos</li>}
+        </ul>
+
+        <div className="text-muted-foreground text-xs">
+          1. Faça upload do seu relatório → 2. Aguarde ~30s → 3. Pronto!
+        </div>
+
+        <div className="flex flex-col items-center gap-2">
+          <Link href="/reports">
+            <Button>Fazer Upload do Relatório</Button>
+          </Link>
+          {isAiEnabled() && (
+            <button
+              type="button"
+              onClick={() => abrirChatComPergunta("O que é o Fortuna e como ele pode me ajudar?")}
+              className="text-muted-foreground hover:text-foreground text-sm underline transition-colors"
+            >
+              Tem dúvidas? Pergunte à Fortuna
+            </button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
