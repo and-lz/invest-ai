@@ -1,7 +1,8 @@
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi, obterAiConfig } from "@/lib/container";
+import { criarProvedorAi, obterAiConfig, obterGetDashboardDataUseCase } from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
+import { serializarContextoCompletoUsuario } from "@/lib/serialize-chat-context";
 import { AiApiTransientError, AiApiQuotaError } from "@/domain/errors/app-errors";
 import type { MensagemAi, ConfiguracaoGeracao } from "@/domain/interfaces/ai-provider";
 
@@ -39,7 +40,22 @@ export async function POST(request: Request): Promise<Response> {
 
     const { mensagens, contextoPagina, identificadorPagina } = resultadoValidacao.data;
 
-    const instrucaoSistema = construirInstrucaoSistemaChat(identificadorPagina, contextoPagina);
+    // When no page context is provided (e.g. /chat page), load portfolio data server-side
+    let contextoFinal = contextoPagina;
+    if (!contextoFinal) {
+      try {
+        const dashboardUseCase = await obterGetDashboardDataUseCase();
+        const dadosDashboard = await dashboardUseCase.executar();
+        if (dadosDashboard) {
+          contextoFinal = serializarContextoCompletoUsuario(dadosDashboard);
+        }
+      } catch (erro) {
+        console.error("[Chat] Falha ao carregar dados do portfolio:", erro);
+        // Graceful degradation: proceed without portfolio context
+      }
+    }
+
+    const instrucaoSistema = construirInstrucaoSistemaChat(identificadorPagina, contextoFinal);
 
     const mensagensAi: MensagemAi[] = mensagens.map((mensagem) => ({
       papel: mensagem.papel === "assistente" ? ("modelo" as const) : ("usuario" as const),
