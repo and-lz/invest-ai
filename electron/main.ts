@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, shell, net as electronNet } from "electron";
 import { spawn, ChildProcess } from "child_process";
 import * as path from "path";
 import * as net from "net";
@@ -97,6 +97,32 @@ function createWindow(): void {
     },
   });
 
+  // Delegate Google OAuth to the system browser where passkeys work.
+  // When navigation targets accounts.google.com, open it externally.
+  // After auth completes, Google redirects back to localhost:3000 which
+  // lands in the user's browser. The Electron window polls for the session.
+  mainWindow.webContents.on("will-navigate", (event, url) => {
+    if (url.includes("accounts.google.com")) {
+      event.preventDefault();
+      shell.openExternal(url);
+      // Poll until the session exists (user completed login in browser)
+      pollForSession();
+    }
+  });
+
+  // Also intercept new-window requests (target="_blank" or window.open)
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (
+      url.includes("accounts.google.com") ||
+      url.includes("google.com/o/oauth2")
+    ) {
+      shell.openExternal(url);
+      pollForSession();
+      return { action: "deny" };
+    }
+    return { action: "deny" };
+  });
+
   // Show loading state while server starts
   mainWindow.loadURL(
     `data:text/html,
@@ -122,13 +148,38 @@ function createWindow(): void {
   });
 }
 
+function pollForSession(): void {
+  if (!mainWindow) return;
+
+  const interval = setInterval(async () => {
+    if (!mainWindow) {
+      clearInterval(interval);
+      return;
+    }
+    try {
+      // Check if the session endpoint returns an authenticated user
+      const response = await electronNet.fetch(`${DEV_URL}/api/auth/session`);
+      const data = await response.json();
+      if (data && typeof data === "object" && "user" in data) {
+        clearInterval(interval);
+        // Reload the app — user is now authenticated
+        mainWindow?.loadURL(DEV_URL);
+      }
+    } catch {
+      // Server not ready or request failed, keep polling
+    }
+  }, 2000);
+
+  // Stop polling after 5 minutes
+  setTimeout(() => clearInterval(interval), 5 * 60 * 1000);
+}
+
 app.whenReady().then(async () => {
   createWindow();
   startDevServer();
 
   try {
     await waitForPort(DEV_PORT);
-    // Small extra delay for Next.js to fully initialize
     await new Promise((r) => setTimeout(r, 1000));
     mainWindow?.loadURL(DEV_URL);
   } catch (err) {

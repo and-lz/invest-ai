@@ -12,11 +12,11 @@ const SuggestionsRequestSchema = z.object({
   recentMessages: z.array(z.string().max(200)).max(4).optional(),
 });
 
-const SYSTEM_PROMPT = `Voce gera sugestoes de perguntas sobre investimentos para autocomplete.
-Retorne um JSON array com exatamente 3 strings curtas (max 50 chars cada).
-Cada string deve ser uma pergunta natural em portugues brasileiro que complete ou expanda o que o usuario comecou a digitar.
+const SYSTEM_PROMPT = `Você gera sugestões de perguntas sobre investimentos para autocomplete.
+Retorne um JSON array com exatamente 3 strings curtas (máx. 50 chars cada).
+Cada string deve ser uma pergunta natural em português brasileiro que complete ou expanda o que o usuário começou a digitar.
 As perguntas devem ser relevantes para um dashboard de investimentos pessoal.
-Retorne APENAS o JSON array, sem explicacao.`;
+Retorne apenas o JSON array, sem explicação.`;
 
 export async function POST(request: Request): Promise<Response> {
   const auth = await requireAuth();
@@ -34,9 +34,9 @@ export async function POST(request: Request): Promise<Response> {
 
     const { input, recentMessages } = parsed.data;
 
-    let userPrompt = `O usuario comecou a digitar: "${input}"`;
+    let userPrompt = `O usuário começou a digitar: "${input}"`;
     if (recentMessages && recentMessages.length > 0) {
-      userPrompt += `\nUltimas mensagens da conversa: ${recentMessages.join(" | ")}`;
+      userPrompt += `\nÚltimas mensagens da conversa: ${recentMessages.join(" | ")}`;
     }
 
     const aiConfig = obterAiConfig();
