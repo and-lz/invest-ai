@@ -19,7 +19,9 @@ import { formatarMesAno } from "@/lib/format-date";
 import { typography } from "@/lib/design-system";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, LayoutDashboard } from "lucide-react";
+import { Upload, LayoutDashboard, BotIcon } from "lucide-react";
+import { formatarMoeda } from "@/domain/value-objects/money";
+import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
 import { isAiEnabled } from "@/lib/ai-features";
 import { abrirChatComPergunta } from "@/components/ui/ai-explain-button";
 import Link from "next/link";
@@ -66,6 +68,65 @@ const LiquidityLadder = dynamic(
   () => import("@/components/dashboard/liquidity-ladder").then((mod) => mod.LiquidityLadder),
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
 );
+
+function gerarTextoHeadline(
+  variacaoCentavos: number | null,
+  benchmarks: ComparacaoBenchmarks[],
+): string {
+  if (variacaoCentavos === null) {
+    return "Confira o resumo dos seus investimentos abaixo.";
+  }
+
+  const mensal = benchmarks.find((b) => b.periodo === "No mes");
+  const acimaIpca = mensal ? mensal.carteira.valor > mensal.ipca.valor : false;
+  const abaixoCdi = mensal ? mensal.carteira.valor < mensal.cdi.valor : false;
+  const absValue = formatarMoeda(Math.abs(variacaoCentavos));
+
+  if (variacaoCentavos >= 0 && acimaIpca) {
+    return `Seu patrimônio cresceu ${absValue} — acima da inflação.`;
+  }
+  if (variacaoCentavos >= 0 && abaixoCdi) {
+    return `Seu patrimônio cresceu ${absValue}. Ficou abaixo da renda fixa, mas cresceu.`;
+  }
+  if (variacaoCentavos >= 0) {
+    return `Seu patrimônio cresceu ${absValue} este mês.`;
+  }
+  if (variacaoCentavos > -500_00) {
+    return `Seu patrimônio recuou ${absValue} este mês — variações pequenas são normais.`;
+  }
+  return `Seu patrimônio recuou ${absValue}. Quer entender o que aconteceu?`;
+}
+
+function DashboardHeadline({
+  variacaoCentavos,
+  benchmarks,
+}: {
+  variacaoCentavos: number | null;
+  benchmarks: ComparacaoBenchmarks[];
+}) {
+  const texto = gerarTextoHeadline(variacaoCentavos, benchmarks);
+  const aiEnabled = isAiEnabled();
+
+  return (
+    <Card className="bg-muted/30 border-muted">
+      <CardContent className="flex flex-col items-start gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm">{texto}</p>
+        {aiEnabled && (
+          <button
+            type="button"
+            onClick={() =>
+              abrirChatComPergunta("Resuma como meus investimentos estão indo este mês.")
+            }
+            className="text-muted-foreground hover:text-foreground flex shrink-0 items-center gap-1.5 text-sm underline transition-colors"
+          >
+            <BotIcon className="h-4 w-4" />
+            Perguntar à Fortuna
+          </button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -183,6 +244,11 @@ export default function DashboardPage() {
 
       {!estaCarregando && dadosDashboard && (
         <>
+          <DashboardHeadline
+            variacaoCentavos={dadosDashboard.variacaoPatrimonialCentavos}
+            benchmarks={dadosDashboard.comparacaoBenchmarksAtual}
+          />
+
           {/* ── Resumo ── */}
           <SectionLabel>Resumo</SectionLabel>
 
