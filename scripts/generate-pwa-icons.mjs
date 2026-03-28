@@ -44,7 +44,11 @@ async function generateIcons() {
 
       const outputPath = path.join(dir, name);
 
-      await sharp(sourceBuffer).resize(size, size).png().toFile(outputPath);
+      await sharp(sourceBuffer)
+        .trim()
+        .resize(size, size)
+        .png()
+        .toFile(outputPath);
 
       console.log(`  ${name} (${size}x${size})`);
     }

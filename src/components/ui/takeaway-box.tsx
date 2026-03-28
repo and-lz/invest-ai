@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import Image from "next/image";
 import {
   CheckCircle2,
   AlertCircle,
   Info,
-  BotIcon,
   Loader2,
   RefreshCw,
   ListPlus,
@@ -346,15 +346,19 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                         className="mt-0.5 cursor-pointer rounded-sm p-0.5 transition-colors"
                         aria-label="Pedir para a Fortuna explicar"
                       >
-                        <BotIcon
+                        <Image
+                          src="/fortuna-minimal.png"
+                          alt="Fortuna"
+                          width={16}
+                          height={16}
                           className={cn(
                             icon.button,
                             "ai-icon-hover",
                             isOpen
-                              ? "text-muted-foreground"
-                              : "text-muted-foreground/60",
+                              ? "opacity-100"
+                              : "opacity-60",
                           )}
-                          aria-hidden="true"
+                          aria-hidden
                         />
                       </button>
                     </TooltipTrigger>

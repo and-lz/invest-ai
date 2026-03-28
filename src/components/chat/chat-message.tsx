@@ -48,7 +48,7 @@ export function MensagemChatBolha({
         </Avatar>
       ) : (
         <Avatar className={cn("shrink-0 border border-border/50", fs ? "h-9 w-9" : "h-8 w-8")}>
-          <AvatarImage src="/fortuna-icon.png" alt="Fortuna" />
+          <AvatarImage src="/fortuna-minimal.png" alt="Fortuna" />
           <AvatarFallback className="bg-primary/10 text-xs">F</AvatarFallback>
         </Avatar>
       )}

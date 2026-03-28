@@ -19,7 +19,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trash2, FileText, Upload, X } from "lucide-react";
+import { Trash2, FileText, Upload, X, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { notificar as notify } from "@/lib/notifier";
 import { typography, icon, layout, dialog } from "@/lib/design-system";
@@ -65,6 +65,29 @@ export default function ReportsPage() {
       }
     },
     [revalidar],
+  );
+
+  const handleRegenerar = useCallback(
+    async (identificador: string) => {
+      try {
+        const resposta = await fetch(`/api/reports/${identificador}/regenerate`, {
+          method: "POST",
+        });
+        if (resposta.ok) {
+          notify.success("Reextracao iniciada", {
+            description: "Voce sera notificado quando concluir.",
+            actionUrl: "/",
+            actionLabel: "Ver dashboard",
+          });
+        } else {
+          const dados = await resposta.json() as { erro?: string };
+          notify.error(dados.erro ?? "Falha ao iniciar reextracao");
+        }
+      } catch {
+        notify.error("Falha ao iniciar reextracao");
+      }
+    },
+    [],
   );
 
   return (
@@ -167,6 +190,15 @@ export default function ReportsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={relatorio.statusExtracao !== "concluido"}
+                            onClick={() => void handleRegenerar(relatorio.identificador)}
+                            title="Reextrair relatorio"
+                          >
+                            <RefreshCw className={icon.button} />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

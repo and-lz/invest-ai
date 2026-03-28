@@ -3,12 +3,12 @@ import { cn } from "@/lib/utils";
 
 /**
  * Brand logo mark — Fortuna goddess icon for header use.
- * Clipped to circle to hide the black background corners.
+ * Clipped to circle for consistent shape.
  */
 export function Logo({ className }: { className?: string }) {
   return (
     <Image
-      src="/fortuna-icon.png"
+      src="/fortuna-minimal.png"
       alt="Fortuna"
       width={50}
       height={50}

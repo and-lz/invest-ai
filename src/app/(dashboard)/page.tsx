@@ -17,7 +17,8 @@ import { formatarMesAno } from "@/lib/format-date";
 import { typography } from "@/lib/design-system";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, LayoutDashboard, BotIcon } from "lucide-react";
+import Image from "next/image";
+import { Upload, LayoutDashboard } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
 import { isAiEnabled } from "@/lib/ai-features";
@@ -117,7 +118,7 @@ function DashboardHeadline({
             }
             className="text-muted-foreground hover:text-foreground flex shrink-0 items-center gap-1.5 text-sm underline transition-colors"
           >
-            <BotIcon className="h-4 w-4" />
+            <Image src="/fortuna-minimal.png" alt="Fortuna" width={16} height={16} className="h-4 w-4" />
             Perguntar à Fortuna
           </button>
         )}
