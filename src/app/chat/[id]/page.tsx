@@ -174,6 +174,7 @@ export default function ChatPage() {
           onSelecionarConversa={handleSelecionarConversa}
           onNovaConversa={handleNovaConversa}
           fullscreen
+          useLinks
         />
       </div>
 

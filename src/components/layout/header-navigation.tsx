@@ -73,7 +73,7 @@ export function HeaderNavigation() {
   } = useNativeDialog();
 
   useEffect(() => {
-    import("../../../package.json").then((pkg) => setVersion(pkg.version));
+    setVersion(process.env.NEXT_PUBLIC_APP_VERSION || "");
   }, []);
 
   return (

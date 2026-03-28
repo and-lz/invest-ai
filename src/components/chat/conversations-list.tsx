@@ -12,6 +12,7 @@ interface ListaConversasProps {
   readonly onSelecionarConversa: (identificador: string) => void;
   readonly onNovaConversa: () => void;
   readonly fullscreen?: boolean;
+  readonly useLinks?: boolean;
 }
 
 export function ListaConversas({
@@ -19,6 +20,7 @@ export function ListaConversas({
   onSelecionarConversa,
   onNovaConversa,
   fullscreen,
+  useLinks,
 }: ListaConversasProps) {
   const { conversas, estaCarregando, deletarConversa } = useConversas();
   const fs = fullscreen;
@@ -62,6 +64,7 @@ export function ListaConversas({
                 onSelecionar={() => onSelecionarConversa(conversa.identificador)}
                 onDeletar={() => deletarConversa(conversa.identificador)}
                 fullscreen={fs}
+                href={useLinks ? `/chat/${conversa.identificador}` : undefined}
               />
             ))}
           </div>

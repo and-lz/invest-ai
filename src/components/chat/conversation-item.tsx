@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Trash2, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,10 +18,32 @@ interface ItemConversaProps {
   readonly onSelecionar: () => void;
   readonly onDeletar: () => void;
   readonly fullscreen?: boolean;
+  readonly href?: string;
 }
 
-export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, fullscreen }: ItemConversaProps) {
+export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, fullscreen, href }: ItemConversaProps) {
   const fs = fullscreen;
+
+  const content = (
+    <>
+      {/* Titulo */}
+      <h4 className={cn("line-clamp-1 font-medium", fs ? "text-lg" : "text-sm")}>{conversa.titulo}</h4>
+
+      {/* Preview */}
+      <p className={cn("text-muted-foreground mt-1 line-clamp-2", fs ? "text-base" : "text-xs")}>
+        {conversa.previewMensagem}
+      </p>
+
+      {/* Footer: timestamp + contagem */}
+      <div className={cn("text-muted-foreground mt-2 flex items-center gap-2", fs ? "text-sm" : "text-xs")}>
+        <MessageSquare className="h-3 w-3" />
+        <span>{conversa.contagemMensagens}</span>
+        <span>•</span>
+        <span>{formatBrazilianTimestamp(conversa.atualizadaEm)}</span>
+      </div>
+    </>
+  );
+
   return (
     <div
       className={cn(
@@ -29,23 +52,15 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, ful
         estaAtiva && "border-primary bg-muted",
       )}
     >
-      <button onClick={onSelecionar} className="w-full text-left pr-7">
-        {/* Titulo */}
-        <h4 className={cn("line-clamp-1 font-medium", fs ? "text-lg" : "text-sm")}>{conversa.titulo}</h4>
-
-        {/* Preview */}
-        <p className={cn("text-muted-foreground mt-1 line-clamp-2", fs ? "text-base" : "text-xs")}>
-          {conversa.previewMensagem}
-        </p>
-
-        {/* Footer: timestamp + contagem */}
-        <div className={cn("text-muted-foreground mt-2 flex items-center gap-2", fs ? "text-sm" : "text-xs")}>
-          <MessageSquare className="h-3 w-3" />
-          <span>{conversa.contagemMensagens}</span>
-          <span>•</span>
-          <span>{formatBrazilianTimestamp(conversa.atualizadaEm)}</span>
-        </div>
-      </button>
+      {href ? (
+        <Link href={href} className="block w-full text-left pr-7">
+          {content}
+        </Link>
+      ) : (
+        <button onClick={onSelecionar} className="w-full text-left pr-7">
+          {content}
+        </button>
+      )}
 
       {/* Botao deletar: sempre visivel em touch, hover em desktop */}
       <Button
