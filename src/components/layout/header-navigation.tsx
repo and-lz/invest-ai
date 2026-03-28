@@ -27,8 +27,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
 import { isAiEnabled } from "@/lib/ai-features";
-import packageJson from "../../../package.json";
 
 const lastCommitMessage = process.env.NEXT_PUBLIC_LAST_COMMIT_MESSAGE || "";
 
@@ -58,12 +58,17 @@ const todosItensNavegacao = [...itensNavegacaoPrincipais, ...itensNavegacaoSecun
 
 export function HeaderNavigation() {
   const pathname = usePathname();
+  const [version, setVersion] = useState("");
   const {
     dialogRef: navDialogRef,
     open: abrirNav,
     close: fecharNav,
     handleBackdropClick: handleNavBackdrop,
   } = useNativeDialog();
+
+  useEffect(() => {
+    import("../../../package.json").then((pkg) => setVersion(pkg.version));
+  }, []);
 
   return (
     <div className="sticky top-0 z-50">
@@ -98,8 +103,8 @@ export function HeaderNavigation() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="text-muted-foreground cursor-default text-xs font-normal">
-                    v{packageJson.version}
+                  <span className="text-muted-foreground cursor-default text-xs font-normal" suppressHydrationWarning>
+                    {version ? `v${version}` : ""}
                   </span>
                 </TooltipTrigger>
                 {lastCommitMessage && (
@@ -155,8 +160,8 @@ export function HeaderNavigation() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="text-muted-foreground cursor-default text-xs font-normal">
-                      v{packageJson.version}
+                    <span className="text-muted-foreground cursor-default text-xs font-normal" suppressHydrationWarning>
+                      {version ? `v${version}` : ""}
                     </span>
                   </TooltipTrigger>
                   {lastCommitMessage && (
