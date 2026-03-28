@@ -19,6 +19,7 @@ const cabecalhosSeguranca = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   env: {
     NEXT_PUBLIC_LAST_COMMIT_MESSAGE: getLastCommitMessage(),
     NEXT_PUBLIC_AI_ENABLED: process.env.NODE_ENV === "development" ? "true" : "false",
