@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   serializarContextoDashboard,
+  serializarContextoCompletoUsuario,
   serializarContextoInsights,
   serializarContextoTendencias,
   serializarContextoDesempenho,
@@ -398,6 +399,245 @@ describe("serializarContextoDashboard", () => {
     // Then
     expect(result).toContain("Periodo: 2025-01");
     expect(result).toContain("Quantidade de Relatorios: 3");
+  });
+});
+
+describe("serializarContextoCompletoUsuario", () => {
+  it("Given minimal dashboard data, When serialized, Then output contains core sections from serializarContextoDashboard", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Resumo da Carteira");
+    expect(result).toContain("## Analise Risco-Retorno");
+    expect(result).toContain("Patrimonio Total");
+    expect(result).toContain("Rentabilidade Mensal: 1,50%");
+    expect(result).toContain("Periodos Disponiveis: 2025-01");
+  });
+
+  it("Given dashboard data with empty optional sections, When serialized, Then output omits those sections", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).not.toContain("## Todas as Posicoes da Carteira");
+    expect(result).not.toContain("## Eventos Financeiros Recentes");
+    expect(result).not.toContain("## Movimentacoes Recentes");
+    expect(result).not.toContain("## Faixas de Liquidez");
+    expect(result).not.toContain("## Evolucao Patrimonial");
+    expect(result).not.toContain("## Retornos Mensais");
+    expect(result).not.toContain("## Comparacao por Periodos");
+    expect(result).not.toContain("## Rentabilidade por Categoria");
+  });
+
+  it("Given dashboard data with all positions, When serialized, Then output includes all positions section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.todasPosicoes = [
+      {
+        nomeAtivo: "Petrobras PN",
+        codigoAtivo: "PETR4",
+        estrategia: "Renda Variavel",
+        saldoAnterior: { valorEmCentavos: 4000000, moeda: "BRL" },
+        aplicacoes: { valorEmCentavos: 0, moeda: "BRL" },
+        resgates: { valorEmCentavos: 0, moeda: "BRL" },
+        eventosFinanceiros: { valorEmCentavos: 0, moeda: "BRL" },
+        saldoBruto: { valorEmCentavos: 5000000, moeda: "BRL" },
+        rentabilidadeMes: { valor: 3.5 },
+        rentabilidade12Meses: null,
+        rentabilidadeDesdeInicio: null,
+        participacaoNaCarteira: { valor: 10 },
+      },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Todas as Posicoes da Carteira");
+    expect(result).toContain("Petrobras PN (PETR4) [Renda Variavel]");
+    expect(result).toContain("rent. mes 3,50%");
+    expect(result).toContain("part. 10,00%");
+  });
+
+  it("Given dashboard data with financial events, When serialized, Then output includes events section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.eventosRecentes = [
+      {
+        tipoEvento: "Dividendo",
+        nomeAtivo: "Itau Unibanco",
+        codigoAtivo: "ITUB4",
+        valor: { valorEmCentavos: 25000, moeda: "BRL" },
+        dataEvento: "2025-01-15",
+      },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Eventos Financeiros Recentes");
+    expect(result).toContain("Dividendo: Itau Unibanco (ITUB4)");
+    expect(result).toContain("em 2025-01-15");
+  });
+
+  it("Given dashboard data with movements, When serialized, Then output includes movements section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.movimentacoes = [
+      {
+        data: "2025-01-10",
+        tipoMovimentacao: "Aplicacao",
+        nomeAtivo: "Tesouro Selic",
+        codigoAtivo: null,
+        valor: { valorEmCentavos: 1000000, moeda: "BRL" },
+        descricao: null,
+      },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Movimentacoes Recentes");
+    expect(result).toContain("2025-01-10 Aplicacao: Tesouro Selic (s/c)");
+  });
+
+  it("Given dashboard data with liquidity bands, When serialized, Then output includes liquidity section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.faixasLiquidez = [
+      {
+        descricaoPeriodo: "0 a 1",
+        diasMinimo: 0,
+        diasMaximo: 1,
+        percentualDaCarteira: { valor: 20 },
+        valor: { valorEmCentavos: 20000000, moeda: "BRL" },
+        valorAcumulado: { valorEmCentavos: 20000000, moeda: "BRL" },
+        percentualAcumulado: { valor: 20 },
+      },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Faixas de Liquidez");
+    expect(result).toContain("0 a 1 dias: 20,00%");
+    expect(result).toContain("acumulado 20,00%");
+  });
+
+  it("Given dashboard data with wealth evolution, When serialized, Then output includes evolution section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.evolucaoPatrimonial = [
+      { mesAno: "2024-12", patrimonioTotalCentavos: 95000000, totalAportadoCentavos: 80000000 },
+      { mesAno: "2025-01", patrimonioTotalCentavos: 100000000, totalAportadoCentavos: 80000000 },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Evolucao Patrimonial");
+    expect(result).toContain("2024-12");
+    expect(result).toContain("2025-01");
+  });
+
+  it("Given dashboard data with monthly returns, When serialized, Then output includes returns section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.retornosMensais = [
+      {
+        ano: 2025,
+        meses: [
+          { mes: 1, rentabilidadeCarteira: { valor: 1.5 }, percentualDoCDI: { valor: 120 } },
+          { mes: 2, rentabilidadeCarteira: null, percentualDoCDI: null },
+        ],
+        rentabilidadeAnual: { valor: 1.5 },
+        rentabilidadeAcumulada: null,
+      },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Retornos Mensais");
+    expect(result).toContain("2025: M1:1,50%");
+    expect(result).toContain("Anual: 1,50%");
+  });
+
+  it("Given dashboard data with period comparisons, When serialized, Then output includes periods section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.comparacaoPeriodos = [
+      {
+        periodo: "03 meses",
+        rentabilidadeCarteira: { valor: 4.5 },
+        rentabilidadeCDI: { valor: 3.2 },
+        percentualDoCDI: { valor: 140 },
+        volatilidade: { valor: 2.1 },
+      },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Comparacao por Periodos");
+    expect(result).toContain("03 meses: Carteira 4,50%, CDI 3,20%, %CDI 140,00%, Vol 2,10%");
+  });
+
+  it("Given dashboard data with category performance, When serialized, Then output includes category section", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.rentabilidadePorCategoria = [
+      { nomeCategoria: "Renda Variavel", rentabilidade12Meses: { valor: 18.5 } },
+    ];
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("## Rentabilidade por Categoria (12 meses)");
+    expect(result).toContain("Renda Variavel: 18,50%");
+  });
+
+  it("Given dashboard data with aplicacoes/resgates, When serialized, Then output includes flow lines", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+    dados.resumoAtual.aplicacoesNoMes = { valorEmCentavos: 500000, moeda: "BRL" };
+    dados.resumoAtual.resgatesNoMes = { valorEmCentavos: 200000, moeda: "BRL" };
+    dados.resumoAtual.eventosFinanceirosNoMes = { valorEmCentavos: 15000, moeda: "BRL" };
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).toContain("Aplicacoes no Mes");
+    expect(result).toContain("Resgates no Mes");
+    expect(result).toContain("Eventos Financeiros no Mes");
+  });
+
+  it("Given dashboard data with zero aplicacoes/resgates, When serialized, Then output omits flow lines", () => {
+    // Given
+    const dados = criarDashboardDataMinima();
+
+    // When
+    const result = serializarContextoCompletoUsuario(dados);
+
+    // Then
+    expect(result).not.toContain("Aplicacoes no Mes");
+    expect(result).not.toContain("Resgates no Mes");
+    expect(result).not.toContain("Eventos Financeiros no Mes:");
   });
 });
 
