@@ -32,6 +32,7 @@ import type { PlanoAcaoRepository } from "@/domain/interfaces/action-plan-reposi
 import type { UserSettingsRepository } from "@/domain/interfaces/user-settings-repository";
 import { GeminiProvedorAi } from "@/infrastructure/ai/gemini-ai-provider";
 import { AnthropicProvedorAi } from "@/infrastructure/ai/anthropic-ai-provider";
+import { FallbackProvedorAi } from "@/infrastructure/ai/fallback-ai-provider";
 import { resolveModelId, resolveClaudeModelId, DEFAULT_AI_PROVIDER, DEFAULT_CLAUDE_MODEL_TIER } from "@/lib/model-tiers";
 import type { AiProvider } from "@/lib/model-tiers";
 import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
@@ -83,12 +84,31 @@ function obterGoogleApiKey(): string {
   return apiKey;
 }
 
-export function criarProvedorAi(config: AiConfig): ProvedorAi {
+function criarProvedorAiDireto(config: AiConfig): ProvedorAi {
   if (config.provider === "claude-proxy") {
     const proxyUrl = process.env.CLAUDE_PROXY_URL ?? "http://localhost:3099";
     return new AnthropicProvedorAi(proxyUrl, config.modelId);
   }
   return new GeminiProvedorAi(obterGoogleApiKey(), config.modelId);
+}
+
+/**
+ * Creates the AI provider for the given config.
+ * When Claude is primary and a Gemini API key is available,
+ * wraps with FallbackProvedorAi for automatic failover.
+ */
+export function criarProvedorAi(config: AiConfig): ProvedorAi {
+  const primary = criarProvedorAiDireto(config);
+
+  if (config.provider === "claude-proxy" && process.env.GOOGLE_API_KEY) {
+    const fallback = new GeminiProvedorAi(
+      process.env.GOOGLE_API_KEY,
+      resolveModelId(undefined),
+    );
+    return new FallbackProvedorAi(primary, fallback);
+  }
+
+  return primary;
 }
 
 function criarServicoExtracao(config: AiConfig): ExtractionService {
@@ -125,7 +145,7 @@ export async function resolverConfiguracaoAiDoUsuario(userId: string): Promise<A
 
     return { provider: "gemini", modelId: resolveModelId(settings?.modelTier) };
   } catch {
-    return { provider: "gemini", modelId: resolveModelId(undefined) };
+    return { provider: DEFAULT_AI_PROVIDER, modelId: DEFAULT_AI_PROVIDER === "claude-proxy" ? resolveClaudeModelId(undefined) : resolveModelId(undefined) };
   }
 }
 
