@@ -7,6 +7,7 @@ import { UpdateClaudeModelTierUseCase } from "@/application/use-cases/update-cla
 import { AiTextPdfExtractionService } from "@/infrastructure/services/ai-text-pdf-extraction-service";
 import { AiInsightsService } from "@/infrastructure/services/ai-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
+import { RegenerateReportUseCase } from "@/application/use-cases/regenerate-report";
 import { ListReportsUseCase } from "@/application/use-cases/list-reports";
 import { GetReportDetailUseCase } from "@/application/use-cases/get-report-detail";
 import { GetDashboardDataUseCase } from "@/application/use-cases/get-dashboard-data";
@@ -104,6 +105,11 @@ function criarServicoInsights(config: AiConfig): InsightsService {
 export async function obterUploadReportUseCase(config: AiConfig) {
   const repository = await criarRepositorio();
   return new UploadReportUseCase(repository, criarServicoExtracao(config));
+}
+
+export async function obterRegenerateReportUseCase(config: AiConfig) {
+  const repository = await criarRepositorio();
+  return new RegenerateReportUseCase(repository, criarServicoExtracao(config));
 }
 
 export async function obterListReportsUseCase() {
