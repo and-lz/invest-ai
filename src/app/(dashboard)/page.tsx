@@ -11,8 +11,6 @@ import { FinancialEventsList } from "@/components/dashboard/financial-events-lis
 import { PeriodSelector } from "@/components/dashboard/period-selector";
 import { MonthlyReturnsHeatmap } from "@/components/dashboard/monthly-returns-heatmap";
 import { RiskConsistencyCard } from "@/components/dashboard/risk-consistency-card";
-import { AllPositionsTable } from "@/components/dashboard/all-positions-table";
-import { TransactionsTable } from "@/components/dashboard/transactions-table";
 import { PeriodComparisonDetail } from "@/components/dashboard/period-comparison-detail";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import { formatarMesAno } from "@/lib/format-date";
@@ -296,13 +294,22 @@ export default function DashboardPage() {
             />
           </div>
 
-          <AllPositionsTable posicoes={dadosDashboard.todasPosicoes} />
-
-          <StrategyGainsTable ganhos={dadosDashboard.ganhosPorEstrategia} />
-
           <div className="grid gap-6 lg:grid-cols-2">
+            <StrategyGainsTable ganhos={dadosDashboard.ganhosPorEstrategia} />
             <FinancialEventsList eventos={dadosDashboard.eventosRecentes} />
-            <TransactionsTable movimentacoes={dadosDashboard.movimentacoes} />
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link href="/desempenho">
+              <Button variant="outline" size="sm">
+                Ver todas as posições →
+              </Button>
+            </Link>
+            <Link href="/reports">
+              <Button variant="outline" size="sm">
+                Ver movimentações →
+              </Button>
+            </Link>
           </div>
         </>
       )}
