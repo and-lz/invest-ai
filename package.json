@@ -1,11 +1,11 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.148",
+  "version": "0.1.149",
   "private": true,
   "main": "electron/dist/main.js",
   "scripts": {
-    "dev": "concurrently --kill-others -n next,proxy -c blue,magenta \"next dev --turbopack\" \"npx tsx scripts/claude-proxy.ts\"",
-    "dev:resilient": "bash scripts/dev-resilient.sh",
+    "dev": "bash scripts/dev-resilient.sh",
+    "dev:raw": "concurrently --kill-others -n next,proxy -c blue,magenta \"next dev --turbopack\" \"npx tsx scripts/claude-proxy.ts\"",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -23,8 +23,8 @@
     "prepare": "husky",
     "desktop:build-main": "tsc -p electron/tsconfig.json",
     "desktop:build-proxy": "tsc --target ES2020 --module commonjs --esModuleInterop --strict --skipLibCheck --outDir electron/dist scripts/claude-proxy.ts",
-    "desktop": "npm run desktop:build-main && ELECTRON_RUN_AS_NODE= npx electron .",
-    "desktop:package": "npm run desktop:build-main && electron-builder --mac"
+    "desktop": "npm run desktop:build-main && npm run desktop:build-proxy && ELECTRON_RUN_AS_NODE= npx electron .",
+    "desktop:package": "npm run build && npm run desktop:build-main && npm run desktop:build-proxy && electron-builder --mac"
   },
   "build": {
     "appId": "com.investimentos.app",
@@ -36,6 +36,37 @@
     "files": [
       "electron/dist/**/*",
       "electron/icons/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": ".next/static",
+        "to": "standalone/.next/static",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "public",
+        "to": "standalone/public",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "electron/dist/claude-proxy.js",
+        "to": "claude-proxy.js"
+      },
+      {
+        "from": ".env.local",
+        "to": ".env.local"
+      }
     ],
     "directories": {
       "output": "electron-dist"
