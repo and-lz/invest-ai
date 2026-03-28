@@ -6,28 +6,28 @@ import { RelatorioExtraidoSchema } from "@/schemas/report-extraction.schema";
 // Fonte unica de verdade para instrucoes de extracao.
 // ============================================================
 
-export const SYSTEM_PROMPT_EXTRACAO = `Voce e um especialista em analise de relatorios financeiros de investimentos brasileiros.
+export const SYSTEM_PROMPT_EXTRACAO = `Você é um especialista em análise de relatórios financeiros de investimentos brasileiros.
 
-Sua tarefa e extrair TODOS os dados estruturados do relatorio consolidado de rentabilidade do Inter Prime.
+Sua tarefa é extrair todos os dados estruturados do relatório consolidado de rentabilidade do Inter Prime.
 
-INSTRUCOES IMPORTANTES:
-1. Extraia TODOS os valores numericos com precisao. Valores monetarios devem ser convertidos para centavos (inteiros). Ex: R$ 415.332,91 = 41533291
-2. Percentuais devem ser numeros decimais. Ex: 14,56% = 14.56
-3. Para o campo mesReferencia, identifique o mes/ano de referencia do relatorio no formato YYYY-MM
-4. Extraia TODOS os ativos listados na posicao detalhada, nao pule nenhum
+INSTRUÇÕES:
+1. Extraia todos os valores numéricos com precisão. Valores monetários devem ser convertidos para centavos (inteiros). Ex: R$ 415.332,91 = 41533291
+2. Percentuais devem ser números decimais. Ex: 14,56% = 14.56
+3. Para o campo mesReferencia, identifique o mês/ano de referência do relatório no formato YYYY-MM
+4. Extraia todos os ativos listados na posição detalhada, não pule nenhum
 5. Para eventos financeiros (dividendos, JCP), extraia cada um individualmente
-6. Se um campo nao existir no relatorio, use null
-7. Mantenha a precisao dos nomes de ativos e codigos exatamente como aparecem no relatorio
-8. Para a evolucao de alocacao, extraia os dados dos ultimos meses mostrados no grafico
-9. Para rentabilidades mensais, extraia a tabela completa com todos os anos e meses disponiveis
-10. Categorize as estrategias exatamente como aparecem: Liquidez, Pos-fixado, Inflacao, Multimercado, Alternativos, Renda Variavel, Global, Fundos Listados, Outros
-11. Para movimentacoes, extraia cada transacao individual com data, tipo, ativo e valor
-12. Moeda padrao e BRL
+6. Se um campo não existir no relatório, use null
+7. Mantenha a precisão dos nomes de ativos e códigos exatamente como aparecem no relatório
+8. Para a evolução de alocação, extraia os dados dos últimos meses mostrados no gráfico
+9. Para rentabilidades mensais, extraia a tabela completa com todos os anos e meses disponíveis
+10. Categorize as estratégias exatamente como aparecem: Liquidez, Pós-fixado, Inflação, Multimercado, Alternativos, Renda Variável, Global, Fundos Listados, Outros
+11. Para movimentações, extraia cada transação individual com data, tipo, ativo e valor
+12. Moeda padrão é BRL
 
 Retorne os dados no formato JSON seguindo exatamente o schema fornecido.`;
 
 export const INSTRUCAO_USUARIO_EXTRACAO =
-  "Extraia todos os dados estruturados deste relatorio consolidado de rentabilidade de investimentos. Retorne APENAS o JSON valido, sem texto adicional. Siga o schema com extrema precisao.";
+  "Extraia todos os dados estruturados deste relatório consolidado de rentabilidade de investimentos. Retorne apenas o JSON válido, sem texto adicional. Siga o schema com extrema precisão.";
 
 export function gerarPromptCompletoParaExtracaoManual(): string {
   const jsonSchema = toJSONSchema(RelatorioExtraidoSchema);
