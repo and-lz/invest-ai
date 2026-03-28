@@ -1,71 +1,18 @@
-import {
-  app,
-  Tray,
-  Menu,
-  nativeImage,
-  shell,
-  Notification,
-  MenuItemConstructorOptions,
-} from "electron";
+import { app, BrowserWindow } from "electron";
 import { spawn, ChildProcess } from "child_process";
 import * as path from "path";
 import * as net from "net";
 
-const PROJECT_ROOT = path.resolve(__dirname, "..");
+const PROJECT_ROOT = path.resolve(__dirname, "..", "..");
 const DEV_PORT = 3000;
 const DEV_URL = `http://localhost:${DEV_PORT}`;
 
-type ServerState = "idle" | "starting" | "running" | "stopped";
-
-let tray: Tray | null = null;
+let mainWindow: BrowserWindow | null = null;
 let serverProcess: ChildProcess | null = null;
-let serverState: ServerState = "idle";
-
-function getIconPath(): string {
-  return path.join(__dirname, "..", "electron", "icons", "trayTemplate.png");
-}
-
-function getTrayTitle(): string {
-  switch (serverState) {
-    case "idle":
-      return "Invest AI";
-    case "starting":
-      return "Invest AI (starting...)";
-    case "running":
-      return "Invest AI (running)";
-    case "stopped":
-      return "Invest AI (stopped)";
-  }
-}
-
-function isPortInUse(port: number): Promise<boolean> {
-  return new Promise((resolve) => {
-    const socket = new net.Socket();
-    socket.setTimeout(1000);
-    socket.once("connect", () => {
-      socket.destroy();
-      resolve(true);
-    });
-    socket.once("timeout", () => {
-      socket.destroy();
-      resolve(false);
-    });
-    socket.once("error", () => {
-      resolve(false);
-    });
-    socket.connect(port, "127.0.0.1");
-  });
-}
-
-function showNotification(title: string, body: string): void {
-  new Notification({ title, body }).show();
-}
 
 function killServerProcess(): void {
   if (!serverProcess || serverProcess.pid === undefined) return;
-
   try {
-    // Kill the entire process group (negative PID)
     process.kill(-serverProcess.pid, "SIGTERM");
   } catch {
     try {
@@ -74,26 +21,43 @@ function killServerProcess(): void {
       // Process already dead
     }
   }
-
   serverProcess = null;
 }
 
-async function startServer(): Promise<void> {
-  if (serverState === "running" || serverState === "starting") return;
+function waitForPort(port: number, timeout = 60000): Promise<void> {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      const socket = new net.Socket();
+      socket.setTimeout(500);
+      socket.once("connect", () => {
+        socket.destroy();
+        resolve();
+      });
+      socket.once("error", () => {
+        socket.destroy();
+        if (Date.now() - start > timeout) {
+          reject(new Error(`Port ${port} not ready after ${timeout}ms`));
+        } else {
+          setTimeout(check, 500);
+        }
+      });
+      socket.once("timeout", () => {
+        socket.destroy();
+        if (Date.now() - start > timeout) {
+          reject(new Error(`Port ${port} not ready after ${timeout}ms`));
+        } else {
+          setTimeout(check, 500);
+        }
+      });
+      socket.connect(port, "127.0.0.1");
+    };
+    check();
+  });
+}
 
-  const portInUse = await isPortInUse(DEV_PORT);
-  if (portInUse) {
-    showNotification(
-      "Port already in use",
-      `Port ${DEV_PORT} is already in use. Stop the existing server first.`
-    );
-    return;
-  }
-
-  serverState = "starting";
-  updateTrayMenu();
-
-  serverProcess = spawn("npm", ["run", "dev"], {
+function startDevServer(): void {
+  serverProcess = spawn("npx", ["next", "dev", "--turbopack"], {
     cwd: PROJECT_ROOT,
     shell: true,
     detached: true,
@@ -101,112 +65,99 @@ async function startServer(): Promise<void> {
     env: { ...process.env },
   });
 
-  // Detect when the server is ready by watching stdout for the Next.js ready message
   serverProcess.stdout?.on("data", (data: Buffer) => {
-    const output = data.toString();
-    if (
-      output.includes("Ready in") ||
-      output.includes(`localhost:${DEV_PORT}`)
-    ) {
-      serverState = "running";
-      updateTrayMenu();
-      showNotification("Server started", `Dev server running at ${DEV_URL}`);
-    }
+    process.stdout.write(`[dev] ${data}`);
   });
 
   serverProcess.stderr?.on("data", (data: Buffer) => {
-    // Log stderr but don't treat compilation warnings as crashes
-    const output = data.toString();
-    if (output.includes("Error") && !output.includes("Warning")) {
-      console.error("[dev-server]", output);
-    }
+    process.stderr.write(`[dev] ${data}`);
   });
 
   serverProcess.on("exit", (code) => {
-    if (serverState === "running" || serverState === "starting") {
-      serverState = "stopped";
-      updateTrayMenu();
-      if (code !== 0 && code !== null) {
-        showNotification(
-          "Server crashed",
-          `Dev server exited with code ${code}`
-        );
-      }
-    }
+    console.log(`[dev] Server exited with code ${code}`);
     serverProcess = null;
   });
 }
 
-function stopServer(): void {
-  if (serverState !== "running" && serverState !== "starting") return;
+function createWindow(): void {
+  const iconPath = path.join(__dirname, "..", "icons", "icon.png");
 
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 900,
+    minWidth: 800,
+    minHeight: 600,
+    title: "Investimentos",
+    icon: iconPath,
+    titleBarStyle: "hiddenInset",
+    trafficLightPosition: { x: 16, y: 16 },
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  // Show loading state while server starts
+  mainWindow.loadURL(
+    `data:text/html,
+    <html>
+      <head><style>
+        body { margin:0; display:flex; align-items:center; justify-content:center;
+               height:100vh; background:#0d0c14; color:#fff; font-family:system-ui; }
+        .loader { text-align:center; }
+        .spinner { width:40px; height:40px; border:3px solid #333;
+                   border-top-color:#fff; border-radius:50%;
+                   animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+      </style></head>
+      <body><div class="loader">
+        <div class="spinner"></div>
+        <div>Starting dev server...</div>
+      </div></body>
+    </html>`
+  );
+
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+  });
+}
+
+app.whenReady().then(async () => {
+  createWindow();
+  startDevServer();
+
+  try {
+    await waitForPort(DEV_PORT);
+    // Small extra delay for Next.js to fully initialize
+    await new Promise((r) => setTimeout(r, 1000));
+    mainWindow?.loadURL(DEV_URL);
+  } catch (err) {
+    console.error("[electron] Server failed to start:", err);
+    mainWindow?.loadURL(
+      `data:text/html,
+      <html><body style="margin:0;display:flex;align-items:center;justify-content:center;
+        height:100vh;background:#0d0c14;color:#fff;font-family:system-ui;">
+        <div style="text-align:center;">
+          <div style="font-size:24px;margin-bottom:8px;">Failed to start server</div>
+          <div style="color:#888;">Check the terminal for errors</div>
+        </div>
+      </body></html>`
+    );
+  }
+});
+
+app.on("window-all-closed", () => {
   killServerProcess();
-  serverState = "idle";
-  updateTrayMenu();
-  showNotification("Server stopped", "Dev server has been stopped");
-}
-
-function buildContextMenu(): Menu {
-  const isRunning =
-    serverState === "running" || serverState === "starting";
-
-  const template: MenuItemConstructorOptions[] = [
-    {
-      label: getTrayTitle(),
-      enabled: false,
-    },
-    { type: "separator" },
-    {
-      label: "Start Server",
-      enabled: !isRunning,
-      click: () => startServer(),
-    },
-    {
-      label: "Stop Server",
-      enabled: isRunning,
-      click: () => stopServer(),
-    },
-    { type: "separator" },
-    {
-      label: "Open in Browser",
-      enabled: serverState === "running",
-      click: () => shell.openExternal(DEV_URL),
-    },
-    { type: "separator" },
-    {
-      label: "Quit",
-      click: () => {
-        killServerProcess();
-        app.quit();
-      },
-    },
-  ];
-
-  return Menu.buildFromTemplate(template);
-}
-
-function updateTrayMenu(): void {
-  if (!tray) return;
-  tray.setToolTip(getTrayTitle());
-  tray.setContextMenu(buildContextMenu());
-}
-
-app.whenReady().then(() => {
-  app.dock?.hide();
-
-  const icon = nativeImage.createFromPath(getIconPath());
-  icon.setTemplateImage(true);
-
-  tray = new Tray(icon);
-  tray.setToolTip(getTrayTitle());
-  tray.setContextMenu(buildContextMenu());
+  app.quit();
 });
 
 app.on("before-quit", () => {
   killServerProcess();
 });
 
-// Prevent app from quitting when all windows are closed (we have no windows)
-app.on("window-all-closed", () => {
-  // Do nothing — keep the app running (tray only, no windows)
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+    mainWindow!.loadURL(DEV_URL);
+  }
 });
