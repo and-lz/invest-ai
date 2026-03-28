@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import Image from "next/image";
+import { BotIcon } from "lucide-react";
 import { MensagemChatBolha } from "@/components/chat/chat-message";
 import { CampoEntradaChat } from "@/components/chat/chat-input-field";
 import { SuggestionChips } from "@/components/chat/suggestion-chips";
@@ -68,7 +68,7 @@ export function ChatBody({
             "flex h-full flex-col items-center justify-center text-center",
             fs ? "mx-auto max-w-4xl gap-6" : "gap-4",
           )}>
-            <Image src="/fortuna-icon.png" alt="Fortuna" width={64} height={64} className={cn("rounded-full", fs ? "h-12 w-12" : "h-10 w-10")} />
+            <BotIcon className={cn("text-muted-foreground", fs ? "h-12 w-12" : "h-10 w-10")} />
             <div>
               <p className={cn("text-muted-foreground", fs ? "text-base" : "text-sm")}>
                 Pergunte sobre seus investimentos.

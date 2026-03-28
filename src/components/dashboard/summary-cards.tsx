@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatSimplePercentage } from "@/domain/value-objects/percentage";
-import { formatBrazilianDate } from "@/lib/format-date";
+import { formatarMesAno } from "@/lib/format-date";
 import { typography, icon, layout, valueColor } from "@/lib/design-system";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import {
@@ -32,6 +32,7 @@ interface SummaryCardsProps {
 
 export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCardsProps) {
   const variacaoPositiva = variacaoPatrimonialCentavos !== null && variacaoPatrimonialCentavos >= 0;
+  const anoAtual = new Date().getFullYear();
 
   return (
     <div className={layout.gridCards}>
@@ -69,6 +70,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
               />
             </p>
           )}
+          <p className={typography.helper}>Quanto vale tudo junto</p>
         </CardContent>
       </Card>
 
@@ -94,6 +96,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
               tamanhoIcone="h-3 w-3"
             />
           </p>
+          <p className={typography.helper}>Quanto seu dinheiro rendeu este mes</p>
         </CardContent>
       </Card>
 
@@ -101,7 +104,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className={cn("flex items-center gap-1", typography.label)}>
             <Percent className={cn(icon.cardTitle, "text-muted-foreground")} aria-hidden="true" />
-            Rentabilidade Anual
+            Rentabilidade em {anoAtual}
             <InfoTooltip conteudo={GLOSSARY_RENTABILIDADE_ANUAL.explicacao} />
           </CardTitle>
         </CardHeader>
@@ -114,6 +117,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
               {formatSimplePercentage(resumo.rentabilidadeAnoAnterior.valor)} no ano anterior
             </p>
           )}
+          <p className={typography.helper}>Crescimento no ano ate agora</p>
         </CardContent>
       </Card>
 
@@ -124,7 +128,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
               className={cn(icon.cardTitle, "text-muted-foreground")}
               aria-hidden="true"
             />
-            Desde o Inicio
+            Desde {formatarMesAno(resumo.dataInicioCarteira.slice(0, 7), "abreviado")}
             <InfoTooltip conteudo={GLOSSARY_DESDE_INICIO.explicacao} />
           </CardTitle>
         </CardHeader>
@@ -132,9 +136,7 @@ export function SummaryCards({ resumo, variacaoPatrimonialCentavos }: SummaryCar
           <div className={typography.mainValue}>
             {formatSimplePercentage(resumo.rentabilidadeDesdeInicio.valor)}
           </div>
-          <p className={typography.helper}>
-            Desde {formatBrazilianDate(resumo.dataInicioCarteira)}
-          </p>
+          <p className={typography.helper}>Resultado total desde o comeco</p>
         </CardContent>
       </Card>
     </div>
