@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { serializarContextoDashboard } from "@/lib/serialize-chat-context";
-import { Header } from "@/components/layout/header";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { TopPerformersTable } from "@/components/dashboard/top-performers-table";
 import { StrategyGainsTable } from "@/components/dashboard/strategy-gains-table";
@@ -16,6 +15,8 @@ import { AllPositionsTable } from "@/components/dashboard/all-positions-table";
 import { TransactionsTable } from "@/components/dashboard/transactions-table";
 import { PeriodComparisonDetail } from "@/components/dashboard/period-comparison-detail";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
+import { formatarMesAno } from "@/lib/format-date";
+import { typography } from "@/lib/design-system";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, LayoutDashboard } from "lucide-react";
@@ -144,10 +145,17 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <LayoutDashboard className="text-muted-foreground h-6 w-6" aria-hidden="true" />
-          <Header titulo="Dashboard" descricao="Visao geral dos seus investimentos" />
+          <h1 className={typography.h1}>
+            Dashboard
+            {dadosDashboard && (
+              <span className="text-muted-foreground ml-2 text-base font-normal">
+                · {formatarMesAno(periodoSelecionado ?? dadosDashboard.mesAtual, "extenso")}
+              </span>
+            )}
+          </h1>
         </div>
         {dadosDashboard && dadosDashboard.periodosDisponiveis.length > 0 && (
           <PeriodSelector
