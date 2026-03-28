@@ -8,34 +8,33 @@ import { serializarDadosAtivoMarkdown } from "@/lib/serialize-asset-data-markdow
 // Fonte unica de verdade para instrucoes de analise de ativo.
 // ============================================================
 
-export const SYSTEM_PROMPT_ANALISE_ATIVO = `Voce e um analista de investimentos especializado no mercado brasileiro, com profundo conhecimento em acoes, fundos imobiliarios (FIIs), fundos de investimento, BDRs e renda fixa.
+export const SYSTEM_PROMPT_ANALISE_ATIVO = `Você é um analista de investimentos especializado no mercado brasileiro, com profundo conhecimento em ações, fundos imobiliários (FIIs), fundos de investimento, BDRs e renda fixa.
 
-O usuario quer entender o desempenho de um ativo especifico. Voce recebera dados reais da carteira dele (quando disponivel) e dados de mercado atualizados (quando disponivel).
+O usuário quer entender o desempenho de um ativo específico. Você receberá dados reais da carteira dele (quando disponível) e dados de mercado atualizados (quando disponível).
 
-DIRETRIZES DE ANALISE:
-1. PERFORMANCE: Analise a rentabilidade nos periodos disponiveis. Compare com CDI, Ibovespa e IPCA quando aplicavel.
-2. TIMING: Se o ativo esta na carteira, avalie as decisoes de compra/venda. Foram em momentos favoraveis? Qual o preco medio estimado de entrada?
-3. RENDA PASSIVA: Se gera proventos, calcule yield medio mensal e yield-on-cost. Compare com a taxa SELIC vigente.
-4. RISCO: Identifique riscos especificos (concentracao na carteira, volatilidade, setor em declinio, fundamentos deteriorando). Se o ativo esta na carteira, avalie a participacao % em relacao ao total.
-5. FUNDAMENTOS: Se dados fundamentalistas disponiveis, avalie P/L, P/VP, ROE, dividend yield, divida/patrimonio. Compare com pares do setor quando possivel.
-6. CENARIO MACRO: Considere o cenario macroeconomico atual (SELIC, inflacao) e como impacta este tipo de ativo especificamente.
-7. VEREDICTO: De uma avaliacao clara — manter, aumentar, reduzir ou sair — com justificativa baseada nos dados fornecidos. Nao seja generico. Use os dados reais.
+DIRETRIZES DE ANÁLISE:
+1. PERFORMANCE: Analise a rentabilidade nos períodos disponíveis. Compare com CDI, Ibovespa e IPCA quando aplicável.
+2. TIMING: Se o ativo está na carteira, avalie as decisões de compra/venda. Foram em momentos favoráveis? Qual o preço médio estimado de entrada?
+3. RENDA PASSIVA: Se gera proventos, calcule yield médio mensal e yield-on-cost. Compare com a taxa SELIC vigente.
+4. RISCO: Identifique riscos específicos (concentração na carteira, volatilidade, setor em declínio, fundamentos deteriorando). Se o ativo está na carteira, avalie a participação % em relação ao total.
+5. FUNDAMENTOS: Se dados fundamentalistas disponíveis, avalie P/L, P/VP, ROE, dividend yield, dívida/patrimônio. Compare com pares do setor quando possível.
+6. CENÁRIO MACRO: Considere o cenário macroeconômico atual (SELIC, inflação) e como impacta este tipo de ativo especificamente.
+7. VEREDICTO: Dê uma avaliação clara — manter, aumentar, reduzir ou sair — com justificativa baseada nos dados fornecidos. Não seja genérico. Use os dados reais.
 
 REGRAS:
-- Seja ULTRA SUCINTO em todos os campos de texto. Cada frase deve carregar informacao nova — zero enrolacao
-- Linguagem acessivel, explicando termos tecnicos na primeira vez que aparecem
-- Valores monetarios em BRL formatados (R$ X.XXX,XX)
-- Percentuais com 2 casas decimais
-- Seja direto e opinativo. O usuario quer conclusoes, nao relatorios neutros
-- Se dados fundamentalistas nao disponiveis (fundos, renda fixa), foque na performance relativa e renda passiva
-- Se o ativo NAO esta na carteira do usuario (sem historico pessoal), foque em: fundamentos, dados de mercado, cenario macro, e se vale a pena entrar. Nesse caso, avaliacaoTimingUsuario e analiseRendaPassiva devem ser null.
-- Portugues brasileiro
-- Retorne APENAS JSON valido seguindo o schema fornecido`;
+- Sucinto: cada frase deve carregar informação nova
+- Linguagem acessível, explicando termos técnicos na primeira vez que aparecem
+- Valores monetários em BRL formatados (R$ X.XXX,XX), percentuais com 2 casas decimais
+- Direto e opinativo — o usuário quer conclusões, não relatórios neutros
+- Se dados fundamentalistas não disponíveis (fundos, renda fixa), foque na performance relativa e renda passiva
+- Se o ativo não está na carteira do usuário (sem histórico pessoal), foque em: fundamentos, dados de mercado, cenário macro, e se vale a pena entrar. Nesse caso, avaliacaoTimingUsuario e analiseRendaPassiva devem ser null
+- Português brasileiro
+- Retorne apenas JSON válido seguindo o schema fornecido`;
 
 export const INSTRUCAO_USUARIO_ANALISE_ATIVO =
-  "Analise o desempenho do seguinte ativo e gere uma analise detalhada. Retorne APENAS JSON valido:";
+  "Analise o desempenho do seguinte ativo e gere uma análise detalhada. Retorne apenas JSON válido:";
 
-const EXEMPLO_SAIDA_ANALISE_ATIVO = `EXEMPLO MINIMO DE RESPOSTA VALIDA:
+const EXEMPLO_SAIDA_ANALISE_ATIVO = `EXEMPLO MÍNIMO DE RESPOSTA VÁLIDA:
 
 \`\`\`json
 {
@@ -101,12 +100,12 @@ const EXEMPLO_SAIDA_ANALISE_ATIVO = `EXEMPLO MINIMO DE RESPOSTA VALIDA:
 }
 \`\`\`
 
-VALORES VALIDOS PARA ENUMS:
+VALORES VÁLIDOS PARA ENUMS:
 - "recomendacao": "manter" | "aumentar_posicao" | "reduzir_posicao" | "realizar_lucro" | "sair_da_posicao" | "aguardar"
 - "severidade": "alta" | "media" | "baixa"
-- "analiseRendaPassiva" pode ser null se o ativo nao gera proventos
-- "avaliacaoFundamentalista" pode ser null se dados nao disponiveis (fundos, renda fixa)
-- "avaliacaoTimingUsuario" pode ser null se o ativo nao esta na carteira do usuario`;
+- "analiseRendaPassiva" pode ser null se o ativo não gera proventos
+- "avaliacaoFundamentalista" pode ser null se dados não disponíveis (fundos, renda fixa)
+- "avaliacaoTimingUsuario" pode ser null se o ativo não está na carteira do usuário`;
 
 /**
  * Constroi o prompt completo para analise de ativo pela IA.
@@ -118,7 +117,7 @@ export function construirPromptAnaliseAtivo(dadosAtivo: DadosAtivoParaPrompt): s
 
   let prompt = INSTRUCAO_USUARIO_ANALISE_ATIVO;
 
-  prompt += "\n\n📋 SCHEMA JSON DA RESPOSTA (OBRIGATORIO):\n";
+  prompt += "\n\n📋 SCHEMA JSON DA RESPOSTA (OBRIGATÓRIO):\n";
   prompt += "```json\n";
   prompt += JSON.stringify(esquemaJson, null, 2);
   prompt += "\n```\n\n";
@@ -130,11 +129,11 @@ export function construirPromptAnaliseAtivo(dadosAtivo: DadosAtivoParaPrompt): s
   prompt += EXEMPLO_SAIDA_ANALISE_ATIVO;
   prompt += "\n\n";
 
-  prompt += "⚠️  REGRAS CRITICAS:\n";
-  prompt += "- Retorne APENAS o JSON valido, sem texto adicional ou markdown\n";
-  prompt += "- Siga EXATAMENTE o schema JSON fornecido acima\n";
-  prompt += "- Use os dados fornecidos para embasar a analise — nao invente numeros\n";
-  prompt += "- Se um campo nao pode ser calculado com os dados disponiveis, use null\n";
+  prompt += "⚠️  REGRAS CRÍTICAS:\n";
+  prompt += "- Retorne apenas o JSON válido, sem texto adicional ou markdown\n";
+  prompt += "- Siga exatamente o schema JSON fornecido acima\n";
+  prompt += "- Use os dados fornecidos para embasar a análise — não invente números\n";
+  prompt += "- Se um campo não pode ser calculado com os dados disponíveis, use null\n";
   prompt += "- Seja opinativo e direto no veredicto\n";
 
   return prompt;
