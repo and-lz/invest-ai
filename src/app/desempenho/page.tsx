@@ -9,8 +9,7 @@ import { Header } from "@/components/layout/header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, RefreshCw, AlertTriangle, Loader2 } from "lucide-react";
-import Image from "next/image";
+import { BarChart3, BotIcon, RefreshCw, AlertTriangle, Loader2 } from "lucide-react";
 import { useDadosAtivo, useListaAtivosCarteira } from "@/hooks/use-asset-data";
 import { useAssetAiAnalysis, dispararAnaliseIaAtivo } from "@/hooks/use-asset-ai-analysis";
 import { GridAtivosCarteira } from "@/components/desempenho/portfolio-assets-grid";
@@ -151,7 +150,7 @@ function DesempenhoConteudo() {
               {analisandoComIa ? (
                 <Loader2 className="relative z-10 h-4 w-4 animate-spin" />
               ) : (
-                <Image src="/fortuna-minimal.png" alt="Fortuna" width={16} height={16} className="relative z-10 h-4 w-4" />
+                <BotIcon className="relative z-10 h-4 w-4" />
               )}
               <span className="relative z-10">{analisandoComIa ? "Analisando..." : "Analisar com a Fortuna"}</span>
             </Button>

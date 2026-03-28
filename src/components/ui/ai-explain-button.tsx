@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import Image from "next/image";
+import { BotIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -59,7 +59,7 @@ export function BotaoExplicarIA({ identificadorCard }: BotaoExplicarIAProps) {
             className="ai-icon-hover text-muted-foreground/60"
             aria-label="Pedir para a Fortuna explicar este gráfico"
           >
-            <Image src="/fortuna-minimal.png" alt="Fortuna" width={16} height={16} className="h-4 w-4" />
+            <BotIcon />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left" sideOffset={4}>

@@ -54,7 +54,7 @@ export function MensagemChatBolha({
             fs ? "h-12 w-12" : "h-8 w-8",
           )}
         >
-          <Image src="/fortuna-minimal.png" alt="Fortuna" width={24} height={24} className={cn("rounded-full", fs ? "h-6 w-6" : "h-4 w-4")} />
+          <Image src="/fortuna-icon.png" alt="Fortuna" width={24} height={24} className={cn("rounded-full", fs ? "h-6 w-6" : "h-4 w-4")} />
         </div>
       )}
 
