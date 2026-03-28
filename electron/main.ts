@@ -1,28 +1,51 @@
-import { app, BrowserWindow, shell, net as electronNet } from "electron";
+import { app, BrowserWindow } from "electron";
 import { spawn, ChildProcess } from "child_process";
 import * as path from "path";
+import * as fs from "fs";
 import * as net from "net";
 
-const PROJECT_ROOT = path.resolve(__dirname, "..", "..");
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+
 const DEV_PORT = 3000;
-const DEV_URL = `http://localhost:${DEV_PORT}`;
+const PROXY_PORT = 3099;
+
+// ---------------------------------------------------------------------------
+// Child process management
+// ---------------------------------------------------------------------------
+
+const childProcesses: ChildProcess[] = [];
 
 let mainWindow: BrowserWindow | null = null;
-let serverProcess: ChildProcess | null = null;
 
-function killServerProcess(): void {
-  if (!serverProcess || serverProcess.pid === undefined) return;
-  try {
-    process.kill(-serverProcess.pid, "SIGTERM");
-  } catch {
+function trackProcess(proc: ChildProcess): void {
+  childProcesses.push(proc);
+  proc.on("exit", () => {
+    const idx = childProcesses.indexOf(proc);
+    if (idx !== -1) childProcesses.splice(idx, 1);
+  });
+}
+
+function killAllChildren(): void {
+  for (const proc of [...childProcesses]) {
+    if (proc.pid === undefined) continue;
     try {
-      serverProcess.kill("SIGTERM");
+      process.kill(-proc.pid, "SIGTERM");
     } catch {
-      // Process already dead
+      try {
+        proc.kill("SIGTERM");
+      } catch {
+        // Process already dead
+      }
     }
   }
-  serverProcess = null;
+  childProcesses.length = 0;
 }
+
+// ---------------------------------------------------------------------------
+// Port utilities
+// ---------------------------------------------------------------------------
 
 function waitForPort(port: number, timeout = 60000): Promise<void> {
   const start = Date.now();
@@ -56,31 +79,195 @@ function waitForPort(port: number, timeout = 60000): Promise<void> {
   });
 }
 
+function findFreePort(preferred: number): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.once("error", () => {
+      // Preferred port in use — let OS pick a random one
+      const fallback = net.createServer();
+      fallback.once("error", reject);
+      fallback.listen(0, "127.0.0.1", () => {
+        const addr = fallback.address();
+        const port = typeof addr === "object" && addr ? addr.port : 0;
+        fallback.close(() => resolve(port));
+      });
+    });
+    server.listen(preferred, "127.0.0.1", () => {
+      server.close(() => resolve(preferred));
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Env file loader (for production builds)
+// ---------------------------------------------------------------------------
+
+function loadEnvFile(envPath: string): Record<string, string> {
+  const vars: Record<string, string> = {};
+  if (!fs.existsSync(envPath)) return vars;
+
+  const content = fs.readFileSync(envPath, "utf-8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    let value = trimmed.slice(eqIdx + 1).trim();
+    // Strip surrounding quotes
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    vars[key] = value;
+  }
+  return vars;
+}
+
+// ---------------------------------------------------------------------------
+// Resolve paths based on packaged vs dev
+// ---------------------------------------------------------------------------
+
+function getProjectRoot(): string {
+  return app.isPackaged
+    ? path.join(process.resourcesPath)
+    : path.resolve(__dirname, "..", "..");
+}
+
+function getStandalonePath(): string {
+  return path.join(getProjectRoot(), "standalone");
+}
+
+function getProxyPath(): string {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, "claude-proxy.js");
+  }
+  return path.join(__dirname, "claude-proxy.js");
+}
+
+function getEnvPath(): string {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, ".env.local");
+  }
+  return path.join(path.resolve(__dirname, "..", ".."), ".env.local");
+}
+
+// ---------------------------------------------------------------------------
+// Build environment for child processes
+// ---------------------------------------------------------------------------
+
+function buildChildEnv(port: number): NodeJS.ProcessEnv {
+  const envFromFile = loadEnvFile(getEnvPath());
+  return {
+    ...process.env,
+    ...envFromFile,
+    PORT: String(port),
+    HOSTNAME: "localhost",
+    NODE_ENV: "production",
+    CLAUDE_PROXY_URL: `http://localhost:${PROXY_PORT}`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Server spawning
+// ---------------------------------------------------------------------------
+
 function startDevServer(): void {
-  serverProcess = spawn("npx", ["next", "dev", "--turbopack"], {
-    cwd: PROJECT_ROOT,
+  const projectRoot = path.resolve(__dirname, "..", "..");
+  const proc = spawn("npx", ["next", "dev", "--turbopack"], {
+    cwd: projectRoot,
     shell: true,
     detached: true,
     stdio: ["ignore", "pipe", "pipe"],
     env: { ...process.env },
   });
 
-  serverProcess.stdout?.on("data", (data: Buffer) => {
-    process.stdout.write(`[dev] ${data}`);
-  });
+  trackProcess(proc);
 
-  serverProcess.stderr?.on("data", (data: Buffer) => {
-    process.stderr.write(`[dev] ${data}`);
+  proc.stdout?.on("data", (data: Buffer) => {
+    process.stdout.write(`[next-dev] ${data}`);
   });
-
-  serverProcess.on("exit", (code) => {
-    console.log(`[dev] Server exited with code ${code}`);
-    serverProcess = null;
+  proc.stderr?.on("data", (data: Buffer) => {
+    process.stderr.write(`[next-dev] ${data}`);
+  });
+  proc.on("exit", (code) => {
+    console.log(`[next-dev] exited with code ${code}`);
   });
 }
 
+function startProdServer(port: number): void {
+  const standalonePath = getStandalonePath();
+  const serverJs = path.join(standalonePath, "server.js");
+
+  if (!fs.existsSync(serverJs)) {
+    console.error(`[next-prod] server.js not found at ${serverJs}`);
+    mainWindow?.loadURL(
+      `data:text/html,<html><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0d0c14;color:#fff;font-family:system-ui;"><div style="text-align:center;"><div style="font-size:24px;margin-bottom:8px;">Build output not found</div><div style="color:#888;">server.js missing from standalone bundle</div></div></body></html>`
+    );
+    return;
+  }
+
+  const env = buildChildEnv(port);
+
+  const proc = spawn(process.execPath, [serverJs], {
+    cwd: standalonePath,
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"],
+    env,
+  });
+
+  trackProcess(proc);
+
+  proc.stdout?.on("data", (data: Buffer) => {
+    process.stdout.write(`[next-prod] ${data}`);
+  });
+  proc.stderr?.on("data", (data: Buffer) => {
+    process.stderr.write(`[next-prod] ${data}`);
+  });
+  proc.on("exit", (code) => {
+    console.log(`[next-prod] exited with code ${code}`);
+  });
+}
+
+function startProxy(): void {
+  const proxyPath = getProxyPath();
+
+  if (!fs.existsSync(proxyPath)) {
+    console.warn(`[proxy] claude-proxy.js not found at ${proxyPath} — skipping`);
+    return;
+  }
+
+  const env = { ...process.env, ...loadEnvFile(getEnvPath()), PROXY_PORT: String(PROXY_PORT) };
+
+  const proc = spawn(process.execPath, [proxyPath], {
+    detached: true,
+    stdio: ["ignore", "pipe", "pipe"],
+    env,
+  });
+
+  trackProcess(proc);
+
+  proc.stdout?.on("data", (data: Buffer) => {
+    process.stdout.write(`[proxy] ${data}`);
+  });
+  proc.stderr?.on("data", (data: Buffer) => {
+    process.stderr.write(`[proxy] ${data}`);
+  });
+  proc.on("exit", (code) => {
+    console.log(`[proxy] exited with code ${code}`);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Window
+// ---------------------------------------------------------------------------
+
 function createWindow(): void {
-  const iconPath = path.join(__dirname, "..", "icons", "icon.png");
+  const iconPath = app.isPackaged
+    ? path.join(process.resourcesPath, "..", "electron", "icons", "icon.png")
+    : path.join(__dirname, "..", "icons", "icon.png");
 
   mainWindow = new BrowserWindow({
     width: 1280,
@@ -97,33 +284,29 @@ function createWindow(): void {
     },
   });
 
-  // Delegate Google OAuth to the system browser where passkeys work.
-  // When navigation targets accounts.google.com, open it externally.
-  // After auth completes, Google redirects back to localhost:3000 which
-  // lands in the user's browser. The Electron window polls for the session.
-  mainWindow.webContents.on("will-navigate", (event, url) => {
-    if (url.includes("accounts.google.com")) {
-      event.preventDefault();
-      shell.openExternal(url);
-      // Poll until the session exists (user completed login in browser)
-      pollForSession();
-    }
-  });
-
-  // Also intercept new-window requests (target="_blank" or window.open)
+  // Allow popups for Google OAuth
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (
       url.includes("accounts.google.com") ||
       url.includes("google.com/o/oauth2")
     ) {
-      shell.openExternal(url);
-      pollForSession();
-      return { action: "deny" };
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          width: 500,
+          height: 700,
+          title: "Sign in with Google",
+          autoHideMenuBar: true,
+        },
+      };
+    }
+    if (url.includes("localhost")) {
+      return { action: "allow" };
     }
     return { action: "deny" };
   });
 
-  // Show loading state while server starts
+  // Loading screen
   mainWindow.loadURL(
     `data:text/html,
     <html>
@@ -138,7 +321,7 @@ function createWindow(): void {
       </style></head>
       <body><div class="loader">
         <div class="spinner"></div>
-        <div>Starting dev server...</div>
+        <div>Starting server...</div>
       </div></body>
     </html>`
   );
@@ -148,40 +331,34 @@ function createWindow(): void {
   });
 }
 
-function pollForSession(): void {
-  if (!mainWindow) return;
+// ---------------------------------------------------------------------------
+// App lifecycle
+// ---------------------------------------------------------------------------
 
-  const interval = setInterval(async () => {
-    if (!mainWindow) {
-      clearInterval(interval);
-      return;
-    }
-    try {
-      // Check if the session endpoint returns an authenticated user
-      const response = await electronNet.fetch(`${DEV_URL}/api/auth/session`);
-      const data = await response.json();
-      if (data && typeof data === "object" && "user" in data) {
-        clearInterval(interval);
-        // Reload the app — user is now authenticated
-        mainWindow?.loadURL(DEV_URL);
-      }
-    } catch {
-      // Server not ready or request failed, keep polling
-    }
-  }, 2000);
-
-  // Stop polling after 5 minutes
-  setTimeout(() => clearInterval(interval), 5 * 60 * 1000);
-}
+app.name = "Investimentos";
 
 app.whenReady().then(async () => {
   createWindow();
-  startDevServer();
+
+  let serverPort: number;
+
+  if (app.isPackaged) {
+    // Production: run standalone Next.js server + proxy
+    serverPort = await findFreePort(DEV_PORT);
+    console.log(`[electron] Production mode — port ${serverPort}`);
+    startProdServer(serverPort);
+    startProxy();
+  } else {
+    // Development: run next dev (proxy is started separately or via npm run dev)
+    serverPort = DEV_PORT;
+    console.log("[electron] Development mode");
+    startDevServer();
+  }
 
   try {
-    await waitForPort(DEV_PORT);
+    await waitForPort(serverPort);
     await new Promise((r) => setTimeout(r, 1000));
-    mainWindow?.loadURL(DEV_URL);
+    mainWindow?.loadURL(`http://localhost:${serverPort}`);
   } catch (err) {
     console.error("[electron] Server failed to start:", err);
     mainWindow?.loadURL(
@@ -198,17 +375,17 @@ app.whenReady().then(async () => {
 });
 
 app.on("window-all-closed", () => {
-  killServerProcess();
+  killAllChildren();
   app.quit();
 });
 
 app.on("before-quit", () => {
-  killServerProcess();
+  killAllChildren();
 });
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
-    mainWindow!.loadURL(DEV_URL);
+    mainWindow!.loadURL(`http://localhost:${DEV_PORT}`);
   }
 });

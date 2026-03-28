@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Script para gerar ícones PWA a partir do SVG base
- * Usa sharp para conversão SVG -> PNG
+ * Generate PWA and Electron icons from the Fortuna icon PNG.
+ * Uses sharp for PNG resizing.
  */
 
 import fs from "node:fs";
@@ -12,52 +12,53 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function gerarIcones() {
+async function generateIcons() {
   try {
-    // Importação dinâmica do sharp (ESM)
     const sharp = (await import("sharp")).default;
 
-    const svgPath = path.join(__dirname, "..", "public", "icon.svg");
+    const sourcePath = path.join(__dirname, "..", "public", "fortuna-icon.png");
     const publicDir = path.join(__dirname, "..", "public");
+    const electronIconsDir = path.join(__dirname, "..", "electron", "icons");
 
-    if (!fs.existsSync(svgPath)) {
-      console.error("❌ Arquivo icon.svg não encontrado em public/");
+    if (!fs.existsSync(sourcePath)) {
+      console.error("Error: fortuna-icon.png not found in public/");
       process.exit(1);
     }
 
-    const svgBuffer = fs.readFileSync(svgPath);
+    const sourceBuffer = fs.readFileSync(sourcePath);
 
-    // Tamanhos necessários para PWA e iOS
-    const tamanhos = [
-      { nome: "icon-192.png", tamanho: 192 },
-      { nome: "icon-512.png", tamanho: 512 },
-      { nome: "apple-icon-180.png", tamanho: 180 },
-      { nome: "favicon.ico", tamanho: 32 }, // Favicon básico
+    const targets = [
+      { name: "icon-192.png", size: 192, dir: publicDir },
+      { name: "icon-512.png", size: 512, dir: publicDir },
+      { name: "apple-icon-180.png", size: 180, dir: publicDir },
+      { name: "favicon.ico", size: 32, dir: publicDir },
+      { name: "icon.png", size: 512, dir: electronIconsDir },
     ];
 
-    console.log("🎨 Gerando ícones PWA...\n");
+    console.log("Generating icons from fortuna-icon.png...\n");
 
-    for (const { nome, tamanho } of tamanhos) {
-      const outputPath = path.join(publicDir, nome);
+    for (const { name, size, dir } of targets) {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
 
-      await sharp(svgBuffer)
-        .resize(tamanho, tamanho)
-        .png()
-        .toFile(outputPath);
+      const outputPath = path.join(dir, name);
 
-      console.log(`✅ ${nome} (${tamanho}x${tamanho})`);
+      await sharp(sourceBuffer).resize(size, size).png().toFile(outputPath);
+
+      console.log(`  ${name} (${size}x${size})`);
     }
 
-    console.log("\n✨ Todos os ícones foram gerados com sucesso!");
-  } catch (erro) {
-    if (erro.code === "ERR_MODULE_NOT_FOUND") {
-      console.error("\n❌ Pacote 'sharp' não encontrado.");
-      console.error("\n📦 Instale com: npm install --save-dev sharp\n");
+    console.log("\nAll icons generated successfully!");
+  } catch (error) {
+    if (error.code === "ERR_MODULE_NOT_FOUND") {
+      console.error("\nError: 'sharp' package not found.");
+      console.error("\nInstall with: npm install --save-dev sharp\n");
       process.exit(1);
     }
-    console.error("❌ Erro ao gerar ícones:", erro);
+    console.error("Error generating icons:", error);
     process.exit(1);
   }
 }
 
-gerarIcones();
+generateIcons();

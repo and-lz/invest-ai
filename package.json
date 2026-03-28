@@ -1,10 +1,11 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.146",
+  "version": "0.1.148",
   "private": true,
   "main": "electron/dist/main.js",
   "scripts": {
     "dev": "concurrently --kill-others -n next,proxy -c blue,magenta \"next dev --turbopack\" \"npx tsx scripts/claude-proxy.ts\"",
+    "dev:resilient": "bash scripts/dev-resilient.sh",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
