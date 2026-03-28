@@ -67,6 +67,17 @@ const LiquidityLadder = dynamic(
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
 );
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+        {children}
+      </span>
+      <div className="bg-border h-px flex-1" />
+    </div>
+  );
+}
+
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
@@ -172,12 +183,18 @@ export default function DashboardPage() {
 
       {!estaCarregando && dadosDashboard && (
         <>
+          {/* ── Resumo ── */}
+          <SectionLabel>Resumo</SectionLabel>
+
           <SummaryCards
             resumo={dadosDashboard.resumoAtual}
             variacaoPatrimonialCentavos={dadosDashboard.variacaoPatrimonialCentavos}
           />
 
           <WealthEvolutionChart evolucaoPatrimonial={dadosDashboard.evolucaoPatrimonial} />
+
+          {/* ── Análise ── */}
+          <SectionLabel>Análise</SectionLabel>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
@@ -196,6 +213,9 @@ export default function DashboardPage() {
             <PeriodComparisonDetail comparacaoPeriodos={dadosDashboard.comparacaoPeriodos} />
             <LiquidityLadder faixasLiquidez={dadosDashboard.faixasLiquidez} />
           </div>
+
+          {/* ── Destaques ── */}
+          <SectionLabel>Destaques</SectionLabel>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <TopPerformersTable
