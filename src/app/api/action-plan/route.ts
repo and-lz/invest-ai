@@ -1,6 +1,6 @@
 import { NextResponse, after } from "next/server";
 import { requireAuth } from "@/lib/auth-utils";
-import { obterPlanoAcaoRepository, criarProvedorAi, resolverConfiguracaoAiDoUsuario } from "@/lib/container";
+import { obterPlanoAcaoRepository, criarProvedorAi, obterAiConfig } from "@/lib/container";
 import { CriarItemPlanoSchema, EnriquecimentoAiSchema } from "@/schemas/action-plan.schema";
 import { cabecalhosSemCache } from "@/lib/cache-headers";
 import {
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       rotuloLog: "Enriquecer Item Plano",
       usuarioId: userId,
       executarOperacao: async () => {
-        const aiConfig = await resolverConfiguracaoAiDoUsuario(userId);
+        const aiConfig = obterAiConfig();
         const provider = criarProvedorAi(aiConfig);
         const aiResponse = await provider.gerar({
           instrucaoSistema: SYSTEM_PROMPT_ENRIQUECER_ACAO,

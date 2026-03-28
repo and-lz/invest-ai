@@ -7,7 +7,7 @@ import {
   obterAnalyzeAssetPerformanceUseCase,
   obterPlanoAcaoRepository,
   criarProvedorAi,
-  resolverConfiguracaoAiDoUsuario,
+  obterAiConfig,
 } from "@/lib/container";
 import { salvarAnaliseAtivo } from "@/lib/asset-analysis-storage";
 import { EnriquecimentoAiSchema } from "@/schemas/action-plan.schema";
@@ -27,7 +27,7 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         rotuloLog: "Insights Consolidados (retry)",
         usuarioId,
         executarOperacao: async () => {
-          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const aiConfig = obterAiConfig();
           const useCase = await obterGenerateConsolidatedInsightsUseCase(aiConfig);
           await useCase.executar();
           return {
@@ -56,7 +56,7 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         rotuloLog: "Insights (retry)",
         usuarioId,
         executarOperacao: async () => {
-          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const aiConfig = obterAiConfig();
           const useCase = await obterGenerateInsightsUseCase(aiConfig);
           await useCase.executar({
             identificadorRelatorio,
@@ -86,7 +86,7 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         rotuloLog: "Analise Ativo (retry)",
         usuarioId,
         executarOperacao: async () => {
-          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const aiConfig = obterAiConfig();
           const useCase = await obterAnalyzeAssetPerformanceUseCase(aiConfig);
           const analise = await useCase.executar({ codigoAtivo });
           await salvarAnaliseAtivo(analise, usuarioId);
@@ -117,7 +117,7 @@ export function dispatchTaskByType(tarefa: TarefaBackground, usuarioId: string):
         usuarioId,
         executarOperacao: async () => {
           const repository = await obterPlanoAcaoRepository();
-          const aiConfig = await resolverConfiguracaoAiDoUsuario(usuarioId);
+          const aiConfig = obterAiConfig();
           const provider = criarProvedorAi(aiConfig);
           const aiResponse = await provider.gerar({
             instrucaoSistema: SYSTEM_PROMPT_ENRIQUECER_ACAO,

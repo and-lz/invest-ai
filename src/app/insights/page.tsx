@@ -518,7 +518,7 @@ export default function InsightsPage() {
           <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
             <Lightbulb className="text-muted-foreground h-12 w-12" />
             <p className="text-muted-foreground">
-              Funcionalidade indisponível. Configure a variável de ambiente <code className="text-xs font-mono">GOOGLE_API_KEY</code> para habilitar a Fortuna.
+              Funcionalidade disponível apenas em desenvolvimento. Execute o app localmente para gerar análises com a Fortuna.
             </p>
           </CardContent>
         </Card>

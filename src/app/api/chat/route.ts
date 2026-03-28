@@ -1,5 +1,5 @@
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi, resolverConfiguracaoAiDoUsuario } from "@/lib/container";
+import { criarProvedorAi, obterAiConfig } from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { AiApiTransientError, AiApiQuotaError } from "@/domain/errors/app-errors";
@@ -8,10 +8,6 @@ import type { MensagemAi, ConfiguracaoGeracao } from "@/domain/interfaces/ai-pro
 export const dynamic = "force-dynamic";
 
 function classificarMensagemErroChat(erro: unknown): string {
-  // Quota and transient errors share the same user-facing message because
-  // Gemini uses "Quota exceeded" for both per-minute rate limits AND actual
-  // credit exhaustion — we can't reliably distinguish them. The /settings
-  // health check is the authoritative source for key health diagnosis.
   if (erro instanceof AiApiQuotaError || erro instanceof AiApiTransientError) {
     return "A Fortuna esta com dificuldades para responder no momento. Tente novamente em alguns segundos.";
   }
@@ -50,7 +46,7 @@ export async function POST(request: Request): Promise<Response> {
       partes: [{ tipo: "texto" as const, dados: mensagem.conteudo }],
     }));
 
-    const aiConfig = await resolverConfiguracaoAiDoUsuario(verificacaoAuth.session.user.userId);
+    const aiConfig = obterAiConfig();
     const provedor = criarProvedorAi(aiConfig);
 
     const configBase: ConfiguracaoGeracao = {
@@ -58,53 +54,21 @@ export async function POST(request: Request): Promise<Response> {
       mensagens: mensagensAi,
       temperatura: 0.7,
       formatoResposta: "texto",
-      // Claude proxy does not support web search tools
-      pesquisaWeb: aiConfig.provider === "gemini",
     };
 
     const codificadorTexto = new TextEncoder();
     const streamResposta = new ReadableStream({
       async start(controlador) {
-        // Try with web search first; if it fails before sending any chunks,
-        // retry without web search as fallback.
-        let chunksEnviados = 0;
-
         try {
           const geradorStream = provedor.transmitir(configBase);
           for await (const pedacoTexto of geradorStream) {
             controlador.enqueue(codificadorTexto.encode(pedacoTexto));
-            chunksEnviados++;
           }
           controlador.close();
-          return;
-        } catch (erroPrimario) {
-          console.error("[Chat] Erro durante streaming (pesquisaWeb=true):", erroPrimario);
-
-          // If we already sent chunks, report inline (can't retry mid-stream).
-          // Quota errors from web search should still fall through to the
-          // non-web-search fallback — Google Search grounding has its own quota
-          // separate from the generative model quota.
-          if (chunksEnviados > 0) {
-            controlador.enqueue(
-              codificadorTexto.encode(`\n\n[ERRO]: ${classificarMensagemErroChat(erroPrimario)}`),
-            );
-            controlador.close();
-            return;
-          }
-        }
-
-        // Fallback: retry without web search
-        try {
-          console.info("[Chat] Tentando fallback sem pesquisaWeb...");
-          const geradorFallback = provedor.transmitir({ ...configBase, pesquisaWeb: false });
-          for await (const pedacoTexto of geradorFallback) {
-            controlador.enqueue(codificadorTexto.encode(pedacoTexto));
-          }
-          controlador.close();
-        } catch (erroFallback) {
-          console.error("[Chat] Erro no fallback (pesquisaWeb=false):", erroFallback);
+        } catch (erro) {
+          console.error("[Chat] Erro durante streaming:", erro);
           controlador.enqueue(
-            codificadorTexto.encode(`\n\n[ERRO]: ${classificarMensagemErroChat(erroFallback)}`),
+            codificadorTexto.encode(`\n\n[ERRO]: ${classificarMensagemErroChat(erro)}`),
           );
           controlador.close();
         }
