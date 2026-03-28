@@ -174,7 +174,7 @@ describe("executeBackgroundTask", () => {
     const ultimaChamadaSalvar = mockSalvarTarefa.mock.calls.at(-1)?.[0];
     expect(ultimaChamadaSalvar).toMatchObject({
       status: "erro",
-      erro: "A API Gemini está indisponível no momento. Tente novamente em alguns minutos.",
+      erro: "A IA está indisponível no momento. Tente novamente em alguns minutos.",
       erroRecuperavel: true,
       tentativaAtual: 2,
     });
