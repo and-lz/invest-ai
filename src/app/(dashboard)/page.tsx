@@ -261,7 +261,7 @@ export default function DashboardPage() {
           {/* ── Análise ── */}
           <SectionLabel>Análise</SectionLabel>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid-lanes grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
             <AssetAllocationChart alocacaoMensal={dadosDashboard.alocacaoAtual} />
             <BenchmarkComparisonChart comparacoes={dadosDashboard.comparacaoBenchmarksAtual} />
