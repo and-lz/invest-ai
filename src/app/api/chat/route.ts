@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 
 function classificarMensagemErroChat(erro: unknown): string {
   if (erro instanceof AiApiQuotaError || erro instanceof AiApiTransientError) {
-    return "A Fortuna esta com dificuldades para responder no momento. Tente novamente em alguns segundos.";
+    return "A Fortuna está com dificuldades para responder no momento. Tente novamente em alguns segundos.";
   }
-  return "Algo deu errado ao gerar a resposta. Voce pode tentar novamente.";
+  return "Algo deu errado ao gerar a resposta. Você pode tentar novamente.";
 }
 
 export async function POST(request: Request): Promise<Response> {

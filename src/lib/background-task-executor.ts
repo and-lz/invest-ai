@@ -40,13 +40,13 @@ export interface ConfiguracaoExecutorTarefa {
  */
 function friendlyErrorMessage(erro: unknown): string {
   if (erro instanceof AiApiQuotaError) {
-    return "Sua chave de API Gemini está sem créditos. Verifique em Configurações e adicione créditos no Google AI Studio.";
+    return "A IA está com limite de uso excedido. Tente novamente mais tarde.";
   }
   if (erro instanceof AiApiTransientError) {
-    return "A API Gemini está indisponível no momento. Tente novamente em alguns minutos.";
+    return "A IA está indisponível no momento. Tente novamente em alguns minutos.";
   }
   if (erro instanceof AiApiError) {
-    return "Falha na comunicação com a API Gemini. Tente novamente.";
+    return "Falha na comunicação com a IA. Tente novamente.";
   }
   // Non-AI errors (PdfParsingError, ValidationError, etc.) already have structured messages
   if (erro instanceof AppError) {
