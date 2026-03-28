@@ -182,7 +182,7 @@ export function ChatWidget() {
           )}
           type="button"
         >
-          <Image src="/fortuna-icon.png" alt="Fortuna" width={56} height={56} className="h-14 w-14 object-cover" />
+          <Image src="/fortuna-minimal.png" alt="Fortuna" width={56} height={56} className="h-14 w-14 object-cover" />
           <span className="sr-only">Abrir Fortuna</span>
         </button>
       )}
@@ -253,7 +253,7 @@ export function ChatWidget() {
                   <Menu className={fs ? "h-6 w-6" : "h-4 w-4"} />
                 </Button>
 
-                <Image src="/fortuna-icon.png" alt="Fortuna" width={28} height={28} className={cn("rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
+                <Image src="/fortuna-minimal.png" alt="Fortuna" width={28} height={28} className={cn("rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
                 <h3 className={cn("font-medium", fs ? "text-lg" : "text-sm")}>Fortuna</h3>
               </div>
               <div className="flex items-center gap-1">

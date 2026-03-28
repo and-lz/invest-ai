@@ -68,7 +68,7 @@ export function ChatBody({
             "flex h-full flex-col items-center justify-center text-center",
             fs ? "mx-auto max-w-4xl gap-8" : "gap-4",
           )}>
-            <Image src="/fortuna-icon.png" alt="Fortuna" width={64} height={64} className={cn("rounded-full", fs ? "h-16 w-16" : "h-10 w-10")} />
+            <Image src="/fortuna-minimal.png" alt="Fortuna" width={64} height={64} className={cn("rounded-full", fs ? "h-16 w-16" : "h-10 w-10")} />
             <div>
               <p className={cn("text-muted-foreground", fs ? "text-lg" : "text-sm")}>
                 Pergunte sobre seus investimentos.

@@ -1,10 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  BotIcon,
   Shield,
   TrendingUp,
   Wallet,
@@ -62,7 +62,7 @@ export function AnaliseIaAtivo({ analise }: AnaliseIaAtivoProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <BotIcon className={cn(icon.cardTitle, "text-muted-foreground")} />
+              <Image src="/fortuna-minimal.png" alt="Fortuna" width={20} height={20} className={cn(icon.cardTitle)} />
               <CardTitle>Análise Fortuna</CardTitle>
             </div>
             <Badge
