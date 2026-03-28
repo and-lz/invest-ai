@@ -14,7 +14,7 @@ import {
  * Responsabilidade: construir prompts + validar schema.
  * Criacao de cliente, log de tokens e classificacao de erros ficam no ProvedorAi.
  */
-export class GeminiAssetAnalysisService implements AssetAnalysisService {
+export class AiAssetAnalysisService implements AssetAnalysisService {
   constructor(private readonly provedor: ProvedorAi) {}
 
   async analisarAtivo(dadosAtivo: DadosAtivoParaPrompt): Promise<AnaliseAtivoResponse> {

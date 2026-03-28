@@ -19,7 +19,7 @@ import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/manual
  * Diferente do GeminiPdfExtractionService que envia o PDF binario, este servico
  * extrai o texto do PDF localmente e envia apenas texto para o modelo.
  */
-export class ClaudePdfExtractionService implements ExtractionService {
+export class AiTextPdfExtractionService implements ExtractionService {
   constructor(private readonly provedor: ProvedorAi) {}
 
   async extrairDadosDoRelatorio(pdfBase64: string): Promise<RelatorioExtraido> {

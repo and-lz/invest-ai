@@ -11,7 +11,7 @@ import { SYSTEM_PROMPT_EXTRACAO, INSTRUCAO_USUARIO_EXTRACAO } from "@/lib/manual
  * Responsabilidade: construir prompt + validar schema.
  * Criacao de cliente, log de tokens e classificacao de erros ficam no ProvedorAi.
  */
-export class GeminiPdfExtractionService implements ExtractionService {
+export class AiPdfExtractionService implements ExtractionService {
   constructor(private readonly provedor: ProvedorAi) {}
 
   async extrairDadosDoRelatorio(pdfBase64: string): Promise<RelatorioExtraido> {

@@ -2,9 +2,9 @@ import { DbReportRepository } from "@/infrastructure/repositories/db-report-repo
 import { DbConversaRepository } from "@/infrastructure/repositories/db-conversation-repository";
 import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-action-plan-repository";
 import { DbUserSettingsRepository } from "@/infrastructure/repositories/user-settings-repository";
-import { GeminiPdfExtractionService } from "@/infrastructure/services/gemini-pdf-extraction-service";
-import { ClaudePdfExtractionService } from "@/infrastructure/services/claude-pdf-extraction-service";
-import { GeminiInsightsService } from "@/infrastructure/services/gemini-insights-service";
+import { AiPdfExtractionService } from "@/infrastructure/services/ai-pdf-extraction-service";
+import { AiTextPdfExtractionService } from "@/infrastructure/services/ai-text-pdf-extraction-service";
+import { AiInsightsService } from "@/infrastructure/services/ai-insights-service";
 import { UploadReportUseCase } from "@/application/use-cases/upload-report";
 import { ListReportsUseCase } from "@/application/use-cases/list-reports";
 import { GetReportDetailUseCase } from "@/application/use-cases/get-report-detail";
@@ -35,7 +35,7 @@ import { AnthropicProvedorAi } from "@/infrastructure/ai/anthropic-ai-provider";
 import { FallbackProvedorAi } from "@/infrastructure/ai/fallback-ai-provider";
 import { resolveModelId, resolveClaudeModelId, DEFAULT_AI_PROVIDER, DEFAULT_CLAUDE_MODEL_TIER } from "@/lib/model-tiers";
 import type { AiProvider } from "@/lib/model-tiers";
-import { GeminiAssetAnalysisService } from "@/infrastructure/services/gemini-asset-analysis-service";
+import { AiAssetAnalysisService } from "@/infrastructure/services/ai-asset-analysis-service";
 import { BrapiMarketDataService } from "@/infrastructure/services/brapi-market-data-service";
 import { BrapiAssetDetailService } from "@/infrastructure/services/brapi-asset-detail-service";
 import { BcbMacroDataService } from "@/infrastructure/services/bcb-macro-data-service";
@@ -113,13 +113,13 @@ export function criarProvedorAi(config: AiConfig): ProvedorAi {
 
 function criarServicoExtracao(config: AiConfig): ExtractionService {
   if (config.provider === "claude-proxy") {
-    return new ClaudePdfExtractionService(criarProvedorAi(config));
+    return new AiTextPdfExtractionService(criarProvedorAi(config));
   }
-  return new GeminiPdfExtractionService(criarProvedorAi(config));
+  return new AiPdfExtractionService(criarProvedorAi(config));
 }
 
 function criarServicoInsights(config: AiConfig): InsightsService {
-  return new GeminiInsightsService(criarProvedorAi(config));
+  return new AiInsightsService(criarProvedorAi(config));
 }
 
 // ---- User AI config resolution ----
@@ -247,7 +247,7 @@ export async function obterAnalyzeAssetPerformanceUseCase(config: AiConfig) {
   const repository = await criarRepositorio();
   return new AnalyzeAssetPerformanceUseCase(
     repository,
-    new GeminiAssetAnalysisService(criarProvedorAi(config)),
+    new AiAssetAnalysisService(criarProvedorAi(config)),
     obterBrapiAssetDetailService(),
     obterBcbMacroDataService(),
   );

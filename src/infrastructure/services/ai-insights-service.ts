@@ -21,7 +21,7 @@ import {
  * Responsabilidade: construir prompts + validar schema.
  * Criacao de cliente, log de tokens e classificacao de erros ficam no ProvedorAi.
  */
-export class GeminiInsightsService implements InsightsService {
+export class AiInsightsService implements InsightsService {
   constructor(private readonly provedor: ProvedorAi) {}
 
   async gerarInsights(
