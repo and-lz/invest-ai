@@ -46,7 +46,7 @@ export function ListaConversas({
         {conversas.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 p-6">
             <MessageSquare className={icon.emptyState} />
-            <p className={cn("text-muted-foreground text-center", fs ? "text-base" : "text-sm")}>
+            <p className={cn("text-muted-foreground text-center", fs ? "text-lg" : "text-sm")}>
               Nenhuma conversa ainda.
               <br />
               Comece a conversar!

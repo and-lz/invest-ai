@@ -31,10 +31,10 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, ful
     >
       <button onClick={onSelecionar} className="w-full text-left pr-7">
         {/* Titulo */}
-        <h4 className={cn("line-clamp-1 font-medium", fs ? "text-base" : "text-sm")}>{conversa.titulo}</h4>
+        <h4 className={cn("line-clamp-1 font-medium", fs ? "text-lg" : "text-sm")}>{conversa.titulo}</h4>
 
         {/* Preview */}
-        <p className={cn("text-muted-foreground mt-1 line-clamp-2", fs ? "text-sm" : "text-xs")}>
+        <p className={cn("text-muted-foreground mt-1 line-clamp-2", fs ? "text-base" : "text-xs")}>
           {conversa.previewMensagem}
         </p>
 

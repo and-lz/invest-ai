@@ -29,7 +29,7 @@ export const ConteudoMarkdownChat = React.memo(
   ({ conteudo, fullscreen }: ConteudoMarkdownChatProps) => {
     const fs = fullscreen;
     return (
-      <div className={cn("markdown-content prose max-w-none", fs ? "prose-base" : "prose-sm")}>
+      <div className={cn("markdown-content prose max-w-none", fs ? "prose-lg" : "prose-sm")}>
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw, [rehypeSanitize, schemaSegurancaMarkdown]]}
@@ -71,9 +71,9 @@ export const ConteudoMarkdownChat = React.memo(
             ),
             em: ({ children }) => <em className="italic">{children}</em>,
             // Headings
-            h1: ({ children }) => <h1 className={cn("mt-4 mb-2 font-semibold", fs ? "text-2xl" : "text-lg")}>{children}</h1>,
-            h2: ({ children }) => <h2 className={cn("mt-3 mb-2 font-semibold", fs ? "text-xl" : "text-base")}>{children}</h2>,
-            h3: ({ children }) => <h3 className={cn("mt-3 mb-1 font-semibold", fs ? "text-lg" : "text-sm")}>{children}</h3>,
+            h1: ({ children }) => <h1 className={cn("mt-4 mb-2 font-semibold", fs ? "text-3xl" : "text-lg")}>{children}</h1>,
+            h2: ({ children }) => <h2 className={cn("mt-3 mb-2 font-semibold", fs ? "text-2xl" : "text-base")}>{children}</h2>,
+            h3: ({ children }) => <h3 className={cn("mt-3 mb-1 font-semibold", fs ? "text-xl" : "text-sm")}>{children}</h3>,
           }}
         >
           {conteudo}

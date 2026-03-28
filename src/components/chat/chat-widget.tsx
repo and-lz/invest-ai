@@ -243,7 +243,7 @@ export function ChatWidget() {
             {/* Cabecalho */}
             <div className={cn(
               "flex items-center justify-between border-b",
-              fs ? "px-5 py-4" : "px-4 py-3",
+              fs ? "px-6 py-5" : "px-4 py-3",
             )}>
               <div className="flex items-center gap-2">
                 {/* Botao toggle sidebar (historico de conversas) */}
@@ -251,13 +251,13 @@ export function ChatWidget() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setMostrarSidebar(!mostrarSidebar)}
-                  className={fs ? "h-9 w-9" : "h-8 w-8"}
+                  className={fs ? "h-10 w-10" : "h-8 w-8"}
                 >
-                  <Menu className={fs ? "h-5 w-5" : "h-4 w-4"} />
+                  <Menu className={fs ? "h-6 w-6" : "h-4 w-4"} />
                 </Button>
 
-                <Bot className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-5 w-5")} />
-                <h3 className={cn("font-medium", fs ? "text-base" : "text-sm")}>Fortuna</h3>
+                <Bot className={cn("text-muted-foreground", fs ? "h-7 w-7" : "h-5 w-5")} />
+                <h3 className={cn("font-medium", fs ? "text-lg" : "text-sm")}>Fortuna</h3>
               </div>
               <div className="flex items-center gap-1">
                 {ttsSupported && (
@@ -273,17 +273,17 @@ export function ChatWidget() {
                               return !v;
                             });
                           }}
-                          className={cn(fs ? "h-9 w-9" : "h-8 w-8", ttsEnabled && "text-primary")}
+                          className={cn(fs ? "h-10 w-10" : "h-8 w-8", ttsEnabled && "text-primary")}
                         >
                           {ttsEnabled ? (
                             <Volume2
                               className={cn(
-                                fs ? "h-5 w-5" : "h-4 w-4",
+                                fs ? "h-6 w-6" : "h-4 w-4",
                                 speechStatus === "speaking" && "animate-pulse",
                               )}
                             />
                           ) : (
-                            <VolumeX className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
+                            <VolumeX className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
                           )}
                         </Button>
                       </TooltipTrigger>
@@ -294,8 +294,8 @@ export function ChatWidget() {
                   </TooltipProvider>
                 )}
                 {mensagens.length > 0 && (
-                  <Button variant="ghost" size="icon" onClick={limparHistorico} className={fs ? "h-9 w-9" : "h-8 w-8"}>
-                    <Trash2 className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
+                  <Button variant="ghost" size="icon" onClick={limparHistorico} className={fs ? "h-10 w-10" : "h-8 w-8"}>
+                    <Trash2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
                     <span className="sr-only">Limpar historico</span>
                   </Button>
                 )}
@@ -303,12 +303,12 @@ export function ChatWidget() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setTelaCheia((v) => !v)}
-                  className={cn("hidden md:inline-flex", fs ? "h-9 w-9" : "h-8 w-8")}
+                  className={cn("hidden md:inline-flex", fs ? "h-10 w-10" : "h-8 w-8")}
                 >
                   {telaCheia ? (
-                    <Minimize2 className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
+                    <Minimize2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
                   ) : (
-                    <Maximize2 className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
+                    <Maximize2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
                   )}
                   <span className="sr-only">{telaCheia ? "Sair da tela cheia" : "Tela cheia"}</span>
                 </Button>
@@ -316,9 +316,9 @@ export function ChatWidget() {
                   variant="ghost"
                   size="icon"
                   onClick={fecharChat}
-                  className={fs ? "h-9 w-9" : "h-8 w-8"}
+                  className={fs ? "h-10 w-10" : "h-8 w-8"}
                 >
-                  <X className={cn("text-muted-foreground", fs ? "h-5 w-5" : "h-4 w-4")} />
+                  <X className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
                   <span className="sr-only">Fechar Fortuna</span>
                 </Button>
               </div>
@@ -329,20 +329,20 @@ export function ChatWidget() {
               ref={areaScrollRef}
               className={cn(
                 "flex-1 overflow-y-auto",
-                fs ? "space-y-6 p-6" : "space-y-4 p-4",
+                fs ? "space-y-8 p-8" : "space-y-4 p-4",
               )}
             >
               {mensagens.length === 0 && (
                 <div className={cn(
                   "flex h-full flex-col items-center justify-center text-center",
-                  fs ? "mx-auto max-w-4xl gap-6" : "gap-4",
+                  fs ? "mx-auto max-w-4xl gap-8" : "gap-4",
                 )}>
-                  <Bot className={cn("text-muted-foreground", fs ? "h-14 w-14" : "h-10 w-10")} />
+                  <Bot className={cn("text-muted-foreground", fs ? "h-16 w-16" : "h-10 w-10")} />
                   <div>
-                    <p className={cn("text-muted-foreground", fs ? "text-base" : "text-sm")}>
+                    <p className={cn("text-muted-foreground", fs ? "text-lg" : "text-sm")}>
                       Pergunte sobre seus investimentos.
                     </p>
-                    <p className={cn("text-muted-foreground mt-1", fs ? "text-sm" : "text-xs")}>
+                    <p className={cn("text-muted-foreground mt-1", fs ? "text-base" : "text-xs")}>
                       A Fortuna tem acesso aos dados da pagina atual.
                     </p>
                   </div>

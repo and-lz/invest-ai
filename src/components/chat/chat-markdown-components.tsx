@@ -48,7 +48,7 @@ interface CelulaCabecalhoMarkdownProps {
 }
 
 export function CelulaCabecalhoMarkdown({ children, fullscreen }: CelulaCabecalhoMarkdownProps) {
-  return <TableHead className={fullscreen ? "text-sm" : "text-xs"}>{children}</TableHead>;
+  return <TableHead className={fullscreen ? "text-base" : "text-xs"}>{children}</TableHead>;
 }
 
 interface CelulaMarkdownProps {
@@ -57,7 +57,7 @@ interface CelulaMarkdownProps {
 }
 
 export function CelulaMarkdown({ children, fullscreen }: CelulaMarkdownProps) {
-  return <TableCell className={fullscreen ? "text-sm" : "text-xs"}>{children}</TableCell>;
+  return <TableCell className={fullscreen ? "text-base" : "text-xs"}>{children}</TableCell>;
 }
 
 interface LinkMarkdownProps {
@@ -89,7 +89,7 @@ interface CodigoInlineMarkdownProps {
 
 export function CodigoInlineMarkdown({ children, fullscreen }: CodigoInlineMarkdownProps) {
   return (
-    <code className={cn("bg-muted text-foreground rounded px-1 py-0.5 font-mono", fullscreen ? "text-sm" : "text-xs")}>
+    <code className={cn("bg-muted text-foreground rounded px-1 py-0.5 font-mono", fullscreen ? "text-base" : "text-xs")}>
       {children}
     </code>
   );
