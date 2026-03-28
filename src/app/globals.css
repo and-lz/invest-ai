@@ -596,3 +596,12 @@ main:has(> .chat-fullbleed) {
   color: oklch(0.84 0.20 165);
   filter: drop-shadow(0 0 5px oklch(0.84 0.20 165 / 40%));
 }
+
+/* ─── Grid Lanes (masonry) ─── */
+/* Progressive enhancement: items pack into shortest column.
+   Falls back to regular grid in browsers without support. */
+@supports (display: grid-lanes) {
+  .grid-lanes {
+    display: grid-lanes;
+  }
+}

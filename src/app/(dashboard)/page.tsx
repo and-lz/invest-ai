@@ -147,7 +147,7 @@ function DashboardSkeleton() {
         ))}
       </div>
       <Skeleton className="h-96" />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid-lanes grid gap-6 lg:grid-cols-2">
         <Skeleton className="h-96" />
         <Skeleton className="h-96" />
       </div>
@@ -269,12 +269,12 @@ export default function DashboardPage() {
 
           <MonthlyReturnsHeatmap retornosMensais={dadosDashboard.retornosMensais} />
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
             <AllocationEvolutionChart evolucaoAlocacao={dadosDashboard.evolucaoAlocacaoHistorica} />
             <CategoryPerformanceChart categorias={dadosDashboard.rentabilidadePorCategoria} />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
             <PeriodComparisonDetail comparacaoPeriodos={dadosDashboard.comparacaoPeriodos} />
             <LiquidityLadder faixasLiquidez={dadosDashboard.faixasLiquidez} />
           </div>
@@ -282,7 +282,7 @@ export default function DashboardPage() {
           {/* ── Destaques ── */}
           <SectionLabel>Destaques</SectionLabel>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
             <TopPerformersTable
               titulo="Melhores do Mes"
               ativos={dadosDashboard.melhoresPerformers}
@@ -295,7 +295,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
             <StrategyGainsTable ganhos={dadosDashboard.ganhosPorEstrategia} />
             <FinancialEventsList eventos={dadosDashboard.eventosRecentes} />
           </div>
