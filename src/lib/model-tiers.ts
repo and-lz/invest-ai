@@ -95,9 +95,9 @@ export function resolveClaudeModelId(tier: string | null | undefined): string {
 export type AiProvider = "gemini" | "claude-proxy";
 
 export const DEFAULT_AI_PROVIDER: AiProvider =
-  (process.env.AI_PROVIDER as AiProvider | undefined) === "claude-proxy"
-    ? "claude-proxy"
-    : "gemini";
+  (process.env.AI_PROVIDER as AiProvider | undefined) === "gemini"
+    ? "gemini"
+    : "claude-proxy";
 
 export const AI_PROVIDER_OPTIONS: ReadonlyArray<{
   value: AiProvider;
@@ -105,13 +105,13 @@ export const AI_PROVIDER_OPTIONS: ReadonlyArray<{
   description: string;
 }> = [
   {
-    value: "gemini",
-    label: "Gemini",
-    description: "Google Gemini via chave de API. Suporta streaming e busca na web.",
-  },
-  {
     value: "claude-proxy",
     label: "Claude (proxy local)",
-    description: "Claude via proxy local. Requer claude CLI instalado e proxy rodando.",
+    description: "Claude via proxy local (padrão). Requer claude CLI instalado e proxy rodando.",
+  },
+  {
+    value: "gemini",
+    label: "Gemini (fallback)",
+    description: "Google Gemini via chave de API. Usado como fallback quando Claude não está disponível.",
   },
 ];

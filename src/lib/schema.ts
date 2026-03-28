@@ -297,7 +297,7 @@ export const configuracoesUsuario = pgTable(
     usuarioId: text("usuario_id").notNull(),
     chaveApiGemini: text("chave_api_gemini"), // Criptografada
     modeloTier: text("modelo_tier"), // "economic" | "capable"
-    provedorAi: text("provedor_ai").default("gemini"), // "gemini" | "claude-proxy"
+    provedorAi: text("provedor_ai").default("claude-proxy"), // "gemini" | "claude-proxy"
     modeloTierClaude: text("modelo_tier_claude").default("sonnet"), // "haiku" | "sonnet" | "opus"
     criadaEm: timestamp("criada_em", { withTimezone: true }).notNull().defaultNow(),
     atualizadaEm: timestamp("atualizada_em", { withTimezone: true }).notNull().defaultNow(),
