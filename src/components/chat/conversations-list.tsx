@@ -4,7 +4,8 @@ import { useMemo } from "react";
 import { useConversas } from "@/hooks/use-conversations";
 import { ItemConversa } from "./conversation-item";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Loader2, MessageSquare } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { PlusCircle, MessageSquare } from "lucide-react";
 import { icon } from "@/lib/design-system";
 import { groupByDate } from "@/lib/date-grouping";
 import { cn } from "@/lib/utils";
@@ -29,14 +30,6 @@ export function ListaConversas({
 
   const groups = useMemo(() => groupByDate(conversas), [conversas]);
 
-  if (estaCarregando) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-full flex-col">
       {/* New conversation button */}
@@ -49,7 +42,13 @@ export function ListaConversas({
 
       {/* Conversation list grouped by date */}
       <div className="flex-1 overflow-y-auto">
-        {conversas.length === 0 ? (
+        {estaCarregando ? (
+          <div className={cn("space-y-1.5", fs ? "p-3" : "p-2")}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className={cn("rounded-md", fs ? "h-9" : "h-7")} />
+            ))}
+          </div>
+        ) : conversas.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 p-6">
             <MessageSquare className={icon.emptyState} />
             <p className={cn("text-muted-foreground text-center", fs ? "text-lg" : "text-sm")}>

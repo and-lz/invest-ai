@@ -2,7 +2,8 @@
 
 import { useMemo } from "react";
 import { useSavedMessages } from "@/hooks/use-saved-messages";
-import { Bookmark, Loader2 } from "lucide-react";
+import { Bookmark } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { icon } from "@/lib/design-system";
 import { groupByDate } from "@/lib/date-grouping";
 import { cn } from "@/lib/utils";
@@ -29,8 +30,10 @@ export function SavedMessagesList({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+      <div className={cn("space-y-2", fs ? "p-3" : "p-2")}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className={cn("rounded-md", fs ? "h-14" : "h-12")} />
+        ))}
       </div>
     );
   }
