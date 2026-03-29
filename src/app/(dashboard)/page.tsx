@@ -141,13 +141,13 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid-lanes grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, indice) => (
           <Skeleton key={indice} className="h-32" />
         ))}
       </div>
       <Skeleton className="h-96" />
-      <div className="grid-lanes grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <Skeleton className="h-96" />
         <Skeleton className="h-96" />
       </div>
@@ -261,20 +261,21 @@ export default function DashboardPage() {
           {/* ── Análise ── */}
           <SectionLabel>Análise</SectionLabel>
 
-          <div className="grid-lanes grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-2">
             <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
             <AssetAllocationChart alocacaoMensal={dadosDashboard.alocacaoAtual} />
-            <BenchmarkComparisonChart comparacoes={dadosDashboard.comparacaoBenchmarksAtual} />
           </div>
+
+          <BenchmarkComparisonChart comparacoes={dadosDashboard.comparacaoBenchmarksAtual} />
 
           <MonthlyReturnsHeatmap retornosMensais={dadosDashboard.retornosMensais} />
 
-          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2">
             <AllocationEvolutionChart evolucaoAlocacao={dadosDashboard.evolucaoAlocacaoHistorica} />
             <CategoryPerformanceChart categorias={dadosDashboard.rentabilidadePorCategoria} />
           </div>
 
-          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2">
             <PeriodComparisonDetail comparacaoPeriodos={dadosDashboard.comparacaoPeriodos} />
             <LiquidityLadder faixasLiquidez={dadosDashboard.faixasLiquidez} />
           </div>
@@ -282,7 +283,7 @@ export default function DashboardPage() {
           {/* ── Destaques ── */}
           <SectionLabel>Destaques</SectionLabel>
 
-          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2">
             <TopPerformersTable
               titulo="Melhores do Mes"
               ativos={dadosDashboard.melhoresPerformers}
@@ -295,7 +296,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="grid-lanes grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2">
             <StrategyGainsTable ganhos={dadosDashboard.ganhosPorEstrategia} />
             <FinancialEventsList eventos={dadosDashboard.eventosRecentes} />
           </div>

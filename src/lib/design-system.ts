@@ -105,14 +105,14 @@ export const layout = {
   /** Vertical spacing within sections */
   sectionSpacing: "space-y-4",
 
-  /** Summary cards grid — 1 col → 2 col → 4 col (masonry when supported) */
-  gridCards: "grid-lanes grid gap-4 md:grid-cols-2 lg:grid-cols-4",
+  /** Summary cards grid — 1 col → 2 col → 4 col */
+  gridCards: "grid gap-4 md:grid-cols-2 lg:grid-cols-4",
 
-  /** Content grid — 1 col → 2 col → 3 col (masonry when supported) */
-  gridContent: "grid-lanes grid gap-4 md:grid-cols-2 lg:grid-cols-3",
+  /** Content grid — 1 col → 2 col → 3 col */
+  gridContent: "grid gap-4 md:grid-cols-2 lg:grid-cols-3",
 
-  /** Charts grid — 1 col → 2 col wide (masonry when supported) */
-  gridCharts: "grid-lanes grid gap-6 lg:grid-cols-2",
+  /** Charts grid — 1 col → 2 col wide */
+  gridCharts: "grid gap-6 lg:grid-cols-2",
 
   /** Empty state layout — centered flex */
   emptyState: "flex flex-col items-center justify-center gap-3 p-6",
