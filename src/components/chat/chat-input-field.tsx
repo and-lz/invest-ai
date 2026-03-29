@@ -95,14 +95,17 @@ export function CampoEntradaChat({
     )}>
       {onRaciocinioChange && (
         <Button
-          variant="ghost"
-          size="icon"
+          variant={raciocinio ? "default" : "outline"}
+          size="sm"
           onClick={() => onRaciocinioChange(!raciocinio)}
-          className={cn("shrink-0", raciocinio ? "text-primary" : "text-muted-foreground")}
+          className={cn(
+            "shrink-0 gap-1.5 rounded-full",
+            !raciocinio && "text-muted-foreground",
+          )}
           title={raciocinio ? "Desativar raciocínio" : "Ativar raciocínio"}
         >
-          <Brain className="h-4 w-4" />
-          <span className="sr-only">{raciocinio ? "Desativar raciocínio" : "Ativar raciocínio"}</span>
+          <Brain className="h-3.5 w-3.5" />
+          <span className={fs ? "" : "hidden sm:inline"}>Pensar</span>
         </Button>
       )}
       <textarea

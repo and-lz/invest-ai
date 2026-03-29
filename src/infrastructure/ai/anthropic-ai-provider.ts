@@ -193,79 +193,44 @@ export class AnthropicProvedorAi implements ProvedorAi {
   }
 
   async *transmitirComPensamento(configuracao: ConfiguracaoGeracao): AsyncGenerator<StreamChunk, void, unknown> {
-    // The local proxy strips the `thinking` API parameter, so we use a
-    // prompt-based approach: instruct the model to wrap reasoning in
-    // <thinking>...</thinking> tags, then parse those from the text stream.
-    const thinkingPrompt =
-      "\n\nIMPORTANT: Before answering, write your step-by-step reasoning inside <thinking>...</thinking> tags. " +
-      "After the closing </thinking> tag, write your final answer. The thinking section should show your " +
-      "analysis process in a natural, conversational way. Always include both sections.";
+    // Two-step approach: the local Claude proxy buffers full responses and
+    // strips the native `thinking` API parameter. So we make two calls:
+    // 1) Non-streaming reasoning call (~500 tokens) — yielded as thinking
+    // 2) Streaming response call with reasoning injected as context
 
-    const instrucaoComPensamento = configuracao.instrucaoSistema + thinkingPrompt;
+    // Step 1: Generate reasoning (non-streaming, fast)
+    const reasoningSystemPrompt =
+      "You are an internal reasoning engine. Analyze the user's question and the conversation context. " +
+      "Produce a brief, structured analysis (3-8 bullet points) covering: what data is relevant, " +
+      "what patterns or insights you notice, and what approach you'll take to answer. " +
+      "Write in the same language as the user. Be concise — this is internal analysis, not the final answer. " +
+      "Do NOT answer the question itself, only analyze it.";
 
-    const configComPensamento: ConfiguracaoGeracao = {
+    const reasoningConfig: ConfiguracaoGeracao = {
       ...configuracao,
-      instrucaoSistema: instrucaoComPensamento,
+      instrucaoSistema: reasoningSystemPrompt,
+      maxOutputTokens: 600,
     };
 
-    // Reuse the existing text streaming, then split by <thinking> tags
-    let accumulated = "";
-    let insideThinking = false;
-    let thinkingDone = false;
+    const reasoningResult = await this.gerar(reasoningConfig);
+    const reasoning = reasoningResult.texto;
 
-    for await (const textChunk of this.transmitir(configComPensamento)) {
-      accumulated += textChunk;
+    // Yield reasoning as thinking chunk
+    yield { type: "thinking", content: reasoning };
 
-      // Check for <thinking> open tag
-      if (!insideThinking && !thinkingDone) {
-        const openIdx = accumulated.indexOf("<thinking>");
-        if (openIdx !== -1) {
-          insideThinking = true;
-          // Yield any text before <thinking> as text (unlikely but safe)
-          const before = accumulated.slice(0, openIdx);
-          if (before.trim()) {
-            yield { type: "text", content: before };
-          }
-          accumulated = accumulated.slice(openIdx + "<thinking>".length);
-        }
-      }
+    // Step 2: Generate response with reasoning context injected
+    const augmentedSystemPrompt =
+      configuracao.instrucaoSistema +
+      "\n\n<internal-analysis>\n" + reasoning + "\n</internal-analysis>\n" +
+      "Use the analysis above to inform your response. Do NOT reference or mention the analysis itself.";
 
-      // Check for </thinking> close tag
-      if (insideThinking) {
-        const closeIdx = accumulated.indexOf("</thinking>");
-        if (closeIdx !== -1) {
-          // Everything before </thinking> is thinking content
-          const thinkingContent = accumulated.slice(0, closeIdx);
-          if (thinkingContent) {
-            yield { type: "thinking", content: thinkingContent };
-          }
-          accumulated = accumulated.slice(closeIdx + "</thinking>".length);
-          insideThinking = false;
-          thinkingDone = true;
-          // Yield remaining accumulated text
-          if (accumulated.trim()) {
-            yield { type: "text", content: accumulated };
-            accumulated = "";
-          }
-        } else {
-          // Still inside thinking — yield what we have so far for real-time display
-          // Keep only a small tail buffer to detect the closing tag across chunks
-          const safeLen = accumulated.length - "</thinking>".length;
-          if (safeLen > 0) {
-            yield { type: "thinking", content: accumulated.slice(0, safeLen) };
-            accumulated = accumulated.slice(safeLen);
-          }
-        }
-      } else if (thinkingDone) {
-        // After thinking is done, everything is text
-        yield { type: "text", content: textChunk };
-        accumulated = "";
-      }
-    }
+    const responseConfig: ConfiguracaoGeracao = {
+      ...configuracao,
+      instrucaoSistema: augmentedSystemPrompt,
+    };
 
-    // Flush any remaining content
-    if (accumulated.trim()) {
-      yield { type: insideThinking ? "thinking" : "text", content: accumulated };
+    for await (const textChunk of this.transmitir(responseConfig)) {
+      yield { type: "text", content: textChunk };
     }
   }
 

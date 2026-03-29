@@ -75,26 +75,51 @@ export async function POST(request: Request): Promise<Response> {
     const codificadorTexto = new TextEncoder();
     const streamResposta = new ReadableStream({
       async start(controlador) {
+        // Helper: safely enqueue — guards against closed controller
+        let closed = false;
+        function enqueue(data: Uint8Array) {
+          if (closed) return;
+          try {
+            controlador.enqueue(data);
+          } catch {
+            closed = true;
+          }
+        }
+        function close() {
+          if (closed) return;
+          closed = true;
+          try { controlador.close(); } catch { /* already closed */ }
+        }
+
         try {
           if (raciocinio) {
-            const geradorStream = provedor.transmitirComPensamento(configBase);
-            for await (const chunk of geradorStream) {
-              const t = chunk.type === "thinking" ? 0 : 1;
-              controlador.enqueue(codificadorTexto.encode(JSON.stringify({ t, c: chunk.content }) + "\n"));
+            // Send keepalive so stream doesn't timeout during reasoning call
+            const keepaliveInterval = setInterval(() => {
+              enqueue(codificadorTexto.encode(" "));
+            }, 5000);
+
+            try {
+              const geradorStream = provedor.transmitirComPensamento(configBase);
+              for await (const chunk of geradorStream) {
+                const t = chunk.type === "thinking" ? 0 : 1;
+                enqueue(codificadorTexto.encode(JSON.stringify({ t, c: chunk.content }) + "\n"));
+              }
+            } finally {
+              clearInterval(keepaliveInterval);
             }
           } else {
             const geradorStream = provedor.transmitir(configBase);
             for await (const pedacoTexto of geradorStream) {
-              controlador.enqueue(codificadorTexto.encode(pedacoTexto));
+              enqueue(codificadorTexto.encode(pedacoTexto));
             }
           }
-          controlador.close();
+          close();
         } catch (erro) {
           console.error("[Chat] Erro durante streaming:", erro);
-          controlador.enqueue(
+          enqueue(
             codificadorTexto.encode(`\n\n[ERRO]: ${classificarMensagemErroChat(erro)}`),
           );
-          controlador.close();
+          close();
         }
       },
     });
