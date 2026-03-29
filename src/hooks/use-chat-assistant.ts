@@ -45,6 +45,7 @@ interface UseChatAssistenteOpcoes {
 interface UseChatAssistenteRetorno {
   readonly mensagens: readonly MensagemChat[];
   readonly estaTransmitindo: boolean;
+  readonly estaCarregandoConversa: boolean;
   readonly erro: string | null;
   readonly enviarMensagem: (conteudo: string) => Promise<void>;
   readonly limparHistorico: () => void;
@@ -419,6 +420,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
   return {
     mensagens,
     estaTransmitindo: estaTransmitindo || estaCarregando,
+    estaCarregandoConversa: estaCarregando,
     erro,
     enviarMensagem,
     limparHistorico: criarNovaConversa, // alias para compatibilidade
