@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import { useConversas } from "@/hooks/use-conversations";
 import { ItemConversa } from "./conversation-item";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Loader2, MessageSquare } from "lucide-react";
 import { icon } from "@/lib/design-system";
+import { groupByDate } from "@/lib/date-grouping";
 import { cn } from "@/lib/utils";
 
 interface ListaConversasProps {
@@ -25,6 +27,8 @@ export function ListaConversas({
   const { conversas, estaCarregando, deletarConversa } = useConversas();
   const fs = fullscreen;
 
+  const groups = useMemo(() => groupByDate(conversas), [conversas]);
+
   if (estaCarregando) {
     return (
       <div className="flex items-center justify-center p-4">
@@ -35,7 +39,7 @@ export function ListaConversas({
 
   return (
     <div className="flex h-full flex-col">
-      {/* Botao Nova Conversa */}
+      {/* New conversation button */}
       <div className={cn("border-b", fs ? "p-4" : "p-3")}>
         <Button onClick={onNovaConversa} variant="outline" size={fs ? "default" : "sm"} className="w-full">
           <PlusCircle className="mr-2 h-4 w-4" />
@@ -43,7 +47,7 @@ export function ListaConversas({
         </Button>
       </div>
 
-      {/* Lista de conversas */}
+      {/* Conversation list grouped by date */}
       <div className="flex-1 overflow-y-auto">
         {conversas.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 p-6">
@@ -55,17 +59,29 @@ export function ListaConversas({
             </p>
           </div>
         ) : (
-          <div className={cn("space-y-1", fs ? "p-3" : "p-2")}>
-            {conversas.map((conversa) => (
-              <ItemConversa
-                key={conversa.identificador}
-                conversa={conversa}
-                estaAtiva={conversa.identificador === conversaAtualId}
-                onSelecionar={() => onSelecionarConversa(conversa.identificador)}
-                onDeletar={() => deletarConversa(conversa.identificador)}
-                fullscreen={fs}
-                href={useLinks ? `/chat/${conversa.identificador}` : undefined}
-              />
+          <div className={cn(fs ? "p-3" : "p-2")}>
+            {groups.map((group) => (
+              <div key={group.label} className="mb-3">
+                <h5 className={cn(
+                  "text-muted-foreground mb-1 font-medium uppercase tracking-wider",
+                  fs ? "px-3 text-xs" : "px-2.5 text-[10px]",
+                )}>
+                  {group.label}
+                </h5>
+                <div className="space-y-0.5">
+                  {group.items.map((conversa) => (
+                    <ItemConversa
+                      key={conversa.identificador}
+                      conversa={conversa}
+                      estaAtiva={conversa.identificador === conversaAtualId}
+                      onSelecionar={() => onSelecionarConversa(conversa.identificador)}
+                      onDeletar={() => deletarConversa(conversa.identificador)}
+                      fullscreen={fs}
+                      href={useLinks ? `/chat/${conversa.identificador}` : undefined}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
