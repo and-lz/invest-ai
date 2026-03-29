@@ -94,6 +94,13 @@ export function HeaderNavigation() {
     setVersion(process.env.NEXT_PUBLIC_APP_VERSION || "");
   }, []);
 
+  // Track last non-chat page for smart back navigation
+  useEffect(() => {
+    if (!pathname.startsWith("/chat")) {
+      sessionStorage.setItem("lastNonChatPage", pathname);
+    }
+  }, [pathname]);
+
   return (
     <div className="sticky top-0 z-50">
       {/* Mobile nav dialog */}

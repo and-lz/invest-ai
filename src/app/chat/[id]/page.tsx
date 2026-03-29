@@ -27,6 +27,13 @@ export default function ChatPage() {
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const prevTransmitindoRef = useRef(false);
+  const lastNonChatPageRef = useRef("/");
+
+  // Read last non-chat page on mount
+  useEffect(() => {
+    const stored = sessionStorage.getItem("lastNonChatPage");
+    if (stored) lastNonChatPageRef.current = stored;
+  }, []);
 
   const { identificadorPagina } = useChatPageContext();
   const { data: session } = useSession();
@@ -264,7 +271,7 @@ export default function ChatPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.back()}
+              onClick={() => router.push(lastNonChatPageRef.current)}
               className="h-10 w-10"
             >
               <ArrowLeft className="text-muted-foreground h-5 w-5" />
