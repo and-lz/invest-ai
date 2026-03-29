@@ -60,13 +60,12 @@ export function SuggestionChips({
     );
   }
 
-  // Quick-reply: horizontal scrollable row, aligned to input field
+  // Quick-reply: vertical stack, right-aligned, above the input
   return (
     <div
       className={cn(
-        "flex items-center gap-2 overflow-x-auto pb-1",
-        "scrollbar-none [mask-image:linear-gradient(to_right,transparent,black_12px,black_calc(100%-12px),transparent)]",
-        fs ? "mx-auto w-full max-w-4xl px-5" : "px-3",
+        "flex flex-col items-end gap-1.5",
+        fs ? "mx-auto w-full max-w-4xl px-5 py-2" : "px-3 py-1.5",
       )}
       role="group"
       aria-label="Sugestoes de perguntas"
@@ -81,7 +80,7 @@ export function SuggestionChips({
           onClick={() => onSelect(suggestion.text)}
           className={cn(
             "bg-secondary hover:bg-secondary/80 rounded-full border",
-            "cursor-pointer transition-colors shrink-0",
+            "cursor-pointer transition-colors",
             "text-foreground hover:border-primary/30",
             fs ? "text-sm px-4 py-1.5" : "text-xs px-3 py-1",
           )}

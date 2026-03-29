@@ -141,7 +141,7 @@ export function ChatBody({
 
       {/* Quick-reply suggestions — aligned to input field */}
       {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
-        <div className="border-t pt-2 pb-0">
+        <div>
           <SuggestionChips
             suggestions={activeSuggestions}
             onSelect={onSuggestionSelect}
