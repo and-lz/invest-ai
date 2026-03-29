@@ -130,25 +130,26 @@ export function ChatBody({
           </div>
         )}
 
-        {/* Floating follow-up / AI suggestions */}
-        {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
-          <div className="pointer-events-none sticky bottom-0">
-            <SuggestionChips
-              suggestions={activeSuggestions}
-              onSelect={onSuggestionSelect}
-              filterText={aiSuggestions.length > 0 ? undefined : inputValue}
-              variant="floating"
-              isLoading={aiSuggestionsLoading}
-              fullscreen={fs}
-            />
-          </div>
-        )}
       </div>
 
       {/* Error banner */}
       {erro && (
         <div className="bg-destructive/5 border-t px-4 py-2">
           <p className={cn("text-destructive", fs ? "text-sm" : "text-xs")}>{erro}</p>
+        </div>
+      )}
+
+      {/* Quick-reply suggestions — aligned to input field */}
+      {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
+        <div className="border-t pt-2 pb-0">
+          <SuggestionChips
+            suggestions={activeSuggestions}
+            onSelect={onSuggestionSelect}
+            filterText={aiSuggestions.length > 0 ? undefined : inputValue}
+            variant="quick-reply"
+            isLoading={aiSuggestionsLoading}
+            fullscreen={fs}
+          />
         </div>
       )}
 
