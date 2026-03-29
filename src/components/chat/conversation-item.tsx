@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ItemConversaProps {
@@ -16,9 +16,10 @@ interface ItemConversaProps {
   readonly onDeletar: () => void;
   readonly fullscreen?: boolean;
   readonly href?: string;
+  readonly estaExcluindo?: boolean;
 }
 
-export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, fullscreen, href }: ItemConversaProps) {
+export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, fullscreen, href, estaExcluindo }: ItemConversaProps) {
   const fs = fullscreen;
 
   const content = (
@@ -33,6 +34,7 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, ful
         "group hover:bg-muted/50 relative rounded-md transition-colors",
         fs ? "px-3 py-2" : "px-2.5 py-1.5",
         estaAtiva && "bg-muted",
+        estaExcluindo && "pointer-events-none opacity-50",
       )}
     >
       {href ? (
@@ -54,7 +56,11 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, ful
         }}
         className="absolute top-1/2 right-1 h-6 w-6 -translate-y-1/2 opacity-60 transition-opacity hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
       >
-        <Trash2 className="text-destructive h-3.5 w-3.5" />
+        {estaExcluindo ? (
+          <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <Trash2 className="text-destructive h-3.5 w-3.5" />
+        )}
         <span className="sr-only">Deletar conversa</span>
       </Button>
     </div>

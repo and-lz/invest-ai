@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useConversas } from "@/hooks/use-conversations";
 import { ItemConversa } from "./conversation-item";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,16 @@ export function ListaConversas({
 }: ListaConversasProps) {
   const { conversas, estaCarregando, deletarConversa } = useConversas();
   const fs = fullscreen;
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeletar = useCallback(async (identificador: string) => {
+    setDeletingId(identificador);
+    try {
+      await deletarConversa(identificador);
+    } finally {
+      setDeletingId(null);
+    }
+  }, [deletarConversa]);
 
   const groups = useMemo(() => groupByDate(conversas), [conversas]);
 
@@ -74,7 +84,8 @@ export function ListaConversas({
                       conversa={conversa}
                       estaAtiva={conversa.identificador === conversaAtualId}
                       onSelecionar={() => onSelecionarConversa(conversa.identificador)}
-                      onDeletar={() => deletarConversa(conversa.identificador)}
+                      onDeletar={() => void handleDeletar(conversa.identificador)}
+                      estaExcluindo={conversa.identificador === deletingId}
                       fullscreen={fs}
                       href={useLinks ? `/chat/${conversa.identificador}` : undefined}
                     />
