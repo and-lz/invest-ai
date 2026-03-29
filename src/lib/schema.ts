@@ -286,6 +286,31 @@ export const analiseAtivos = pgTable(
 );
 
 // ============================================================
+// Tabela: mensagens_salvas
+// Bookmarked/starred individual chat messages
+// Survives conversation deletion (snapshot of content at save time)
+// ============================================================
+
+export const mensagensSalvas = pgTable(
+  "mensagens_salvas",
+  {
+    identificador: text("identificador").primaryKey(), // UUID
+    usuarioId: text("usuario_id").notNull(),
+    conversaId: text("conversa_id").notNull(), // source conversation (no FK)
+    tituloConversa: text("titulo_conversa").notNull(), // snapshot at save time
+    mensagemId: text("mensagem_id").notNull(), // UUID of original message in JSONB
+    papel: text("papel").notNull(), // "usuario" | "assistente"
+    conteudo: text("conteudo").notNull(), // message content snapshot
+    salvadaEm: timestamp("salvada_em", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_salvas_usuario_mensagem").on(table.usuarioId, table.mensagemId),
+    index("idx_salvas_usuario_id").on(table.usuarioId),
+    index("idx_salvas_usuario_salvada").on(table.usuarioId, table.salvadaEm),
+  ],
+);
+
+// ============================================================
 // Tabela: configuracoes_usuario
 // Armazena configuracoes sensíveis do usuario (ex: chaves de API)
 // Chaves sao criptografadas antes de armazenar
