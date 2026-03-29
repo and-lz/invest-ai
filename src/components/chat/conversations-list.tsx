@@ -54,14 +54,36 @@ export function ListaConversas({
       <div className="flex-1 overflow-y-auto">
         {estaCarregando ? (
           <div className={cn(fs ? "p-3" : "p-2")}>
-            {/* Fake date group header */}
-            <Skeleton className={cn("mb-2 rounded", fs ? "mx-3 h-2.5 w-16" : "mx-2.5 h-2 w-12")} />
-            <div className="space-y-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className={cn("rounded-md", fs ? "px-3 py-2" : "px-2.5 py-1.5")}>
-                  <Skeleton className={cn("rounded", fs ? "h-3.5 w-full" : "h-3 w-full")} style={{ width: `${70 + (i % 3) * 10}%` }} />
-                </div>
-              ))}
+            {/* Group 1 — mirrors real group: h5 header + item rows */}
+            <div className="mb-4">
+              <div className={cn(fs ? "px-3" : "px-2.5")}>
+                <Skeleton className={cn("mb-2 rounded", fs ? "h-2.5 w-14" : "h-2 w-10")} />
+              </div>
+              <div className="space-y-0.5">
+                {/* Each row mirrors ItemConversa: same padding, single text line with pr-6 */}
+                {["w-4/5", "w-3/5", "w-full"].map((w, i) => (
+                  <div key={i} className={cn("rounded-md", fs ? "px-3 py-2" : "px-2.5 py-1.5")}>
+                    <div className="pr-6">
+                      <Skeleton className={cn("rounded", w, fs ? "h-3.5" : "h-3")} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Group 2 */}
+            <div>
+              <div className={cn(fs ? "px-3" : "px-2.5")}>
+                <Skeleton className={cn("mb-2 rounded", fs ? "h-2.5 w-20" : "h-2 w-16")} />
+              </div>
+              <div className="space-y-0.5">
+                {["w-full", "w-2/3"].map((w, i) => (
+                  <div key={i} className={cn("rounded-md", fs ? "px-3 py-2" : "px-2.5 py-1.5")}>
+                    <div className="pr-6">
+                      <Skeleton className={cn("rounded", w, fs ? "h-3.5" : "h-3")} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         ) : conversas.length === 0 ? (

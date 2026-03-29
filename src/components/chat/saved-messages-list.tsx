@@ -30,21 +30,30 @@ export function SavedMessagesList({
 
   if (isLoading) {
     return (
-      <div className={cn(fs ? "p-3" : "p-2")}>
-        {/* Fake date group header */}
-        <Skeleton className={cn("mb-2 rounded", fs ? "mx-3 h-2.5 w-16" : "mx-2.5 h-2 w-12")} />
-        <div className="space-y-0.5">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className={cn("rounded-md", fs ? "px-3 py-2.5" : "px-2.5 py-2")}>
-              {/* Conversation title line */}
-              <Skeleton className={cn("mb-1 rounded", fs ? "h-2.5 w-24" : "h-2 w-20")} />
-              {/* Message preview lines */}
-              <div className="space-y-1">
-                <Skeleton className={cn("rounded", fs ? "h-3 w-full" : "h-2.5 w-full")} />
-                <Skeleton className={cn("rounded", fs ? "h-3" : "h-2.5")} style={{ width: `${50 + (i % 3) * 15}%` }} />
+      <div className="flex h-full flex-col">
+        <div className="flex-1 overflow-y-auto">
+          <div className={cn(fs ? "p-3" : "p-2")}>
+            {/* Group — mirrors real: h5 header + SavedMessageItem rows */}
+            <div className="mb-4">
+              <div className={cn(fs ? "px-3" : "px-2.5")}>
+                <Skeleton className={cn("mb-2 rounded", fs ? "h-2.5 w-14" : "h-2 w-10")} />
+              </div>
+              <div className="space-y-0.5">
+                {/* Each row mirrors SavedMessageItem: same padding, title + 2-line preview */}
+                {["w-full", "w-4/5", "w-full"].map((lastLineW, i) => (
+                  <div key={i} className={cn("rounded-md", fs ? "px-3 py-2.5" : "px-2.5 py-2")}>
+                    {/* Conversation title — matches text-[10px]/text-[11px] */}
+                    <Skeleton className={cn("mb-1 rounded", fs ? "h-2.5 w-20" : "h-2 w-16")} />
+                    {/* Content preview — matches text-xs/text-sm, line-clamp-2 */}
+                    <div className="space-y-1">
+                      <Skeleton className={cn("w-full rounded", fs ? "h-3.5" : "h-3")} />
+                      <Skeleton className={cn("rounded", lastLineW, fs ? "h-3.5" : "h-3")} />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     );

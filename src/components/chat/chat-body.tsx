@@ -76,14 +76,10 @@ export function ChatBody({
       >
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-[72px]" : "p-3")}>
-            {/* User message skeleton */}
-            <MessageBubbleSkeleton role="user" fullscreen={fs} lines={1} />
-            {/* Assistant message skeleton */}
-            <MessageBubbleSkeleton role="assistant" fullscreen={fs} lines={4} />
-            {/* User message skeleton */}
-            <MessageBubbleSkeleton role="user" fullscreen={fs} lines={1} widthClass="w-3/4" />
-            {/* Assistant message skeleton */}
-            <MessageBubbleSkeleton role="assistant" fullscreen={fs} lines={2} />
+            <MessageBubbleSkeleton role="user" fullscreen={fs} contentLines={["w-3/5"]} />
+            <MessageBubbleSkeleton role="assistant" fullscreen={fs} contentLines={["w-full", "w-full", "w-full", "w-2/3"]} />
+            <MessageBubbleSkeleton role="user" fullscreen={fs} contentLines={["w-2/5"]} />
+            <MessageBubbleSkeleton role="assistant" fullscreen={fs} contentLines={["w-full", "w-4/5"]} />
           </div>
         )}
         {!estaCarregandoConversa && mensagens.length === 0 && (
@@ -169,42 +165,42 @@ export function ChatBody({
   );
 }
 
+/** Mirrors the exact DOM of MensagemChatBolha but with skeleton placeholders. */
 function MessageBubbleSkeleton({
   role,
   fullscreen: fs,
-  lines,
-  widthClass,
+  contentLines,
 }: {
   readonly role: "user" | "assistant";
   readonly fullscreen: boolean;
-  readonly lines: number;
-  readonly widthClass?: string;
+  /** Width classes for each skeleton text line (e.g. ["w-full", "w-4/5"]) */
+  readonly contentLines: readonly string[];
 }) {
   const isUser = role === "user";
   return (
-    <div
-      className={cn(
-        "w-full rounded-lg",
-        !isUser && "bg-muted/50",
-        fs ? "px-5 py-4" : "px-4 py-3",
-      )}
-    >
-      {/* Avatar + name row */}
-      <div className={cn("mb-2 flex items-center", fs ? "gap-2.5" : "gap-2")}>
-        <Skeleton className={cn("shrink-0 rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
-        <Skeleton className={cn("rounded", fs ? "h-3.5 w-14" : "h-3 w-10")} />
-      </div>
-      {/* Content lines */}
-      <div className="space-y-1.5">
-        {Array.from({ length: lines }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className={cn(
-              "h-3.5 rounded",
-              widthClass ?? (i === lines - 1 && lines > 1 ? "w-3/5" : "w-full"),
-            )}
-          />
-        ))}
+    <div className="space-y-1">
+      {/* Message bubble — same classes as MensagemChatBolha */}
+      <div
+        className={cn(
+          "group/msg w-full rounded-lg",
+          !isUser && "bg-muted/50",
+          fs ? "px-5 py-4" : "px-4 py-3",
+        )}
+      >
+        {/* Role label row — same as real: avatar + name */}
+        <div className={cn("mb-2 flex items-center", fs ? "gap-2.5" : "gap-2")}>
+          <Skeleton className={cn("shrink-0 rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
+          <Skeleton className={cn("rounded", fs ? "h-3.5 w-12" : "h-3 w-8")} />
+        </div>
+        {/* Content — same text size leading as real */}
+        <div className={cn("space-y-2", fs ? "text-base leading-relaxed" : "text-sm leading-relaxed")}>
+          {contentLines.map((widthCls, i) => (
+            <Skeleton
+              key={i}
+              className={cn("rounded", widthCls, fs ? "h-4" : "h-3.5")}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
