@@ -308,7 +308,7 @@ describe("executeBackgroundTask", () => {
       });
 
       expect(cleanupMock).toHaveBeenCalledTimes(1);
-    });
+    }, 15_000); // retry backoff takes ~4000ms — needs more than the 5s default
 
     it("Given a successful operation, When aoFalharDefinitivo is provided, Then it is NOT called", async () => {
       const tarefa = criarTarefaBase();
