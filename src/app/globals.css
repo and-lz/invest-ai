@@ -444,7 +444,7 @@ dialog[data-closing]::backdrop {
   overflow: hidden;
 }
 
-/* Chat auto-hide header — transform-only, no layout reflow */
+/* Chat auto-hide header — kept for reference, no longer toggled */
 .chat-auto-header {
   transition: transform 200ms ease, opacity 150ms ease;
 }

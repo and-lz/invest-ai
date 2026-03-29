@@ -125,7 +125,9 @@ export function ChatWidget() {
     if (aiSuggestions.length > 0) {
       return aiSuggestions;
     }
-    return followUpSuggestions;
+    return followUpSuggestions.length > 0
+      ? followUpSuggestions
+      : (INITIAL_SUGGESTIONS[identificadorPagina] ?? []);
   }, [mensagens.length, identificadorPagina, followUpSuggestions, aiSuggestions]);
 
   const handleSuggestionSelect = useCallback(

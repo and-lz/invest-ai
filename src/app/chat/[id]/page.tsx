@@ -15,7 +15,6 @@ import { useConversas } from "@/hooks/use-conversations";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
-import { useAutoHideOnScroll } from "@/hooks/use-auto-hide-on-scroll";
 import { stripMarkdown } from "@/lib/strip-markdown";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
 import { cn } from "@/lib/utils";
@@ -28,7 +27,6 @@ export default function ChatPage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
-  const { ref: headerRef, onScroll: onMessagesScroll } = useAutoHideOnScroll("chat-auto-header--hidden");
   const [inputValue, setInputValue] = useState("");
   const [raciocinio, setRaciocinio] = useState(false);
   const prevTransmitindoRef = useRef(false);
@@ -85,6 +83,8 @@ export default function ChatPage() {
   // Saved messages
   const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
   const { conversas } = useConversas();
+  const conversaAtual = conversas.find((c) => c.identificador === conversaAtualId);
+  const title = conversaAtual?.titulo ?? "Nova conversa";
 
   const handleToggleSave = useCallback(
     (mensagem: MensagemChat) => {
@@ -134,7 +134,9 @@ export default function ChatPage() {
     if (aiSuggestions.length > 0) {
       return aiSuggestions;
     }
-    return followUpSuggestions;
+    return followUpSuggestions.length > 0
+      ? followUpSuggestions
+      : (INITIAL_SUGGESTIONS[identificadorPagina] ?? []);
   }, [mensagens.length, identificadorPagina, followUpSuggestions, aiSuggestions]);
 
   const handleSuggestionSelect = useCallback(
@@ -215,7 +217,7 @@ export default function ChatPage() {
       {/* Main chat area */}
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <ChatPageHeader
-          headerRef={headerRef}
+          title={title}
           onToggleSidebar={toggleSidebar}
           ttsSupported={ttsSupported}
           ttsEnabled={ttsEnabled}
@@ -244,7 +246,6 @@ export default function ChatPage() {
           aiSuggestions={aiSuggestions}
           raciocinio={raciocinio}
           onRaciocinioChange={handleRaciocinioChange}
-          onScroll={onMessagesScroll}
           savedMessageIds={savedMessageIds}
           onToggleSave={handleToggleSave}
           estaCarregandoConversa={estaCarregandoConversa}

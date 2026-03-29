@@ -79,10 +79,9 @@ export function SuggestionChips({
           type="button"
           onClick={() => onSelect(suggestion.text)}
           className={cn(
-            "bg-secondary hover:bg-secondary/80 rounded-full border",
+            "text-muted-foreground hover:text-foreground",
             "cursor-pointer transition-colors",
-            "text-foreground hover:border-primary/30",
-            fs ? "text-sm px-4 py-1.5" : "text-xs px-3 py-1",
+            fs ? "text-sm" : "text-xs",
           )}
         >
           {suggestion.label}

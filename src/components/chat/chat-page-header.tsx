@@ -8,7 +8,7 @@ import type { SpeechStatus } from "@/hooks/use-speech-synthesis";
 import { cn } from "@/lib/utils";
 
 interface ChatPageHeaderProps {
-  readonly headerRef: React.RefObject<HTMLDivElement | null>;
+  readonly title: string;
   readonly onToggleSidebar: () => void;
   readonly ttsSupported: boolean;
   readonly ttsEnabled: boolean;
@@ -20,7 +20,7 @@ interface ChatPageHeaderProps {
 }
 
 export function ChatPageHeader({
-  headerRef,
+  title,
   onToggleSidebar,
   ttsSupported,
   ttsEnabled,
@@ -31,18 +31,18 @@ export function ChatPageHeader({
   onBack,
 }: ChatPageHeaderProps) {
   return (
-    <div
-      ref={headerRef}
-      className="chat-auto-header bg-background/95 supports-[backdrop-filter]:bg-background/80 absolute inset-x-0 top-0 z-10 border-b backdrop-blur-sm"
-    >
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-2">
+    <div className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky inset-x-0 top-0 z-10 border-b backdrop-blur-sm">
+      <div className="flex items-center px-6 py-2">
+        <div className="flex shrink-0 items-center gap-2">
           <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="h-10 w-10">
             <Menu className="h-5 w-5" />
           </Button>
           <Logo />
         </div>
-        <div className="flex items-center gap-1">
+        <div className="min-w-0 flex-1 px-4 text-center">
+          <p className="text-muted-foreground truncate text-sm font-medium">{title}</p>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
           {ttsSupported && (
             <TooltipProvider>
               <Tooltip>
