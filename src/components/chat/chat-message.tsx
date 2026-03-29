@@ -1,10 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Bookmark, RefreshCw, User } from "lucide-react";
+import { AlertCircle, Bookmark, ChevronRight, RefreshCw, User } from "lucide-react";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import { ConteudoMarkdownChat } from "@/components/chat/chat-markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 /** Matches `[ERRO]: <message>` at the end of streamed content */
 const STREAM_ERROR_REGEX = /\n*\[ERRO\]:\s*(.+)$/;
@@ -40,14 +46,48 @@ export function MensagemChatBolha({
     ? mensagem.conteudo.replace(STREAM_ERROR_REGEX, "").trim()
     : mensagem.conteudo;
 
+  const [reasoningOpen, setReasoningOpen] = useState(false);
+
   return (
-    <div
-      className={cn(
-        "group/msg w-full rounded-lg",
-        !ehUsuario && "bg-muted/50",
-        fs ? "px-5 py-4" : "px-4 py-3",
+    <div className="space-y-1">
+      {/* Collapsible reasoning block (before the bubble) */}
+      {!ehUsuario && mensagem.pensamento && (
+        <Collapsible open={reasoningOpen} onOpenChange={setReasoningOpen}>
+          <CollapsibleTrigger
+            className={cn(
+              "text-muted-foreground flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 transition-colors hover:bg-muted/50",
+              fs ? "text-xs" : "text-[11px]",
+            )}
+          >
+            <ChevronRight
+              className={cn(
+                "h-3 w-3 shrink-0 transition-transform duration-200",
+                reasoningOpen && "rotate-90",
+              )}
+            />
+            <span className="font-medium">Raciocínio</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div
+              className={cn(
+                "text-muted-foreground mt-1 ml-2 border-l-2 border-border/40 pl-3 italic",
+                fs ? "text-sm" : "text-xs",
+              )}
+            >
+              {mensagem.pensamento}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
-    >
+
+      {/* Message bubble */}
+      <div
+        className={cn(
+          "group/msg w-full rounded-lg",
+          !ehUsuario && "bg-muted/50",
+          fs ? "px-5 py-4" : "px-4 py-3",
+        )}
+      >
       {/* Role label */}
       <div className={cn("mb-2 flex items-center gap-2", fs ? "gap-2.5" : "gap-2")}>
         {ehUsuario ? (
@@ -89,31 +129,33 @@ export function MensagemChatBolha({
         )}
       </div>
 
-      {/* Thinking / reasoning (inline dimmed) */}
-      {!ehUsuario && mensagem.pensamento && (
-        <div className={cn(
-          "text-muted-foreground mb-3 border-l-2 border-border/50 pl-3 italic",
-          fs ? "text-sm" : "text-xs",
-        )}>
-          <span className="text-muted-foreground mb-1 block text-[10px] font-medium uppercase tracking-wider not-italic">
-            Raciocínio
-          </span>
-          {mensagem.pensamento}
-        </div>
-      )}
-
       {/* Message content */}
       <div className={fs ? "text-base leading-relaxed" : "text-sm leading-relaxed"}>
         {cleanContent ? (
           <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} fullscreen={fs} />
+        ) : estaTransmitindo && !streamError ? (
+          <span className="inline-flex gap-1">
+            <span className="animate-bounce">.</span>
+            <span className="animate-bounce [animation-delay:0.1s]">.</span>
+            <span className="animate-bounce [animation-delay:0.2s]">.</span>
+          </span>
         ) : (
-          estaTransmitindo &&
-          !streamError && (
-            <span className="inline-flex gap-1">
-              <span className="animate-bounce">.</span>
-              <span className="animate-bounce [animation-delay:0.1s]">.</span>
-              <span className="animate-bounce [animation-delay:0.2s]">.</span>
-            </span>
+          !ehUsuario &&
+          !streamError &&
+          onRetry && (
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-xs">
+                Resposta vazia — tente novamente.
+              </span>
+              <button
+                onClick={onRetry}
+                type="button"
+                className="text-primary flex items-center gap-1.5 text-xs font-medium hover:underline"
+              >
+                <RefreshCw className="h-3 w-3" />
+                Tentar novamente
+              </button>
+            </div>
           )
         )}
 
@@ -137,6 +179,7 @@ export function MensagemChatBolha({
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }
