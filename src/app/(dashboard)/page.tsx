@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { serializarContextoDashboard } from "@/lib/serialize-chat-context";
@@ -17,8 +17,9 @@ import { formatarMesAno } from "@/lib/format-date";
 import { typography } from "@/lib/design-system";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import Image from "next/image";
-import { Upload, LayoutDashboard } from "lucide-react";
+import { Upload, LayoutDashboard, ChevronDown } from "lucide-react";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
 import { isAiEnabled } from "@/lib/ai-features";
@@ -127,6 +128,8 @@ function DashboardHeadline({
   );
 }
 
+const DETAILS_STORAGE_KEY = "dashboard-details-open";
+
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3">
@@ -135,6 +138,18 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
       </span>
       <div className="bg-border h-px flex-1" />
     </div>
+  );
+}
+
+function CollapsibleSectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <CollapsibleTrigger className="flex w-full cursor-pointer items-center gap-3 [&[data-state=open]>svg]:rotate-180">
+      <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+        {children}
+      </span>
+      <div className="bg-border h-px flex-1" />
+      <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200" />
+    </CollapsibleTrigger>
   );
 }
 
@@ -147,10 +162,6 @@ function DashboardSkeleton() {
         ))}
       </div>
       <Skeleton className="h-96" />
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Skeleton className="h-96" />
-        <Skeleton className="h-96" />
-      </div>
     </div>
   );
 }
@@ -197,8 +208,41 @@ function EstadoVazio() {
   );
 }
 
+function useDetailsOpen() {
+  const [open, setOpen] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(DETAILS_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const setDetailsOpen = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
+    setOpen((prev) => {
+      const next = typeof value === "function" ? value(prev) : value;
+      try {
+        localStorage.setItem(DETAILS_STORAGE_KEY, String(next));
+      } catch {
+        // localStorage unavailable
+      }
+      return next;
+    });
+  }, []);
+
+  // Listen for chat highlight expand requests
+  useEffect(() => {
+    const handler = () => setDetailsOpen(true);
+    window.addEventListener("dashboard-expand-details", handler);
+    return () => window.removeEventListener("dashboard-expand-details", handler);
+  }, [setDetailsOpen]);
+
+  return [open, setDetailsOpen] as const;
+}
+
 export default function DashboardPage() {
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string | undefined>(undefined);
+  const [detailsOpen, setDetailsOpen] = useDetailsOpen();
 
   const { dadosDashboard, estaVazio, estaCarregando } = useDashboardData(
     periodoSelecionado ? { mesAno: periodoSelecionado } : undefined,
@@ -258,61 +302,64 @@ export default function DashboardPage() {
 
           <WealthEvolutionChart evolucaoPatrimonial={dadosDashboard.evolucaoPatrimonial} />
 
-          {/* ── Análise ── */}
-          <SectionLabel>Análise</SectionLabel>
+          {/* ── Análise detalhada (collapsible) ── */}
+          <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
+            <CollapsibleSectionLabel>Análise detalhada</CollapsibleSectionLabel>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
-            <AssetAllocationChart alocacaoMensal={dadosDashboard.alocacaoAtual} />
-          </div>
+            <CollapsibleContent className="space-y-6 pt-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                <RiskConsistencyCard analiseRiscoRetorno={dadosDashboard.analiseRiscoRetorno} />
+                <AssetAllocationChart alocacaoMensal={dadosDashboard.alocacaoAtual} />
+              </div>
 
-          <BenchmarkComparisonChart comparacoes={dadosDashboard.comparacaoBenchmarksAtual} />
+              <BenchmarkComparisonChart comparacoes={dadosDashboard.comparacaoBenchmarksAtual} />
 
-          <MonthlyReturnsHeatmap retornosMensais={dadosDashboard.retornosMensais} />
+              <MonthlyReturnsHeatmap retornosMensais={dadosDashboard.retornosMensais} />
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <AllocationEvolutionChart evolucaoAlocacao={dadosDashboard.evolucaoAlocacaoHistorica} />
-            <CategoryPerformanceChart categorias={dadosDashboard.rentabilidadePorCategoria} />
-          </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                <AllocationEvolutionChart evolucaoAlocacao={dadosDashboard.evolucaoAlocacaoHistorica} />
+                <CategoryPerformanceChart categorias={dadosDashboard.rentabilidadePorCategoria} />
+              </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <PeriodComparisonDetail comparacaoPeriodos={dadosDashboard.comparacaoPeriodos} />
-            <LiquidityLadder faixasLiquidez={dadosDashboard.faixasLiquidez} />
-          </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                <PeriodComparisonDetail comparacaoPeriodos={dadosDashboard.comparacaoPeriodos} />
+                <LiquidityLadder faixasLiquidez={dadosDashboard.faixasLiquidez} />
+              </div>
 
-          {/* ── Destaques ── */}
-          <SectionLabel>Destaques</SectionLabel>
+              <SectionLabel>Destaques</SectionLabel>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <TopPerformersTable
-              titulo="Melhores do Mes"
-              ativos={dadosDashboard.melhoresPerformers}
-              tipo="melhores"
-            />
-            <TopPerformersTable
-              titulo="Piores do Mes"
-              ativos={dadosDashboard.pioresPerformers}
-              tipo="piores"
-            />
-          </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                <TopPerformersTable
+                  titulo="Melhores do Mes"
+                  ativos={dadosDashboard.melhoresPerformers}
+                  tipo="melhores"
+                />
+                <TopPerformersTable
+                  titulo="Piores do Mes"
+                  ativos={dadosDashboard.pioresPerformers}
+                  tipo="piores"
+                />
+              </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <StrategyGainsTable ganhos={dadosDashboard.ganhosPorEstrategia} />
-            <FinancialEventsList eventos={dadosDashboard.eventosRecentes} />
-          </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                <StrategyGainsTable ganhos={dadosDashboard.ganhosPorEstrategia} />
+                <FinancialEventsList eventos={dadosDashboard.eventosRecentes} />
+              </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/desempenho">
-              <Button variant="outline" size="sm">
-                Ver todas as posições →
-              </Button>
-            </Link>
-            <Link href="/reports">
-              <Button variant="outline" size="sm">
-                Ver movimentações →
-              </Button>
-            </Link>
-          </div>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <Link href="/desempenho">
+                  <Button variant="outline" size="sm">
+                    Ver todas as posições →
+                  </Button>
+                </Link>
+                <Link href="/reports">
+                  <Button variant="outline" size="sm">
+                    Ver movimentações →
+                  </Button>
+                </Link>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </>
       )}
     </div>

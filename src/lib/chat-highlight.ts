@@ -15,21 +15,34 @@
  * destacarElemento("patrimonio-total", 3000);
  * // Card com data-chat-highlight="patrimonio-total" pisca com ring azul
  */
+function aplicarHighlight(elemento: Element, duracao: number): void {
+  elemento.classList.add("chat-highlight-active");
+  elemento.scrollIntoView({ behavior: "smooth", block: "center" });
+  setTimeout(() => {
+    elemento.classList.remove("chat-highlight-active");
+  }, duracao);
+}
+
 export function destacarElemento(seletor: string, duracao: number = 3000): void {
   if (typeof window === "undefined") return;
 
   const elemento = document.querySelector(`[data-chat-highlight="${seletor}"]`);
-  if (!elemento) {
-    console.warn(`[Chat Highlight] Elemento nao encontrado: ${seletor}`);
+  if (elemento) {
+    aplicarHighlight(elemento, duracao);
     return;
   }
 
-  elemento.classList.add("chat-highlight-active");
-  elemento.scrollIntoView({ behavior: "smooth", block: "center" });
+  // Element might be inside collapsed details section — request expand and retry
+  window.dispatchEvent(new CustomEvent("dashboard-expand-details"));
 
   setTimeout(() => {
-    elemento.classList.remove("chat-highlight-active");
-  }, duracao);
+    const retryElemento = document.querySelector(`[data-chat-highlight="${seletor}"]`);
+    if (!retryElemento) {
+      console.warn(`[Chat Highlight] Elemento nao encontrado: ${seletor}`);
+      return;
+    }
+    aplicarHighlight(retryElemento, duracao);
+  }, 300);
 }
 
 /**
