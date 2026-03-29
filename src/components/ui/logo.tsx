@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export function Logo({ className }: { className?: string }) {
   return (
     <Image
-      src="/fortuna-minimal.png"
+      src="/fortuna.png"
       alt="Fortuna"
       width={50}
       height={50}

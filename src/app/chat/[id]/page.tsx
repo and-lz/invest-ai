@@ -4,11 +4,11 @@ import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { Bot, Menu, Trash2, Volume2, VolumeX, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChatBody } from "@/components/chat/chat-body";
 import { SidebarTabs } from "@/components/chat/sidebar-tabs";
+import { ChatPageHeader } from "@/components/chat/chat-page-header";
+import { ChatMobileSidebar } from "@/components/chat/chat-mobile-sidebar";
+import type { ChatMobileSidebarHandle } from "@/components/chat/chat-mobile-sidebar";
 import { useChatAssistant } from "@/hooks/use-chat-assistant";
 import { useSavedMessages } from "@/hooks/use-saved-messages";
 import { useConversas } from "@/hooks/use-conversations";
@@ -16,11 +16,9 @@ import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { useAutoHideOnScroll } from "@/hooks/use-auto-hide-on-scroll";
-import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { stripMarkdown } from "@/lib/strip-markdown";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
 import { cn } from "@/lib/utils";
-import { dialog } from "@/lib/design-system";
 import type { MensagemChat } from "@/schemas/chat.schema";
 
 export default function ChatPage() {
@@ -34,6 +32,7 @@ export default function ChatPage() {
   const [inputValue, setInputValue] = useState("");
   const [raciocinio, setRaciocinio] = useState(false);
   const prevTransmitindoRef = useRef(false);
+  const mobileSidebarRef = useRef<ChatMobileSidebarHandle>(null);
 
   useEffect(() => {
     setRaciocinio(localStorage.getItem("chatReasoningEnabled") === "true");
@@ -173,36 +172,20 @@ export default function ChatPage() {
     router.push("/chat");
   }, [criarNovaConversa, router]);
 
-  // Mobile sidebar drawer
-  const {
-    dialogRef: sidebarDialogRef,
-    open: openMobileSidebar,
-    close: closeMobileSidebar,
-    handleBackdropClick: handleSidebarBackdrop,
-  } = useNativeDialog();
-
   const toggleSidebar = useCallback(() => {
-    // On mobile, use dialog drawer
     if (window.innerWidth < 768) {
-      openMobileSidebar();
+      mobileSidebarRef.current?.open();
     } else {
       setSidebarOpen((v) => !v);
     }
-  }, [openMobileSidebar]);
+  }, []);
 
-  const handleMobileSelecionarConversa = useCallback(
-    (identificador: string) => {
-      closeMobileSidebar();
-      router.push(`/chat/${identificador}`);
-    },
-    [closeMobileSidebar, router],
-  );
-
-  const handleMobileNovaConversa = useCallback(() => {
-    closeMobileSidebar();
-    criarNovaConversa();
-    router.push("/chat");
-  }, [closeMobileSidebar, criarNovaConversa, router]);
+  const handleToggleTts = useCallback(() => {
+    setTtsEnabled((v) => {
+      if (v) stopSpeech();
+      return !v;
+    });
+  }, [stopSpeech]);
 
   return (
     <div className="flex min-h-0 flex-1">
@@ -222,106 +205,27 @@ export default function ChatPage() {
         />
       </div>
 
-      {/* Mobile sidebar drawer */}
-      <dialog
-        ref={sidebarDialogRef}
-        onClick={handleSidebarBackdrop}
-        aria-label="Conversas"
-        className={cn(
-          "bg-background flex flex-col border-r p-0 shadow-lg md:hidden",
-          dialog.backdrop,
-          dialog.drawerLeft,
-        )}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          width: "min(320px, 80vw)",
-          height: "100dvh",
-          margin: 0,
-        }}
-      >
-        <SidebarTabs
-          conversaAtualId={conversaAtualId}
-          onSelecionarConversa={handleMobileSelecionarConversa}
-          onNovaConversa={handleMobileNovaConversa}
-          fullscreen
-        />
-      </dialog>
+      <ChatMobileSidebar
+        ref={mobileSidebarRef}
+        conversaAtualId={conversaAtualId}
+        onSelecionarConversa={(id) => router.push(`/chat/${id}`)}
+        onNovaConversa={() => { criarNovaConversa(); router.push("/chat"); }}
+      />
 
       {/* Main chat area */}
       <div className="relative flex flex-1 flex-col overflow-hidden">
-        {/* Header — absolutely positioned, slides up via transform (no reflow) */}
-        <div ref={headerRef} className="chat-auto-header bg-background/95 supports-[backdrop-filter]:bg-background/80 absolute inset-x-0 top-0 z-10 border-b backdrop-blur-sm">
-          <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              className="h-10 w-10"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+        <ChatPageHeader
+          headerRef={headerRef}
+          onToggleSidebar={toggleSidebar}
+          ttsSupported={ttsSupported}
+          ttsEnabled={ttsEnabled}
+          speechStatus={speechStatus}
+          onToggleTts={handleToggleTts}
+          hasMessages={mensagens.length > 0}
+          onClearHistory={limparHistorico}
+          onBack={() => router.push(lastNonChatPageRef.current)}
+        />
 
-            <Bot className="text-muted-foreground h-6 w-6" />
-            <h3 className="text-lg font-medium">Fortuna</h3>
-          </div>
-          <div className="flex items-center gap-1">
-            {ttsSupported && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setTtsEnabled((v) => {
-                          if (v) stopSpeech();
-                          return !v;
-                        });
-                      }}
-                      className={cn("h-10 w-10", ttsEnabled && "text-primary")}
-                    >
-                      {ttsEnabled ? (
-                        <Volume2
-                          className={cn(
-                            "h-5 w-5",
-                            speechStatus === "speaking" && "animate-pulse",
-                          )}
-                        />
-                      ) : (
-                        <VolumeX className="text-muted-foreground h-5 w-5" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {ttsEnabled ? "Desativar leitura em voz alta" : "Ativar leitura em voz alta"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            {mensagens.length > 0 && (
-              <Button variant="ghost" size="icon" onClick={limparHistorico} className="h-10 w-10">
-                <Trash2 className="text-muted-foreground h-5 w-5" />
-                <span className="sr-only">Limpar historico</span>
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(lastNonChatPageRef.current)}
-              className="h-10 w-10"
-            >
-              <ArrowLeft className="text-muted-foreground h-5 w-5" />
-              <span className="sr-only">Voltar</span>
-            </Button>
-          </div>
-          </div>
-        </div>
-
-        {/* Chat body */}
         <ChatBody
           mensagens={mensagens}
           estaTransmitindo={estaTransmitindo}
