@@ -13,6 +13,7 @@ import { useChatAssistant } from "@/hooks/use-chat-assistant";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
+import { useAutoHideOnScroll } from "@/hooks/use-auto-hide-on-scroll";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { stripMarkdown } from "@/lib/strip-markdown";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
@@ -26,6 +27,7 @@ export default function ChatPage() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
+  const { ref: headerRef, onScroll: onMessagesScroll } = useAutoHideOnScroll("chat-auto-header--hidden");
   const [inputValue, setInputValue] = useState("");
   const [raciocinio, setRaciocinio] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -222,9 +224,10 @@ export default function ChatPage() {
       </dialog>
 
       {/* Main chat area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-4">
+      <div className="relative flex flex-1 flex-col overflow-hidden">
+        {/* Header — absolutely positioned, slides up via transform (no reflow) */}
+        <div ref={headerRef} className="chat-auto-header bg-background/95 supports-[backdrop-filter]:bg-background/80 absolute inset-x-0 top-0 z-10 border-b backdrop-blur-sm">
+          <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -288,6 +291,7 @@ export default function ChatPage() {
               <span className="sr-only">Voltar</span>
             </Button>
           </div>
+          </div>
         </div>
 
         {/* Chat body */}
@@ -309,6 +313,7 @@ export default function ChatPage() {
           aiSuggestions={aiSuggestions}
           raciocinio={raciocinio}
           onRaciocinioChange={handleRaciocinioChange}
+          onScroll={onMessagesScroll}
         />
       </div>
     </div>

@@ -193,94 +193,79 @@ export class AnthropicProvedorAi implements ProvedorAi {
   }
 
   async *transmitirComPensamento(configuracao: ConfiguracaoGeracao): AsyncGenerator<StreamChunk, void, unknown> {
-    const messages: AnthropicMessage[] = configuracao.mensagens.map((mensagem) => ({
-      role: mensagem.papel === "usuario" ? "user" : "assistant",
-      content: mensagem.partes
-        .filter((p) => p.tipo === "texto")
-        .map((p) => (p.tipo === "texto" ? p.dados : ""))
-        .join("\n"),
-    }));
+    // The local proxy strips the `thinking` API parameter, so we use a
+    // prompt-based approach: instruct the model to wrap reasoning in
+    // <thinking>...</thinking> tags, then parse those from the text stream.
+    const thinkingPrompt =
+      "\n\nIMPORTANT: Before answering, write your step-by-step reasoning inside <thinking>...</thinking> tags. " +
+      "After the closing </thinking> tag, write your final answer. The thinking section should show your " +
+      "analysis process in a natural, conversational way. Always include both sections.";
 
-    const budgetTokens = configuracao.thinking?.budgetTokens ?? 10000;
+    const instrucaoComPensamento = configuracao.instrucaoSistema + thinkingPrompt;
 
-    let httpResponse: Response;
+    const configComPensamento: ConfiguracaoGeracao = {
+      ...configuracao,
+      instrucaoSistema: instrucaoComPensamento,
+    };
 
-    try {
-      httpResponse = await fetch(`${this.proxyBaseUrl}/v1/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: this.model,
-          system: configuracao.instrucaoSistema,
-          messages,
-          max_tokens: configuracao.maxOutputTokens ?? 16000,
-          stream: true,
-          thinking: { type: "enabled", budget_tokens: budgetTokens },
-        }),
-      });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      throw new AiApiTransientError(
-        `Nao foi possivel conectar ao proxy Claude em ${this.proxyBaseUrl}. Inicie o proxy com \`npm run proxy\`. Erro: ${message}`,
-      );
-    }
+    // Reuse the existing text streaming, then split by <thinking> tags
+    let accumulated = "";
+    let insideThinking = false;
+    let thinkingDone = false;
 
-    if (!httpResponse.ok) {
-      const errorText = await httpResponse.text().catch(() => "");
-      if (httpResponse.status >= 500) {
-        throw new AiApiTransientError(
-          `Proxy Claude retornou ${httpResponse.status}. Verifique se o proxy esta rodando com \`npm run proxy\`. Detalhes: ${errorText}`,
-        );
-      }
-      throw new AiApiError(
-        `Proxy Claude retornou ${httpResponse.status}: ${errorText}`,
-      );
-    }
+    for await (const textChunk of this.transmitir(configComPensamento)) {
+      accumulated += textChunk;
 
-    const body = httpResponse.body;
-    if (!body) {
-      throw new AiApiError("Resposta do proxy Claude nao contem body stream");
-    }
-
-    const reader = body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        const events = buffer.split("\n\n");
-        buffer = events.pop() ?? "";
-
-        for (const event of events) {
-          if (!event.trim()) continue;
-
-          const dataLine = event.split("\n").find((l) => l.startsWith("data: "));
-          if (!dataLine) continue;
-
-          const jsonStr = dataLine.slice(6);
-          let parsed: { type?: string; delta?: { type?: string; text?: string; thinking?: string } };
-          try {
-            parsed = JSON.parse(jsonStr) as typeof parsed;
-          } catch {
-            continue;
+      // Check for <thinking> open tag
+      if (!insideThinking && !thinkingDone) {
+        const openIdx = accumulated.indexOf("<thinking>");
+        if (openIdx !== -1) {
+          insideThinking = true;
+          // Yield any text before <thinking> as text (unlikely but safe)
+          const before = accumulated.slice(0, openIdx);
+          if (before.trim()) {
+            yield { type: "text", content: before };
           }
-
-          if (parsed.type === "content_block_delta") {
-            if (parsed.delta?.type === "thinking_delta" && parsed.delta.thinking) {
-              yield { type: "thinking", content: parsed.delta.thinking };
-            } else if (parsed.delta?.type === "text_delta" && parsed.delta.text) {
-              yield { type: "text", content: parsed.delta.text };
-            }
-          }
+          accumulated = accumulated.slice(openIdx + "<thinking>".length);
         }
       }
-    } finally {
-      reader.releaseLock();
+
+      // Check for </thinking> close tag
+      if (insideThinking) {
+        const closeIdx = accumulated.indexOf("</thinking>");
+        if (closeIdx !== -1) {
+          // Everything before </thinking> is thinking content
+          const thinkingContent = accumulated.slice(0, closeIdx);
+          if (thinkingContent) {
+            yield { type: "thinking", content: thinkingContent };
+          }
+          accumulated = accumulated.slice(closeIdx + "</thinking>".length);
+          insideThinking = false;
+          thinkingDone = true;
+          // Yield remaining accumulated text
+          if (accumulated.trim()) {
+            yield { type: "text", content: accumulated };
+            accumulated = "";
+          }
+        } else {
+          // Still inside thinking — yield what we have so far for real-time display
+          // Keep only a small tail buffer to detect the closing tag across chunks
+          const safeLen = accumulated.length - "</thinking>".length;
+          if (safeLen > 0) {
+            yield { type: "thinking", content: accumulated.slice(0, safeLen) };
+            accumulated = accumulated.slice(safeLen);
+          }
+        }
+      } else if (thinkingDone) {
+        // After thinking is done, everything is text
+        yield { type: "text", content: textChunk };
+        accumulated = "";
+      }
+    }
+
+    // Flush any remaining content
+    if (accumulated.trim()) {
+      yield { type: insideThinking ? "thinking" : "text", content: accumulated };
     }
   }
 

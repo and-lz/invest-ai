@@ -13,14 +13,26 @@ import {
 /** Envia apenas as ultimas N mensagens para a API, controlando uso de tokens */
 const LIMITE_MENSAGENS_PARA_API = 20;
 
-/** Find the next "0:" or "1:" prefix position in the reasoning stream protocol */
-function findNextPrefix(str: string, from: number): number {
-  for (let i = from; i < str.length - 1; i++) {
-    if ((str[i] === "0" || str[i] === "1") && str[i + 1] === ":") {
-      return i;
+/** Parse newline-delimited JSON stream for reasoning protocol.
+ * Each line is {"t":0,"c":"..."} (thinking) or {"t":1,"c":"..."} (text). */
+function parseReasoningStream(raw: string): { thinking: string; text: string } {
+  let thinking = "";
+  let text = "";
+  const lines = raw.split("\n");
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    try {
+      const parsed = JSON.parse(line) as { t: number; c: string };
+      if (parsed.t === 0) {
+        thinking += parsed.c;
+      } else {
+        text += parsed.c;
+      }
+    } catch {
+      // Incomplete JSON line (chunk split mid-line) — skip, will be complete next iteration
     }
   }
-  return -1;
+  return { thinking, text };
 }
 
 /** Debounce para auto-save (aguarda streaming concluir + 2s) */
@@ -237,28 +249,9 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
           rawAcumulado += decodificadorTexto.decode(value, { stream: true });
 
           if (raciocinio) {
-            // Parse prefix protocol: "0:thinking chunk" / "1:text chunk"
-            // Re-parse full raw each iteration to handle chunks split mid-prefix
-            pensamentoAcumulado = "";
-            textoAcumulado = "";
-            let i = 0;
-            while (i < rawAcumulado.length) {
-              if (i + 1 < rawAcumulado.length && rawAcumulado[i + 1] === ":") {
-                const prefix = rawAcumulado[i];
-                const nextPrefixIdx = findNextPrefix(rawAcumulado, i + 2);
-                const chunk = rawAcumulado.slice(i + 2, nextPrefixIdx === -1 ? undefined : nextPrefixIdx);
-                if (prefix === "0") {
-                  pensamentoAcumulado += chunk;
-                } else {
-                  textoAcumulado += chunk;
-                }
-                i = nextPrefixIdx === -1 ? rawAcumulado.length : nextPrefixIdx;
-              } else {
-                // Fallback: treat as text
-                textoAcumulado += rawAcumulado.slice(i);
-                break;
-              }
-            }
+            const parsed = parseReasoningStream(rawAcumulado);
+            pensamentoAcumulado = parsed.thinking;
+            textoAcumulado = parsed.text;
           } else {
             textoAcumulado = rawAcumulado;
           }

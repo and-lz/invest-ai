@@ -1,5 +1,6 @@
 import { DbReportRepository } from "@/infrastructure/repositories/db-report-repository";
 import { DbConversaRepository } from "@/infrastructure/repositories/db-conversation-repository";
+import { DbSavedMessageRepository } from "@/infrastructure/repositories/db-saved-message-repository";
 import { DbPlanoAcaoRepository } from "@/infrastructure/repositories/db-action-plan-repository";
 import { DbUserSettingsRepository } from "@/infrastructure/repositories/user-settings-repository";
 import { GetUserSettingsUseCase } from "@/application/use-cases/get-user-settings";
@@ -23,6 +24,7 @@ import type { ProvedorAi } from "@/domain/interfaces/ai-provider";
 import type { MarketDataService, MacroDataService } from "@/domain/interfaces/market-data-service";
 import type { ConversaRepository } from "@/domain/interfaces/conversation-repository";
 import type { PlanoAcaoRepository } from "@/domain/interfaces/action-plan-repository";
+import type { SavedMessageRepository } from "@/domain/interfaces/saved-message-repository";
 import { AnthropicProvedorAi } from "@/infrastructure/ai/anthropic-ai-provider";
 import { resolveClaudeModelId, DEFAULT_CLAUDE_MODEL_TIER } from "@/lib/model-tiers";
 import { AiAssetAnalysisService } from "@/infrastructure/services/ai-asset-analysis-service";
@@ -213,4 +215,11 @@ export async function obterConversaRepository(): Promise<ConversaRepository> {
  */
 export async function obterPlanoAcaoRepository(): Promise<PlanoAcaoRepository> {
   return new DbPlanoAcaoRepository();
+}
+
+/**
+ * Obtem o repository de mensagens salvas/bookmarked (DB-backed).
+ */
+export function obterSavedMessageRepository(): SavedMessageRepository {
+  return new DbSavedMessageRepository();
 }

@@ -27,6 +27,7 @@ interface ChatBodyProps {
   readonly aiSuggestions: readonly ChatSuggestion[];
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
+  readonly onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
 }
 
 export function ChatBody({
@@ -47,6 +48,7 @@ export function ChatBody({
   aiSuggestions,
   raciocinio,
   onRaciocinioChange,
+  onScroll,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
 
@@ -62,6 +64,7 @@ export function ChatBody({
       {/* Messages area */}
       <div
         ref={areaScrollRef}
+        onScroll={onScroll}
         className="min-h-0 flex-1 overflow-y-auto"
       >
         {mensagens.length === 0 && (

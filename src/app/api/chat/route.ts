@@ -79,8 +79,8 @@ export async function POST(request: Request): Promise<Response> {
           if (raciocinio) {
             const geradorStream = provedor.transmitirComPensamento(configBase);
             for await (const chunk of geradorStream) {
-              const prefix = chunk.type === "thinking" ? "0:" : "1:";
-              controlador.enqueue(codificadorTexto.encode(prefix + chunk.content));
+              const t = chunk.type === "thinking" ? 0 : 1;
+              controlador.enqueue(codificadorTexto.encode(JSON.stringify({ t, c: chunk.content }) + "\n"));
             }
           } else {
             const geradorStream = provedor.transmitir(configBase);
