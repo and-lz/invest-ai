@@ -37,32 +37,35 @@ export function MensagemChatBolha({
     : mensagem.conteudo;
 
   return (
-    <div className={cn("flex gap-3", ehUsuario ? "flex-row-reverse" : "flex-row")}>
-      {/* Avatar */}
-      {ehUsuario ? (
-        <Avatar className={cn("shrink-0", fs ? "h-11 w-11" : "h-8 w-8")}>
-          <AvatarImage src={userImageUrl} alt="Você" />
-          <AvatarFallback className={cn("bg-primary/10", fs ? "text-base" : "text-xs")}>
-            {userInitials ?? <User className={fs ? "h-6 w-6" : "h-4 w-4"} />}
-          </AvatarFallback>
-        </Avatar>
-      ) : (
-        <Avatar className={cn("shrink-0 overflow-hidden", fs ? "h-11 w-11" : "h-8 w-8 border border-border/50")}>
-          <AvatarImage src="/fortuna-minimal.png" alt="Fortuna" className="scale-[1.35]" />
-          <AvatarFallback className={cn("bg-primary/10", fs ? "text-base" : "text-xs")}>F</AvatarFallback>
-        </Avatar>
+    <div
+      className={cn(
+        "w-full",
+        !ehUsuario && "bg-muted/50",
+        fs ? "px-5 py-4" : "px-4 py-3",
       )}
-
-      {/* Bolha de mensagem */}
-      <div
-        className={cn(
-          "rounded-2xl leading-relaxed",
-          fs
-            ? "max-w-[80ch] px-4 py-2.5 text-base"
-            : "max-w-[80%] px-4 py-2.5 text-sm",
-          ehUsuario ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground",
+    >
+      {/* Role label */}
+      <div className={cn("mb-2 flex items-center gap-2", fs ? "gap-2.5" : "gap-2")}>
+        {ehUsuario ? (
+          <Avatar className={cn("shrink-0", fs ? "h-7 w-7" : "h-5 w-5")}>
+            <AvatarImage src={userImageUrl} alt="Você" />
+            <AvatarFallback className={cn("bg-primary/10", fs ? "text-xs" : "text-[10px]")}>
+              {userInitials ?? <User className={fs ? "h-4 w-4" : "h-3 w-3"} />}
+            </AvatarFallback>
+          </Avatar>
+        ) : (
+          <Avatar className={cn("shrink-0 overflow-hidden", fs ? "h-7 w-7" : "h-5 w-5 border border-border/50")}>
+            <AvatarImage src="/fortuna-minimal.png" alt="Fortuna" className="scale-[1.35]" />
+            <AvatarFallback className={cn("bg-primary/10", fs ? "text-xs" : "text-[10px]")}>F</AvatarFallback>
+          </Avatar>
         )}
-      >
+        <span className={cn("font-medium", fs ? "text-sm" : "text-xs")}>
+          {ehUsuario ? "Você" : "Fortuna"}
+        </span>
+      </div>
+
+      {/* Message content */}
+      <div className={fs ? "text-base leading-relaxed" : "text-sm leading-relaxed"}>
         {cleanContent ? (
           <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} fullscreen={fs} />
         ) : (
