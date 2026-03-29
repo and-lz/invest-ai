@@ -47,8 +47,8 @@ export function MensagemChatBolha({
           </AvatarFallback>
         </Avatar>
       ) : (
-        <Avatar className={cn("shrink-0", fs ? "h-11 w-11" : "h-8 w-8 border border-border/50")}>
-          <AvatarImage src="/fortuna-minimal.png" alt="Fortuna" />
+        <Avatar className={cn("shrink-0 overflow-hidden", fs ? "h-11 w-11" : "h-8 w-8 border border-border/50")}>
+          <AvatarImage src="/fortuna-minimal.png" alt="Fortuna" className="scale-[1.35]" />
           <AvatarFallback className={cn("bg-primary/10", fs ? "text-base" : "text-xs")}>F</AvatarFallback>
         </Avatar>
       )}
