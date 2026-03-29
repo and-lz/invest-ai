@@ -141,7 +141,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid-lanes grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, indice) => (
           <Skeleton key={indice} className="h-32" />
         ))}
