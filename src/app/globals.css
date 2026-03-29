@@ -426,10 +426,20 @@ dialog[data-closing]::backdrop {
   @apply mb-0;
 }
 
-/* Chat Fullbleed — remove main padding/scroll so the chat fills the entire area */
-main:has(> .chat-fullbleed) {
+/* Chat Fullbleed — standalone immersive chat: hide app shell, fill viewport */
+.app-shell:has(.chat-fullbleed) {
+  height: 100dvh;
+  min-height: auto;
+}
+
+.app-shell:has(.chat-fullbleed) > :first-child {
+  display: none;
+}
+
+.app-shell:has(.chat-fullbleed) > main {
   display: flex;
   flex-direction: column;
+  max-width: none;
   padding: 0;
   overflow: hidden;
 }
