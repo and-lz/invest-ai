@@ -77,21 +77,13 @@ export function ChatBody({
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-[72px]" : "p-3")}>
             {/* User message skeleton */}
-            <div className="flex justify-end">
-              <Skeleton className={cn("rounded-lg", fs ? "h-12 w-2/5" : "h-10 w-2/5")} />
-            </div>
+            <MessageBubbleSkeleton role="user" fullscreen={fs} lines={1} />
             {/* Assistant message skeleton */}
-            <div className="space-y-2">
-              <Skeleton className={cn("rounded-lg", fs ? "h-28 w-full" : "h-24 w-full")} />
-            </div>
+            <MessageBubbleSkeleton role="assistant" fullscreen={fs} lines={4} />
             {/* User message skeleton */}
-            <div className="flex justify-end">
-              <Skeleton className={cn("rounded-lg", fs ? "h-12 w-1/3" : "h-10 w-1/3")} />
-            </div>
+            <MessageBubbleSkeleton role="user" fullscreen={fs} lines={1} widthClass="w-3/4" />
             {/* Assistant message skeleton */}
-            <div className="space-y-2">
-              <Skeleton className={cn("rounded-lg", fs ? "h-20 w-4/5" : "h-16 w-4/5")} />
-            </div>
+            <MessageBubbleSkeleton role="assistant" fullscreen={fs} lines={2} />
           </div>
         )}
         {!estaCarregandoConversa && mensagens.length === 0 && (
@@ -173,6 +165,47 @@ export function ChatBody({
         raciocinio={raciocinio}
         onRaciocinioChange={onRaciocinioChange}
       />
+    </div>
+  );
+}
+
+function MessageBubbleSkeleton({
+  role,
+  fullscreen: fs,
+  lines,
+  widthClass,
+}: {
+  readonly role: "user" | "assistant";
+  readonly fullscreen: boolean;
+  readonly lines: number;
+  readonly widthClass?: string;
+}) {
+  const isUser = role === "user";
+  return (
+    <div
+      className={cn(
+        "w-full rounded-lg",
+        !isUser && "bg-muted/50",
+        fs ? "px-5 py-4" : "px-4 py-3",
+      )}
+    >
+      {/* Avatar + name row */}
+      <div className={cn("mb-2 flex items-center", fs ? "gap-2.5" : "gap-2")}>
+        <Skeleton className={cn("shrink-0 rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
+        <Skeleton className={cn("rounded", fs ? "h-3.5 w-14" : "h-3 w-10")} />
+      </div>
+      {/* Content lines */}
+      <div className="space-y-1.5">
+        {Array.from({ length: lines }).map((_, i) => (
+          <Skeleton
+            key={i}
+            className={cn(
+              "h-3.5 rounded",
+              widthClass ?? (i === lines - 1 && lines > 1 ? "w-3/5" : "w-full"),
+            )}
+          />
+        ))}
+      </div>
     </div>
   );
 }

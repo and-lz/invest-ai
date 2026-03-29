@@ -53,10 +53,16 @@ export function ListaConversas({
       {/* Conversation list grouped by date */}
       <div className="flex-1 overflow-y-auto">
         {estaCarregando ? (
-          <div className={cn("space-y-1.5", fs ? "p-3" : "p-2")}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className={cn("rounded-md", fs ? "h-9" : "h-7")} />
-            ))}
+          <div className={cn(fs ? "p-3" : "p-2")}>
+            {/* Fake date group header */}
+            <Skeleton className={cn("mb-2 rounded", fs ? "mx-3 h-2.5 w-16" : "mx-2.5 h-2 w-12")} />
+            <div className="space-y-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className={cn("rounded-md", fs ? "px-3 py-2" : "px-2.5 py-1.5")}>
+                  <Skeleton className={cn("rounded", fs ? "h-3.5 w-full" : "h-3 w-full")} style={{ width: `${70 + (i % 3) * 10}%` }} />
+                </div>
+              ))}
+            </div>
           </div>
         ) : conversas.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 p-6">

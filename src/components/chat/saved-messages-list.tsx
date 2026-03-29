@@ -30,10 +30,22 @@ export function SavedMessagesList({
 
   if (isLoading) {
     return (
-      <div className={cn("space-y-2", fs ? "p-3" : "p-2")}>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className={cn("rounded-md", fs ? "h-14" : "h-12")} />
-        ))}
+      <div className={cn(fs ? "p-3" : "p-2")}>
+        {/* Fake date group header */}
+        <Skeleton className={cn("mb-2 rounded", fs ? "mx-3 h-2.5 w-16" : "mx-2.5 h-2 w-12")} />
+        <div className="space-y-0.5">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className={cn("rounded-md", fs ? "px-3 py-2.5" : "px-2.5 py-2")}>
+              {/* Conversation title line */}
+              <Skeleton className={cn("mb-1 rounded", fs ? "h-2.5 w-24" : "h-2 w-20")} />
+              {/* Message preview lines */}
+              <div className="space-y-1">
+                <Skeleton className={cn("rounded", fs ? "h-3 w-full" : "h-2.5 w-full")} />
+                <Skeleton className={cn("rounded", fs ? "h-3" : "h-2.5")} style={{ width: `${50 + (i % 3) * 15}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
