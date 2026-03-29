@@ -8,8 +8,10 @@ import { Bot, Menu, Trash2, Volume2, VolumeX, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChatBody } from "@/components/chat/chat-body";
-import { ListaConversas } from "@/components/chat/conversations-list";
+import { SidebarTabs } from "@/components/chat/sidebar-tabs";
 import { useChatAssistant } from "@/hooks/use-chat-assistant";
+import { useSavedMessages } from "@/hooks/use-saved-messages";
+import { useConversas } from "@/hooks/use-conversations";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
@@ -19,6 +21,7 @@ import { stripMarkdown } from "@/lib/strip-markdown";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
 import { cn } from "@/lib/utils";
 import { dialog } from "@/lib/design-system";
+import type { MensagemChat } from "@/schemas/chat.schema";
 
 export default function ChatPage() {
   const params = useParams<{ id: string }>();
@@ -77,6 +80,28 @@ export default function ChatPage() {
     followUpSuggestions,
     reenviarUltimaMensagem,
   } = useChatAssistant({ raciocinio });
+
+  // Saved messages
+  const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
+  const { conversas } = useConversas();
+
+  const handleToggleSave = useCallback(
+    (mensagem: MensagemChat) => {
+      if (savedMessageIds.has(mensagem.identificador)) {
+        void unsaveMessage(mensagem.identificador);
+      } else if (conversaAtualId) {
+        const conversa = conversas.find((c) => c.identificador === conversaAtualId);
+        void saveMessage({
+          conversaId: conversaAtualId,
+          tituloConversa: conversa?.titulo ?? "Conversa",
+          mensagemId: mensagem.identificador,
+          papel: mensagem.papel,
+          conteudo: mensagem.conteudo,
+        });
+      }
+    },
+    [savedMessageIds, unsaveMessage, saveMessage, conversaAtualId, conversas],
+  );
 
   // Load conversation on mount or when ID changes
   const loadedIdRef = useRef<string | null>(null);
@@ -186,7 +211,7 @@ export default function ChatPage() {
           sidebarOpen ? "w-80" : "w-0 overflow-hidden border-r-0",
         )}
       >
-        <ListaConversas
+        <SidebarTabs
           conversaAtualId={conversaAtualId}
           onSelecionarConversa={handleSelecionarConversa}
           onNovaConversa={handleNovaConversa}
@@ -215,7 +240,7 @@ export default function ChatPage() {
           margin: 0,
         }}
       >
-        <ListaConversas
+        <SidebarTabs
           conversaAtualId={conversaAtualId}
           onSelecionarConversa={handleMobileSelecionarConversa}
           onNovaConversa={handleMobileNovaConversa}
@@ -314,6 +339,8 @@ export default function ChatPage() {
           raciocinio={raciocinio}
           onRaciocinioChange={handleRaciocinioChange}
           onScroll={onMessagesScroll}
+          savedMessageIds={savedMessageIds}
+          onToggleSave={handleToggleSave}
         />
       </div>
     </div>

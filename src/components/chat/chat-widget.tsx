@@ -8,8 +8,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChatBody } from "@/components/chat/chat-body";
-import { ListaConversas } from "@/components/chat/conversations-list";
+import { SidebarTabs } from "@/components/chat/sidebar-tabs";
 import { useChatAssistant } from "@/hooks/use-chat-assistant";
+import { useSavedMessages } from "@/hooks/use-saved-messages";
+import { useConversas } from "@/hooks/use-conversations";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
@@ -22,6 +24,7 @@ import {
 } from "@/components/ui/ai-explain-button";
 import { cn } from "@/lib/utils";
 import { dialog } from "@/lib/design-system";
+import type { MensagemChat } from "@/schemas/chat.schema";
 
 
 export function ChatWidget() {
@@ -76,6 +79,28 @@ export function ChatWidget() {
     followUpSuggestions,
     reenviarUltimaMensagem,
   } = useChatAssistant({ raciocinio });
+
+  // Saved messages
+  const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
+  const { conversas } = useConversas();
+
+  const handleToggleSave = useCallback(
+    (mensagem: MensagemChat) => {
+      if (savedMessageIds.has(mensagem.identificador)) {
+        void unsaveMessage(mensagem.identificador);
+      } else if (conversaAtualId) {
+        const conversa = conversas.find((c) => c.identificador === conversaAtualId);
+        void saveMessage({
+          conversaId: conversaAtualId,
+          tituloConversa: conversa?.titulo ?? "Conversa",
+          mensagemId: mensagem.identificador,
+          papel: mensagem.papel,
+          conteudo: mensagem.conteudo,
+        });
+      }
+    },
+    [savedMessageIds, unsaveMessage, saveMessage, conversaAtualId, conversas],
+  );
 
   // Recent message texts for AI suggestions context (last 4, truncated)
   const recentMessages = useMemo(
@@ -236,7 +261,7 @@ export function ChatWidget() {
               mostrarSidebar ? "translate-x-0" : "-translate-x-full",
             )}
           >
-            <ListaConversas
+            <SidebarTabs
               conversaAtualId={conversaAtualId}
               onSelecionarConversa={handleSelecionarConversa}
               onNovaConversa={handleNovaConversa}
@@ -344,6 +369,8 @@ export function ChatWidget() {
               aiSuggestions={aiSuggestions}
               raciocinio={raciocinio}
               onRaciocinioChange={handleRaciocinioChange}
+              savedMessageIds={savedMessageIds}
+              onToggleSave={handleToggleSave}
             />
           </div>
         </div>
