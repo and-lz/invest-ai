@@ -80,6 +80,7 @@ export default function ChatPage() {
     carregarConversa,
     followUpSuggestions,
     reenviarUltimaMensagem,
+    estaCarregandoConversa,
   } = useChatAssistant({ raciocinio });
 
   // Saved messages
@@ -342,6 +343,7 @@ export default function ChatPage() {
           onScroll={onMessagesScroll}
           savedMessageIds={savedMessageIds}
           onToggleSave={handleToggleSave}
+          estaCarregandoConversa={estaCarregandoConversa}
         />
       </div>
     </div>

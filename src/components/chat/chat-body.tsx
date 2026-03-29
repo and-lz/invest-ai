@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MensagemChatBolha } from "@/components/chat/chat-message";
 import { CampoEntradaChat } from "@/components/chat/chat-input-field";
 import { SuggestionChips } from "@/components/chat/suggestion-chips";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import type { ChatSuggestion } from "@/lib/chat-suggestions";
@@ -30,6 +31,7 @@ interface ChatBodyProps {
   readonly onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   readonly savedMessageIds?: ReadonlySet<string>;
   readonly onToggleSave?: (mensagem: MensagemChat) => void;
+  readonly estaCarregandoConversa?: boolean;
 }
 
 export function ChatBody({
@@ -53,6 +55,7 @@ export function ChatBody({
   onScroll,
   savedMessageIds,
   onToggleSave,
+  estaCarregandoConversa,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
 
@@ -71,7 +74,27 @@ export function ChatBody({
         onScroll={onScroll}
         className="min-h-0 flex-1 overflow-y-auto"
       >
-        {mensagens.length === 0 && (
+        {estaCarregandoConversa && (
+          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-[72px]" : "p-3")}>
+            {/* User message skeleton */}
+            <div className="flex justify-end">
+              <Skeleton className={cn("rounded-lg", fs ? "h-12 w-2/5" : "h-10 w-2/5")} />
+            </div>
+            {/* Assistant message skeleton */}
+            <div className="space-y-2">
+              <Skeleton className={cn("rounded-lg", fs ? "h-28 w-full" : "h-24 w-full")} />
+            </div>
+            {/* User message skeleton */}
+            <div className="flex justify-end">
+              <Skeleton className={cn("rounded-lg", fs ? "h-12 w-1/3" : "h-10 w-1/3")} />
+            </div>
+            {/* Assistant message skeleton */}
+            <div className="space-y-2">
+              <Skeleton className={cn("rounded-lg", fs ? "h-20 w-4/5" : "h-16 w-4/5")} />
+            </div>
+          </div>
+        )}
+        {!estaCarregandoConversa && mensagens.length === 0 && (
           <div className={cn(
             "flex h-full flex-col items-center justify-center text-center",
             fs ? "mx-auto max-w-4xl gap-6" : "gap-4",
