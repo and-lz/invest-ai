@@ -10,7 +10,7 @@ interface SuggestionChipsProps {
   readonly suggestions: readonly ChatSuggestion[];
   readonly onSelect: (text: string) => void;
   readonly filterText?: string;
-  readonly variant: "empty-state" | "floating" | "follow-up";
+  readonly variant: "empty-state" | "floating";
   readonly isLoading?: boolean;
   readonly fullscreen?: boolean;
 }
@@ -76,7 +76,7 @@ export function SuggestionChips({
   return (
     <div
       className={cn(
-        "absolute bottom-3 right-3 z-10 flex items-end gap-1.5",
+        "pointer-events-auto absolute bottom-3 right-3 z-10 flex items-end gap-1.5",
         "animate-in fade-in slide-in-from-bottom-2 duration-200",
       )}
       role="group"

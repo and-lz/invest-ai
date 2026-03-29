@@ -72,7 +72,7 @@ export function ChatBody({
       <div
         ref={areaScrollRef}
         onScroll={onScroll}
-        className="min-h-0 flex-1 overflow-y-auto"
+        className="relative min-h-0 flex-1 overflow-y-auto"
       >
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-[72px]" : "p-3")}>
@@ -129,6 +129,20 @@ export function ChatBody({
             ))}
           </div>
         )}
+
+        {/* Floating follow-up / AI suggestions */}
+        {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
+          <div className="pointer-events-none sticky bottom-0">
+            <SuggestionChips
+              suggestions={activeSuggestions}
+              onSelect={onSuggestionSelect}
+              filterText={aiSuggestions.length > 0 ? undefined : inputValue}
+              variant="floating"
+              isLoading={aiSuggestionsLoading}
+              fullscreen={fs}
+            />
+          </div>
+        )}
       </div>
 
       {/* Error banner */}
@@ -136,18 +150,6 @@ export function ChatBody({
         <div className="bg-destructive/5 border-t px-4 py-2">
           <p className={cn("text-destructive", fs ? "text-sm" : "text-xs")}>{erro}</p>
         </div>
-      )}
-
-      {/* Follow-up / AI suggestions */}
-      {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
-        <SuggestionChips
-          suggestions={activeSuggestions}
-          onSelect={onSuggestionSelect}
-          filterText={aiSuggestions.length > 0 ? undefined : inputValue}
-          variant="follow-up"
-          isLoading={aiSuggestionsLoading}
-          fullscreen={fs}
-        />
       )}
 
       {/* Input field */}
