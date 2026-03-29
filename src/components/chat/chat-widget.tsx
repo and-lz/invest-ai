@@ -36,11 +36,12 @@ export function ChatWidget() {
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [raciocinio, setRaciocinio] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem("chatReasoningEnabled") === "true";
-  });
+  const [raciocinio, setRaciocinio] = useState(false);
   const prevTransmitindoRef = useRef(false);
+
+  useEffect(() => {
+    setRaciocinio(localStorage.getItem("chatReasoningEnabled") === "true");
+  }, []);
 
   const handleRaciocinioChange = useCallback((enabled: boolean) => {
     setRaciocinio(enabled);
