@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Square } from "lucide-react";
+import { Send, Square, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CampoEntradaChatProps {
@@ -14,6 +14,8 @@ interface CampoEntradaChatProps {
   readonly value?: string;
   readonly onValueChange?: (value: string) => void;
   readonly fullscreen?: boolean;
+  readonly raciocinio?: boolean;
+  readonly onRaciocinioChange?: (enabled: boolean) => void;
 }
 
 function ehDispositivoTouch(): boolean {
@@ -30,6 +32,8 @@ export function CampoEntradaChat({
   value: controlledValue,
   onValueChange,
   fullscreen,
+  raciocinio,
+  onRaciocinioChange,
 }: CampoEntradaChatProps) {
   const [internalValue, setInternalValue] = useState("");
   const isControlled = controlledValue !== undefined;
@@ -89,6 +93,18 @@ export function CampoEntradaChat({
       "flex items-end border-t",
       fs ? "mx-auto w-full max-w-4xl gap-3 p-5" : "gap-2 p-3",
     )}>
+      {onRaciocinioChange && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onRaciocinioChange(!raciocinio)}
+          className={cn("shrink-0", raciocinio ? "text-primary" : "text-muted-foreground")}
+          title={raciocinio ? "Desativar raciocínio" : "Ativar raciocínio"}
+        >
+          <Brain className="h-4 w-4" />
+          <span className="sr-only">{raciocinio ? "Desativar raciocínio" : "Ativar raciocínio"}</span>
+        </Button>
+      )}
       <textarea
         ref={textareaRef}
         value={valor}

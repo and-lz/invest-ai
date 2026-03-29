@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Bot, Menu, Trash2, Volume2, VolumeX, ArrowLeft } from "lucide-react";
@@ -26,8 +27,17 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [raciocinio, setRaciocinio] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("chatReasoningEnabled") === "true";
+  });
   const prevTransmitindoRef = useRef(false);
   const lastNonChatPageRef = useRef("/");
+
+  const handleRaciocinioChange = useCallback((enabled: boolean) => {
+    setRaciocinio(enabled);
+    localStorage.setItem("chatReasoningEnabled", String(enabled));
+  }, []);
 
   // Read last non-chat page on mount
   useEffect(() => {
@@ -64,7 +74,7 @@ export default function ChatPage() {
     carregarConversa,
     followUpSuggestions,
     reenviarUltimaMensagem,
-  } = useChatAssistant();
+  } = useChatAssistant({ raciocinio });
 
   // Load conversation on mount or when ID changes
   const loadedIdRef = useRef<string | null>(null);
@@ -297,6 +307,8 @@ export default function ChatPage() {
           onInputValueChange={setInputValue}
           onSuggestionSelect={handleSuggestionSelect}
           aiSuggestions={aiSuggestions}
+          raciocinio={raciocinio}
+          onRaciocinioChange={handleRaciocinioChange}
         />
       </div>
     </div>

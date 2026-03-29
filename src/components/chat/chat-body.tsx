@@ -25,6 +25,8 @@ interface ChatBodyProps {
   readonly onInputValueChange: (value: string) => void;
   readonly onSuggestionSelect: (text: string) => void;
   readonly aiSuggestions: readonly ChatSuggestion[];
+  readonly raciocinio?: boolean;
+  readonly onRaciocinioChange?: (enabled: boolean) => void;
 }
 
 export function ChatBody({
@@ -43,6 +45,8 @@ export function ChatBody({
   onInputValueChange,
   onSuggestionSelect,
   aiSuggestions,
+  raciocinio,
+  onRaciocinioChange,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
 
@@ -134,6 +138,8 @@ export function ChatBody({
         value={inputValue}
         onValueChange={onInputValueChange}
         fullscreen={fs}
+        raciocinio={raciocinio}
+        onRaciocinioChange={onRaciocinioChange}
       />
     </div>
   );

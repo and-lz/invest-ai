@@ -38,7 +38,7 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    const { mensagens, contextoPagina, identificadorPagina } = resultadoValidacao.data;
+    const { mensagens, contextoPagina, identificadorPagina, raciocinio } = resultadoValidacao.data;
 
     // When no page context is provided (e.g. /chat page), load portfolio data server-side
     let contextoFinal = contextoPagina;
@@ -76,9 +76,17 @@ export async function POST(request: Request): Promise<Response> {
     const streamResposta = new ReadableStream({
       async start(controlador) {
         try {
-          const geradorStream = provedor.transmitir(configBase);
-          for await (const pedacoTexto of geradorStream) {
-            controlador.enqueue(codificadorTexto.encode(pedacoTexto));
+          if (raciocinio) {
+            const geradorStream = provedor.transmitirComPensamento(configBase);
+            for await (const chunk of geradorStream) {
+              const prefix = chunk.type === "thinking" ? "0:" : "1:";
+              controlador.enqueue(codificadorTexto.encode(prefix + chunk.content));
+            }
+          } else {
+            const geradorStream = provedor.transmitir(configBase);
+            for await (const pedacoTexto of geradorStream) {
+              controlador.enqueue(codificadorTexto.encode(pedacoTexto));
+            }
           }
           controlador.close();
         } catch (erro) {

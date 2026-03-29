@@ -39,6 +39,14 @@ export interface ConfiguracaoGeracao {
   readonly formatoResposta?: "json" | "texto";
   readonly pesquisaWeb?: boolean;
   readonly maxOutputTokens?: number;
+  readonly thinking?: { readonly type: "enabled"; readonly budgetTokens: number };
+}
+
+// ---- Stream chunks ----
+
+export interface StreamChunk {
+  readonly type: "thinking" | "text";
+  readonly content: string;
 }
 
 // ---- Resposta ----
@@ -57,4 +65,7 @@ export interface ProvedorAi {
 
   /** Geracao com streaming (chat) - produz chunks de texto */
   transmitir(configuracao: ConfiguracaoGeracao): AsyncGenerator<string, void, unknown>;
+
+  /** Streaming com suporte a extended thinking - produz chunks tipados (thinking + text) */
+  transmitirComPensamento(configuracao: ConfiguracaoGeracao): AsyncGenerator<StreamChunk, void, unknown>;
 }

@@ -8,6 +8,7 @@ export const MensagemChatSchema = z.object({
   identificador: z.string().uuid(),
   papel: PapelMensagemChatEnum,
   conteudo: z.string(),
+  pensamento: z.string().optional(),
   criadaEm: z.string().datetime(),
 });
 
@@ -32,6 +33,7 @@ export const RequisicaoChatSchema = z.object({
   mensagens: z.array(MensagemParaServidorSchema).min(1).max(40),
   contextoPagina: z.string().max(50000).optional(),
   identificadorPagina: IdentificadorPaginaEnum,
+  raciocinio: z.boolean().optional(),
 });
 
 // ---- Tipos inferidos ----

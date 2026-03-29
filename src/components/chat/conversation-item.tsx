@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatBrazilianTimestamp } from "@/lib/format-date";
 
 interface ItemConversaProps {
   readonly conversa: {
@@ -23,14 +22,9 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, ful
   const fs = fullscreen;
 
   const content = (
-    <div className="flex items-center justify-between gap-2">
-      <h4 className={cn("line-clamp-1 flex-1 font-medium", fs ? "text-sm" : "text-xs")}>
-        {conversa.titulo}
-      </h4>
-      <span className={cn("text-muted-foreground shrink-0", fs ? "text-xs" : "text-[10px]")}>
-        {formatBrazilianTimestamp(conversa.atualizadaEm)}
-      </span>
-    </div>
+    <p className={cn("line-clamp-1", fs ? "text-sm" : "text-xs")}>
+      {conversa.titulo}
+    </p>
   );
 
   return (
@@ -51,7 +45,6 @@ export function ItemConversa({ conversa, estaAtiva, onSelecionar, onDeletar, ful
         </button>
       )}
 
-      {/* Delete button: always visible on touch, hover on desktop */}
       <Button
         variant="ghost"
         size="icon"

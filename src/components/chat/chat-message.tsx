@@ -64,6 +64,19 @@ export function MensagemChatBolha({
         </span>
       </div>
 
+      {/* Thinking / reasoning (inline dimmed) */}
+      {!ehUsuario && mensagem.pensamento && (
+        <div className={cn(
+          "text-muted-foreground mb-3 border-l-2 border-border/50 pl-3 italic",
+          fs ? "text-sm" : "text-xs",
+        )}>
+          <span className="text-muted-foreground mb-1 block text-[10px] font-medium uppercase tracking-wider not-italic">
+            Raciocínio
+          </span>
+          {mensagem.pensamento}
+        </div>
+      )}
+
       {/* Message content */}
       <div className={fs ? "text-base leading-relaxed" : "text-sm leading-relaxed"}>
         {cleanContent ? (

@@ -13,8 +13,22 @@ import {
 /** Envia apenas as ultimas N mensagens para a API, controlando uso de tokens */
 const LIMITE_MENSAGENS_PARA_API = 20;
 
+/** Find the next "0:" or "1:" prefix position in the reasoning stream protocol */
+function findNextPrefix(str: string, from: number): number {
+  for (let i = from; i < str.length - 1; i++) {
+    if ((str[i] === "0" || str[i] === "1") && str[i + 1] === ":") {
+      return i;
+    }
+  }
+  return -1;
+}
+
 /** Debounce para auto-save (aguarda streaming concluir + 2s) */
 const DEBOUNCE_AUTO_SAVE_MS = 2000;
+
+interface UseChatAssistenteOpcoes {
+  readonly raciocinio?: boolean;
+}
 
 interface UseChatAssistenteRetorno {
   readonly mensagens: readonly MensagemChat[];
@@ -30,7 +44,8 @@ interface UseChatAssistenteRetorno {
   readonly reenviarUltimaMensagem: () => void;
 }
 
-export function useChatAssistant(): UseChatAssistenteRetorno {
+export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssistenteRetorno {
+  const raciocinio = opcoes?.raciocinio ?? false;
   const [mensagens, setMensagens] = useState<MensagemChat[]>([]);
   const [estaTransmitindo, setEstaTransmitindo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -71,12 +86,40 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
     return texto.replace(regex, "");
   }, []);
 
+  // Generate smart AI title for a conversation (fire-and-forget)
+  const gerarTituloInteligente = useCallback(
+    async (conversaId: string, mensagens: MensagemChat[]) => {
+      try {
+        const payload = mensagens.slice(0, 4).map((m) => ({
+          papel: m.papel,
+          conteudo: m.conteudo,
+        }));
+        const resp = await fetch("/api/chat/title", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mensagens: payload }),
+        });
+        if (!resp.ok) return;
+        const { titulo } = (await resp.json()) as { titulo: string };
+        if (!titulo) return;
+        await fetch(`/api/conversations/${conversaId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ titulo }),
+        });
+      } catch {
+        // Silent fail — placeholder title remains
+      }
+    },
+    [],
+  );
+
   // Auto-save debounced (declarado ANTES de enviarMensagem para evitar erro de ordem)
   const salvarConversaAutomaticamente = useCallback(
     async (mensagensAtualizadas: MensagemChat[]) => {
       if (mensagensAtualizadas.length === 0) return;
 
-      // Gerar titulo a partir da primeira mensagem do usuario
+      // Placeholder title from first user message (replaced by AI title later)
       const primeiraMensagemUsuario = mensagensAtualizadas.find(
         (mensagem) => mensagem.papel === "usuario",
       );
@@ -103,6 +146,9 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
             conversa: { identificador: string };
           };
           setConversaAtualId(dados.conversa.identificador);
+
+          // Fire-and-forget: generate smart AI title
+          void gerarTituloInteligente(dados.conversa.identificador, mensagensAtualizadas);
         } else {
           // Atualizar conversa existente
           await fetch(`/api/conversations/${conversaAtualId}`, {
@@ -116,7 +162,7 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
         // Silent fail: nao interrompe fluxo do chat
       }
     },
-    [conversaAtualId, identificadorPagina],
+    [conversaAtualId, identificadorPagina, gerarTituloInteligente],
   );
 
   const enviarMensagem = useCallback(
@@ -168,6 +214,7 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
             mensagens: mensagensParaServidor,
             contextoPagina: dadosContexto,
             identificadorPagina,
+            ...(raciocinio && { raciocinio: true }),
           }),
           signal: controladorAbort.signal,
         });
@@ -180,12 +227,41 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
         const leitor = resposta.body!.getReader();
         const decodificadorTexto = new TextDecoder();
         let textoAcumulado = "";
+        let pensamentoAcumulado = "";
+        let rawAcumulado = "";
 
         for (;;) {
           const { done, value } = await leitor.read();
           if (done) break;
 
-          textoAcumulado += decodificadorTexto.decode(value, { stream: true });
+          rawAcumulado += decodificadorTexto.decode(value, { stream: true });
+
+          if (raciocinio) {
+            // Parse prefix protocol: "0:thinking chunk" / "1:text chunk"
+            // Re-parse full raw each iteration to handle chunks split mid-prefix
+            pensamentoAcumulado = "";
+            textoAcumulado = "";
+            let i = 0;
+            while (i < rawAcumulado.length) {
+              if (i + 1 < rawAcumulado.length && rawAcumulado[i + 1] === ":") {
+                const prefix = rawAcumulado[i];
+                const nextPrefixIdx = findNextPrefix(rawAcumulado, i + 2);
+                const chunk = rawAcumulado.slice(i + 2, nextPrefixIdx === -1 ? undefined : nextPrefixIdx);
+                if (prefix === "0") {
+                  pensamentoAcumulado += chunk;
+                } else {
+                  textoAcumulado += chunk;
+                }
+                i = nextPrefixIdx === -1 ? rawAcumulado.length : nextPrefixIdx;
+              } else {
+                // Fallback: treat as text
+                textoAcumulado += rawAcumulado.slice(i);
+                break;
+              }
+            }
+          } else {
+            textoAcumulado = rawAcumulado;
+          }
 
           // Strip complete suggestion markers + partial ones (streaming)
           const { cleanText: textoSemSugestoes } = parseSuggestionsFromResponse(textoAcumulado);
@@ -198,7 +274,7 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
           setMensagens((anteriores) =>
             anteriores.map((mensagem) =>
               mensagem.identificador === identificadorAssistente
-                ? { ...mensagem, conteudo: textoLimpo }
+                ? { ...mensagem, conteudo: textoLimpo, pensamento: pensamentoAcumulado || undefined }
                 : mensagem,
             ),
           );
@@ -214,13 +290,14 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
           clearTimeout(timeoutAutoSaveRef.current);
         }
 
+        const pensamentoFinal = pensamentoAcumulado || undefined;
         timeoutAutoSaveRef.current = setTimeout(() => {
           // Processar highlights uma última vez para garantir texto limpo
           const textoFinalLimpo = processarHighlights(textoFinalSemSugestoes);
           const mensagensFinais = [
             ...mensagens,
             mensagemUsuario,
-            { ...mensagemAssistentePlaceholder, conteudo: textoFinalLimpo },
+            { ...mensagemAssistentePlaceholder, conteudo: textoFinalLimpo, pensamento: pensamentoFinal },
           ];
           void salvarConversaAutomaticamente(mensagensFinais);
         }, DEBOUNCE_AUTO_SAVE_MS);
@@ -251,6 +328,7 @@ export function useChatAssistant(): UseChatAssistenteRetorno {
       identificadorPagina,
       salvarConversaAutomaticamente,
       processarHighlights,
+      raciocinio,
     ],
   );
 

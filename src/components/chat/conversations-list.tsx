@@ -61,10 +61,10 @@ export function ListaConversas({
         ) : (
           <div className={cn(fs ? "p-3" : "p-2")}>
             {groups.map((group) => (
-              <div key={group.label} className="mb-3">
+              <div key={group.label} className="mb-4 last:mb-0">
                 <h5 className={cn(
-                  "text-muted-foreground mb-1 font-medium uppercase tracking-wider",
-                  fs ? "px-3 text-xs" : "px-2.5 text-[10px]",
+                  "text-muted-foreground mb-2 font-medium uppercase tracking-wider",
+                  fs ? "px-3 text-[11px]" : "px-2.5 text-[10px]",
                 )}>
                   {group.label}
                 </h5>

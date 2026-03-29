@@ -2,6 +2,7 @@ import type {
   ProvedorAi,
   ConfiguracaoGeracao,
   RespostaAi,
+  StreamChunk,
 } from "@/domain/interfaces/ai-provider";
 import { AiApiError, AiApiTransientError } from "@/domain/errors/app-errors";
 
@@ -183,6 +184,98 @@ export class AnthropicProvedorAi implements ProvedorAi {
 
           if (parsed.type === "content_block_delta" && parsed.delta?.type === "text_delta" && parsed.delta.text) {
             yield parsed.delta.text;
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  async *transmitirComPensamento(configuracao: ConfiguracaoGeracao): AsyncGenerator<StreamChunk, void, unknown> {
+    const messages: AnthropicMessage[] = configuracao.mensagens.map((mensagem) => ({
+      role: mensagem.papel === "usuario" ? "user" : "assistant",
+      content: mensagem.partes
+        .filter((p) => p.tipo === "texto")
+        .map((p) => (p.tipo === "texto" ? p.dados : ""))
+        .join("\n"),
+    }));
+
+    const budgetTokens = configuracao.thinking?.budgetTokens ?? 10000;
+
+    let httpResponse: Response;
+
+    try {
+      httpResponse = await fetch(`${this.proxyBaseUrl}/v1/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: this.model,
+          system: configuracao.instrucaoSistema,
+          messages,
+          max_tokens: configuracao.maxOutputTokens ?? 16000,
+          stream: true,
+          thinking: { type: "enabled", budget_tokens: budgetTokens },
+        }),
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new AiApiTransientError(
+        `Nao foi possivel conectar ao proxy Claude em ${this.proxyBaseUrl}. Inicie o proxy com \`npm run proxy\`. Erro: ${message}`,
+      );
+    }
+
+    if (!httpResponse.ok) {
+      const errorText = await httpResponse.text().catch(() => "");
+      if (httpResponse.status >= 500) {
+        throw new AiApiTransientError(
+          `Proxy Claude retornou ${httpResponse.status}. Verifique se o proxy esta rodando com \`npm run proxy\`. Detalhes: ${errorText}`,
+        );
+      }
+      throw new AiApiError(
+        `Proxy Claude retornou ${httpResponse.status}: ${errorText}`,
+      );
+    }
+
+    const body = httpResponse.body;
+    if (!body) {
+      throw new AiApiError("Resposta do proxy Claude nao contem body stream");
+    }
+
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? "";
+
+        for (const event of events) {
+          if (!event.trim()) continue;
+
+          const dataLine = event.split("\n").find((l) => l.startsWith("data: "));
+          if (!dataLine) continue;
+
+          const jsonStr = dataLine.slice(6);
+          let parsed: { type?: string; delta?: { type?: string; text?: string; thinking?: string } };
+          try {
+            parsed = JSON.parse(jsonStr) as typeof parsed;
+          } catch {
+            continue;
+          }
+
+          if (parsed.type === "content_block_delta") {
+            if (parsed.delta?.type === "thinking_delta" && parsed.delta.thinking) {
+              yield { type: "thinking", content: parsed.delta.thinking };
+            } else if (parsed.delta?.type === "text_delta" && parsed.delta.text) {
+              yield { type: "text", content: parsed.delta.text };
+            }
           }
         }
       }

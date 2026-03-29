@@ -33,7 +33,16 @@ export function ChatWidget() {
   const [mostrarSidebar, setMostrarSidebar] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [raciocinio, setRaciocinio] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("chatReasoningEnabled") === "true";
+  });
   const prevTransmitindoRef = useRef(false);
+
+  const handleRaciocinioChange = useCallback((enabled: boolean) => {
+    setRaciocinio(enabled);
+    localStorage.setItem("chatReasoningEnabled", String(enabled));
+  }, []);
 
   const { identificadorPagina } = useChatPageContext();
 
@@ -66,7 +75,7 @@ export function ChatWidget() {
     carregarConversa,
     followUpSuggestions,
     reenviarUltimaMensagem,
-  } = useChatAssistant();
+  } = useChatAssistant({ raciocinio });
 
   // Recent message texts for AI suggestions context (last 4, truncated)
   const recentMessages = useMemo(
@@ -333,6 +342,8 @@ export function ChatWidget() {
               onInputValueChange={setInputValue}
               onSuggestionSelect={handleSuggestionSelect}
               aiSuggestions={aiSuggestions}
+              raciocinio={raciocinio}
+              onRaciocinioChange={handleRaciocinioChange}
             />
           </div>
         </div>
