@@ -39,7 +39,7 @@ export function MensagemChatBolha({
   return (
     <div
       className={cn(
-        "w-full",
+        "w-full rounded-lg",
         !ehUsuario && "bg-muted/50",
         fs ? "px-5 py-4" : "px-4 py-3",
       )}

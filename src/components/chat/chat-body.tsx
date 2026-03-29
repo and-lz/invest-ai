@@ -83,7 +83,7 @@ export function ChatBody({
           </div>
         )}
         {mensagens.length > 0 && (
-          <div className={cn("divide-y divide-border/40", fs && "mx-auto max-w-[80ch]")}>
+          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4" : "p-3")}>
             {mensagens.map((mensagem, indice) => (
               <MensagemChatBolha
                 key={mensagem.identificador}
