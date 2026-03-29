@@ -53,7 +53,6 @@ export function useConversas() {
         );
       } catch (erro) {
         console.error("Erro ao deletar conversa:", erro);
-        throw erro;
       }
     },
     [mutate, conversas],

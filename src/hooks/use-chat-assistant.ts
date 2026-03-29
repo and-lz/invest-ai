@@ -9,6 +9,7 @@ import {
   stripPartialSuggestionMarker,
   type ChatSuggestion,
 } from "@/lib/chat-suggestions";
+import { notificar } from "@/lib/notifier";
 
 /** Envia apenas as ultimas N mensagens para a API, controlando uso de tokens */
 const LIMITE_MENSAGENS_PARA_API = 20;
@@ -68,6 +69,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
   const controladorAbortRef = useRef<AbortController | null>(null);
   const timeoutAutoSaveRef = useRef<NodeJS.Timeout | null>(null);
   const retryContentRef = useRef<string | null>(null);
+  const autoSaveFailCountRef = useRef(0);
 
   const { identificadorPagina, dadosContexto } = useChatPageContext();
 
@@ -121,7 +123,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
           body: JSON.stringify({ titulo }),
         });
       } catch {
-        // Silent fail — placeholder title remains
+        notificar.info("Não foi possível gerar título da conversa");
       }
     },
     [],
@@ -170,9 +172,15 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
             body: JSON.stringify({ mensagens: mensagensAtualizadas }),
           });
         }
+        autoSaveFailCountRef.current = 0;
       } catch (erroCatch) {
         console.error("Erro ao salvar conversa:", erroCatch);
-        // Silent fail: nao interrompe fluxo do chat
+        autoSaveFailCountRef.current += 1;
+        if (autoSaveFailCountRef.current >= 3) {
+          notificar.warning("Conversa não salva", {
+            description: "Suas mensagens podem não ser preservadas.",
+          });
+        }
       }
     },
     [conversaAtualId, identificadorPagina, gerarTituloInteligente],
@@ -350,10 +358,12 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
       setMensagens(dados.conversa.mensagens);
       setConversaAtualId(identificador);
       setErro(null);
+      autoSaveFailCountRef.current = 0;
       return true;
     } catch (erroCatch) {
       console.error("Erro ao carregar conversa:", erroCatch);
       setErro("Falha ao carregar conversa");
+      notificar.error("Erro ao carregar conversa");
       return false;
     } finally {
       setEstaCarregando(false);
@@ -366,6 +376,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
     setConversaAtualId(null);
     setErro(null);
     setFollowUpSuggestions([]);
+    autoSaveFailCountRef.current = 0;
   }, []);
 
   // Keep a ref to enviarMensagem so the retry effect always calls the latest version

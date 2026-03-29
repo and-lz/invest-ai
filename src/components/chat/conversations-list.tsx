@@ -9,6 +9,7 @@ import { PlusCircle, MessageSquare } from "lucide-react";
 import { icon } from "@/lib/design-system";
 import { groupByDate } from "@/lib/date-grouping";
 import { cn } from "@/lib/utils";
+import { notificar } from "@/lib/notifier";
 
 interface ListaConversasProps {
   readonly conversaAtualId: string | null;
@@ -33,6 +34,8 @@ export function ListaConversas({
     setDeletingId(identificador);
     try {
       await deletarConversa(identificador);
+    } catch {
+      notificar.error("Erro ao excluir conversa", { description: "Tente novamente." });
     } finally {
       setDeletingId(null);
     }
