@@ -54,14 +54,11 @@ export function ChatBody({
   }, [mensagens]);
 
   return (
-    <div className={cn("flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen mx-auto w-full max-w-[80ch]")}>
+    <div className={cn("flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen")}>
       {/* Messages area */}
       <div
         ref={areaScrollRef}
-        className={cn(
-          "min-h-0 flex-1 overflow-y-auto",
-          fs ? "space-y-4 p-5" : "space-y-4 p-4",
-        )}
+        className="min-h-0 flex-1 overflow-y-auto"
       >
         {mensagens.length === 0 && (
           <div className={cn(
@@ -85,26 +82,29 @@ export function ChatBody({
             />
           </div>
         )}
-        {mensagens.map((mensagem, indice) => (
-          <div key={mensagem.identificador} className={cn(fs && "mx-auto max-w-4xl")}>
-            <MensagemChatBolha
-              mensagem={mensagem}
-              estaTransmitindo={
-                estaTransmitindo &&
-                mensagem.papel === "assistente" &&
-                indice === mensagens.length - 1
-              }
-              userImageUrl={userImageUrl}
-              userInitials={userInitials}
-              onRetry={
-                mensagem.papel === "assistente" && indice === mensagens.length - 1
-                  ? reenviarUltimaMensagem
-                  : undefined
-              }
-              fullscreen={fs}
-            />
+        {mensagens.length > 0 && (
+          <div className={cn("divide-y divide-border/40", fs && "mx-auto max-w-[80ch]")}>
+            {mensagens.map((mensagem, indice) => (
+              <MensagemChatBolha
+                key={mensagem.identificador}
+                mensagem={mensagem}
+                estaTransmitindo={
+                  estaTransmitindo &&
+                  mensagem.papel === "assistente" &&
+                  indice === mensagens.length - 1
+                }
+                userImageUrl={userImageUrl}
+                userInitials={userInitials}
+                onRetry={
+                  mensagem.papel === "assistente" && indice === mensagens.length - 1
+                    ? reenviarUltimaMensagem
+                    : undefined
+                }
+                fullscreen={fs}
+              />
+            ))}
           </div>
-        ))}
+        )}
       </div>
 
       {/* Error banner */}
