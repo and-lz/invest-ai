@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { AlertCircle, RefreshCw, User } from "lucide-react";
+import { AlertCircle, Bookmark, RefreshCw, User } from "lucide-react";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import { ConteudoMarkdownChat } from "@/components/chat/chat-markdown-content";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,6 +16,8 @@ interface MensagemChatBolhaProps {
   readonly userInitials?: string;
   readonly onRetry?: () => void;
   readonly fullscreen?: boolean;
+  readonly isSaved?: boolean;
+  readonly onToggleSave?: () => void;
 }
 
 export function MensagemChatBolha({
@@ -25,6 +27,8 @@ export function MensagemChatBolha({
   userInitials,
   onRetry,
   fullscreen,
+  isSaved,
+  onToggleSave,
 }: MensagemChatBolhaProps) {
   const ehUsuario = mensagem.papel === "usuario";
   const fs = fullscreen;
@@ -39,7 +43,7 @@ export function MensagemChatBolha({
   return (
     <div
       className={cn(
-        "w-full rounded-lg",
+        "group/msg w-full rounded-lg",
         !ehUsuario && "bg-muted/50",
         fs ? "px-5 py-4" : "px-4 py-3",
       )}
@@ -62,6 +66,27 @@ export function MensagemChatBolha({
         <span className={cn("font-medium", fs ? "text-sm" : "text-xs")}>
           {ehUsuario ? "Você" : "Fortuna"}
         </span>
+
+        {/* Bookmark toggle */}
+        {onToggleSave && !estaTransmitindo && cleanContent && (
+          <button
+            onClick={onToggleSave}
+            type="button"
+            className={cn(
+              "ml-auto transition-opacity",
+              fs ? "h-7 w-7" : "h-6 w-6",
+              "inline-flex items-center justify-center rounded-md hover:bg-muted",
+              isSaved
+                ? "text-primary opacity-100"
+                : "text-muted-foreground opacity-0 group-hover/msg:opacity-100",
+            )}
+            aria-label={isSaved ? "Remover dos salvos" : "Salvar mensagem"}
+          >
+            <Bookmark
+              className={cn(fs ? "h-4 w-4" : "h-3.5 w-3.5", isSaved && "fill-current")}
+            />
+          </button>
+        )}
       </div>
 
       {/* Thinking / reasoning (inline dimmed) */}

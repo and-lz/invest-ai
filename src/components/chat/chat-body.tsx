@@ -28,6 +28,8 @@ interface ChatBodyProps {
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
   readonly onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
+  readonly savedMessageIds?: ReadonlySet<string>;
+  readonly onToggleSave?: (mensagem: MensagemChat) => void;
 }
 
 export function ChatBody({
@@ -49,6 +51,8 @@ export function ChatBody({
   raciocinio,
   onRaciocinioChange,
   onScroll,
+  savedMessageIds,
+  onToggleSave,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
 
@@ -90,7 +94,7 @@ export function ChatBody({
           </div>
         )}
         {mensagens.length > 0 && (
-          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4" : "p-3")}>
+          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-[72px]" : "p-3")}>
             {mensagens.map((mensagem, indice) => (
               <MensagemChatBolha
                 key={mensagem.identificador}
@@ -108,6 +112,8 @@ export function ChatBody({
                     : undefined
                 }
                 fullscreen={fs}
+                isSaved={savedMessageIds?.has(mensagem.identificador)}
+                onToggleSave={onToggleSave ? () => onToggleSave(mensagem) : undefined}
               />
             ))}
           </div>
