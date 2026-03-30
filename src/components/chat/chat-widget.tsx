@@ -62,6 +62,7 @@ export function ChatWidget() {
   const {
     mensagens,
     estaTransmitindo,
+    streamingPhase,
     enviarMensagem,
     limparHistorico,
     erro,
@@ -270,6 +271,7 @@ export function ChatWidget() {
             <ChatBody
               mensagens={mensagens}
               estaTransmitindo={estaTransmitindo}
+              streamingPhase={streamingPhase}
               erro={erro}
               enviarMensagem={enviarMensagem}
               pararTransmissao={pararTransmissao}

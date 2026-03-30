@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Bookmark, ChevronRight, RefreshCw } from "lucide-react";
+import { AlertCircle, Bookmark, Brain, ChevronRight, RefreshCw } from "lucide-react";
 import type { MensagemChat } from "@/schemas/chat.schema";
+import type { StreamingPhase } from "@/hooks/use-chat-assistant";
 import { ConteudoMarkdownChat } from "@/components/chat/chat-markdown-content";
 import {
   Collapsible,
@@ -17,6 +18,7 @@ const STREAM_ERROR_REGEX = /\n*\[ERRO\]:\s*(.+)$/;
 interface MensagemChatBolhaProps {
   readonly mensagem: MensagemChat;
   readonly estaTransmitindo?: boolean;
+  readonly streamingPhase?: StreamingPhase;
   readonly userImageUrl?: string;
   readonly userInitials?: string;
   readonly onRetry?: () => void;
@@ -28,6 +30,7 @@ interface MensagemChatBolhaProps {
 export function MensagemChatBolha({
   mensagem,
   estaTransmitindo,
+  streamingPhase = "idle",
   onRetry,
   fullscreen,
   isSaved,
@@ -43,12 +46,35 @@ export function MensagemChatBolha({
     ? mensagem.conteudo.replace(STREAM_ERROR_REGEX, "").trim()
     : mensagem.conteudo;
 
+  const isThinking = streamingPhase === "thinking";
+  const hasThinkingContent = Boolean(mensagem.pensamento);
+
+  // Auto-open reasoning during thinking phase, auto-collapse when responding starts
   const [reasoningOpen, setReasoningOpen] = useState(false);
+
+  useEffect(() => {
+    if (isThinking) {
+      setReasoningOpen(true);
+    } else if (streamingPhase === "responding" && hasThinkingContent) {
+      setReasoningOpen(false);
+    }
+  }, [isThinking, streamingPhase, hasThinkingContent]);
 
   return (
     <div>
+      {/* Thinking indicator — shown while AI is reasoning, before any content */}
+      {!ehUsuario && isThinking && !hasThinkingContent && !cleanContent && (
+        <div className={cn(
+          "text-muted-foreground flex items-center gap-2 px-2 py-1.5",
+          fs ? "text-sm" : "text-xs",
+        )}>
+          <Brain className="h-3.5 w-3.5 chat-thinking-pulse" />
+          <span className="font-medium">Pensando...</span>
+        </div>
+      )}
+
       {/* Collapsible reasoning block (before the message) */}
-      {!ehUsuario && mensagem.pensamento && (
+      {!ehUsuario && (hasThinkingContent || isThinking) && (
         <Collapsible open={reasoningOpen} onOpenChange={setReasoningOpen}>
           <CollapsibleTrigger
             className={cn(
@@ -56,22 +82,29 @@ export function MensagemChatBolha({
               fs ? "text-xs" : "text-[11px]",
             )}
           >
-            <ChevronRight
-              className={cn(
-                "h-3 w-3 shrink-0 transition-transform duration-200",
-                reasoningOpen && "rotate-90",
-              )}
-            />
-            <span className="font-medium">Raciocínio</span>
+            {isThinking ? (
+              <Brain className="h-3 w-3 shrink-0 chat-thinking-pulse" />
+            ) : (
+              <ChevronRight
+                className={cn(
+                  "h-3 w-3 shrink-0 transition-transform duration-200",
+                  reasoningOpen && "rotate-90",
+                )}
+              />
+            )}
+            <span className="font-medium">
+              {isThinking ? "Pensando..." : "Raciocínio"}
+            </span>
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div
               className={cn(
-                "text-muted-foreground mt-1 ml-2 border-l-2 border-border/40 pl-3 italic",
+                "text-muted-foreground mt-1 ml-2 border-l-2 border-border/40 pl-3 italic whitespace-pre-wrap",
                 fs ? "text-sm" : "text-xs",
               )}
             >
               {mensagem.pensamento}
+              {isThinking && <span className="chat-thinking-cursor" />}
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -97,11 +130,13 @@ export function MensagemChatBolha({
           {cleanContent ? (
             <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} fullscreen={fs} />
           ) : estaTransmitindo && !streamError ? (
-            <span className="text-muted-foreground inline-flex gap-1">
-              <span className="animate-bounce">.</span>
-              <span className="animate-bounce [animation-delay:0.1s]">.</span>
-              <span className="animate-bounce [animation-delay:0.2s]">.</span>
-            </span>
+            isThinking ? null : (
+              <span className="text-muted-foreground inline-flex gap-1">
+                <span className="animate-bounce">.</span>
+                <span className="animate-bounce [animation-delay:0.1s]">.</span>
+                <span className="animate-bounce [animation-delay:0.2s]">.</span>
+              </span>
+            )
           ) : (
             !ehUsuario &&
             !streamError &&

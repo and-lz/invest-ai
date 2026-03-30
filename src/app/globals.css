@@ -469,6 +469,36 @@ dialog[data-closing]::backdrop {
   }
 }
 
+/* Chat Thinking — Pulsing indicator while AI reasons */
+.chat-thinking-pulse {
+  animation: thinking-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes thinking-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Chat Thinking — Blinking cursor at end of streaming reasoning text */
+.chat-thinking-cursor::after {
+  content: "▍";
+  animation: thinking-cursor-blink 0.8s steps(2) infinite;
+  margin-left: 1px;
+}
+
+@keyframes thinking-cursor-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
 /* ─── AI Visual Identity ─── */
 
 /* Breathing glow for the Chat FAB */

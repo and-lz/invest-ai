@@ -10,10 +10,12 @@ import { cn } from "@/lib/utils";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import type { ChatSuggestion } from "@/lib/chat-suggestions";
 import type { ClaudeModelTier } from "@/lib/model-tiers";
+import type { StreamingPhase } from "@/hooks/use-chat-assistant";
 
 interface ChatBodyProps {
   readonly mensagens: readonly MensagemChat[];
   readonly estaTransmitindo: boolean;
+  readonly streamingPhase: StreamingPhase;
   readonly erro: string | null;
   readonly enviarMensagem: (conteudo: string) => Promise<void>;
   readonly pararTransmissao: () => void;
@@ -40,6 +42,7 @@ interface ChatBodyProps {
 export function ChatBody({
   mensagens,
   estaTransmitindo,
+  streamingPhase,
   erro,
   enviarMensagem,
   pararTransmissao,
@@ -119,6 +122,11 @@ export function ChatBody({
                   estaTransmitindo &&
                   mensagem.papel === "assistente" &&
                   indice === mensagens.length - 1
+                }
+                streamingPhase={
+                  estaTransmitindo && indice === mensagens.length - 1
+                    ? streamingPhase
+                    : "idle"
                 }
                 userImageUrl={userImageUrl}
                 userInitials={userInitials}

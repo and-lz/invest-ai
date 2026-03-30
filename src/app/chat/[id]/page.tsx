@@ -80,6 +80,7 @@ export default function ChatPage() {
   const {
     mensagens,
     estaTransmitindo,
+    streamingPhase,
     enviarMensagem,
     limparHistorico,
     erro,
@@ -243,6 +244,7 @@ export default function ChatPage() {
         <ChatBody
           mensagens={mensagens}
           estaTransmitindo={estaTransmitindo}
+          streamingPhase={streamingPhase}
           erro={erro}
           enviarMensagem={enviarMensagem}
           pararTransmissao={pararTransmissao}
