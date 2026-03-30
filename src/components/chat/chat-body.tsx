@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import type { ChatSuggestion } from "@/lib/chat-suggestions";
+import type { ClaudeModelTier } from "@/lib/model-tiers";
 
 interface ChatBodyProps {
   readonly mensagens: readonly MensagemChat[];
@@ -28,6 +29,8 @@ interface ChatBodyProps {
   readonly aiSuggestions: readonly ChatSuggestion[];
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
+  readonly modelTier?: ClaudeModelTier;
+  readonly onModelTierChange?: (tier: ClaudeModelTier) => void;
   readonly onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   readonly savedMessageIds?: ReadonlySet<string>;
   readonly onToggleSave?: (mensagem: MensagemChat) => void;
@@ -52,6 +55,8 @@ export function ChatBody({
   aiSuggestions,
   raciocinio,
   onRaciocinioChange,
+  modelTier,
+  onModelTierChange,
   onScroll,
   savedMessageIds,
   onToggleSave,
@@ -150,6 +155,8 @@ export function ChatBody({
           fullscreen={fs}
           raciocinio={raciocinio}
           onRaciocinioChange={onRaciocinioChange}
+          modelTier={modelTier}
+          onModelTierChange={onModelTierChange}
           hideBorderTop
           suggestions={mensagens.length > 0 && !estaTransmitindo ? activeSuggestions : undefined}
           suggestionsLoading={mensagens.length > 0 && !estaTransmitindo ? aiSuggestionsLoading : false}

@@ -19,6 +19,7 @@ import { stripMarkdown } from "@/lib/strip-markdown";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
 import { cn } from "@/lib/utils";
 import type { MensagemChat } from "@/schemas/chat.schema";
+import type { ClaudeModelTier } from "@/lib/model-tiers";
 
 export default function ChatPage() {
   const params = useParams<{ id: string }>();
@@ -29,18 +30,28 @@ export default function ChatPage() {
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [raciocinio, setRaciocinio] = useState(true);
+  const [modelTier, setModelTier] = useState<ClaudeModelTier>("sonnet");
   const prevTransmitindoRef = useRef(false);
   const mobileSidebarRef = useRef<ChatMobileSidebarHandle>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("chatReasoningEnabled");
     setRaciocinio(stored === null ? true : stored === "true");
+    const storedTier = localStorage.getItem("chatModelTier");
+    if (storedTier === "haiku" || storedTier === "sonnet" || storedTier === "opus") {
+      setModelTier(storedTier);
+    }
   }, []);
   const lastNonChatPageRef = useRef("/");
 
   const handleRaciocinioChange = useCallback((enabled: boolean) => {
     setRaciocinio(enabled);
     localStorage.setItem("chatReasoningEnabled", String(enabled));
+  }, []);
+
+  const handleModelTierChange = useCallback((tier: ClaudeModelTier) => {
+    setModelTier(tier);
+    localStorage.setItem("chatModelTier", tier);
   }, []);
 
   // Read last non-chat page on mount
@@ -79,7 +90,7 @@ export default function ChatPage() {
     followUpSuggestions,
     reenviarUltimaMensagem,
     estaCarregandoConversa,
-  } = useChatAssistant({ raciocinio });
+  } = useChatAssistant({ raciocinio, modelTier });
 
   // Saved messages
   const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
@@ -247,6 +258,8 @@ export default function ChatPage() {
           aiSuggestions={aiSuggestions}
           raciocinio={raciocinio}
           onRaciocinioChange={handleRaciocinioChange}
+          modelTier={modelTier}
+          onModelTierChange={handleModelTierChange}
           savedMessageIds={savedMessageIds}
           onToggleSave={handleToggleSave}
           estaCarregandoConversa={estaCarregandoConversa}
