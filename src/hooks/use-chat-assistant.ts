@@ -41,6 +41,7 @@ const DEBOUNCE_AUTO_SAVE_MS = 2000;
 
 interface UseChatAssistenteOpcoes {
   readonly raciocinio?: boolean;
+  readonly modelTier?: string;
 }
 
 interface UseChatAssistenteRetorno {
@@ -60,6 +61,7 @@ interface UseChatAssistenteRetorno {
 
 export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssistenteRetorno {
   const raciocinio = opcoes?.raciocinio ?? false;
+  const modelTier = opcoes?.modelTier;
   const [mensagens, setMensagens] = useState<MensagemChat[]>([]);
   const [estaTransmitindo, setEstaTransmitindo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -236,6 +238,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
             contextoPagina: dadosContexto,
             identificadorPagina,
             ...(raciocinio && { raciocinio: true }),
+            ...(modelTier && { modelTier }),
           }),
           signal: controladorAbort.signal,
         });
@@ -331,6 +334,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
       salvarConversaAutomaticamente,
       processarHighlights,
       raciocinio,
+      modelTier,
     ],
   );
 
