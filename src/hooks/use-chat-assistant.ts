@@ -21,6 +21,8 @@ import { autoSaveConversation, loadConversation } from "@/lib/chat-persistence";
 /** Debounce para auto-save (aguarda streaming concluir + 2s) */
 const DEBOUNCE_AUTO_SAVE_MS = 2000;
 
+export type StreamingPhase = "idle" | "thinking" | "responding";
+
 interface UseChatAssistenteOpcoes {
   readonly raciocinio?: boolean;
   readonly modelTier?: string;
@@ -30,6 +32,7 @@ interface UseChatAssistenteRetorno {
   readonly mensagens: readonly MensagemChat[];
   readonly estaTransmitindo: boolean;
   readonly estaCarregandoConversa: boolean;
+  readonly streamingPhase: StreamingPhase;
   readonly erro: string | null;
   readonly enviarMensagem: (conteudo: string) => Promise<void>;
   readonly limparHistorico: () => void;
@@ -46,6 +49,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
   const modelTier = opcoes?.modelTier;
   const [mensagens, setMensagens] = useState<MensagemChat[]>([]);
   const [estaTransmitindo, setEstaTransmitindo] = useState(false);
+  const [streamingPhase, setStreamingPhase] = useState<StreamingPhase>("idle");
   const [erro, setErro] = useState<string | null>(null);
   const [conversaAtualId, setConversaAtualId] = useState<string | null>(null);
   const [estaCarregando, setEstaCarregando] = useState(false);
@@ -134,6 +138,9 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
         let textoAcumulado = "";
         let pensamentoAcumulado = "";
         let rawAcumulado = "";
+        let enteredRespondingPhase = false;
+
+        setStreamingPhase(raciocinio ? "thinking" : "responding");
 
         for (;;) {
           const { done, value } = await leitor.read();
@@ -145,6 +152,12 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
             const parsed = parseReasoningStream(rawAcumulado);
             pensamentoAcumulado = parsed.thinking;
             textoAcumulado = parsed.text;
+
+            // Transition to responding phase when first text chunk arrives
+            if (!enteredRespondingPhase && parsed.text.length > 0) {
+              enteredRespondingPhase = true;
+              setStreamingPhase("responding");
+            }
           } else {
             textoAcumulado = rawAcumulado;
           }
@@ -204,6 +217,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
         );
       } finally {
         setEstaTransmitindo(false);
+        setStreamingPhase("idle");
         controladorAbortRef.current = null;
       }
     },
@@ -286,6 +300,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
     mensagens,
     estaTransmitindo: estaTransmitindo || estaCarregando,
     estaCarregandoConversa: estaCarregando,
+    streamingPhase,
     erro,
     enviarMensagem,
     limparHistorico: criarNovaConversa, // alias para compatibilidade
