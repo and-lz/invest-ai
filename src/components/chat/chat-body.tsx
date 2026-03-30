@@ -75,7 +75,7 @@ export function ChatBody({
         className="relative min-h-0 flex-1 overflow-y-auto"
       >
         {estaCarregandoConversa && (
-          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-[72px]" : "p-3")}>
+          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
             <MessageBubbleSkeleton role="user" fullscreen={fs} contentLines={["w-3/5"]} />
             <MessageBubbleSkeleton role="assistant" fullscreen={fs} contentLines={["w-full", "w-full", "w-full", "w-2/3"]} />
             <MessageBubbleSkeleton role="user" fullscreen={fs} contentLines={["w-2/5"]} />
@@ -105,7 +105,7 @@ export function ChatBody({
           </div>
         )}
         {mensagens.length > 0 && (
-          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-[72px]" : "p-3")}>
+          <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
             {mensagens.map((mensagem, indice) => (
               <MensagemChatBolha
                 key={mensagem.identificador}
@@ -140,7 +140,7 @@ export function ChatBody({
       )}
 
       {/* Footer: input with inline suggestion chips */}
-      <div className="border-t">
+      <div>
         <CampoEntradaChat
           onEnviar={enviarMensagem}
           onParar={pararTransmissao}
@@ -163,7 +163,6 @@ export function ChatBody({
 
 /** Mirrors the exact DOM of MensagemChatBolha but with skeleton placeholders. */
 function MessageBubbleSkeleton({
-  role,
   fullscreen: fs,
   contentLines,
 }: {
@@ -172,31 +171,15 @@ function MessageBubbleSkeleton({
   /** Width classes for each skeleton text line (e.g. ["w-full", "w-4/5"]) */
   readonly contentLines: readonly string[];
 }) {
-  const isUser = role === "user";
   return (
-    <div className="space-y-1">
-      {/* Message bubble — same classes as MensagemChatBolha */}
-      <div
-        className={cn(
-          "group/msg w-full rounded-lg",
-          !isUser && "bg-muted/50",
-          fs ? "px-5 py-4" : "px-4 py-3",
-        )}
-      >
-        {/* Role label row — same as real: avatar + name */}
-        <div className={cn("mb-2 flex items-center", fs ? "gap-2.5" : "gap-2")}>
-          <Skeleton className={cn("shrink-0 rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
-          <Skeleton className={cn("rounded", fs ? "h-3.5 w-12" : "h-3 w-8")} />
-        </div>
-        {/* Content — same text size leading as real */}
-        <div className={cn("space-y-2", fs ? "text-base leading-relaxed" : "text-sm leading-relaxed")}>
-          {contentLines.map((widthCls, i) => (
-            <Skeleton
-              key={i}
-              className={cn("rounded", widthCls, fs ? "h-4" : "h-3.5")}
-            />
-          ))}
-        </div>
+    <div className={cn("w-full", fs ? "py-2" : "py-1.5")}>
+      <div className={cn("space-y-2", fs ? "text-base leading-relaxed" : "text-sm leading-relaxed")}>
+        {contentLines.map((widthCls, i) => (
+          <Skeleton
+            key={i}
+            className={cn("rounded", widthCls, fs ? "h-4" : "h-3.5")}
+          />
+        ))}
       </div>
     </div>
   );

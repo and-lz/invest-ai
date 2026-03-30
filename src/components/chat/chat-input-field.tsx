@@ -106,7 +106,7 @@ export function CampoEntradaChat({
     <div className={cn(
       "flex flex-col",
       !hideBorderTop && "border-t",
-      fs ? "mx-auto w-full max-w-4xl px-5 pt-2 pb-5" : "px-3 pt-1.5 pb-3",
+      fs ? "bg-gradient-to-t from-background via-background to-transparent mx-auto w-full max-w-4xl px-5 pt-3 pb-5" : "px-3 pt-1.5 pb-3",
     )}>
       {(showInlineChips || suggestionsLoading) && (
         <SuggestionChips
@@ -142,7 +142,7 @@ export function CampoEntradaChat({
         disabled={desabilitado}
         rows={1}
         className={cn(
-          "bg-background placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none rounded-lg border focus:ring-1 focus:outline-none disabled:opacity-50",
+          "placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none bg-transparent focus:ring-0 focus:outline-none disabled:opacity-50",
           fs ? "px-4 py-3 text-base" : "px-3 py-2 text-sm",
         )}
       />

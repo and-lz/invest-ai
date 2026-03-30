@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Bookmark, ChevronRight, RefreshCw, User } from "lucide-react";
+import { AlertCircle, Bookmark, ChevronRight, RefreshCw } from "lucide-react";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import { ConteudoMarkdownChat } from "@/components/chat/chat-markdown-content";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Collapsible,
   CollapsibleContent,
@@ -29,8 +28,6 @@ interface MensagemChatBolhaProps {
 export function MensagemChatBolha({
   mensagem,
   estaTransmitindo,
-  userImageUrl,
-  userInitials,
   onRetry,
   fullscreen,
   isSaved,
@@ -49,8 +46,8 @@ export function MensagemChatBolha({
   const [reasoningOpen, setReasoningOpen] = useState(false);
 
   return (
-    <div className="space-y-1">
-      {/* Collapsible reasoning block (before the bubble) */}
+    <div>
+      {/* Collapsible reasoning block (before the message) */}
       {!ehUsuario && mensagem.pensamento && (
         <Collapsible open={reasoningOpen} onOpenChange={setReasoningOpen}>
           <CollapsibleTrigger
@@ -80,106 +77,90 @@ export function MensagemChatBolha({
         </Collapsible>
       )}
 
-      {/* Message bubble */}
+      {/* Message content — no bubble, no avatar, no label */}
       <div
         className={cn(
-          "group/msg w-full rounded-lg",
-          !ehUsuario && "bg-muted/50",
-          fs ? "px-5 py-4" : "px-4 py-3",
+          "group/msg w-full",
+          fs ? "py-2" : "py-1.5",
         )}
       >
-      {/* Role label */}
-      <div className={cn("mb-2 flex items-center gap-2", fs ? "gap-2.5" : "gap-2")}>
-        {ehUsuario ? (
-          <Avatar className={cn("shrink-0", fs ? "h-7 w-7" : "h-5 w-5")}>
-            <AvatarImage src={userImageUrl} alt="Você" />
-            <AvatarFallback className={cn("bg-primary/10", fs ? "text-xs" : "text-[10px]")}>
-              {userInitials ?? <User className={fs ? "h-4 w-4" : "h-3 w-3"} />}
-            </AvatarFallback>
-          </Avatar>
-        ) : (
-          <Avatar className={cn("shrink-0 overflow-hidden", fs ? "h-7 w-7" : "h-5 w-5 border border-border/50")}>
-            <AvatarImage src="/fortuna-minimal.png" alt="Fortuna" className="scale-[1.35]" />
-            <AvatarFallback className={cn("bg-primary/10", fs ? "text-xs" : "text-[10px]")}>F</AvatarFallback>
-          </Avatar>
-        )}
-        <span className={cn("font-medium", fs ? "text-sm" : "text-xs")}>
-          {ehUsuario ? "Você" : "Fortuna"}
-        </span>
+        <div
+          className={cn(
+            "relative",
+            fs ? "text-base leading-relaxed" : "text-sm leading-relaxed",
+            ehUsuario ? "text-muted-foreground" : "text-foreground",
+          )}
+        >
+          {cleanContent ? (
+            <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} fullscreen={fs} />
+          ) : estaTransmitindo && !streamError ? (
+            <span className="text-muted-foreground inline-flex gap-1">
+              <span className="animate-bounce">.</span>
+              <span className="animate-bounce [animation-delay:0.1s]">.</span>
+              <span className="animate-bounce [animation-delay:0.2s]">.</span>
+            </span>
+          ) : (
+            !ehUsuario &&
+            !streamError &&
+            onRetry && (
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground text-xs">
+                  Resposta vazia — tente novamente.
+                </span>
+                <button
+                  onClick={onRetry}
+                  type="button"
+                  className="text-primary flex items-center gap-1.5 text-xs font-medium hover:underline"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Tentar novamente
+                </button>
+              </div>
+            )
+          )}
 
-        {/* Bookmark toggle */}
-        {onToggleSave && !estaTransmitindo && cleanContent && (
-          <button
-            onClick={onToggleSave}
-            type="button"
-            className={cn(
-              "ml-auto transition-opacity",
-              fs ? "h-7 w-7" : "h-6 w-6",
-              "inline-flex items-center justify-center rounded-md hover:bg-muted",
-              isSaved
-                ? "text-primary opacity-100"
-                : "text-muted-foreground opacity-0 group-hover/msg:opacity-100",
-            )}
-            aria-label={isSaved ? "Remover dos salvos" : "Salvar mensagem"}
-          >
-            <Bookmark
-              className={cn(fs ? "h-4 w-4" : "h-3.5 w-3.5", isSaved && "fill-current")}
-            />
-          </button>
-        )}
-      </div>
+          {/* Bookmark — appears on hover at the trailing edge */}
+          {onToggleSave && !estaTransmitindo && cleanContent && (
+            <button
+              onClick={onToggleSave}
+              type="button"
+              className={cn(
+                "absolute -right-8 top-0 transition-opacity",
+                fs ? "h-7 w-7" : "h-6 w-6",
+                "inline-flex items-center justify-center rounded-md hover:bg-muted",
+                isSaved
+                  ? "text-primary opacity-100"
+                  : "text-muted-foreground opacity-0 group-hover/msg:opacity-100",
+              )}
+              aria-label={isSaved ? "Remover dos salvos" : "Salvar mensagem"}
+            >
+              <Bookmark
+                className={cn(fs ? "h-4 w-4" : "h-3.5 w-3.5", isSaved && "fill-current")}
+              />
+            </button>
+          )}
 
-      {/* Message content */}
-      <div className={fs ? "text-base leading-relaxed" : "text-sm leading-relaxed"}>
-        {cleanContent ? (
-          <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} fullscreen={fs} />
-        ) : estaTransmitindo && !streamError ? (
-          <span className="inline-flex gap-1">
-            <span className="animate-bounce">.</span>
-            <span className="animate-bounce [animation-delay:0.1s]">.</span>
-            <span className="animate-bounce [animation-delay:0.2s]">.</span>
-          </span>
-        ) : (
-          !ehUsuario &&
-          !streamError &&
-          onRetry && (
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-xs">
-                Resposta vazia — tente novamente.
-              </span>
-              <button
-                onClick={onRetry}
-                type="button"
-                className="text-primary flex items-center gap-1.5 text-xs font-medium hover:underline"
-              >
-                <RefreshCw className="h-3 w-3" />
-                Tentar novamente
-              </button>
+          {/* Stream error with retry */}
+          {streamError && (
+            <div className={cn(cleanContent && "mt-3 border-t border-destructive/20 pt-3")}>
+              <div className="flex items-start gap-2">
+                <AlertCircle className="text-destructive mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span className="text-destructive text-xs">{streamError}</span>
+              </div>
+              {onRetry && (
+                <button
+                  onClick={onRetry}
+                  type="button"
+                  className="text-primary mt-2 flex items-center gap-1.5 text-xs font-medium hover:underline"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Tentar novamente
+                </button>
+              )}
             </div>
-          )
-        )}
-
-        {/* Stream error with retry */}
-        {streamError && (
-          <div className={cn(cleanContent && "mt-3 border-t border-destructive/20 pt-3")}>
-            <div className="flex items-start gap-2">
-              <AlertCircle className="text-destructive mt-0.5 h-3.5 w-3.5 shrink-0" />
-              <span className="text-destructive text-xs">{streamError}</span>
-            </div>
-            {onRetry && (
-              <button
-                onClick={onRetry}
-                type="button"
-                className="text-primary mt-2 flex items-center gap-1.5 text-xs font-medium hover:underline"
-              >
-                <RefreshCw className="h-3 w-3" />
-                Tentar novamente
-              </button>
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
     </div>
   );
 }

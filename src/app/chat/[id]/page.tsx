@@ -195,7 +195,7 @@ export default function ChatPage() {
       {/* Desktop sidebar */}
       <div
         className={cn(
-          "bg-background hidden border-r transition-all duration-200 md:block",
+          "bg-background hidden border-r border-border/20 transition-all duration-200 md:block",
           sidebarOpen ? "w-80" : "w-0 overflow-hidden border-r-0",
         )}
       >

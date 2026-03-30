@@ -1,11 +1,14 @@
 "use client";
 
-import { Menu, Trash2, Volume2, VolumeX, ArrowLeft } from "lucide-react";
+import { Menu, Trash2, Volume2, VolumeX, ArrowLeft, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Logo } from "@/components/ui/logo";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { SpeechStatus } from "@/hooks/use-speech-synthesis";
-import { cn } from "@/lib/utils";
 
 interface ChatPageHeaderProps {
   readonly title: string;
@@ -24,59 +27,59 @@ export function ChatPageHeader({
   onToggleSidebar,
   ttsSupported,
   ttsEnabled,
-  speechStatus,
   onToggleTts,
   hasMessages,
   onClearHistory,
   onBack,
 }: ChatPageHeaderProps) {
+  const showOverflow = ttsSupported || hasMessages;
+
   return (
-    <div className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky inset-x-0 top-0 z-10 border-b backdrop-blur-sm">
-      <div className="flex items-center px-6 py-2">
-        <div className="flex shrink-0 items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="h-10 w-10">
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Logo />
+    <div className="sticky inset-x-0 top-0 z-10">
+      <div className="flex items-center px-4 py-2">
+        <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="h-9 w-9 shrink-0">
+          <Menu className="h-4 w-4" />
+        </Button>
+
+        <div className="min-w-0 flex-1 px-3">
+          <p className="text-muted-foreground truncate text-xs">{title}</p>
         </div>
-        <div className="min-w-0 flex-1 px-4 text-center">
-          <p className="text-muted-foreground truncate text-sm font-medium">{title}</p>
-        </div>
-        <div className="flex shrink-0 items-center gap-1">
-          {ttsSupported && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onToggleTts}
-                    className={cn("h-10 w-10", ttsEnabled && "text-primary")}
-                  >
+
+        <div className="flex shrink-0 items-center gap-0.5">
+          {showOverflow && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9">
+                  <MoreHorizontal className="text-muted-foreground h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {ttsSupported && (
+                  <DropdownMenuItem onClick={onToggleTts}>
                     {ttsEnabled ? (
-                      <Volume2
-                        className={cn("h-5 w-5", speechStatus === "speaking" && "animate-pulse")}
-                      />
+                      <>
+                        <Volume2 className="mr-2 h-4 w-4" />
+                        Desativar leitura
+                      </>
                     ) : (
-                      <VolumeX className="text-muted-foreground h-5 w-5" />
+                      <>
+                        <VolumeX className="mr-2 h-4 w-4" />
+                        Ativar leitura
+                      </>
                     )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {ttsEnabled ? "Desativar leitura em voz alta" : "Ativar leitura em voz alta"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                  </DropdownMenuItem>
+                )}
+                {hasMessages && (
+                  <DropdownMenuItem onClick={onClearHistory}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Limpar histórico
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
-          {hasMessages && (
-            <Button variant="ghost" size="icon" onClick={onClearHistory} className="h-10 w-10">
-              <Trash2 className="text-muted-foreground h-5 w-5" />
-              <span className="sr-only">Limpar historico</span>
-            </Button>
-          )}
-          <Button variant="ghost" size="icon" onClick={onBack} className="h-10 w-10">
-            <ArrowLeft className="text-muted-foreground h-5 w-5" />
-            <span className="sr-only">Voltar</span>
+          <Button variant="ghost" size="icon" onClick={onBack} className="h-9 w-9">
+            <ArrowLeft className="text-muted-foreground h-4 w-4" />
           </Button>
         </div>
       </div>
