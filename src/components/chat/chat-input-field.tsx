@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Square, ChevronDown, Check } from "lucide-react";
+import { Send, Square, ChevronDown, Check, Zap, Cpu, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SuggestionChips } from "@/components/chat/suggestion-chips";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,6 +15,12 @@ const TIER_LABELS: Record<ClaudeModelTier, string> = {
   haiku: "Haiku",
   sonnet: "Sonnet",
   opus: "Opus",
+};
+
+const TIER_ICONS: Record<ClaudeModelTier, typeof Zap> = {
+  haiku: Zap,
+  sonnet: Cpu,
+  opus: Sparkles,
 };
 
 interface CampoEntradaChatProps {
@@ -154,7 +160,7 @@ export function CampoEntradaChat({
         />
 
         {/* Bottom toolbar: model selector + reasoning toggle + send */}
-        <div className={cn("flex items-center justify-between", fs ? "mt-1" : "mt-0.5")}>
+        <div className={cn("relative z-10 flex items-center justify-between", fs ? "mt-1" : "mt-0.5")}>
           <div className="flex-1" />
 
           <div className="flex items-center gap-1">
@@ -166,9 +172,10 @@ export function CampoEntradaChat({
                     type="button"
                     disabled={estaTransmitindo}
                     className={cn(
-                      "text-muted-foreground hover:text-foreground flex items-center gap-0.5 rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
+                      "text-muted-foreground hover:text-foreground flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
                     )}
                   >
+                    {(() => { const Icon = TIER_ICONS[modelTier]; return <Icon className="h-3 w-3" />; })()}
                     <span>{TIER_LABELS[modelTier]}</span>
                     <ChevronDown className="h-3 w-3" />
                   </button>
@@ -187,9 +194,10 @@ export function CampoEntradaChat({
                         modelTier === option.value && "bg-muted/50",
                       )}
                     >
+                      {(() => { const Icon = TIER_ICONS[option.value]; return <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />; })()}
                       <span className="flex-1">
                         <span className="font-medium">{option.label}</span>
-                        <span className="text-muted-foreground ml-2 text-xs">{option.description}</span>
+                        <span className="text-muted-foreground ml-1.5 text-xs">{option.description}</span>
                       </span>
                       {modelTier === option.value && (
                         <Check className="text-primary h-3.5 w-3.5 shrink-0" />
@@ -201,25 +209,13 @@ export function CampoEntradaChat({
             )}
 
             {/* Reasoning toggle */}
-            {onRaciocinioChange !== undefined && (
-              <div
-                role="button"
-                tabIndex={0}
-                onPointerDown={(e) => {
-                  if (estaTransmitindo) return;
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onRaciocinioChange!(!raciocinio);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onRaciocinioChange!(!raciocinio);
-                  }
-                }}
+            {onRaciocinioChange && (
+              <button
+                type="button"
+                disabled={estaTransmitindo}
+                onClick={() => onRaciocinioChange(!raciocinio)}
                 className={cn(
-                  "cursor-pointer select-none rounded-md px-2 py-1 text-xs transition-colors",
-                  estaTransmitindo && "pointer-events-none opacity-50",
+                  "cursor-pointer rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
                   raciocinio
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground",
@@ -227,7 +223,7 @@ export function CampoEntradaChat({
                 title={raciocinio ? "Desativar raciocínio extendido" : "Ativar raciocínio extendido"}
               >
                 Extendido
-              </div>
+              </button>
             )}
 
             {/* Send / Stop button */}

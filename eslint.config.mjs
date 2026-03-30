@@ -23,6 +23,25 @@ const eslintConfig = [
       "electron-dist/**",
     ],
   },
+  {
+    rules: {
+      "max-lines": [
+        "warn",
+        { max: 300, skipBlankLines: true, skipComments: true },
+      ],
+    },
+  },
+  {
+    files: [
+      "__tests__/**",
+      "drizzle/**",
+      "src/lib/schema.ts",
+      "src/components/ui/chart.tsx",
+    ],
+    rules: {
+      "max-lines": "off",
+    },
+  },
 ];
 
 export default eslintConfig;
