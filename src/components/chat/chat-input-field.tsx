@@ -126,7 +126,7 @@ export function CampoEntradaChat({
           onClick={() => onRaciocinioChange(!raciocinio)}
           className={cn(
             "shrink-0",
-            raciocinio ? "text-primary" : "text-muted-foreground",
+            raciocinio ? "bg-primary/10 text-primary" : "text-muted-foreground",
           )}
           title={raciocinio ? "Desativar raciocínio" : "Ativar raciocínio"}
         >
