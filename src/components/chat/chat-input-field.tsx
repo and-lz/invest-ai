@@ -118,7 +118,7 @@ export function CampoEntradaChat({
           fullscreen={fs}
         />
       )}
-      <div className={cn("flex items-end", fs ? "gap-3" : "gap-2")}>
+      <div className={cn("flex items-center", fs ? "gap-3" : "gap-2")}>
       {onRaciocinioChange && (
         <Button
           variant="ghost"
