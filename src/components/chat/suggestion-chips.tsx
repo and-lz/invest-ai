@@ -60,12 +60,12 @@ export function SuggestionChips({
     );
   }
 
-  // Quick-reply: vertical stack, right-aligned, above the input
+  // Quick-reply: horizontal wrap, inline above the textarea
   return (
     <div
       className={cn(
-        "flex flex-col items-end gap-1.5",
-        fs ? "mx-auto w-full max-w-4xl px-5 pt-2 pb-0" : "px-3 pt-1.5 pb-0",
+        "flex flex-wrap items-center gap-1.5",
+        fs ? "pb-2 pt-1" : "pb-1.5 pt-0.5",
       )}
       role="group"
       aria-label="Sugestoes de perguntas"

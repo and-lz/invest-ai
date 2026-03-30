@@ -28,12 +28,13 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [raciocinio, setRaciocinio] = useState(false);
+  const [raciocinio, setRaciocinio] = useState(true);
   const prevTransmitindoRef = useRef(false);
   const mobileSidebarRef = useRef<ChatMobileSidebarHandle>(null);
 
   useEffect(() => {
-    setRaciocinio(localStorage.getItem("chatReasoningEnabled") === "true");
+    const stored = localStorage.getItem("chatReasoningEnabled");
+    setRaciocinio(stored === null ? true : stored === "true");
   }, []);
   const lastNonChatPageRef = useRef("/");
 

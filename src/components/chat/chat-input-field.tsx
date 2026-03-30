@@ -4,6 +4,8 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Square, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SuggestionChips } from "@/components/chat/suggestion-chips";
+import type { ChatSuggestion } from "@/lib/chat-suggestions";
 
 interface CampoEntradaChatProps {
   readonly onEnviar: (conteudo: string) => void;
@@ -17,6 +19,10 @@ interface CampoEntradaChatProps {
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
   readonly hideBorderTop?: boolean;
+  readonly suggestions?: readonly ChatSuggestion[];
+  readonly suggestionsLoading?: boolean;
+  readonly onSuggestionSelect?: (text: string) => void;
+  readonly suggestionsFilterText?: string;
 }
 
 function ehDispositivoTouch(): boolean {
@@ -36,6 +42,10 @@ export function CampoEntradaChat({
   raciocinio,
   onRaciocinioChange,
   hideBorderTop,
+  suggestions,
+  suggestionsLoading,
+  onSuggestionSelect,
+  suggestionsFilterText,
 }: CampoEntradaChatProps) {
   const [internalValue, setInternalValue] = useState("");
   const isControlled = controlledValue !== undefined;
@@ -90,12 +100,25 @@ export function CampoEntradaChat({
     [setValor, fs],
   );
 
+  const showInlineChips = suggestions && suggestions.length > 0 && onSuggestionSelect && !valor.trim();
+
   return (
     <div className={cn(
-      "flex items-end",
+      "flex flex-col",
       !hideBorderTop && "border-t",
-      fs ? "mx-auto w-full max-w-4xl gap-3 p-5" : "gap-2 p-3",
+      fs ? "mx-auto w-full max-w-4xl px-5 pt-2 pb-5" : "px-3 pt-1.5 pb-3",
     )}>
+      {(showInlineChips || suggestionsLoading) && (
+        <SuggestionChips
+          suggestions={suggestions ?? []}
+          onSelect={onSuggestionSelect!}
+          filterText={suggestionsFilterText}
+          variant="quick-reply"
+          isLoading={suggestionsLoading}
+          fullscreen={fs}
+        />
+      )}
+      <div className={cn("flex items-end", fs ? "gap-3" : "gap-2")}>
       {onRaciocinioChange && (
         <Button
           variant="ghost"
@@ -140,6 +163,7 @@ export function CampoEntradaChat({
           <span className="sr-only">Enviar mensagem</span>
         </Button>
       )}
+      </div>
     </div>
   );
 }

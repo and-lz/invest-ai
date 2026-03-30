@@ -139,18 +139,8 @@ export function ChatBody({
         </div>
       )}
 
-      {/* Footer: suggestions + input — single border-t above the whole section */}
+      {/* Footer: input with inline suggestion chips */}
       <div className="border-t">
-        {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
-          <SuggestionChips
-            suggestions={activeSuggestions}
-            onSelect={onSuggestionSelect}
-            filterText={aiSuggestions.length > 0 ? undefined : inputValue}
-            variant="quick-reply"
-            isLoading={aiSuggestionsLoading}
-            fullscreen={fs}
-          />
-        )}
         <CampoEntradaChat
           onEnviar={enviarMensagem}
           onParar={pararTransmissao}
@@ -161,6 +151,10 @@ export function ChatBody({
           raciocinio={raciocinio}
           onRaciocinioChange={onRaciocinioChange}
           hideBorderTop
+          suggestions={mensagens.length > 0 && !estaTransmitindo ? activeSuggestions : undefined}
+          suggestionsLoading={mensagens.length > 0 && !estaTransmitindo ? aiSuggestionsLoading : false}
+          onSuggestionSelect={onSuggestionSelect}
+          suggestionsFilterText={aiSuggestions.length > 0 ? undefined : inputValue}
         />
       </div>
     </div>
