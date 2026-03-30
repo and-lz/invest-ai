@@ -173,7 +173,7 @@ export function CampoEntradaChat({
                     <ChevronDown className="h-3 w-3" />
                   </button>
                 </PopoverTrigger>
-                <PopoverContent align="end" className="w-52 p-1" sideOffset={8}>
+                <PopoverContent side="top" align="end" className="w-52 p-1" sideOffset={8}>
                   {CLAUDE_MODEL_TIER_OPTIONS.map((option) => (
                     <button
                       key={option.value}
