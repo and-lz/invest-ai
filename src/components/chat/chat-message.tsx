@@ -77,20 +77,21 @@ export function MensagemChatBolha({
         </Collapsible>
       )}
 
-      {/* Message content — no bubble, no avatar, no label */}
+      {/* Message content */}
       <div
         className={cn(
-          "group/msg w-full",
+          "group/msg w-full flex",
           fs ? "py-2" : "py-1.5",
-          ehUsuario && "text-right",
+          ehUsuario ? "justify-end" : "justify-start",
         )}
       >
         <div
           className={cn(
-            "relative inline-block",
+            "relative",
             fs ? "text-base leading-relaxed" : "text-sm leading-relaxed",
-            ehUsuario ? "text-muted-foreground text-right" : "text-foreground text-left",
-            ehUsuario && "max-w-[85%] ml-auto",
+            ehUsuario
+              ? "bg-muted/40 rounded-2xl rounded-br-sm max-w-[85%] px-4 py-2.5"
+              : "text-foreground w-full",
           )}
         >
           {cleanContent ? (
@@ -121,13 +122,14 @@ export function MensagemChatBolha({
             )
           )}
 
-          {/* Bookmark — appears on hover at the trailing edge */}
+          {/* Bookmark — appears on hover outside the message */}
           {onToggleSave && !estaTransmitindo && cleanContent && (
             <button
               onClick={onToggleSave}
               type="button"
               className={cn(
-                "absolute -right-8 top-0 transition-opacity",
+                "absolute top-0 transition-opacity",
+                ehUsuario ? "-left-8" : "-right-8",
                 fs ? "h-7 w-7" : "h-6 w-6",
                 "inline-flex items-center justify-center rounded-md hover:bg-muted",
                 isSaved
