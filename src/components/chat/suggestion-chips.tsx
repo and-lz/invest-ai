@@ -65,7 +65,7 @@ export function SuggestionChips({
     <div
       className={cn(
         "flex flex-col items-end gap-1.5",
-        fs ? "mx-auto w-full max-w-4xl px-5 py-2" : "px-3 py-1.5",
+        fs ? "mx-auto w-full max-w-4xl px-5 pt-2 pb-0" : "px-3 pt-1.5 pb-0",
       )}
       role="group"
       aria-label="Sugestoes de perguntas"
@@ -79,7 +79,8 @@ export function SuggestionChips({
           type="button"
           onClick={() => onSelect(suggestion.text)}
           className={cn(
-            "text-muted-foreground hover:text-foreground border rounded-full",
+            "bg-secondary/60 hover:bg-secondary text-muted-foreground hover:text-foreground",
+            "border border-border/50 hover:border-primary/30 rounded-full",
             "cursor-pointer transition-colors",
             fs ? "text-sm px-4 py-1.5" : "text-xs px-3 py-1",
           )}
