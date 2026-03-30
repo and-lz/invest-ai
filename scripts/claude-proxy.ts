@@ -5,6 +5,12 @@
  * Personal use only — routes requests through your Claude Code subscription.
  * Supports model selection via the `model` field in the request body.
  *
+ * Features:
+ *   - Real token-by-token streaming via `--output-format stream-json`
+ *   - Request body size limit (100KB)
+ *   - Concurrent request limit (3)
+ *   - CORS restricted to localhost
+ *
  * Usage:
  *   npm run proxy
  *   PROXY_PORT=3099 npm run proxy
@@ -19,6 +25,7 @@
 import http from "node:http";
 import { execSync, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import readline from "node:readline";
 
 // ============================================================
 // Config
@@ -26,6 +33,11 @@ import { randomUUID } from "node:crypto";
 
 const PORT = parseInt(process.env["PROXY_PORT"] ?? "3099", 10);
 const HOST = "127.0.0.1";
+const MAX_BODY_SIZE = 100 * 1024; // 100KB
+const MAX_CONCURRENT_REQUESTS = 3;
+
+/** CLI flags shared by all invocations — reduces overhead and token count. */
+const SHARED_CLI_FLAGS = ["--no-session-persistence", "--tools", ""];
 
 const COLORS = {
   reset: "\x1b[0m",
@@ -44,6 +56,7 @@ const COLORS = {
 const MAX_LOG_ENTRIES = 200;
 const requestLog: RequestLogEntry[] = [];
 let totalRequests = 0;
+let activeRequests = 0;
 const startedAt = Date.now();
 
 function recordRequest(entry: RequestLogEntry): void {
@@ -102,6 +115,29 @@ interface ClaudeJsonOutput {
     string,
     { inputTokens?: number; outputTokens?: number }
   >;
+}
+
+/** A single line from `--output-format stream-json --include-partial-messages` */
+interface StreamJsonLine {
+  type: string;
+  subtype?: string;
+  event?: {
+    type: string;
+    message?: { model?: string; usage?: Record<string, unknown> };
+    delta?: { type?: string; text?: string; stop_reason?: string };
+    index?: number;
+    content_block?: { type: string; text?: string };
+    usage?: Record<string, unknown>;
+    [key: string]: unknown;
+  };
+  // Fields from the final "result" line
+  is_error?: boolean;
+  result?: string;
+  stop_reason?: string;
+  usage?: { input_tokens: number; output_tokens: number; [key: string]: unknown };
+  modelUsage?: Record<string, { inputTokens?: number; outputTokens?: number }>;
+  // Error info from assistant messages
+  error?: string;
 }
 
 // ============================================================
@@ -185,20 +221,30 @@ function resolveCliModel(modelId: string | undefined): string {
   }
 }
 
+/** Build CLI args shared between streaming and non-streaming invocations. */
+function buildBaseCliArgs(
+  systemPrompt: string | null,
+  modelId?: string,
+): string[] {
+  const cliModel = resolveCliModel(modelId);
+  const args = ["-p", "--model", cliModel, ...SHARED_CLI_FLAGS];
+  if (systemPrompt) {
+    args.push("--system-prompt", systemPrompt);
+  }
+  return args;
+}
+
+/**
+ * Non-streaming CLI invocation. Waits for full response, returns parsed JSON.
+ * Used for `stream: false` requests.
+ */
 async function invokeClaudeCli(
   prompt: string,
   systemPrompt: string | null,
   modelId?: string
 ): Promise<ClaudeJsonOutput> {
   return new Promise((resolve, reject) => {
-    const cliModel = resolveCliModel(modelId);
-    const args = ["-p", "--output-format", "json", "--model", cliModel];
-
-    if (systemPrompt) {
-      args.push("--system-prompt", systemPrompt);
-    }
-
-    args.push(prompt);
+    const args = [...buildBaseCliArgs(systemPrompt, modelId), "--output-format", "json", prompt];
 
     const child = spawn("claude", args, {
       stdio: ["ignore", "pipe", "pipe"],
@@ -242,7 +288,7 @@ async function invokeClaudeCli(
 }
 
 // ============================================================
-// Response formatting
+// Response formatting (non-streaming)
 // ============================================================
 
 function buildAnthropicResponse(cliOutput: ClaudeJsonOutput) {
@@ -271,7 +317,14 @@ function buildAnthropicResponse(cliOutput: ClaudeJsonOutput) {
 function readBody(req: http.IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     let body = "";
+    let size = 0;
     req.on("data", (chunk: Buffer) => {
+      size += chunk.length;
+      if (size > MAX_BODY_SIZE) {
+        reject(new BodyTooLargeError());
+        req.destroy();
+        return;
+      }
       body += chunk.toString();
     });
     req.on("end", () => resolve(body));
@@ -279,19 +332,45 @@ function readBody(req: http.IncomingMessage): Promise<string> {
   });
 }
 
+class BodyTooLargeError extends Error {
+  constructor() {
+    super("Request body exceeds maximum size");
+    this.name = "BodyTooLargeError";
+  }
+}
+
+/** Check if an origin is from localhost. */
+function isLocalhostOrigin(origin: string | undefined): boolean {
+  if (!origin) return true; // no origin header = same-origin or non-browser
+  try {
+    const url = new URL(origin);
+    return url.hostname === "localhost" || url.hostname === "127.0.0.1";
+  } catch {
+    return false;
+  }
+}
+
+function getCorsHeaders(origin: string | undefined): Record<string, string> {
+  if (!isLocalhostOrigin(origin)) return {};
+  return {
+    "Access-Control-Allow-Origin": origin ?? "http://localhost:3000",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, x-api-key, anthropic-version",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  };
+}
+
 function sendJson(
   res: http.ServerResponse,
   status: number,
-  body: unknown
+  body: unknown,
+  origin?: string
 ): void {
   const json = JSON.stringify(body);
   res.writeHead(status, {
     "Content-Type": "application/json",
     "Content-Length": Buffer.byteLength(json),
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-      "Content-Type, Authorization, x-api-key, anthropic-version",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    ...getCorsHeaders(origin),
   });
   res.end(json);
 }
@@ -308,42 +387,18 @@ function sendSseEvent(
   res.write(`event: ${eventType}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
-/**
- * Splits text into chunks for streaming simulation.
- * Uses word boundaries for natural-feeling output.
- */
-function splitIntoChunks(text: string, chunkSize = 20): string[] {
-  const chunks: string[] = [];
-  let remaining = text;
-  while (remaining.length > 0) {
-    if (remaining.length <= chunkSize) {
-      chunks.push(remaining);
-      break;
-    }
-    // Find last space within chunkSize range for natural word breaks
-    let end = chunkSize;
-    const spaceIdx = remaining.lastIndexOf(" ", end);
-    if (spaceIdx > chunkSize / 2) {
-      end = spaceIdx + 1; // include the space
-    }
-    chunks.push(remaining.slice(0, end));
-    remaining = remaining.slice(end);
-  }
-  return chunks;
-}
-
 // ============================================================
 // Route handlers
 // ============================================================
 
-function parsePayload(rawBody: string, res: http.ServerResponse): AnthropicRequest | null {
+function parsePayload(rawBody: string, res: http.ServerResponse, origin?: string): AnthropicRequest | null {
   let payload: AnthropicRequest;
   try {
     payload = JSON.parse(rawBody) as AnthropicRequest;
   } catch {
     sendJson(res, 400, {
       error: { type: "invalid_request_error", message: "Invalid JSON body" },
-    });
+    }, origin);
     return null;
   }
 
@@ -353,135 +408,109 @@ function parsePayload(rawBody: string, res: http.ServerResponse): AnthropicReque
         type: "invalid_request_error",
         message: "messages must be a non-empty array",
       },
-    });
+    }, origin);
     return null;
   }
 
   return payload;
 }
 
+/**
+ * Handle streaming request — spawn CLI with `stream-json` and pipe real
+ * token-by-token SSE events directly to the client.
+ */
 async function handleMessagesStream(
   payload: AnthropicRequest,
-  res: http.ServerResponse
+  res: http.ServerResponse,
+  origin?: string,
 ): Promise<void> {
   const prompt = buildPrompt(payload.messages);
   const systemPrompt = extractSystemPrompt(payload.system);
-
   const start = Date.now();
 
-  let cliOutput: ClaudeJsonOutput;
-  try {
-    cliOutput = await invokeClaudeCli(prompt, systemPrompt, payload.model);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${message}`);
-    recordRequest({
-      timestamp: new Date().toISOString(),
-      method: "POST",
-      url: "/v1/messages",
-      model: payload.model ?? null,
-      statusCode: 502,
-      latencyMs: Date.now() - start,
-      inputTokens: 0,
-      outputTokens: 0,
-    });
-    sendJson(res, 502, {
-      error: { type: "api_error", message: `claude CLI error: ${message}` },
-    });
-    return;
-  }
+  const args = [
+    ...buildBaseCliArgs(systemPrompt, payload.model),
+    "--output-format", "stream-json",
+    "--verbose",
+    "--include-partial-messages",
+    prompt,
+  ];
 
-  if (cliOutput.is_error) {
-    console.error(
-      `${COLORS.red}✗ CLI returned error:${COLORS.reset} ${cliOutput.result}`
-    );
-    recordRequest({
-      timestamp: new Date().toISOString(),
-      method: "POST",
-      url: "/v1/messages",
-      model: payload.model ?? null,
-      statusCode: 502,
-      latencyMs: Date.now() - start,
-      inputTokens: 0,
-      outputTokens: 0,
-    });
-    sendJson(res, 502, {
-      error: { type: "api_error", message: cliOutput.result },
-    });
-    return;
-  }
+  const child = spawn("claude", args, {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
 
-  const modelName =
-    Object.keys(cliOutput.modelUsage ?? {})[0] ?? "claude-opus-4-6";
-  const messageId = `msg_${randomUUID().replace(/-/g, "").slice(0, 24)}`;
-  const inputTokens = cliOutput.usage?.input_tokens ?? 0;
-  const outputTokens = cliOutput.usage?.output_tokens ?? 0;
+  // Kill CLI process if client disconnects
+  let clientDisconnected = false;
+  res.on("close", () => {
+    clientDisconnected = true;
+    child.kill("SIGTERM");
+  });
 
-  // Start SSE response
+  // Start SSE response immediately
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
     Connection: "keep-alive",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers":
-      "Content-Type, Authorization, x-api-key, anthropic-version",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    ...getCorsHeaders(origin),
   });
 
-  // message_start
-  sendSseEvent(res, "message_start", {
-    type: "message_start",
-    message: {
-      id: messageId,
-      type: "message",
-      role: "assistant",
-      content: [],
-      model: modelName,
-      stop_reason: null,
-      stop_sequence: null,
-      usage: { input_tokens: inputTokens, output_tokens: 0 },
-    },
-  });
+  // Track usage from the result line for logging
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let modelName = payload.model ?? "claude-opus-4-6";
+  let hadError = false;
 
-  // content_block_start
-  sendSseEvent(res, "content_block_start", {
-    type: "content_block_start",
-    index: 0,
-    content_block: { type: "text", text: "" },
-  });
+  // Parse NDJSON from CLI stdout line by line
+  const rl = readline.createInterface({ input: child.stdout!, crlfDelay: Infinity });
 
-  // Emit text deltas in chunks for streaming feel
-  const resultText = cliOutput.result.trim();
-  const chunks = splitIntoChunks(resultText);
+  for await (const rawLine of rl) {
+    if (clientDisconnected) break;
 
-  for (const chunk of chunks) {
-    sendSseEvent(res, "content_block_delta", {
-      type: "content_block_delta",
-      index: 0,
-      delta: { type: "text_delta", text: chunk },
-    });
+    const trimmed = rawLine.trim();
+    if (!trimmed) continue;
+
+    let line: StreamJsonLine;
+    try {
+      line = JSON.parse(trimmed) as StreamJsonLine;
+    } catch {
+      continue; // skip malformed lines
+    }
+
+    // Forward stream_event lines as SSE — these are the real Anthropic events
+    if (line.type === "stream_event" && line.event) {
+      sendSseEvent(res, line.event.type, line.event);
+    }
+
+    // Check for authentication or CLI errors in assistant messages
+    if (line.type === "assistant" && line.error) {
+      hadError = true;
+      console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${line.error}`);
+      sendJson(res, 502, {
+        error: { type: "api_error", message: `claude CLI error: ${line.error}` },
+      }, origin);
+      break;
+    }
+
+    // Extract usage from the final result line
+    if (line.type === "result") {
+      inputTokens = line.usage?.input_tokens ?? 0;
+      outputTokens = line.usage?.output_tokens ?? 0;
+      const models = Object.keys(line.modelUsage ?? {});
+      if (models[0]) modelName = models[0];
+
+      if (line.is_error) {
+        hadError = true;
+        console.error(
+          `${COLORS.red}✗ CLI returned error:${COLORS.reset} ${line.result}`
+        );
+      }
+    }
   }
 
-  // content_block_stop
-  sendSseEvent(res, "content_block_stop", {
-    type: "content_block_stop",
-    index: 0,
-  });
-
-  // message_delta (final usage + stop_reason)
-  sendSseEvent(res, "message_delta", {
-    type: "message_delta",
-    delta: {
-      stop_reason: cliOutput.stop_reason ?? "end_turn",
-      stop_sequence: null,
-    },
-    usage: { output_tokens: outputTokens },
-  });
-
-  // message_stop
-  sendSseEvent(res, "message_stop", { type: "message_stop" });
-
-  res.end();
+  if (!clientDisconnected && !hadError) {
+    res.end();
+  }
 
   const elapsed = Date.now() - start;
 
@@ -490,7 +519,7 @@ async function handleMessagesStream(
     method: "POST",
     url: "/v1/messages",
     model: modelName,
-    statusCode: 200,
+    statusCode: hadError ? 502 : 200,
     latencyMs: elapsed,
     inputTokens,
     outputTokens,
@@ -507,85 +536,121 @@ async function handleMessages(
   req: http.IncomingMessage,
   res: http.ServerResponse
 ): Promise<void> {
-  const rawBody = await readBody(req);
-  const payload = parsePayload(rawBody, res);
-  if (!payload) return;
+  const origin = req.headers.origin;
 
-  // Dispatch to streaming handler if requested
-  if (payload.stream) {
-    return handleMessagesStream(payload, res);
+  // Enforce concurrent request limit
+  if (activeRequests >= MAX_CONCURRENT_REQUESTS) {
+    sendJson(res, 429, {
+      error: {
+        type: "rate_limit_error",
+        message: `Too many concurrent requests (max ${MAX_CONCURRENT_REQUESTS}). Try again shortly.`,
+      },
+    }, origin);
+    res.setHeader("Retry-After", "5");
+    return;
   }
 
-  const prompt = buildPrompt(payload.messages);
-  const systemPrompt = extractSystemPrompt(payload.system);
+  activeRequests++;
 
-  const start = Date.now();
-
-  let cliOutput: ClaudeJsonOutput;
   try {
-    cliOutput = await invokeClaudeCli(prompt, systemPrompt, payload.model);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${message}`);
+    let rawBody: string;
+    try {
+      rawBody = await readBody(req);
+    } catch (err) {
+      if (err instanceof BodyTooLargeError) {
+        sendJson(res, 413, {
+          error: {
+            type: "invalid_request_error",
+            message: `Request body exceeds maximum size of ${MAX_BODY_SIZE} bytes`,
+          },
+        }, origin);
+        return;
+      }
+      throw err;
+    }
+
+    const payload = parsePayload(rawBody, res, origin);
+    if (!payload) return;
+
+    // Dispatch to streaming handler if requested
+    if (payload.stream) {
+      return await handleMessagesStream(payload, res, origin);
+    }
+
+    // Non-streaming path
+    const prompt = buildPrompt(payload.messages);
+    const systemPrompt = extractSystemPrompt(payload.system);
+
+    const start = Date.now();
+
+    let cliOutput: ClaudeJsonOutput;
+    try {
+      cliOutput = await invokeClaudeCli(prompt, systemPrompt, payload.model);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`${COLORS.red}✗ CLI error:${COLORS.reset} ${message}`);
+      recordRequest({
+        timestamp: new Date().toISOString(),
+        method: "POST",
+        url: "/v1/messages",
+        model: payload.model ?? null,
+        statusCode: 502,
+        latencyMs: Date.now() - start,
+        inputTokens: 0,
+        outputTokens: 0,
+      });
+      sendJson(res, 502, {
+        error: { type: "api_error", message: `claude CLI error: ${message}` },
+      }, origin);
+      return;
+    }
+
+    if (cliOutput.is_error) {
+      console.error(
+        `${COLORS.red}✗ CLI returned error:${COLORS.reset} ${cliOutput.result}`
+      );
+      recordRequest({
+        timestamp: new Date().toISOString(),
+        method: "POST",
+        url: "/v1/messages",
+        model: payload.model ?? null,
+        statusCode: 502,
+        latencyMs: Date.now() - start,
+        inputTokens: 0,
+        outputTokens: 0,
+      });
+      sendJson(res, 502, {
+        error: { type: "api_error", message: cliOutput.result },
+      }, origin);
+      return;
+    }
+
+    const response = buildAnthropicResponse(cliOutput);
+    const elapsed = Date.now() - start;
+    const inTok = cliOutput.usage?.input_tokens ?? 0;
+    const outTok = cliOutput.usage?.output_tokens ?? 0;
+
     recordRequest({
       timestamp: new Date().toISOString(),
       method: "POST",
       url: "/v1/messages",
-      model: payload.model ?? null,
-      statusCode: 502,
-      latencyMs: Date.now() - start,
-      inputTokens: 0,
-      outputTokens: 0,
+      model: response.model,
+      statusCode: 200,
+      latencyMs: elapsed,
+      inputTokens: inTok,
+      outputTokens: outTok,
     });
-    sendJson(res, 502, {
-      error: { type: "api_error", message: `claude CLI error: ${message}` },
-    });
-    return;
-  }
 
-  if (cliOutput.is_error) {
-    console.error(
-      `${COLORS.red}✗ CLI returned error:${COLORS.reset} ${cliOutput.result}`
+    console.log(
+      `${COLORS.green}→${COLORS.reset} POST /v1/messages ` +
+        `${COLORS.dim}${elapsed}ms${COLORS.reset} ` +
+        `${COLORS.cyan}in:${inTok} out:${outTok}${COLORS.reset}`
     );
-    recordRequest({
-      timestamp: new Date().toISOString(),
-      method: "POST",
-      url: "/v1/messages",
-      model: payload.model ?? null,
-      statusCode: 502,
-      latencyMs: Date.now() - start,
-      inputTokens: 0,
-      outputTokens: 0,
-    });
-    sendJson(res, 502, {
-      error: { type: "api_error", message: cliOutput.result },
-    });
-    return;
+
+    sendJson(res, 200, response, origin);
+  } finally {
+    activeRequests--;
   }
-
-  const response = buildAnthropicResponse(cliOutput);
-  const elapsed = Date.now() - start;
-  const inputTokens = cliOutput.usage?.input_tokens ?? 0;
-  const outputTokens = cliOutput.usage?.output_tokens ?? 0;
-
-  recordRequest({
-    timestamp: new Date().toISOString(),
-    method: "POST",
-    url: "/v1/messages",
-    model: response.model,
-    statusCode: 200,
-    latencyMs: elapsed,
-    inputTokens,
-    outputTokens,
-  });
-
-  console.log(
-    `${COLORS.green}→${COLORS.reset} POST /v1/messages ` +
-      `${COLORS.dim}${elapsed}ms${COLORS.reset} ` +
-      `${COLORS.cyan}in:${inputTokens} out:${outputTokens}${COLORS.reset}`
-  );
-
-  sendJson(res, 200, response);
 }
 
 // ============================================================
@@ -595,21 +660,25 @@ async function handleMessages(
 const server = http.createServer(
   async (req: http.IncomingMessage, res: http.ServerResponse) => {
     const { method, url } = req;
+    const origin = req.headers.origin;
+
+    // CORS: reject non-localhost origins
+    if (origin && !isLocalhostOrigin(origin)) {
+      sendJson(res, 403, {
+        error: { type: "forbidden", message: "Non-localhost origin rejected" },
+      });
+      return;
+    }
 
     // CORS preflight
     if (method === "OPTIONS") {
-      res.writeHead(204, {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, x-api-key, anthropic-version",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      });
+      res.writeHead(204, getCorsHeaders(origin));
       res.end();
       return;
     }
 
     if (method === "GET" && url === "/health") {
-      sendJson(res, 200, { status: "ok" });
+      sendJson(res, 200, { status: "ok" }, origin);
       return;
     }
 
@@ -619,9 +688,10 @@ const server = http.createServer(
         startedAt: new Date(startedAt).toISOString(),
         uptimeMs: Date.now() - startedAt,
         totalRequests,
+        activeRequests,
         bufferSize: requestLog.length,
         requests: requestLog,
-      });
+      }, origin);
       return;
     }
 
@@ -634,7 +704,7 @@ const server = http.createServer(
           { id: "claude-sonnet-4-5", object: "model", created, owned_by: "claude-code" },
           { id: "claude-opus-4-6", object: "model", created, owned_by: "claude-code" },
         ],
-      });
+      }, origin);
       return;
     }
 
@@ -648,7 +718,7 @@ const server = http.createServer(
         type: "not_found",
         message: `${method} ${url} not found`,
       },
-    });
+    }, origin);
   }
 );
 
@@ -667,7 +737,7 @@ server.listen(PORT, HOST, () => {
     `\n${COLORS.green}${COLORS.bold}✓ Listening${COLORS.reset} http://${HOST}:${PORT}\n`
   );
   console.log(
-    `${COLORS.dim}  POST /v1/messages   — Anthropic Messages API${COLORS.reset}`
+    `${COLORS.dim}  POST /v1/messages   — Anthropic Messages API (real streaming)${COLORS.reset}`
   );
   console.log(
     `${COLORS.dim}  GET  /v1/models     — Model listing${COLORS.reset}`
@@ -676,7 +746,10 @@ server.listen(PORT, HOST, () => {
     `${COLORS.dim}  GET  /health        — Liveness check${COLORS.reset}`
   );
   console.log(
-    `${COLORS.dim}  GET  /stats         — Health + request history${COLORS.reset}\n`
+    `${COLORS.dim}  GET  /stats         — Health + request history${COLORS.reset}`
+  );
+  console.log(
+    `${COLORS.dim}  Max body: ${MAX_BODY_SIZE / 1024}KB · Max concurrent: ${MAX_CONCURRENT_REQUESTS} · CORS: localhost only${COLORS.reset}\n`
   );
 });
 
