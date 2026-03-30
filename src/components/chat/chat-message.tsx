@@ -82,13 +82,15 @@ export function MensagemChatBolha({
         className={cn(
           "group/msg w-full",
           fs ? "py-2" : "py-1.5",
+          ehUsuario && "text-right",
         )}
       >
         <div
           className={cn(
-            "relative",
+            "relative inline-block",
             fs ? "text-base leading-relaxed" : "text-sm leading-relaxed",
-            ehUsuario ? "text-muted-foreground" : "text-foreground",
+            ehUsuario ? "text-muted-foreground text-right" : "text-foreground text-left",
+            ehUsuario && "max-w-[85%] ml-auto",
           )}
         >
           {cleanContent ? (
