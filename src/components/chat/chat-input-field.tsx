@@ -2,10 +2,20 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Square, Brain } from "lucide-react";
+import { Send, Square, ChevronDown, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SuggestionChips } from "@/components/chat/suggestion-chips";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CLAUDE_MODEL_TIER_OPTIONS } from "@/lib/model-tiers";
+import type { ClaudeModelTier } from "@/lib/model-tiers";
 import type { ChatSuggestion } from "@/lib/chat-suggestions";
+
+/** Maps tier to display label shown in the input toolbar */
+const TIER_LABELS: Record<ClaudeModelTier, string> = {
+  haiku: "Haiku",
+  sonnet: "Sonnet",
+  opus: "Opus",
+};
 
 interface CampoEntradaChatProps {
   readonly onEnviar: (conteudo: string) => void;
@@ -18,6 +28,8 @@ interface CampoEntradaChatProps {
   readonly fullscreen?: boolean;
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
+  readonly modelTier?: ClaudeModelTier;
+  readonly onModelTierChange?: (tier: ClaudeModelTier) => void;
   readonly hideBorderTop?: boolean;
   readonly suggestions?: readonly ChatSuggestion[];
   readonly suggestionsLoading?: boolean;
@@ -41,6 +53,8 @@ export function CampoEntradaChat({
   fullscreen,
   raciocinio,
   onRaciocinioChange,
+  modelTier,
+  onModelTierChange,
   hideBorderTop,
   suggestions,
   suggestionsLoading,
@@ -61,6 +75,7 @@ export function CampoEntradaChat({
     [isControlled, onValueChange],
   );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [modelPopoverOpen, setModelPopoverOpen] = useState(false);
   const fs = fullscreen;
 
   // Auto-focus quando componente monta (apenas em desktop, nao abre teclado no mobile)
@@ -118,51 +133,111 @@ export function CampoEntradaChat({
           fullscreen={fs}
         />
       )}
-      <div className={cn("flex items-center", fs ? "gap-3" : "gap-2")}>
-      {onRaciocinioChange && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onRaciocinioChange(!raciocinio)}
+
+      {/* Claude.ai-style input container: textarea + bottom toolbar */}
+      <div className={cn(
+        "rounded-2xl border border-border/60 bg-muted/30 transition-colors focus-within:border-border",
+        fs ? "px-4 pt-3 pb-2" : "px-3 pt-2 pb-1.5",
+      )}>
+        <textarea
+          ref={textareaRef}
+          value={valor}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder="Pergunte algo sobre seus investimentos..."
+          disabled={desabilitado}
+          rows={1}
           className={cn(
-            "shrink-0",
-            raciocinio ? "bg-primary/10 text-primary" : "text-muted-foreground",
+            "placeholder:text-muted-foreground w-full resize-none bg-transparent focus:ring-0 focus:outline-none disabled:opacity-50",
+            fs ? "text-base" : "text-sm",
           )}
-          title={raciocinio ? "Desativar raciocínio" : "Ativar raciocínio"}
-        >
-          <Brain className="h-4 w-4" />
-        </Button>
-      )}
-      <textarea
-        ref={textareaRef}
-        value={valor}
-        onChange={handleInput}
-        onKeyDown={handleKeyDown}
-        placeholder="Pergunte algo sobre seus investimentos..."
-        disabled={desabilitado}
-        rows={1}
-        className={cn(
-          "placeholder:text-muted-foreground focus:ring-ring flex-1 resize-none bg-transparent focus:ring-0 focus:outline-none disabled:opacity-50",
-          fs ? "px-4 py-3 text-base" : "px-3 py-2 text-sm",
-        )}
-      />
-      {estaTransmitindo ? (
-        <Button variant="ghost" size="icon" onClick={onParar} className="shrink-0">
-          <Square className="h-4 w-4" />
-          <span className="sr-only">Parar transmissao</span>
-        </Button>
-      ) : (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleEnviar}
-          disabled={!valor.trim() || desabilitado}
-          className="shrink-0"
-        >
-          <Send className="h-4 w-4" />
-          <span className="sr-only">Enviar mensagem</span>
-        </Button>
-      )}
+        />
+
+        {/* Bottom toolbar: model selector + reasoning toggle + send */}
+        <div className={cn("flex items-center justify-between", fs ? "mt-1" : "mt-0.5")}>
+          <div className="flex-1" />
+
+          <div className="flex items-center gap-1">
+            {/* Model tier selector */}
+            {onModelTierChange && modelTier && (
+              <Popover open={modelPopoverOpen} onOpenChange={setModelPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={estaTransmitindo}
+                    className={cn(
+                      "text-muted-foreground hover:text-foreground flex items-center gap-0.5 rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
+                    )}
+                  >
+                    <span>{TIER_LABELS[modelTier]}</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-52 p-1" sideOffset={8}>
+                  {CLAUDE_MODEL_TIER_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        onModelTierChange(option.value);
+                        setModelPopoverOpen(false);
+                      }}
+                      className={cn(
+                        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-muted",
+                        modelTier === option.value && "bg-muted/50",
+                      )}
+                    >
+                      <span className="flex-1">
+                        <span className="font-medium">{option.label}</span>
+                        <span className="text-muted-foreground ml-2 text-xs">{option.description}</span>
+                      </span>
+                      {modelTier === option.value && (
+                        <Check className="text-primary h-3.5 w-3.5 shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                </PopoverContent>
+              </Popover>
+            )}
+
+            {/* Reasoning toggle */}
+            {onRaciocinioChange && (
+              <button
+                type="button"
+                disabled={estaTransmitindo}
+                onClick={() => onRaciocinioChange(!raciocinio)}
+                className={cn(
+                  "rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
+                  raciocinio
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+                title={raciocinio ? "Desativar raciocínio estendido" : "Ativar raciocínio estendido"}
+              >
+                Estendido
+              </button>
+            )}
+
+            {/* Send / Stop button */}
+            {estaTransmitindo ? (
+              <Button variant="ghost" size="icon" onClick={onParar} className="h-7 w-7 shrink-0">
+                <Square className="h-3.5 w-3.5" />
+                <span className="sr-only">Parar transmissao</span>
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleEnviar}
+                disabled={!valor.trim() || desabilitado}
+                className="h-7 w-7 shrink-0"
+              >
+                <Send className="h-3.5 w-3.5" />
+                <span className="sr-only">Enviar mensagem</span>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
