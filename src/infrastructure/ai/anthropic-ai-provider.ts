@@ -195,10 +195,10 @@ export class AnthropicProvedorAi implements ProvedorAi {
   async *transmitirComPensamento(configuracao: ConfiguracaoGeracao): AsyncGenerator<StreamChunk, void, unknown> {
     // Two-step approach: the local Claude proxy buffers full responses and
     // strips the native `thinking` API parameter. So we make two calls:
-    // 1) Non-streaming reasoning call (~500 tokens) — yielded as thinking
+    // 1) Streaming reasoning call (~600 tokens) — yielded as thinking chunks
     // 2) Streaming response call with reasoning injected as context
 
-    // Step 1: Generate reasoning (non-streaming, fast)
+    // Step 1: Generate reasoning (streaming for progressive display)
     const reasoningSystemPrompt =
       "You are an internal reasoning engine. Analyze the user's question and the conversation context. " +
       "Produce a brief, structured analysis (3-8 bullet points) covering: what data is relevant, " +
@@ -212,11 +212,11 @@ export class AnthropicProvedorAi implements ProvedorAi {
       maxOutputTokens: 600,
     };
 
-    const reasoningResult = await this.gerar(reasoningConfig);
-    const reasoning = reasoningResult.texto;
-
-    // Yield reasoning as thinking chunk
-    yield { type: "thinking", content: reasoning };
+    let reasoning = "";
+    for await (const chunk of this.transmitir(reasoningConfig)) {
+      reasoning += chunk;
+      yield { type: "thinking", content: chunk };
+    }
 
     // Step 2: Generate response with reasoning context injected
     const augmentedSystemPrompt =

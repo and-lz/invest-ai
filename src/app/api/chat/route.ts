@@ -97,19 +97,10 @@ export async function POST(request: Request): Promise<Response> {
 
         try {
           if (raciocinio) {
-            // Send keepalive so stream doesn't timeout during reasoning call
-            const keepaliveInterval = setInterval(() => {
-              enqueue(codificadorTexto.encode(" "));
-            }, 5000);
-
-            try {
-              const geradorStream = provedor.transmitirComPensamento(configBase);
-              for await (const chunk of geradorStream) {
-                const t = chunk.type === "thinking" ? 0 : 1;
-                enqueue(codificadorTexto.encode(JSON.stringify({ t, c: chunk.content }) + "\n"));
-              }
-            } finally {
-              clearInterval(keepaliveInterval);
+            const geradorStream = provedor.transmitirComPensamento(configBase);
+            for await (const chunk of geradorStream) {
+              const t = chunk.type === "thinking" ? 0 : 1;
+              enqueue(codificadorTexto.encode(JSON.stringify({ t, c: chunk.content }) + "\n"));
             }
           } else {
             const geradorStream = provedor.transmitir(configBase);
