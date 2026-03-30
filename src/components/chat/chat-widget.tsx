@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { dialog } from "@/lib/design-system";
 import type { MensagemChat } from "@/schemas/chat.schema";
+import type { ClaudeModelTier } from "@/lib/model-tiers";
 
 
 export function ChatWidget() {
@@ -37,16 +38,26 @@ export function ChatWidget() {
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [raciocinio, setRaciocinio] = useState(true);
+  const [modelTier, setModelTier] = useState<ClaudeModelTier>("sonnet");
   const prevTransmitindoRef = useRef(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("chatReasoningEnabled");
     setRaciocinio(stored === null ? true : stored === "true");
+    const storedTier = localStorage.getItem("chatModelTier");
+    if (storedTier === "haiku" || storedTier === "sonnet" || storedTier === "opus") {
+      setModelTier(storedTier);
+    }
   }, []);
 
   const handleRaciocinioChange = useCallback((enabled: boolean) => {
     setRaciocinio(enabled);
     localStorage.setItem("chatReasoningEnabled", String(enabled));
+  }, []);
+
+  const handleModelTierChange = useCallback((tier: ClaudeModelTier) => {
+    setModelTier(tier);
+    localStorage.setItem("chatModelTier", tier);
   }, []);
 
   const { identificadorPagina } = useChatPageContext();
@@ -80,7 +91,7 @@ export function ChatWidget() {
     carregarConversa,
     followUpSuggestions,
     reenviarUltimaMensagem,
-  } = useChatAssistant({ raciocinio });
+  } = useChatAssistant({ raciocinio, modelTier });
 
   // Saved messages
   const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
@@ -373,6 +384,8 @@ export function ChatWidget() {
               aiSuggestions={aiSuggestions}
               raciocinio={raciocinio}
               onRaciocinioChange={handleRaciocinioChange}
+              modelTier={modelTier}
+              onModelTierChange={handleModelTierChange}
               savedMessageIds={savedMessageIds}
               onToggleSave={handleToggleSave}
             />
