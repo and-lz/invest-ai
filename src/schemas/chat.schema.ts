@@ -28,12 +28,16 @@ export const MensagemParaServidorSchema = z.object({
   conteudo: z.string().min(1).max(4000),
 });
 
+/** Model tier options for per-message model selection */
+export const ModelTierEnum = z.enum(["haiku", "sonnet", "opus"]);
+
 /** Requisicao POST /api/chat */
 export const RequisicaoChatSchema = z.object({
   mensagens: z.array(MensagemParaServidorSchema).min(1).max(40),
   contextoPagina: z.string().max(50000).optional(),
   identificadorPagina: IdentificadorPaginaEnum,
   raciocinio: z.boolean().optional(),
+  modelTier: ModelTierEnum.optional(),
 });
 
 // ---- Tipos inferidos ----

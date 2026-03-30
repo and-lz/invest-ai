@@ -4,6 +4,7 @@ import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { serializarContextoCompletoUsuario } from "@/lib/serialize-chat-context";
 import { AiApiTransientError, AiApiQuotaError } from "@/domain/errors/app-errors";
+import { resolveClaudeModelId } from "@/lib/model-tiers";
 import type { MensagemAi, ConfiguracaoGeracao } from "@/domain/interfaces/ai-provider";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +39,7 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    const { mensagens, contextoPagina, identificadorPagina, raciocinio } = resultadoValidacao.data;
+    const { mensagens, contextoPagina, identificadorPagina, raciocinio, modelTier } = resultadoValidacao.data;
 
     // When no page context is provided (e.g. /chat page), load portfolio data server-side
     let contextoFinal = contextoPagina;
@@ -62,7 +63,10 @@ export async function POST(request: Request): Promise<Response> {
       partes: [{ tipo: "texto" as const, dados: mensagem.conteudo }],
     }));
 
-    const aiConfig = await obterAiConfigParaUsuario(verificacaoAuth.session.user.userId);
+    // Use per-request model tier if provided, otherwise fall back to user's DB settings
+    const aiConfig = modelTier
+      ? { provider: "claude-proxy" as const, modelId: resolveClaudeModelId(modelTier) }
+      : await obterAiConfigParaUsuario(verificacaoAuth.session.user.userId);
     const provedor = criarProvedorAi(aiConfig);
 
     const configBase: ConfiguracaoGeracao = {
