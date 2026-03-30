@@ -2,209 +2,23 @@
 
 import { useCallback, useState } from "react";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
-import { useRouter } from "next/navigation";
 import {
   Inbox,
   Bell,
   Loader2,
   Trash2,
-  Check,
   CheckCheck,
-  AlertTriangle,
-  Info,
-  CheckCircle,
-  OctagonX,
-  RotateCcw,
   X,
-  XCircle,
 } from "lucide-react";
-import { toast } from "sonner";
 import { useNotifications } from "@/hooks/use-notifications";
-import { useActiveTasks, revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
-import { descreverTarefa } from "@/lib/task-description";
-import type { TarefaBackground } from "@/lib/task-description";
+import { useActiveTasks } from "@/hooks/use-active-tasks";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { InfoTooltip } from "@/components/ui/info-tooltip";
 import { cn } from "@/lib/utils";
 import { typography, icon, layout, dialog } from "@/lib/design-system";
-
-import type { Notificacao } from "@/lib/notification";
-
-const ICONES_TIPO = {
-  success: CheckCircle,
-  error: OctagonX,
-  warning: AlertTriangle,
-  info: Info,
-} as const;
-
-const CORES_TIPO = {
-  success: "text-success",
-  error: "text-destructive",
-  warning: "text-warning",
-  info: "text-muted-foreground",
-} as const;
-
-// Internal component that renders a single active task card
-function TaskCard({ tarefa }: { tarefa: TarefaBackground }) {
-  const [cancelando, setCancelando] = useState(false);
-  const descricao = descreverTarefa(tarefa);
-
-  const handleCancelar = useCallback(async () => {
-    setCancelando(true);
-    try {
-      const resposta = await fetch(`/api/tasks/${tarefa.identificador}/cancel`, {
-        method: "POST",
-      });
-
-      if (resposta.ok) {
-        toast.info("Tarefa cancelada");
-        revalidarTarefasAtivas();
-      } else {
-        const corpo = (await resposta.json()) as { erro?: string };
-        toast.error("Falha ao cancelar", {
-          description: corpo.erro ?? "Erro desconhecido",
-        });
-      }
-    } catch {
-      toast.error("Falha ao cancelar", {
-        description: "Erro de conexão",
-      });
-    } finally {
-      setCancelando(false);
-    }
-  }, [tarefa.identificador]);
-
-  return (
-    <div className="group rounded-lg border p-4">
-      <div className="flex items-start gap-3">
-        <Loader2 className="text-muted-foreground mt-0.5 h-5 w-5 shrink-0 animate-spin" />
-        <div className="flex-1 space-y-1">
-          <p className={cn(typography.label, "leading-snug")}>{descricao}</p>
-          <p className={typography.helper}>
-            Iniciado{" "}
-            {new Date(tarefa.iniciadoEm).toLocaleString("pt-BR", {
-              day: "2-digit",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleCancelar}
-          disabled={cancelando}
-          className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-          title="Cancelar tarefa"
-        >
-          <XCircle className={cn(icon.button, "text-muted-foreground")} />
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function ehAcaoDeRetry(url: string): boolean {
-  return url.includes("/retry");
-}
-
-interface ItemNotificacaoProps {
-  notificacao: Notificacao;
-  onMarcarComoLida: (identificador: string) => void;
-  onFecharDialog: () => void;
-}
-
-function ItemNotificacao({ notificacao, onMarcarComoLida, onFecharDialog }: ItemNotificacaoProps) {
-  const router = useRouter();
-  const [retryEmAndamento, setRetryEmAndamento] = useState(false);
-  const Icone = ICONES_TIPO[notificacao.tipo];
-  const corIcone = CORES_TIPO[notificacao.tipo];
-
-  const handleAcao = useCallback(async () => {
-    if (!notificacao.acao?.url) return;
-
-    if (ehAcaoDeRetry(notificacao.acao.url)) {
-      setRetryEmAndamento(true);
-      try {
-        const resposta = await fetch(notificacao.acao.url, { method: "POST" });
-        if (resposta.ok) {
-          revalidarTarefasAtivas();
-          onMarcarComoLida(notificacao.identificador);
-          onFecharDialog();
-          toast.info("Retentando tarefa...");
-        } else {
-          const corpo = (await resposta.json()) as { erro?: string };
-          toast.error("Falha ao retentar", {
-            description: corpo.erro ?? "Erro desconhecido",
-          });
-        }
-      } catch {
-        toast.error("Falha ao retentar", {
-          description: "Erro de conexão",
-        });
-      } finally {
-        setRetryEmAndamento(false);
-      }
-    } else {
-      onMarcarComoLida(notificacao.identificador);
-      onFecharDialog();
-      router.push(notificacao.acao.url);
-    }
-  }, [notificacao, onMarcarComoLida, onFecharDialog, router]);
-
-  const ehRetry = notificacao.acao?.url ? ehAcaoDeRetry(notificacao.acao.url) : false;
-
-  return (
-    <div
-      className={cn(
-        "group rounded-lg border p-4 transition-all",
-        notificacao.visualizada ? "opacity-60" : "bg-accent/30",
-      )}
-    >
-      <div className="flex items-start gap-3">
-        <Icone className={cn("mt-0.5 h-5 w-5 shrink-0", corIcone)} />
-        <div className="flex-1 space-y-1">
-          <p className={cn(typography.label, "leading-snug")}>{notificacao.titulo}</p>
-          {notificacao.descricao && (
-            <p className={cn(typography.helper, "leading-relaxed")}>{notificacao.descricao}</p>
-          )}
-          <p className={typography.helper}>
-            {new Date(notificacao.criadaEm).toLocaleString("pt-BR", {
-              day: "2-digit",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
-        </div>
-        {!notificacao.visualizada && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onMarcarComoLida(notificacao.identificador)}
-            className="opacity-0 transition-opacity group-hover:opacity-100"
-          >
-            <Check className="text-muted-foreground h-4 w-4" />
-          </Button>
-        )}
-      </div>
-      {notificacao.acao && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleAcao}
-          disabled={retryEmAndamento}
-          className={cn(typography.helper, "mt-3 w-full gap-1.5")}
-        >
-          {ehRetry && <RotateCcw className="h-4 w-4" />}
-          {retryEmAndamento ? "Retentando..." : notificacao.acao.label}
-        </Button>
-      )}
-    </div>
-  );
-}
+import { TaskCard } from "./activity-center-task-card";
+import { ItemNotificacao } from "./activity-center-notification-item";
 
 type AbaAtiva = "notificacoes" | "tarefas";
 
@@ -276,7 +90,7 @@ export function ActivityCenter() {
         <div className="flex items-center justify-between border-b p-6 pb-4">
           <div className="flex items-center gap-2">
             <h2 className={typography.h2}>Atividades</h2>
-            <InfoTooltip conteudo="Central de atividades: acompanhe tarefas em andamento e histórico de notificações do sistema." />
+            <InfoTooltip conteudo="Central de atividades: acompanhe tarefas em andamento e historico de notificacoes do sistema." />
           </div>
           <Button variant="ghost" size="icon" onClick={fechar} className="text-muted-foreground">
             <X className={icon.button} />
@@ -297,7 +111,7 @@ export function ActivityCenter() {
           >
             <div className="flex items-center justify-center gap-2">
               <Bell className={icon.button} />
-              Notificações
+              Notificacoes
               {contagemNaoVisualizadas > 0 && (
                 <Badge variant="destructive" className="h-5 min-w-5 px-1 text-xs">
                   {contagemNaoVisualizadas}
@@ -339,7 +153,7 @@ export function ActivityCenter() {
             <div className="flex items-center justify-between border-b px-6 py-3">
               <p className={typography.helper}>
                 {contagemNaoVisualizadas > 0
-                  ? `${contagemNaoVisualizadas} não lida${contagemNaoVisualizadas > 1 ? "s" : ""}`
+                  ? `${contagemNaoVisualizadas} nao lida${contagemNaoVisualizadas > 1 ? "s" : ""}`
                   : "Todas lidas"}
               </p>
               <div className="flex items-center gap-1">
@@ -378,7 +192,7 @@ export function ActivityCenter() {
               {!estaCarregando && notificacoes.length === 0 && (
                 <div className={layout.emptyState}>
                   <Bell className={icon.emptyState} />
-                  <p className="text-muted-foreground text-center text-sm">Nenhuma notificação</p>
+                  <p className="text-muted-foreground text-center text-sm">Nenhuma notificacao</p>
                 </div>
               )}
 

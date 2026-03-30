@@ -35,6 +35,8 @@ const eslintConfig = [
     files: [
       "__tests__/**",
       "drizzle/**",
+      "scripts/**",
+      "electron/**",
       "src/lib/schema.ts",
       "src/components/ui/chart.tsx",
     ],

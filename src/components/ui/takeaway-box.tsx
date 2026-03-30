@@ -3,21 +3,14 @@
 import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import {
-  CheckCircle2,
-  AlertCircle,
-  Info,
   Loader2,
-  RefreshCw,
   ListPlus,
   Check,
-  type LucideIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { typography, icon } from "@/lib/design-system";
+import { icon } from "@/lib/design-system";
 import { notificar as notify } from "@/lib/notifier";
-import { revalidarTarefasAtivas } from "@/hooks/use-active-tasks";
-import type { TarefaBackground } from "@/lib/task-description";
 import {
   Tooltip,
   TooltipContent,
@@ -30,108 +23,10 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-type TipoConclusao = "positivo" | "neutro" | "atencao";
-
-interface Conclusao {
-  readonly texto: string;
-  readonly tipo: TipoConclusao;
-  readonly acionavel?: boolean;
-}
-
-interface TakeawayBoxProps {
-  readonly conclusoes: Conclusao[];
-  readonly className?: string;
-}
-
-const INDICATOR_ICONS: Record<TipoConclusao, LucideIcon> = {
-  positivo: CheckCircle2,
-  atencao: AlertCircle,
-  neutro: Info,
-};
-
-const ICON_COLORS: Record<TipoConclusao, string> = {
-  positivo: "text-success",
-  atencao: "text-warning",
-  neutro: "text-muted-foreground",
-};
-
-interface ExplanationState {
-  explanations: Record<string, string>;
-  status: "idle" | "loading" | "success" | "error";
-  errorMessage?: string;
-}
-
-const INITIAL_STATE: ExplanationState = {
-  explanations: {},
-  status: "idle",
-};
-
-type AddToPlanStatus = "idle" | "loading" | "added" | "error";
-
-const POLL_INTERVAL_MS = 2000;
-const MAX_POLL_ATTEMPTS = 30; // 60s max
-
-/**
- * Creates an explain-takeaway background task and polls until completion.
- * Returns the explanations map from the task's descricaoResultado.
- */
-async function fetchExplanations(
-  conclusions: Conclusao[],
-): Promise<Record<string, string>> {
-  // 1. Create background task
-  const createResponse = await fetch("/api/explain-takeaway", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      conclusions: conclusions.map((c) => ({
-        text: c.texto,
-        type: c.tipo,
-      })),
-    }),
-  });
-
-  if (!createResponse.ok) {
-    const errorBody = (await createResponse.json().catch(() => ({}))) as {
-      erro?: string;
-    };
-    throw new Error(errorBody.erro ?? "Falha ao iniciar explicações");
-  }
-
-  const { identificadorTarefa } = (await createResponse.json()) as {
-    identificadorTarefa: string;
-  };
-
-  // Notify activity center about new task
-  revalidarTarefasAtivas();
-
-  // 2. Poll task status until completion
-  for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-
-    const statusResponse = await fetch(`/api/tasks/${identificadorTarefa}`);
-    if (!statusResponse.ok) continue;
-
-    const tarefa = (await statusResponse.json()) as TarefaBackground;
-
-    if (tarefa.status === "concluido" && tarefa.descricaoResultado) {
-      const parsed: unknown = JSON.parse(tarefa.descricaoResultado);
-      if (parsed && typeof parsed === "object" && "error" in parsed) {
-        throw new Error("Fortuna retornou formato inesperado");
-      }
-      return parsed as Record<string, string>;
-    }
-
-    if (tarefa.status === "erro") {
-      throw new Error(tarefa.erro ?? "Erro ao gerar explicações");
-    }
-
-    if (tarefa.status === "cancelada") {
-      throw new Error("Tarefa cancelada");
-    }
-  }
-
-  throw new Error("Tempo limite excedido ao gerar explicações");
-}
+import type { Conclusao, TipoConclusao, TakeawayBoxProps, AddToPlanStatus, ExplanationState } from "./takeaway-box-types";
+import { INDICATOR_ICONS, ICON_COLORS, INITIAL_STATE } from "./takeaway-box-types";
+import { fetchExplanations } from "./takeaway-box-fetch";
+import { TakeawayExplanation } from "./takeaway-box-explanation";
 
 export type { Conclusao, TipoConclusao };
 
@@ -156,7 +51,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
     async (index: number) => {
       if (state.status === "loading") return;
 
-      // Already loaded — just toggle visibility
+      // Already loaded -- just toggle visibility
       if (state.status === "success") {
         setOpenIndices((prev) => {
           const next = new Set(prev);
@@ -181,7 +76,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
           errorMessage:
             error instanceof Error
               ? error.message
-              : "Erro ao gerar explicações",
+              : "Erro ao gerar explicacoes",
         });
       }
     },
@@ -221,8 +116,8 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
         });
 
         if (response.status === 409) {
-          notify.info("Já no plano", {
-            description: "Este item já está no seu plano de ação.",
+          notify.info("Ja no plano", {
+            description: "Este item ja esta no seu plano de acao.",
           });
           setAddToPlanStatuses((prev) => ({ ...prev, [index]: "added" }));
           return;
@@ -236,7 +131,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
         }
 
         notify.success("Adicionado ao plano", {
-          description: "Ação adicionada com recomendação da Fortuna.",
+          description: "Acao adicionada com recomendacao da Fortuna.",
           actionUrl: "/plano-acao",
           actionLabel: "Ver plano",
           action: {
@@ -297,7 +192,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
               </CollapsibleTrigger>
 
               <div className="flex shrink-0 items-center gap-1">
-                {/* Add to Plan button — only for actionable conclusions */}
+                {/* Add to Plan button -- only for actionable conclusions */}
                 {conclusao.acionavel && (
                   <TooltipProvider>
                     <Tooltip>
@@ -314,7 +209,7 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                                 ? "text-muted-foreground"
                                 : "text-muted-foreground/60 hover:text-muted-foreground",
                           )}
-                          aria-label="Adicionar ao plano de ação"
+                          aria-label="Adicionar ao plano de acao"
                         >
                           {planStatus === "loading" ? (
                             <Loader2 className={cn(icon.button, "animate-spin")} />
@@ -327,10 +222,10 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
                       </TooltipTrigger>
                       <TooltipContent side="top" sideOffset={4}>
                         {planStatus === "added"
-                          ? "Já no plano de ação"
+                          ? "Ja no plano de acao"
                           : planStatus === "loading"
                             ? "Adicionando..."
-                            : "Adicionar ao plano de ação"}
+                            : "Adicionar ao plano de acao"}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -371,53 +266,12 @@ export function TakeawayBox({ conclusoes, className }: TakeawayBoxProps) {
             </div>
 
             <CollapsibleContent>
-              <div className="ml-6 mt-1.5 border-l-2 border-primary/30 pl-3">
-                {state.status === "loading" && (
-                  <div className="flex items-center gap-2 py-1">
-                    <Loader2
-                      className={cn(
-                        icon.micro,
-                        "text-muted-foreground animate-spin",
-                      )}
-                    />
-                    <span className={typography.helper}>
-                      Gerando explicação...
-                    </span>
-                  </div>
-                )}
-
-                {state.status === "error" && isOpen && (
-                  <div className="flex items-center gap-2 py-1">
-                    <span
-                      className={cn(typography.helper, "text-destructive")}
-                    >
-                      {state.errorMessage}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRetry(index);
-                      }}
-                      className={cn(
-                        typography.helper,
-                        "text-primary inline-flex cursor-pointer items-center gap-1 hover:underline",
-                      )}
-                    >
-                      <RefreshCw className={icon.button} />
-                      Tentar novamente
-                    </button>
-                  </div>
-                )}
-
-                {state.status === "success" && explanation && (
-                  <p
-                    className={cn(typography.body, "text-muted-foreground py-1 leading-relaxed")}
-                  >
-                    {explanation}
-                  </p>
-                )}
-              </div>
+              <TakeawayExplanation
+                state={state}
+                isOpen={isOpen}
+                explanation={explanation}
+                onRetry={() => handleRetry(index)}
+              />
             </CollapsibleContent>
           </Collapsible>
         );

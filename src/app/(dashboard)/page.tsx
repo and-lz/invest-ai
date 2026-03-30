@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { serializarContextoDashboard } from "@/lib/serialize-chat-context";
@@ -13,19 +13,21 @@ import { MonthlyReturnsHeatmap } from "@/components/dashboard/monthly-returns-he
 import { RiskConsistencyCard } from "@/components/dashboard/risk-consistency-card";
 import { PeriodComparisonDetail } from "@/components/dashboard/period-comparison-detail";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
+import { useDetailsOpen } from "@/hooks/use-details-open";
 import { formatarMesAno } from "@/lib/format-date";
 import { typography } from "@/lib/design-system";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent } from "@/components/ui/card";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import Image from "next/image";
-import { Upload, LayoutDashboard, ChevronDown } from "lucide-react";
-import { formatarMoeda } from "@/domain/value-objects/money";
-import type { ComparacaoBenchmarks } from "@/schemas/report-extraction.schema";
-import { isAiEnabled } from "@/lib/ai-features";
-import { abrirChatComPergunta } from "@/components/ui/ai-explain-button";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  DashboardHeadline,
+  SectionLabel,
+  CollapsibleSectionLabel,
+  DashboardSkeleton,
+  EstadoVazio,
+} from "@/components/dashboard/dashboard-sub-components";
 
 // Lazy-load chart components que usam Recharts (~150KB)
 const WealthEvolutionChart = dynamic(
@@ -68,177 +70,6 @@ const LiquidityLadder = dynamic(
   () => import("@/components/dashboard/liquidity-ladder").then((mod) => mod.LiquidityLadder),
   { ssr: false, loading: () => <Skeleton className="h-96" /> },
 );
-
-function gerarTextoHeadline(
-  variacaoCentavos: number | null,
-  benchmarks: ComparacaoBenchmarks[],
-): string {
-  if (variacaoCentavos === null) {
-    return "Confira o resumo dos seus investimentos abaixo.";
-  }
-
-  const mensal = benchmarks.find((b) => b.periodo === "No mes");
-  const acimaIpca = mensal ? mensal.carteira.valor > mensal.ipca.valor : false;
-  const abaixoCdi = mensal ? mensal.carteira.valor < mensal.cdi.valor : false;
-  const absValue = formatarMoeda(Math.abs(variacaoCentavos));
-
-  if (variacaoCentavos >= 0 && acimaIpca) {
-    return `Seu patrimônio cresceu ${absValue} — acima da inflação.`;
-  }
-  if (variacaoCentavos >= 0 && abaixoCdi) {
-    return `Seu patrimônio cresceu ${absValue}. Ficou abaixo da renda fixa, mas cresceu.`;
-  }
-  if (variacaoCentavos >= 0) {
-    return `Seu patrimônio cresceu ${absValue} este mês.`;
-  }
-  if (variacaoCentavos > -500_00) {
-    return `Seu patrimônio recuou ${absValue} este mês — variações pequenas são normais.`;
-  }
-  return `Seu patrimônio recuou ${absValue}. Quer entender o que aconteceu?`;
-}
-
-function DashboardHeadline({
-  variacaoCentavos,
-  benchmarks,
-}: {
-  variacaoCentavos: number | null;
-  benchmarks: ComparacaoBenchmarks[];
-}) {
-  const texto = gerarTextoHeadline(variacaoCentavos, benchmarks);
-  const aiEnabled = isAiEnabled();
-
-  return (
-    <Card className="bg-muted/30 border-muted">
-      <CardContent className="flex flex-col items-start gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm">{texto}</p>
-        {aiEnabled && (
-          <button
-            type="button"
-            onClick={() =>
-              abrirChatComPergunta("Resuma como meus investimentos estão indo este mês.")
-            }
-            className="text-muted-foreground hover:text-foreground flex shrink-0 items-center gap-1.5 text-sm underline transition-colors"
-          >
-            <Image src="/fortuna-minimal.png" alt="Fortuna" width={16} height={16} className="h-4 w-4" />
-            Perguntar à Fortuna
-          </button>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-const DETAILS_STORAGE_KEY = "dashboard-details-open";
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-        {children}
-      </span>
-      <div className="bg-border h-px flex-1" />
-    </div>
-  );
-}
-
-function CollapsibleSectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <CollapsibleTrigger className="flex w-full cursor-pointer items-center gap-3 [&[data-state=open]>svg]:rotate-180">
-      <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-        {children}
-      </span>
-      <div className="bg-border h-px flex-1" />
-      <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0 transition-transform duration-200" />
-    </CollapsibleTrigger>
-  );
-}
-
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, indice) => (
-          <Skeleton key={indice} className="h-32" />
-        ))}
-      </div>
-      <Skeleton className="h-96" />
-    </div>
-  );
-}
-
-function EstadoVazio() {
-  return (
-    <Card className="flex flex-col items-center justify-center p-12">
-      <CardContent className="space-y-6 text-center">
-        <div>
-          <Upload className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
-          <h3 className="mb-2 text-lg font-semibold">Bem-vindo ao Fortuna!</h3>
-          <p className="text-muted-foreground">
-            Veja como seus investimentos estão indo:
-          </p>
-        </div>
-
-        <ul className="text-muted-foreground mx-auto max-w-sm space-y-1 text-left text-sm">
-          <li>✓ Patrimônio total e crescimento mensal</li>
-          <li>✓ Comparação com inflação e renda fixa</li>
-          <li>✓ Análises automáticas em linguagem simples</li>
-          {isAiEnabled() && <li>✓ Fortuna AI responde suas dúvidas sobre investimentos</li>}
-        </ul>
-
-        <div className="text-muted-foreground text-xs">
-          1. Faça upload do seu relatório → 2. Aguarde ~30s → 3. Pronto!
-        </div>
-
-        <div className="flex flex-col items-center gap-2">
-          <Link href="/reports">
-            <Button>Fazer Upload do Relatório</Button>
-          </Link>
-          {isAiEnabled() && (
-            <button
-              type="button"
-              onClick={() => abrirChatComPergunta("O que é o Fortuna e como ele pode me ajudar?")}
-              className="text-muted-foreground hover:text-foreground text-sm underline transition-colors"
-            >
-              Tem dúvidas? Pergunte à Fortuna
-            </button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function useDetailsOpen() {
-  const [open, setOpen] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return localStorage.getItem(DETAILS_STORAGE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const setDetailsOpen = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
-    setOpen((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      try {
-        localStorage.setItem(DETAILS_STORAGE_KEY, String(next));
-      } catch {
-        // localStorage unavailable
-      }
-      return next;
-    });
-  }, []);
-
-  // Listen for chat highlight expand requests
-  useEffect(() => {
-    const handler = () => setDetailsOpen(true);
-    window.addEventListener("dashboard-expand-details", handler);
-    return () => window.removeEventListener("dashboard-expand-details", handler);
-  }, [setDetailsOpen]);
-
-  return [open, setDetailsOpen] as const;
-}
 
 export default function DashboardPage() {
   const [periodoSelecionado, setPeriodoSelecionado] = useState<string | undefined>(undefined);

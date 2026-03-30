@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { X, Trash2, Menu, Maximize2, Volume2, VolumeX } from "lucide-react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ChatBody } from "@/components/chat/chat-body";
+import { ChatHeader } from "@/components/chat/chat-header";
 import { SidebarTabs } from "@/components/chat/sidebar-tabs";
 import { useChatAssistant } from "@/hooks/use-chat-assistant";
 import { useSavedMessages } from "@/hooks/use-saved-messages";
@@ -16,6 +14,7 @@ import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
+import { useChatWidgetState } from "@/hooks/use-chat-widget-state";
 import { stripMarkdown } from "@/lib/strip-markdown";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
 import {
@@ -25,8 +24,6 @@ import {
 import { cn } from "@/lib/utils";
 import { dialog } from "@/lib/design-system";
 import type { MensagemChat } from "@/schemas/chat.schema";
-import type { ClaudeModelTier } from "@/lib/model-tiers";
-
 
 export function ChatWidget() {
   const pathname = usePathname();
@@ -34,46 +31,29 @@ export function ChatWidget() {
   const isOnChatPage = pathname.startsWith("/chat");
 
   const telaCheia = false;
-  const [mostrarSidebar, setMostrarSidebar] = useState(false);
-  const [ttsEnabled, setTtsEnabled] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [raciocinio, setRaciocinio] = useState(true);
-  const [modelTier, setModelTier] = useState<ClaudeModelTier>("sonnet");
   const prevTransmitindoRef = useRef(false);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("chatReasoningEnabled");
-    setRaciocinio(stored === null ? true : stored === "true");
-    const storedTier = localStorage.getItem("chatModelTier");
-    if (storedTier === "haiku" || storedTier === "sonnet" || storedTier === "opus") {
-      setModelTier(storedTier);
-    }
-  }, []);
-
-  const handleRaciocinioChange = useCallback((enabled: boolean) => {
-    setRaciocinio(enabled);
-    localStorage.setItem("chatReasoningEnabled", String(enabled));
-  }, []);
-
-  const handleModelTierChange = useCallback((tier: ClaudeModelTier) => {
-    setModelTier(tier);
-    localStorage.setItem("chatModelTier", tier);
-  }, []);
+  const {
+    mostrarSidebar,
+    setMostrarSidebar,
+    ttsEnabled,
+    raciocinio,
+    modelTier,
+    handleRaciocinioChange,
+    handleModelTierChange,
+    toggleSidebar,
+    closeSidebar,
+    toggleTts,
+  } = useChatWidgetState();
 
   const { identificadorPagina } = useChatPageContext();
 
   const { data: session } = useSession();
 
-  // Derive user initials from session name
   const userInitials = session?.user?.name
-    ? session.user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+    ? session.user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
     : undefined;
-
   const userImageUrl = session?.user?.image ?? undefined;
 
   const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
@@ -93,7 +73,6 @@ export function ChatWidget() {
     reenviarUltimaMensagem,
   } = useChatAssistant({ raciocinio, modelTier });
 
-  // Saved messages
   const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
   const { conversas } = useConversas();
 
@@ -115,13 +94,11 @@ export function ChatWidget() {
     [savedMessageIds, unsaveMessage, saveMessage, conversaAtualId, conversas],
   );
 
-  // Recent message texts for AI suggestions context (last 4, truncated)
   const recentMessages = useMemo(
     () => mensagens.slice(-4).map((m) => m.conteudo.slice(0, 200)),
     [mensagens],
   );
 
-  // AI-powered type-ahead suggestions (debounced, only when user is typing 3+ chars)
   const { suggestions: aiSuggestions, isLoading: aiSuggestionsLoading } = useChatSuggestions({
     input: inputValue,
     pageId: identificadorPagina,
@@ -133,7 +110,6 @@ export function ChatWidget() {
     if (mensagens.length === 0) {
       return INITIAL_SUGGESTIONS[identificadorPagina] ?? [];
     }
-    // AI suggestions take priority when user is typing
     if (aiSuggestions.length > 0) {
       return aiSuggestions;
     }
@@ -156,7 +132,7 @@ export function ChatWidget() {
     stopSpeech();
     setMostrarSidebar(false);
     setEstaAberto(false);
-  }, [stopSpeech]);
+  }, [stopSpeech, setMostrarSidebar]);
 
   const { dialogRef, open: _abrirDialog, close: fecharChat, handleBackdropClick } = useNativeDialog({
     onClose: handleFechar,
@@ -181,13 +157,12 @@ export function ChatWidget() {
     }
   }, [estaTransmitindo, ttsEnabled, mensagens, speak]);
 
-  // Listen for external "ask AI to explain" events from chart card buttons
+  // Listen for external "ask AI to explain" events
   useEffect(() => {
     function handleAbrirComPergunta(evento: Event) {
       const { pergunta } = (evento as CustomEvent<EventoAbrirChatDetalhe>).detail;
       abrirChat();
       criarNovaConversa();
-      // Small delay to let React render before sending
       setTimeout(() => {
         void enviarMensagem(pergunta);
       }, 100);
@@ -204,24 +179,19 @@ export function ChatWidget() {
       await carregarConversa(identificador);
       setMostrarSidebar(false);
     },
-    [carregarConversa],
+    [carregarConversa, setMostrarSidebar],
   );
 
   const handleNovaConversa = useCallback(() => {
     criarNovaConversa();
     setMostrarSidebar(false);
-  }, [criarNovaConversa]);
+  }, [criarNovaConversa, setMostrarSidebar]);
 
-  const handleFecharSidebar = useCallback(() => {
-    setMostrarSidebar(false);
-  }, []);
-
-  // Shorthand for fullscreen conditional classes
   const fs = telaCheia;
 
   return (
     <>
-      {/* Botao flutuante (FAB) — hidden on /chat/* pages */}
+      {/* FAB -- hidden on /chat/* pages */}
       {!isOnChatPage && (
         <button
           onClick={abrirChat}
@@ -236,7 +206,6 @@ export function ChatWidget() {
         </button>
       )}
 
-      {/* Chat dialog — transparent container fills viewport; inner div is the visible panel */}
       <dialog
         ref={dialogRef}
         onClick={handleBackdropClick}
@@ -249,7 +218,6 @@ export function ChatWidget() {
           margin: 0,
         }}
       >
-        {/* Painel de chat */}
         <div
           className={cn(
             "bg-background absolute flex overflow-hidden border shadow-xl",
@@ -259,16 +227,16 @@ export function ChatWidget() {
           )}
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
-          {/* Backdrop da sidebar (mobile) */}
+          {/* Sidebar backdrop (mobile) */}
           {mostrarSidebar && (
             <div
               className="absolute inset-0 z-5 bg-black/40 transition-opacity md:hidden"
-              onClick={handleFecharSidebar}
+              onClick={closeSidebar}
               aria-hidden="true"
             />
           )}
 
-          {/* Sidebar de conversas (overlay, aberta apenas ao clicar) */}
+          {/* Sidebar */}
           <div
             className={cn(
               "bg-background absolute z-10 h-full border-r transition-transform",
@@ -284,87 +252,20 @@ export function ChatWidget() {
             />
           </div>
 
-          {/* Area principal do chat */}
+          {/* Main chat area */}
           <div className="flex flex-1 flex-col">
-            {/* Cabecalho */}
-            <div className={cn(
-              "flex items-center justify-between border-b",
-              fs ? "px-6 py-5" : "px-4 py-3",
-            )}>
-              <div className="flex items-center gap-2">
-                {/* Botao toggle sidebar (historico de conversas) */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setMostrarSidebar(!mostrarSidebar)}
-                  className={fs ? "h-10 w-10" : "h-8 w-8"}
-                >
-                  <Menu className={fs ? "h-6 w-6" : "h-4 w-4"} />
-                </Button>
-
-                <Image src="/fortuna-minimal.png" alt="Fortuna" width={28} height={28} className={cn("rounded-full", fs ? "h-7 w-7" : "h-5 w-5")} />
-                <h3 className={cn("font-medium", fs ? "text-lg" : "text-sm")}>Fortuna</h3>
-              </div>
-              <div className="flex items-center gap-1">
-                {ttsSupported && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => {
-                            setTtsEnabled((v) => {
-                              if (v) stopSpeech();
-                              return !v;
-                            });
-                          }}
-                          className={cn(fs ? "h-10 w-10" : "h-8 w-8", ttsEnabled && "text-primary")}
-                        >
-                          {ttsEnabled ? (
-                            <Volume2
-                              className={cn(
-                                fs ? "h-6 w-6" : "h-4 w-4",
-                                speechStatus === "speaking" && "animate-pulse",
-                              )}
-                            />
-                          ) : (
-                            <VolumeX className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
-                          )}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {ttsEnabled ? "Desativar leitura em voz alta" : "Ativar leitura em voz alta"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-                {mensagens.length > 0 && (
-                  <Button variant="ghost" size="icon" onClick={limparHistorico} className={fs ? "h-10 w-10" : "h-8 w-8"}>
-                    <Trash2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
-                    <span className="sr-only">Limpar historico</span>
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => { fecharChat(); router.push(conversaAtualId ? `/chat/${conversaAtualId}` : "/chat"); }}
-                  className={cn("hidden md:inline-flex", fs ? "h-10 w-10" : "h-8 w-8")}
-                >
-                  <Maximize2 className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
-                  <span className="sr-only">Abrir em tela cheia</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={fecharChat}
-                  className={fs ? "h-10 w-10" : "h-8 w-8"}
-                >
-                  <X className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
-                  <span className="sr-only">Fechar Fortuna</span>
-                </Button>
-              </div>
-            </div>
+            <ChatHeader
+              fullscreen={fs}
+              onToggleSidebar={toggleSidebar}
+              ttsSupported={ttsSupported}
+              ttsEnabled={ttsEnabled}
+              onToggleTts={() => toggleTts(stopSpeech)}
+              speechStatus={speechStatus}
+              hasMensagens={mensagens.length > 0}
+              onLimparHistorico={limparHistorico}
+              onOpenFullscreen={() => { fecharChat(); router.push(conversaAtualId ? `/chat/${conversaAtualId}` : "/chat"); }}
+              onFechar={fecharChat}
+            />
 
             <ChatBody
               mensagens={mensagens}

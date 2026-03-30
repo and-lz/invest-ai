@@ -7,11 +7,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowUp, ArrowDown, ArrowUpDown, Briefcase } from "lucide-react";
+import { Briefcase } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { formatarMoeda } from "@/domain/value-objects/money";
@@ -23,109 +22,16 @@ import {
   GLOSSARY_RENTABILIDADE_12M,
   GLOSSARY_RENTABILIDADE_DESDE_INICIO_ATIVO,
 } from "@/lib/financial-glossary";
-import { TakeawayBox, type Conclusao } from "@/components/ui/takeaway-box";
+import { TakeawayBox } from "@/components/ui/takeaway-box";
 import type { PosicaoAtivo } from "@/schemas/report-extraction.schema";
+import { obterValorColuna, gerarConclusaoTodasPosicoes, type ColunaPosicoes } from "./all-positions-utils";
+import { CabecalhoOrdenavel } from "./all-positions-sortable-header";
 
-type ColunaPosicoes =
-  | "ativo"
-  | "estrategia"
-  | "saldo"
-  | "rentabilidadeMes"
-  | "rentabilidade12m"
-  | "rentabilidadeDesdeInicio"
-  | "participacao";
+// Re-export for external consumers
+export { gerarConclusaoTodasPosicoes } from "./all-positions-utils";
 
 interface AllPositionsTableProps {
   posicoes: PosicaoAtivo[];
-}
-
-function obterValorColuna(posicao: PosicaoAtivo, coluna: ColunaPosicoes): string | number {
-  switch (coluna) {
-    case "ativo":
-      return posicao.codigoAtivo ?? posicao.nomeAtivo;
-    case "estrategia":
-      return posicao.estrategia;
-    case "saldo":
-      return posicao.saldoBruto.valorEmCentavos;
-    case "rentabilidadeMes":
-      return posicao.rentabilidadeMes.valor;
-    case "rentabilidade12m":
-      return posicao.rentabilidade12Meses?.valor ?? -Infinity;
-    case "rentabilidadeDesdeInicio":
-      return posicao.rentabilidadeDesdeInicio?.valor ?? -Infinity;
-    case "participacao":
-      return posicao.participacaoNaCarteira.valor;
-  }
-}
-
-interface CabecalhoOrdenaveProps {
-  coluna: ColunaPosicoes;
-  colunaAtiva: ColunaPosicoes | null;
-  direcao: "asc" | "desc";
-  onClick: (coluna: ColunaPosicoes) => void;
-  className?: string;
-  children: React.ReactNode;
-}
-
-function CabecalhoOrdenavel({
-  coluna,
-  colunaAtiva,
-  direcao,
-  onClick,
-  className,
-  children,
-}: CabecalhoOrdenaveProps) {
-  const eAtiva = colunaAtiva === coluna;
-  const Icone = eAtiva ? (direcao === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
-
-  return (
-    <TableHead
-      className={`group hover:text-foreground cursor-pointer select-none ${className ?? ""}`}
-      onClick={() => onClick(coluna)}
-    >
-      <div
-        className={`flex items-center gap-1 ${className?.includes("text-right") ? "justify-end" : ""}`}
-      >
-        {children}
-        <Icone
-          className={`h-3 w-3 ${eAtiva ? "text-foreground" : "text-muted-foreground/50 opacity-0 group-hover:opacity-100"} transition-opacity`}
-        />
-      </div>
-    </TableHead>
-  );
-}
-
-export function gerarConclusaoTodasPosicoes(posicoes: PosicaoAtivo[]): Conclusao[] {
-  const conclusoes: Conclusao[] = [];
-  if (posicoes.length === 0) return conclusoes;
-
-  const positivasNoMes = posicoes.filter((posicao) => posicao.rentabilidadeMes.valor > 0);
-  const negativasNoMes = posicoes.filter((posicao) => posicao.rentabilidadeMes.valor < 0);
-
-  conclusoes.push({
-    texto: `Você tem ${posicoes.length} posições. ${positivasNoMes.length} estão positivas no mês e ${negativasNoMes.length} negativas.`,
-    tipo:
-      positivasNoMes.length > negativasNoMes.length
-        ? "positivo"
-        : positivasNoMes.length === negativasNoMes.length
-          ? "neutro"
-          : "atencao",
-  });
-
-  const maisConcentrada = [...posicoes].sort(
-    (posicaoA, posicaoB) =>
-      posicaoB.participacaoNaCarteira.valor - posicaoA.participacaoNaCarteira.valor,
-  )[0];
-
-  if (maisConcentrada && maisConcentrada.participacaoNaCarteira.valor > 10) {
-    conclusoes.push({
-      texto: `Maior posição: ${maisConcentrada.codigoAtivo ?? maisConcentrada.nomeAtivo} com ${formatSimplePercentage(maisConcentrada.participacaoNaCarteira.valor)} da carteira.`,
-      tipo: maisConcentrada.participacaoNaCarteira.valor > 25 ? "atencao" : "neutro",
-      acionavel: maisConcentrada.participacaoNaCarteira.valor > 25,
-    });
-  }
-
-  return conclusoes;
 }
 
 export function AllPositionsTable({ posicoes }: AllPositionsTableProps) {

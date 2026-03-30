@@ -2,125 +2,27 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
-import { Search, TrendingUp, TrendingDown, Minus, ChevronDown, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   typography,
   icon,
   layout,
   dialog,
-  valueColor,
-  trendIconColor,
 } from "@/lib/design-system";
 import { Card, CardContent } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-interface AtivoDaCarteira {
-  codigoAtivo: string;
-  nomeAtivo: string;
-  estrategia: string;
-  rentabilidade12Meses: number | null;
-}
-
-interface GrupoAtivos {
-  id: string;
-  label: string;
-  emoji: string;
-  ativos: AtivoDaCarteira[];
-  mediaRentabilidade: number | null;
-}
+import { agruparAtivosPorPerformance } from "./portfolio-assets-utils";
+import type { AtivoDaCarteira } from "./portfolio-assets-utils";
+import { PortfolioAssetsGroup } from "./portfolio-assets-group";
 
 interface GridAtivosCarteiraProps {
   readonly ativosCarteira: AtivoDaCarteira[];
   readonly tickerSelecionado: string | null;
   readonly aoSelecionarTicker: (ticker: string) => void;
   readonly estaCarregando?: boolean;
-}
-
-function calcularMediaRentabilidade(ativos: AtivoDaCarteira[]): number | null {
-  const ativosComDados = ativos.filter((ativo) => ativo.rentabilidade12Meses !== null);
-  if (ativosComDados.length === 0) return null;
-
-  const soma = ativosComDados.reduce(
-    (acumulado, ativo) => acumulado + ativo.rentabilidade12Meses!,
-    0,
-  );
-  return soma / ativosComDados.length;
-}
-
-function agruparAtivosPorPerformance(ativos: AtivoDaCarteira[]): GrupoAtivos[] {
-  const excelentes: AtivoDaCarteira[] = [];
-  const bons: AtivoDaCarteira[] = [];
-  const moderados: AtivoDaCarteira[] = [];
-  const negativos: AtivoDaCarteira[] = [];
-  const semDados: AtivoDaCarteira[] = [];
-
-  for (const ativo of ativos) {
-    if (ativo.rentabilidade12Meses === null) {
-      semDados.push(ativo);
-    } else if (ativo.rentabilidade12Meses >= 15) {
-      excelentes.push(ativo);
-    } else if (ativo.rentabilidade12Meses >= 5) {
-      bons.push(ativo);
-    } else if (ativo.rentabilidade12Meses >= 0) {
-      moderados.push(ativo);
-    } else {
-      negativos.push(ativo);
-    }
-  }
-
-  const grupos: GrupoAtivos[] = [];
-
-  if (excelentes.length > 0) {
-    grupos.push({
-      id: "excelentes",
-      label: "Excelentes (12m ≥ +15%)",
-      emoji: "🔥",
-      ativos: excelentes,
-      mediaRentabilidade: calcularMediaRentabilidade(excelentes),
-    });
-  }
-  if (bons.length > 0) {
-    grupos.push({
-      id: "bons",
-      label: "Bons (12m +5% a +15%)",
-      emoji: "📈",
-      ativos: bons,
-      mediaRentabilidade: calcularMediaRentabilidade(bons),
-    });
-  }
-  if (moderados.length > 0) {
-    grupos.push({
-      id: "moderados",
-      label: "Moderados (12m 0% a +5%)",
-      emoji: "📊",
-      ativos: moderados,
-      mediaRentabilidade: calcularMediaRentabilidade(moderados),
-    });
-  }
-  if (negativos.length > 0) {
-    grupos.push({
-      id: "negativos",
-      label: "Negativos (12m < 0%)",
-      emoji: "📉",
-      ativos: negativos,
-      mediaRentabilidade: calcularMediaRentabilidade(negativos),
-    });
-  }
-  if (semDados.length > 0) {
-    grupos.push({
-      id: "sem-dados",
-      label: "Sem Dados (12m)",
-      emoji: "❓",
-      ativos: semDados,
-      mediaRentabilidade: null,
-    });
-  }
-
-  return grupos;
 }
 
 export function GridAtivosCarteira({
@@ -141,7 +43,6 @@ export function GridAtivosCarteira({
 
   const gruposAtivos = useMemo(() => agruparAtivosPorPerformance(ativosCarteira), [ativosCarteira]);
 
-  // Controlar abertura/fechamento dos grupos - todos abertos por padrão no dialog
   const estaGrupoAberto = (grupoId: string): boolean => {
     return gruposAbertos[grupoId] ?? true;
   };
@@ -175,7 +76,6 @@ export function GridAtivosCarteira({
     }
   };
 
-  // Encontrar o ativo selecionado para exibir resumo compacto
   const ativoSelecionadoInfo = useMemo(
     () =>
       tickerSelecionado
@@ -201,7 +101,7 @@ export function GridAtivosCarteira({
 
   return (
     <>
-      {/* Resumo do ativo selecionado ou botão para selecionar */}
+      {/* Resumo do ativo selecionado ou botao para selecionar */}
       {tickerSelecionado && ativoSelecionadoInfo ? (
         <Card>
           <CardContent className="flex items-center justify-between gap-3 p-4">
@@ -239,7 +139,7 @@ export function GridAtivosCarteira({
         </Card>
       )}
 
-      {/* Dialog de seleção de ativo */}
+      {/* Dialog de selecao de ativo */}
       <dialog
         ref={dialogRef}
         onClick={handleBackdropClick}
@@ -303,97 +203,14 @@ export function GridAtivosCarteira({
           {gruposAtivos.length > 0 && (
             <div className="space-y-3">
               {gruposAtivos.map((grupo) => (
-                <Collapsible
+                <PortfolioAssetsGroup
                   key={grupo.id}
-                  open={estaGrupoAberto(grupo.id)}
-                  onOpenChange={() => toggleGrupo(grupo.id)}
-                >
-                  <Card>
-                    <CardContent className="p-4">
-                      <CollapsibleTrigger className="flex w-full items-center justify-between gap-4 [&[data-state=open]>svg]:rotate-180">
-                        <div className="flex flex-1 items-center justify-between gap-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{grupo.emoji}</span>
-                            <span className="text-sm font-semibold">{grupo.label}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className={typography.helper}>
-                              {grupo.ativos.length} {grupo.ativos.length === 1 ? "ativo" : "ativos"}
-                            </span>
-                            {grupo.mediaRentabilidade !== null && (
-                              <Badge
-                                variant={grupo.mediaRentabilidade >= 0 ? "default" : "destructive"}
-                                className="text-xs"
-                              >
-                                Média: {grupo.mediaRentabilidade > 0 ? "+" : ""}
-                                {grupo.mediaRentabilidade.toFixed(1)}%
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <ChevronDown className={cn(icon.button, "shrink-0 transition-transform duration-200")} />
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <div className="grid gap-3 pt-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                          {grupo.ativos.map((ativo) => {
-                            const ativoTemTicker = ativo.codigoAtivo !== ativo.nomeAtivo;
-                            const estaAtivo =
-                              tickerSelecionado?.toUpperCase() === ativo.codigoAtivo.toUpperCase();
-
-                            return (
-                              <Card
-                                key={ativo.codigoAtivo}
-                                className={cn(
-                                  "hover:border-primary cursor-pointer transition-all hover:shadow-md",
-                                  estaAtivo && "border-primary ring-primary/20 ring-1",
-                                )}
-                                onClick={() => handleSelecionarAtivo(ativo.codigoAtivo)}
-                              >
-                                <CardContent className="p-4">
-                                  <div className="flex items-start justify-between gap-2">
-                                    <div className="min-w-0 flex-1">
-                                      <h4 className="truncate text-sm font-semibold">
-                                        {ativo.codigoAtivo}
-                                      </h4>
-                                      {ativoTemTicker && (
-                                        <p className={cn(typography.helper, "truncate")}>
-                                          {ativo.nomeAtivo}
-                                        </p>
-                                      )}
-                                      <p className={cn(typography.helper, "mt-1")}>
-                                        {ativo.estrategia}
-                                      </p>
-                                    </div>
-                                    {ativo.rentabilidade12Meses !== null && (
-                                      <div className="flex flex-col items-end gap-1">
-                                        {ativo.rentabilidade12Meses > 0 ? (
-                                          <TrendingUp className={cn(icon.button, trendIconColor(ativo.rentabilidade12Meses))} />
-                                        ) : ativo.rentabilidade12Meses < 0 ? (
-                                          <TrendingDown className={cn(icon.button, trendIconColor(ativo.rentabilidade12Meses))} />
-                                        ) : (
-                                          <Minus className={cn(icon.button, trendIconColor(null))} />
-                                        )}
-                                        <span
-                                          className={cn(
-                                            "text-xs font-semibold",
-                                            valueColor(ativo.rentabilidade12Meses),
-                                          )}
-                                        >
-                                          {ativo.rentabilidade12Meses > 0 ? "+" : ""}
-                                          {ativo.rentabilidade12Meses.toFixed(1)}%
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            );
-                          })}
-                        </div>
-                      </CollapsibleContent>
-                    </CardContent>
-                  </Card>
-                </Collapsible>
+                  grupo={grupo}
+                  isOpen={estaGrupoAberto(grupo.id)}
+                  onToggle={() => toggleGrupo(grupo.id)}
+                  tickerSelecionado={tickerSelecionado}
+                  onSelecionarAtivo={handleSelecionarAtivo}
+                />
               ))}
             </div>
           )}
