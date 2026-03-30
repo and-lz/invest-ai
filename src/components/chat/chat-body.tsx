@@ -139,9 +139,9 @@ export function ChatBody({
         </div>
       )}
 
-      {/* Quick-reply suggestions — aligned to input field */}
-      {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
-        <div>
+      {/* Footer: suggestions + input — single border-t above the whole section */}
+      <div className="border-t">
+        {mensagens.length > 0 && !estaTransmitindo && (activeSuggestions.length > 0 || aiSuggestionsLoading) && (
           <SuggestionChips
             suggestions={activeSuggestions}
             onSelect={onSuggestionSelect}
@@ -150,20 +150,19 @@ export function ChatBody({
             isLoading={aiSuggestionsLoading}
             fullscreen={fs}
           />
-        </div>
-      )}
-
-      {/* Input field */}
-      <CampoEntradaChat
-        onEnviar={enviarMensagem}
-        onParar={pararTransmissao}
-        estaTransmitindo={estaTransmitindo}
-        value={inputValue}
-        onValueChange={onInputValueChange}
-        fullscreen={fs}
-        raciocinio={raciocinio}
-        onRaciocinioChange={onRaciocinioChange}
-      />
+        )}
+        <CampoEntradaChat
+          onEnviar={enviarMensagem}
+          onParar={pararTransmissao}
+          estaTransmitindo={estaTransmitindo}
+          value={inputValue}
+          onValueChange={onInputValueChange}
+          fullscreen={fs}
+          raciocinio={raciocinio}
+          onRaciocinioChange={onRaciocinioChange}
+          hideBorderTop
+        />
+      </div>
     </div>
   );
 }
