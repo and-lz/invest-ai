@@ -29,33 +29,32 @@ export function useConversas() {
 
   const deletarConversa = useCallback(
     async (identificador: string) => {
-      // Optimistic update: remove imediatamente da UI
-      const dadosOtimistas: ConversasApiResponse = {
-        conversas: conversas.filter((conversa) => conversa.identificador !== identificador),
-      };
+      const filtrar = (dados?: ConversasApiResponse): ConversasApiResponse => ({
+        conversas: (dados?.conversas ?? []).filter((c) => c.identificador !== identificador),
+      });
 
       try {
         await mutate(
-          async () => {
+          async (dadosAtuais) => {
             const resposta = await fetch(`/api/conversations/${identificador}`, {
               method: "DELETE",
             });
             if (!resposta.ok) {
               throw new Error(`Erro ao deletar conversa: ${resposta.status}`);
             }
-            return dadosOtimistas;
+            return filtrar(dadosAtuais);
           },
           {
-            optimisticData: dadosOtimistas,
+            optimisticData: filtrar,
             rollbackOnError: true,
-            revalidate: true,
+            revalidate: false,
           },
         );
       } catch (erro) {
         console.error("Erro ao deletar conversa:", erro);
       }
     },
-    [mutate, conversas],
+    [mutate],
   );
 
   return {
