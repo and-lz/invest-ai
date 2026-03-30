@@ -200,21 +200,24 @@ export function CampoEntradaChat({
               </Popover>
             )}
 
-            {/* Reasoning toggle */}
-            {onRaciocinioChange && (
+            {/* Reasoning toggle — intentionally outside Popover to avoid event interference */}
+            {onRaciocinioChange !== undefined && (
               <button
                 type="button"
                 disabled={estaTransmitindo}
-                onClick={() => onRaciocinioChange(!raciocinio)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRaciocinioChange!(!raciocinio);
+                }}
                 className={cn(
-                  "rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
+                  "cursor-pointer rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
                   raciocinio
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
-                title={raciocinio ? "Desativar raciocínio estendido" : "Ativar raciocínio estendido"}
+                title={raciocinio ? "Desativar raciocínio extendido" : "Ativar raciocínio extendido"}
               >
-                Estendido
+                Extendido
               </button>
             )}
 
