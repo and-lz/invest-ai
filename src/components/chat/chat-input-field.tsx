@@ -210,20 +210,20 @@ export function CampoEntradaChat({
 
             {/* Reasoning toggle */}
             {onRaciocinioChange && (
-              <button
-                type="button"
-                disabled={estaTransmitindo}
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => onRaciocinioChange(!raciocinio)}
+                disabled={estaTransmitindo}
                 className={cn(
-                  "cursor-pointer rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
+                  "h-7 px-2 text-xs",
                   raciocinio
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground",
                 )}
-                title={raciocinio ? "Desativar raciocínio extendido" : "Ativar raciocínio extendido"}
               >
                 Extendido
-              </button>
+              </Button>
             )}
 
             {/* Send / Stop button */}
