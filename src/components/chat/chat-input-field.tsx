@@ -160,7 +160,7 @@ export function CampoEntradaChat({
           <div className="flex items-center gap-1">
             {/* Model tier selector */}
             {onModelTierChange && modelTier && (
-              <Popover open={modelPopoverOpen} onOpenChange={setModelPopoverOpen}>
+              <Popover modal={false} open={modelPopoverOpen} onOpenChange={setModelPopoverOpen}>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
@@ -200,17 +200,26 @@ export function CampoEntradaChat({
               </Popover>
             )}
 
-            {/* Reasoning toggle — intentionally outside Popover to avoid event interference */}
+            {/* Reasoning toggle */}
             {onRaciocinioChange !== undefined && (
-              <button
-                type="button"
-                disabled={estaTransmitindo}
-                onClick={(e) => {
+              <div
+                role="button"
+                tabIndex={0}
+                onPointerDown={(e) => {
+                  if (estaTransmitindo) return;
+                  e.preventDefault();
                   e.stopPropagation();
                   onRaciocinioChange!(!raciocinio);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onRaciocinioChange!(!raciocinio);
+                  }
+                }}
                 className={cn(
-                  "cursor-pointer rounded-md px-2 py-1 text-xs transition-colors disabled:opacity-50",
+                  "cursor-pointer select-none rounded-md px-2 py-1 text-xs transition-colors",
+                  estaTransmitindo && "pointer-events-none opacity-50",
                   raciocinio
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground",
@@ -218,7 +227,7 @@ export function CampoEntradaChat({
                 title={raciocinio ? "Desativar raciocínio extendido" : "Ativar raciocínio extendido"}
               >
                 Extendido
-              </button>
+              </div>
             )}
 
             {/* Send / Stop button */}
