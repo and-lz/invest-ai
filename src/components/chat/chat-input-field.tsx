@@ -16,6 +16,7 @@ interface CampoEntradaChatProps {
   readonly fullscreen?: boolean;
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
+  readonly hideBorderTop?: boolean;
 }
 
 function ehDispositivoTouch(): boolean {
@@ -34,6 +35,7 @@ export function CampoEntradaChat({
   fullscreen,
   raciocinio,
   onRaciocinioChange,
+  hideBorderTop,
 }: CampoEntradaChatProps) {
   const [internalValue, setInternalValue] = useState("");
   const isControlled = controlledValue !== undefined;
@@ -90,7 +92,8 @@ export function CampoEntradaChat({
 
   return (
     <div className={cn(
-      "flex items-end border-t",
+      "flex items-end",
+      !hideBorderTop && "border-t",
       fs ? "mx-auto w-full max-w-4xl gap-3 p-5" : "gap-2 p-3",
     )}>
       {onRaciocinioChange && (
