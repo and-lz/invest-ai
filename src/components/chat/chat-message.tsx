@@ -143,10 +143,10 @@ export function MensagemChatBolha({
             <ConteudoMarkdownChat conteudo={cleanContent} fullscreen={fs} />
           ) : estaTransmitindo && !streamError ? (
             isThinking ? null : (
-              <span className="text-muted-foreground inline-flex gap-1">
-                <span className="animate-bounce">.</span>
-                <span className="animate-bounce [animation-delay:0.1s]">.</span>
-                <span className="animate-bounce [animation-delay:0.2s]">.</span>
+              <span className="inline-flex items-center gap-1.5 px-1 py-0.5">
+                <span className="bg-primary h-2 w-2 rounded-full animate-bounce" />
+                <span className="bg-primary h-2 w-2 rounded-full animate-bounce [animation-delay:0.15s]" />
+                <span className="bg-primary h-2 w-2 rounded-full animate-bounce [animation-delay:0.3s]" />
               </span>
             )
           ) : (
