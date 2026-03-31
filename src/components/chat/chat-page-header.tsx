@@ -1,6 +1,5 @@
 "use client";
 
-import { forwardRef } from "react";
 import { Menu, Trash2, Volume2, VolumeX, ArrowLeft, MoreHorizontal, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +22,7 @@ interface ChatPageHeaderProps {
   readonly onBack: () => void;
 }
 
-export const ChatPageHeader = forwardRef<HTMLDivElement, ChatPageHeaderProps>(function ChatPageHeader({
+export function ChatPageHeader({
   title,
   onToggleSidebar,
   ttsSupported,
@@ -32,11 +31,11 @@ export const ChatPageHeader = forwardRef<HTMLDivElement, ChatPageHeaderProps>(fu
   hasMessages,
   onClearHistory,
   onBack,
-}, ref) {
+}: ChatPageHeaderProps) {
   const showOverflow = ttsSupported || hasMessages;
 
   return (
-    <div ref={ref} className="chat-auto-header sticky inset-x-0 top-0 z-10">
+    <div className="sticky inset-x-0 top-0 z-10">
       <div className="flex items-center px-4 py-2">
         <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="h-9 w-9 shrink-0">
           <Menu className="h-4 w-4" />
@@ -87,4 +86,4 @@ export const ChatPageHeader = forwardRef<HTMLDivElement, ChatPageHeaderProps>(fu
       </div>
     </div>
   );
-});
+}

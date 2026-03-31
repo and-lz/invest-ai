@@ -14,7 +14,7 @@ import { useConversas } from "@/hooks/use-conversations";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
-import { useAutoHideOnScroll } from "@/hooks/use-auto-hide-on-scroll";
+
 import { stripMarkdown } from "@/lib/strip-markdown";
 import { notificar } from "@/lib/notifier";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
@@ -34,15 +34,7 @@ export default function ChatPage() {
   const [modelTier, setModelTier] = useState<ClaudeModelTier>("sonnet");
   const prevTransmitindoRef = useRef(false);
   const mobileSidebarRef = useRef<ChatMobileSidebarHandle>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-
-  const autoHideTargets = useMemo(() => [
-    { ref: headerRef, hiddenClass: "chat-auto-header--hidden" },
-    { ref: footerRef, hiddenClass: "chat-auto-footer--hidden" },
-  ], []);
-  const { onScroll: autoHideOnScroll } = useAutoHideOnScroll(autoHideTargets);
 
   useEffect(() => {
     const stored = localStorage.getItem("chatReasoningEnabled");
@@ -246,7 +238,6 @@ export default function ChatPage() {
       {/* Main chat area */}
       <div className="relative flex flex-1 flex-col overflow-hidden">
         <ChatPageHeader
-          ref={headerRef}
           title={title}
           onToggleSidebar={toggleSidebar}
           ttsSupported={ttsSupported}
@@ -282,9 +273,7 @@ export default function ChatPage() {
           savedMessageIds={savedMessageIds}
           onToggleSave={handleToggleSave}
           estaCarregandoConversa={estaCarregandoConversa}
-          footerRef={footerRef}
           scrollAreaRef={scrollAreaRef}
-          onScroll={autoHideOnScroll}
         />
       </div>
     </div>

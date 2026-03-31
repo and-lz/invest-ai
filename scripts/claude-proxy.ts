@@ -178,19 +178,16 @@ function buildPrompt(messages: AnthropicMessage[]): string {
     return extractText(msg.content);
   }
 
-  // Multi-turn: linearize history with role labels, then append the current message
+  // Multi-turn: use XML tags so Claude treats history as structured conversation
   const history = messages.slice(0, -1);
   const last = messages[messages.length - 1];
   if (!last) return "";
 
-  const historyText = history
-    .map((m) => {
-      const label = m.role === "user" ? "Human" : "Assistant";
-      return `${label}: ${extractText(m.content)}`;
-    })
-    .join("\n\n");
+  const historyXml = history
+    .map((m) => `<turn role="${m.role}">\n${extractText(m.content)}\n</turn>`)
+    .join("\n");
 
-  return `[Previous conversation]\n${historyText}\n\n[Current message]\n${extractText(last.content)}`;
+  return `<conversation_history>\n${historyXml}\n</conversation_history>\n\n${extractText(last.content)}`;
 }
 
 function extractSystemPrompt(

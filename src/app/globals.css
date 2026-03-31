@@ -462,29 +462,6 @@ dialog[data-closing]::backdrop {
   overflow: hidden;
 }
 
-/* Chat auto-hide header */
-.chat-auto-header {
-  transform: translateY(0);
-  opacity: 1;
-  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.chat-auto-header.chat-auto-header--hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Chat auto-hide footer (floating input) */
-.chat-auto-footer {
-  transform: translateY(0);
-  opacity: 1;
-  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.chat-auto-footer.chat-auto-footer--hidden {
-  transform: translateY(100%);
-  opacity: 0;
-  pointer-events: none;
-}
 
 /* Chat Highlight - Destaque visual de elementos mencionados pelo assistente */
 .chat-highlight-active {

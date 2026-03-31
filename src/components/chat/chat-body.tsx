@@ -54,11 +54,9 @@ interface ChatBodyProps {
   readonly onRaciocinioChange?: (enabled: boolean) => void;
   readonly modelTier?: ClaudeModelTier;
   readonly onModelTierChange?: (tier: ClaudeModelTier) => void;
-  readonly onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
   readonly savedMessageIds?: ReadonlySet<string>;
   readonly onToggleSave?: (mensagem: MensagemChat) => void;
   readonly estaCarregandoConversa?: boolean;
-  readonly footerRef?: React.RefObject<HTMLDivElement | null>;
   readonly scrollAreaRef?: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -83,11 +81,9 @@ export function ChatBody({
   onRaciocinioChange,
   modelTier,
   onModelTierChange,
-  onScroll,
   savedMessageIds,
   onToggleSave,
   estaCarregandoConversa,
-  footerRef,
   scrollAreaRef,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
@@ -115,8 +111,7 @@ export function ChatBody({
     isNearBottomRef.current = nearBottom;
     setShowScrollBtn(!nearBottom);
     if (nearBottom) setHasNewMessages(false);
-    onScroll?.(e);
-  }, [onScroll]);
+  }, []);
 
   // Smart auto-scroll: only scroll when user is near bottom
   useEffect(() => {
@@ -139,7 +134,7 @@ export function ChatBody({
       <div
         ref={mergedScrollRef}
         onScroll={handleScroll}
-        className={cn("chat-scroll-area min-h-0 flex-1 overflow-y-auto", fs ? "pb-40" : "pb-32")}
+        className={cn("min-h-0 flex-1 overflow-y-auto", fs ? "pb-40" : "pb-32")}
       >
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
@@ -244,7 +239,7 @@ export function ChatBody({
       )}
 
       {/* Floating footer: input overlay with gradient fade */}
-      <div ref={footerRef} className="chat-auto-footer pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-20">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-20">
         <div className="pointer-events-auto">
           <CampoEntradaChat
             onEnviar={enviarMensagem}

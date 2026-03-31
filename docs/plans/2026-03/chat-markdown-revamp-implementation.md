@@ -18,6 +18,7 @@
 ## Final Verification
 - Build: Pass (tsc --noEmit + lint clean)
 - Tests: Pass (no UI tests for these components)
+- Tests: Pass — 714/714 tests pass (vitest run)
 - Manual: Pending — test in browser (incognito)
 
 ## Acceptance Criteria
