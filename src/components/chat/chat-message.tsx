@@ -140,7 +140,7 @@ export function MensagemChatBolha({
           )}
         >
           {cleanContent ? (
-            <ConteudoMarkdownChat conteudo={cleanContent} ehUsuario={ehUsuario} fullscreen={fs} />
+            <ConteudoMarkdownChat conteudo={cleanContent} fullscreen={fs} />
           ) : estaTransmitindo && !streamError ? (
             isThinking ? null : (
               <span className="text-muted-foreground inline-flex gap-1">

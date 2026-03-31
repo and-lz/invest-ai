@@ -427,6 +427,23 @@ dialog[data-closing]::backdrop {
   @apply my-3;
 }
 
+/* Shiki syntax highlighting — dual-theme (light/dark) */
+.shiki span {
+  color: var(--shiki-light);
+}
+
+.dark .shiki span {
+  color: var(--shiki-dark);
+}
+
+.shiki {
+  background-color: var(--shiki-light-bg);
+}
+
+.dark .shiki {
+  background-color: var(--shiki-dark-bg);
+}
+
 /* Chat Fullbleed — standalone immersive chat: hide app shell, fill viewport */
 .app-shell:has(.chat-fullbleed) {
   height: 100dvh;
