@@ -323,19 +323,19 @@ dialog[data-closing]::backdrop {
 
 /* Headings - clear visual hierarchy */
 .markdown-content h1 {
-  @apply text-lg font-semibold tracking-tight mt-5 mb-2 first:mt-0 border-b border-border/40 pb-1;
+  @apply text-xl font-semibold tracking-tight mt-5 mb-2 first:mt-0 border-b border-border/40 pb-1;
 }
 
 .markdown-content h2 {
-  @apply text-base font-semibold tracking-tight mt-4 mb-2 first:mt-0;
+  @apply text-lg font-semibold tracking-tight mt-4 mb-2 first:mt-0;
 }
 
 .markdown-content h3 {
-  @apply text-sm font-semibold mt-3 mb-1.5 first:mt-0;
+  @apply text-base font-semibold mt-3 mb-1.5 first:mt-0;
 }
 
 .markdown-content h4 {
-  @apply text-sm font-medium mt-2 mb-1 text-muted-foreground first:mt-0;
+  @apply text-sm font-semibold mt-2 mb-1 text-muted-foreground first:mt-0;
 }
 
 /* Lists - more breathing room */
