@@ -75,12 +75,12 @@ export function ChatBody({
   }, [mensagens]);
 
   return (
-    <div className={cn("flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen")}>
+    <div className={cn("relative flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen")}>
       {/* Messages area */}
       <div
         ref={areaScrollRef}
         onScroll={onScroll}
-        className="relative min-h-0 flex-1 overflow-y-auto"
+        className={cn("min-h-0 flex-1 overflow-y-auto", fs ? "pb-28" : "pb-20")}
       >
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
@@ -152,25 +152,30 @@ export function ChatBody({
         </div>
       )}
 
-      {/* Footer: input with inline suggestion chips */}
-      <div>
-        <CampoEntradaChat
-          onEnviar={enviarMensagem}
-          onParar={pararTransmissao}
-          estaTransmitindo={estaTransmitindo}
-          value={inputValue}
-          onValueChange={onInputValueChange}
-          fullscreen={fs}
-          raciocinio={raciocinio}
-          onRaciocinioChange={onRaciocinioChange}
-          modelTier={modelTier}
-          onModelTierChange={onModelTierChange}
-          hideBorderTop
-          suggestions={mensagens.length > 0 && !estaTransmitindo ? activeSuggestions : undefined}
-          suggestionsLoading={mensagens.length > 0 && !estaTransmitindo ? aiSuggestionsLoading : false}
-          onSuggestionSelect={onSuggestionSelect}
-          suggestionsFilterText={aiSuggestions.length > 0 ? undefined : inputValue}
-        />
+      {/* Floating footer: gradient fade + input overlay */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+        {/* Gradient fade from transparent → background */}
+        <div className={cn("bg-gradient-to-b from-transparent to-card", fs ? "h-10" : "h-6")} />
+        {/* Input container with solid bg so text is readable */}
+        <div className="pointer-events-auto bg-card">
+          <CampoEntradaChat
+            onEnviar={enviarMensagem}
+            onParar={pararTransmissao}
+            estaTransmitindo={estaTransmitindo}
+            value={inputValue}
+            onValueChange={onInputValueChange}
+            fullscreen={fs}
+            raciocinio={raciocinio}
+            onRaciocinioChange={onRaciocinioChange}
+            modelTier={modelTier}
+            onModelTierChange={onModelTierChange}
+            hideBorderTop
+            suggestions={mensagens.length > 0 && !estaTransmitindo ? activeSuggestions : undefined}
+            suggestionsLoading={mensagens.length > 0 && !estaTransmitindo ? aiSuggestionsLoading : false}
+            onSuggestionSelect={onSuggestionSelect}
+            suggestionsFilterText={aiSuggestions.length > 0 ? undefined : inputValue}
+          />
+        </div>
       </div>
     </div>
   );
