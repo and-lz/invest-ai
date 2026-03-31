@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 interface BlocoCodigoChatProps {
-  readonly children?: string;
+  readonly children?: ReactNode;
   readonly className?: string;
   readonly fullscreen?: boolean;
 }
