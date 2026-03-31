@@ -59,6 +59,7 @@ interface ChatBodyProps {
   readonly onToggleSave?: (mensagem: MensagemChat) => void;
   readonly estaCarregandoConversa?: boolean;
   readonly footerRef?: React.RefObject<HTMLDivElement | null>;
+  readonly scrollAreaRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function ChatBody({
@@ -87,8 +88,15 @@ export function ChatBody({
   onToggleSave,
   estaCarregandoConversa,
   footerRef,
+  scrollAreaRef,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
+  const mergedScrollRef = useCallback((node: HTMLDivElement | null) => {
+    (areaScrollRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    if (scrollAreaRef) {
+      (scrollAreaRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    }
+  }, [scrollAreaRef]);
   const isNearBottomRef = useRef(true);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const [hasNewMessages, setHasNewMessages] = useState(false);
@@ -129,9 +137,9 @@ export function ChatBody({
     <div className={cn("relative flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen")}>
       {/* Messages area */}
       <div
-        ref={areaScrollRef}
+        ref={mergedScrollRef}
         onScroll={handleScroll}
-        className={cn("min-h-0 flex-1 overflow-y-auto", fs ? "pb-28" : "pb-20")}
+        className={cn("chat-scroll-area min-h-0 flex-1 overflow-y-auto", fs ? "pb-28" : "pb-20")}
       >
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>

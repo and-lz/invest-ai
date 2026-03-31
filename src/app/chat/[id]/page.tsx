@@ -36,10 +36,12 @@ export default function ChatPage() {
   const mobileSidebarRef = useRef<ChatMobileSidebarHandle>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const autoHideTargets = useMemo(() => [
-    { ref: headerRef, hiddenClass: "chat-auto-header--hidden" },
+    { ref: headerRef, hiddenClass: "chat-auto-header--hidden", collapseSpace: true },
     { ref: footerRef, hiddenClass: "chat-auto-footer--hidden" },
+    { ref: scrollAreaRef, hiddenClass: "chat-scroll-compact" },
   ], []);
   const { onScroll: autoHideOnScroll } = useAutoHideOnScroll(autoHideTargets);
 
@@ -282,6 +284,7 @@ export default function ChatPage() {
           onToggleSave={handleToggleSave}
           estaCarregandoConversa={estaCarregandoConversa}
           footerRef={footerRef}
+          scrollAreaRef={scrollAreaRef}
           onScroll={autoHideOnScroll}
         />
       </div>
