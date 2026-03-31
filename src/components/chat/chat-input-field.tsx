@@ -127,7 +127,7 @@ export function CampoEntradaChat({
     <div className={cn(
       "flex flex-col",
       !hideBorderTop && "border-t",
-      fs ? "bg-gradient-to-t from-background via-background to-transparent mx-auto w-full max-w-4xl px-5 pt-3 pb-5" : "px-3 pt-1.5 pb-3",
+      fs ? "mx-auto w-full max-w-4xl px-5 pt-3 pb-5" : "px-3 pt-1.5 pb-3",
     )}>
       {(showInlineChips || suggestionsLoading) && (
         <SuggestionChips

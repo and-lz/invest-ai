@@ -1,22 +1,22 @@
 {
     "workbench.colorCustomizations": {
-        "activityBar.activeBackground": "#efe7e0",
-        "activityBar.background": "#efe7e0",
-        "activityBar.foreground": "#15202b",
-        "activityBar.inactiveForeground": "#15202b99",
-        "sash.hoverBorder": "#efe7e0",
-        "editorGroup.border": "#efe7e0",
-        "panel.border": "#efe7e0",
-        "tab.activeBorder": "#efe7e0",
-        "activityBarBadge.background": "#6cb38d",
+        "activityBar.activeBackground": "#1467af",
+        "activityBar.background": "#1467af",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "sash.hoverBorder": "#1467af",
+        "editorGroup.border": "#1467af",
+        "panel.border": "#1467af",
+        "tab.activeBorder": "#1467af",
+        "activityBarBadge.background": "#ef70b4",
         "activityBarBadge.foreground": "#15202b"
     },
-    "peacock.color": "#decdbe",
+    "peacock.color": "#0f4c81",
     "markdown.preview.openMarkdownLinks": "inPreview",
     "workbench.editorAssociations": {
         "*.md": "vscode.markdown.preview.editor"
     },
-    "workbench.preferredDarkColorTheme": "Pantone Indigo (Dark)",
-    "workbench.colorTheme": "Pantone Sand Dollar (Light)",
-    "workbench.preferredLightColorTheme": "Pantone Sand Dollar (Light)"
+    "workbench.preferredDarkColorTheme": "Pantone Classic Blue (Dark)",
+    "workbench.colorTheme": "Pantone Cornflower Blue (Dark)",
+    "workbench.preferredLightColorTheme": "Pantone Viva Magenta (Light)"
 }
