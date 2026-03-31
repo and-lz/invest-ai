@@ -75,7 +75,7 @@ export default function ChatPage() {
 
   const userImageUrl = session?.user?.image ?? undefined;
 
-  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus, isHighQualityVoice } =
+  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
     useSpeechSynthesis();
 
   const {
@@ -200,14 +200,14 @@ export default function ChatPage() {
     setTtsEnabled((prev) => {
       if (prev) {
         stopSpeech();
-      } else if (!isHighQualityVoice) {
-        notificar.warning("Voz de alta qualidade não encontrada", {
-          description: "Instale uma voz premium em Ajustes do Sistema > Acessibilidade > Conteúdo Falado.",
+      } else {
+        notificar.warning("Qualidade de voz limitada", {
+          description: "A leitura usa a voz do navegador, que pode soar artificial. Para melhor experiência, instale uma voz premium em Ajustes do Sistema > Acessibilidade > Conteúdo Falado.",
         });
       }
       return !prev;
     });
-  }, [stopSpeech, isHighQualityVoice]);
+  }, [stopSpeech]);
 
   return (
     <div className="flex min-h-0 flex-1">
@@ -242,7 +242,6 @@ export default function ChatPage() {
           ttsSupported={ttsSupported}
           ttsEnabled={ttsEnabled}
           speechStatus={speechStatus}
-          isHighQualityVoice={isHighQualityVoice}
           onToggleTts={handleToggleTts}
           hasMessages={mensagens.length > 0}
           onClearHistory={limparHistorico}

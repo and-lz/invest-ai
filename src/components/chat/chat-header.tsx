@@ -14,7 +14,6 @@ interface ChatHeaderProps {
   readonly ttsEnabled: boolean;
   readonly onToggleTts: () => void;
   readonly speechStatus: SpeechStatus;
-  readonly isHighQualityVoice: boolean;
   readonly hasMensagens: boolean;
   readonly onLimparHistorico: () => void;
   readonly onOpenFullscreen: () => void;
@@ -28,7 +27,6 @@ export function ChatHeader({
   ttsEnabled,
   onToggleTts,
   speechStatus,
-  isHighQualityVoice,
   hasMensagens,
   onLimparHistorico,
   onOpenFullscreen,
@@ -73,14 +71,14 @@ export function ChatHeader({
                   ) : (
                     <VolumeX className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
                   )}
-                  {ttsEnabled && !isHighQualityVoice && (
+                  {ttsEnabled && (
                     <AlertTriangle className="text-warning absolute -right-0.5 -bottom-0.5 h-3 w-3" />
                   )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
                 {ttsEnabled
-                  ? (isHighQualityVoice ? "Desativar leitura em voz alta" : "Leitura ativa (voz de baixa qualidade)")
+                  ? "Leitura ativa (qualidade limitada pelo navegador)"
                   : "Ativar leitura em voz alta"}
               </TooltipContent>
             </Tooltip>

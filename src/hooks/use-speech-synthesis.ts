@@ -14,14 +14,10 @@ interface UseSpeechSynthesisOptions {
 
 export type SpeechStatus = "idle" | "loading" | "speaking" | "paused" | "error";
 
-/** Minimum score to consider a voice "high quality" (premium/enhanced/neural + pt-BR) */
-const HIGH_QUALITY_THRESHOLD = 140;
-
 interface UseSpeechSynthesisReturn {
   readonly status: SpeechStatus;
   readonly error: Error | null;
   readonly isSupported: boolean;
-  readonly isHighQualityVoice: boolean;
   readonly selectedVoiceName: string | null;
   readonly speak: (texto: string) => void;
   readonly pause: () => void;
@@ -84,7 +80,6 @@ export function useSpeechSynthesis(
 
   // Best voice is cached and updated whenever voices change
   const [bestVoice, setBestVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const [voicesLoaded, setVoicesLoaded] = useState(false);
 
   // Detect support only on client to avoid hydration mismatch
   useEffect(() => {
@@ -98,8 +93,6 @@ export function useSpeechSynthesis(
     const voices = window.speechSynthesis.getVoices();
     if (voices.length === 0) return;
 
-    setVoicesLoaded(true);
-
     // Sort ALL voices by score descending
     const sorted = [...voices].sort((a, b) => scoreVoice(b) - scoreVoice(a));
 
@@ -107,8 +100,7 @@ export function useSpeechSynthesis(
       console.group("[TTS] Available voices (sorted by score)");
       for (const v of sorted.slice(0, 15)) {
         const s = scoreVoice(v);
-        const quality = s >= HIGH_QUALITY_THRESHOLD ? "✅" : s >= 100 ? "⚠️" : "❌";
-        console.log(`${quality} ${s.toString().padStart(3)} | ${v.name} (${v.lang}, local=${v.localService})`);
+        console.log(`${s.toString().padStart(3)} | ${v.name} (${v.lang}, local=${v.localService})`);
       }
       console.groupEnd();
     }
@@ -224,13 +216,10 @@ export function useSpeechSynthesis(
     };
   }, [isSupported]);
 
-  const voiceScore = bestVoice ? scoreVoice(bestVoice) : 0;
-
   return {
     status,
     error,
     isSupported,
-    isHighQualityVoice: !voicesLoaded || voiceScore >= HIGH_QUALITY_THRESHOLD,
     selectedVoiceName: bestVoice?.name ?? null,
     speak,
     pause,

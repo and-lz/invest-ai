@@ -57,7 +57,7 @@ export function ChatWidget() {
     : undefined;
   const userImageUrl = session?.user?.image ?? undefined;
 
-  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus, isHighQualityVoice } =
+  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
     useSpeechSynthesis();
 
   const {
@@ -261,13 +261,12 @@ export function ChatWidget() {
               onToggleSidebar={toggleSidebar}
               ttsSupported={ttsSupported}
               ttsEnabled={ttsEnabled}
-              isHighQualityVoice={isHighQualityVoice}
               onToggleTts={() => {
                 const wasEnabled = ttsEnabled;
                 toggleTts(stopSpeech);
-                if (!wasEnabled && !isHighQualityVoice) {
-                  notificar.warning("Voz de alta qualidade não encontrada", {
-                    description: "Instale uma voz premium em Ajustes do Sistema > Acessibilidade > Conteúdo Falado.",
+                if (!wasEnabled) {
+                  notificar.warning("Qualidade de voz limitada", {
+                    description: "A leitura usa a voz do navegador, que pode soar artificial. Para melhor experiência, instale uma voz premium em Ajustes do Sistema > Acessibilidade > Conteúdo Falado.",
                   });
                 }
               }}
