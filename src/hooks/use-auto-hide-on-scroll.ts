@@ -43,10 +43,10 @@ export function useAutoHideOnScroll(targets: AutoHideTarget[]) {
           for (const t of targets) {
             const el = t.ref.current;
             if (!el) continue;
-            if (t.collapseSpace) {
-              el.style.marginBottom = "";
-            }
             el.classList.remove(t.hiddenClass);
+            if (t.collapseSpace) {
+              el.style.marginBottom = "0px";
+            }
           }
           anchorRef.current = scrollTop;
         }

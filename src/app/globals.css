@@ -446,7 +446,7 @@ dialog[data-closing]::backdrop {
 
 /* Chat auto-hide header */
 .chat-auto-header {
-  transition: transform 200ms ease, opacity 150ms ease, margin-bottom 200ms ease;
+  transition: transform 200ms ease, opacity 200ms ease, margin-bottom 200ms ease;
 }
 .chat-auto-header.chat-auto-header--hidden {
   transform: translateY(-100%);
@@ -457,7 +457,7 @@ dialog[data-closing]::backdrop {
 
 /* Chat auto-hide footer (floating input) */
 .chat-auto-footer {
-  transition: transform 200ms ease, opacity 150ms ease;
+  transition: transform 200ms ease, opacity 200ms ease;
 }
 .chat-auto-footer.chat-auto-footer--hidden {
   transform: translateY(100%);
