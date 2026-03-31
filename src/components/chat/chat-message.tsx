@@ -12,6 +12,18 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+function formatMessageTime(isoString: string): string {
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+
+  if (diffMin < 1) return "agora";
+  if (diffMin < 60) return `${diffMin} min`;
+
+  return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+
 /** Matches `[ERRO]: <message>` at the end of streamed content */
 const STREAM_ERROR_REGEX = /\n*\[ERRO\]:\s*(.+)$/;
 
@@ -200,6 +212,17 @@ export function MensagemChatBolha({
           )}
         </div>
       </div>
+
+      {/* Timestamp */}
+      {!estaTransmitindo && cleanContent && (
+        <p className={cn(
+          "text-muted-foreground mt-0.5 px-1",
+          fs ? "text-[11px]" : "text-[10px]",
+          ehUsuario ? "text-right" : "text-left",
+        )}>
+          {formatMessageTime(mensagem.criadaEm)}
+        </p>
+      )}
     </div>
   );
 }
