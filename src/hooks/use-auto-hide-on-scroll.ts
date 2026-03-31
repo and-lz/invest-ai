@@ -3,6 +3,7 @@ import { throttle } from "@/lib/throttle";
 
 const THRESHOLD_HIDE = 50;
 const THRESHOLD_SHOW = 25;
+const NEAR_BOTTOM = 40; // px from bottom to force-show
 const THROTTLE_MS = 16; // ~1 animation frame
 
 export interface AutoHideTarget {
@@ -27,7 +28,20 @@ export function useAutoHideOnScroll(targets: AutoHideTarget[]) {
         const scrollTop = e.currentTarget.scrollTop;
         const delta = scrollTop - anchorRef.current;
 
-        if (!hiddenRef.current && delta > THRESHOLD_HIDE) {
+        const { scrollHeight, clientHeight } = e.currentTarget;
+        const atBottom = scrollHeight - scrollTop - clientHeight < NEAR_BOTTOM;
+
+        if (hiddenRef.current && atBottom) {
+          // Force-show when reaching the end of content
+          hiddenRef.current = false;
+          for (const t of targets) {
+            const el = t.ref.current;
+            if (!el) continue;
+            el.classList.remove(t.hiddenClass);
+            if (t.collapseSpace) el.style.marginBottom = "0px";
+          }
+          anchorRef.current = scrollTop;
+        } else if (!hiddenRef.current && delta > THRESHOLD_HIDE) {
           hiddenRef.current = true;
           for (const t of targets) {
             const el = t.ref.current;
