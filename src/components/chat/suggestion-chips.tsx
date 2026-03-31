@@ -80,7 +80,7 @@ export function SuggestionChips({
           onClick={() => onSelect(suggestion.text)}
           className={cn(
             "text-muted-foreground/60 hover:text-muted-foreground",
-            "rounded-full cursor-pointer transition-colors",
+            "rounded-full border border-border/40 bg-card cursor-pointer transition-colors",
             fs ? "text-xs px-3 py-1" : "text-xs px-2.5 py-0.5",
           )}
         >
