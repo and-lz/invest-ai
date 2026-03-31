@@ -9,8 +9,6 @@ const THROTTLE_MS = 16; // ~1 animation frame
 export interface AutoHideTarget {
   ref: React.RefObject<HTMLElement | null>;
   hiddenClass: string;
-  /** When true, sets negative margin-bottom equal to element height to collapse space. */
-  collapseSpace?: boolean;
 }
 
 /**
@@ -35,32 +33,19 @@ export function useAutoHideOnScroll(targets: AutoHideTarget[]) {
           // Force-show when reaching the end of content
           hiddenRef.current = false;
           for (const t of targets) {
-            const el = t.ref.current;
-            if (!el) continue;
-            el.classList.remove(t.hiddenClass);
-            if (t.collapseSpace) el.style.marginBottom = "0px";
+            t.ref.current?.classList.remove(t.hiddenClass);
           }
           anchorRef.current = scrollTop;
         } else if (!hiddenRef.current && delta > THRESHOLD_HIDE) {
           hiddenRef.current = true;
           for (const t of targets) {
-            const el = t.ref.current;
-            if (!el) continue;
-            if (t.collapseSpace) {
-              el.style.marginBottom = `-${el.offsetHeight}px`;
-            }
-            el.classList.add(t.hiddenClass);
+            t.ref.current?.classList.add(t.hiddenClass);
           }
           anchorRef.current = scrollTop;
         } else if (hiddenRef.current && delta < -THRESHOLD_SHOW) {
           hiddenRef.current = false;
           for (const t of targets) {
-            const el = t.ref.current;
-            if (!el) continue;
-            el.classList.remove(t.hiddenClass);
-            if (t.collapseSpace) {
-              el.style.marginBottom = "0px";
-            }
+            t.ref.current?.classList.remove(t.hiddenClass);
           }
           anchorRef.current = scrollTop;
         }

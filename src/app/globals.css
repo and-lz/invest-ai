@@ -464,31 +464,24 @@ dialog[data-closing]::backdrop {
 
 /* Chat auto-hide header */
 .chat-auto-header {
-  transition: transform 200ms ease, opacity 200ms ease, margin-bottom 200ms ease;
+  will-change: transform, opacity;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .chat-auto-header.chat-auto-header--hidden {
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
-  /* margin-bottom set inline via JS to match actual element height */
 }
 
 /* Chat auto-hide footer (floating input) */
 .chat-auto-footer {
-  transition: transform 200ms ease, opacity 200ms ease;
+  will-change: transform, opacity;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .chat-auto-footer.chat-auto-footer--hidden {
   transform: translateY(100%);
   opacity: 0;
   pointer-events: none;
-}
-
-/* Chat scroll area — reduced bottom padding when footer is hidden */
-.chat-scroll-area {
-  transition: padding-bottom 200ms ease;
-}
-.chat-scroll-area.chat-scroll-compact {
-  padding-bottom: 1rem !important;
 }
 
 /* Chat Highlight - Destaque visual de elementos mencionados pelo assistente */

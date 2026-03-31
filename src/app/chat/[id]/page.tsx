@@ -39,9 +39,8 @@ export default function ChatPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const autoHideTargets = useMemo(() => [
-    { ref: headerRef, hiddenClass: "chat-auto-header--hidden", collapseSpace: true },
+    { ref: headerRef, hiddenClass: "chat-auto-header--hidden" },
     { ref: footerRef, hiddenClass: "chat-auto-footer--hidden" },
-    { ref: scrollAreaRef, hiddenClass: "chat-scroll-compact" },
   ], []);
   const { onScroll: autoHideOnScroll } = useAutoHideOnScroll(autoHideTargets);
 
