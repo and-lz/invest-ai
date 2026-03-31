@@ -140,7 +140,41 @@ export default function ReportsPage() {
 
       {/* Lista de Histórico */}
       <section className="space-y-4">
-        {estaCarregando && <Skeleton className="h-64" />}
+        {estaCarregando && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead><Skeleton className="h-3.5 w-20" /></TableHead>
+                      <TableHead className="hidden sm:table-cell"><Skeleton className="h-3.5 w-28" /></TableHead>
+                      <TableHead className="hidden md:table-cell"><Skeleton className="h-3.5 w-24" /></TableHead>
+                      <TableHead><Skeleton className="h-3.5 w-14" /></TableHead>
+                      <TableHead className="text-right"><Skeleton className="ml-auto h-3.5 w-12" /></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                        <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-36" /></TableCell>
+                        <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-24" /></TableCell>
+                        <TableCell><Skeleton className="h-5 w-16 rounded-full" /></TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Skeleton className="h-8 w-8 rounded-md" />
+                            <Skeleton className="h-8 w-8 rounded-md" />
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {!estaCarregando && relatorios.length === 0 && (
           <Card>
