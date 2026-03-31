@@ -47,7 +47,40 @@ export function InsightsList({ onSelectPeriod, selectedPeriod, onInsightsDeleted
     }
   };
 
-  if (isLoading) return <Skeleton className="h-48" />;
+  if (isLoading)
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-5 w-36" />
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead><Skeleton className="h-3.5 w-16" /></TableHead>
+                  <TableHead className="hidden sm:table-cell"><Skeleton className="h-3.5 w-20" /></TableHead>
+                  <TableHead><Skeleton className="h-3.5 w-16" /></TableHead>
+                  <TableHead className="hidden md:table-cell"><Skeleton className="h-3.5 w-14" /></TableHead>
+                  <TableHead className="text-right"><Skeleton className="ml-auto h-3.5 w-12" /></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                    <TableCell className="hidden sm:table-cell"><Skeleton className="h-4 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-8 rounded-full" /></TableCell>
+                    <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-6" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="ml-auto h-8 w-8 rounded-md" /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
+    );
   if (insightsMetadados.length === 0) {
     return (
       <Card>

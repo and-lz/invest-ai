@@ -78,7 +78,25 @@ export default function InsightsPage() {
 
       {/* --- Loading --- */}
       {(carregandoRelatorios || estaCarregandoInsights) && !temErroRelatorios && (
-        <Skeleton className="h-64" />
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <Skeleton className="h-5 w-40" />
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between py-3">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="hidden h-4 w-20 sm:block" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-5 w-8 rounded-full" />
+                    <Skeleton className="h-8 w-8 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* --- Error state --- */}
