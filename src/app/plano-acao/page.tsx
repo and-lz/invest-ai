@@ -60,9 +60,30 @@ export default function PlanoAcaoPage() {
       {/* Loading state */}
       {estaCarregando && (
         <div className={layout.sectionSpacing}>
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
-          <Skeleton className="h-32" />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="space-y-3 p-4">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="mt-0.5 h-5 w-5 shrink-0 rounded" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+                <div className="ml-7 space-y-1.5 border-l-2 border-border pl-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-3/5" />
+                </div>
+                <div className="ml-7 flex items-center justify-between">
+                  <div className="flex gap-1.5">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </div>
+                  <div className="flex gap-1">
+                    <Skeleton className="h-8 w-20 rounded-md" />
+                    <Skeleton className="h-8 w-16 rounded-md" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
 
