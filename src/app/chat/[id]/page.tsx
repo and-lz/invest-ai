@@ -213,7 +213,7 @@ export default function ChatPage() {
   return (
     <div className="flex min-h-0 flex-1">
       {/* Desktop sidebar */}
-      <div
+      <aside
         className={cn(
           "bg-background hidden border-r border-border/20 transition-all duration-200 md:block",
           sidebarOpen ? "w-80" : "w-0 overflow-hidden border-r-0",
@@ -226,7 +226,7 @@ export default function ChatPage() {
           fullscreen
           useLinks
         />
-      </div>
+      </aside>
 
       <ChatMobileSidebar
         ref={mobileSidebarRef}
@@ -236,7 +236,7 @@ export default function ChatPage() {
       />
 
       {/* Main chat area */}
-      <div className="relative flex flex-1 flex-col overflow-hidden">
+      <main className="relative flex flex-1 flex-col overflow-hidden">
         <ChatPageHeader
           title={title}
           onToggleSidebar={toggleSidebar}
@@ -275,7 +275,7 @@ export default function ChatPage() {
           estaCarregandoConversa={estaCarregandoConversa}
           scrollAreaRef={scrollAreaRef}
         />
-      </div>
+      </main>
     </div>
   );
 }
