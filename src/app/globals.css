@@ -444,12 +444,22 @@ dialog[data-closing]::backdrop {
   overflow: hidden;
 }
 
-/* Chat auto-hide header — kept for reference, no longer toggled */
+/* Chat auto-hide header */
 .chat-auto-header {
   transition: transform 200ms ease, opacity 150ms ease;
 }
 .chat-auto-header.chat-auto-header--hidden {
   transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Chat auto-hide footer (floating input) */
+.chat-auto-footer {
+  transition: transform 200ms ease, opacity 150ms ease;
+}
+.chat-auto-footer.chat-auto-footer--hidden {
+  transform: translateY(100%);
   opacity: 0;
   pointer-events: none;
 }

@@ -58,6 +58,7 @@ interface ChatBodyProps {
   readonly savedMessageIds?: ReadonlySet<string>;
   readonly onToggleSave?: (mensagem: MensagemChat) => void;
   readonly estaCarregandoConversa?: boolean;
+  readonly footerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export function ChatBody({
@@ -85,6 +86,7 @@ export function ChatBody({
   savedMessageIds,
   onToggleSave,
   estaCarregandoConversa,
+  footerRef,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
   const isNearBottomRef = useRef(true);
@@ -234,7 +236,7 @@ export function ChatBody({
       )}
 
       {/* Floating footer: input overlay with gradient fade */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-20">
+      <div ref={footerRef} className="chat-auto-footer pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-20">
         <div className="pointer-events-auto">
           <CampoEntradaChat
             onEnviar={enviarMensagem}
