@@ -233,8 +233,8 @@ export function ChatBody({
         </div>
       )}
 
-      {/* Floating footer: input overlay (no background) */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
+      {/* Floating footer: input overlay with gradient fade */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-20">
         <div className="pointer-events-auto">
           <CampoEntradaChat
             onEnviar={enviarMensagem}
