@@ -50,7 +50,7 @@ export function BlocoCodigoChat({ children, className, fullscreen }: BlocoCodigo
     return (
       <div
         className={cn(
-          "shiki-wrapper my-3 overflow-x-auto rounded-lg border border-border/30",
+          "shiki-wrapper my-3 overflow-x-auto rounded-lg border border-border",
           "[&>pre]:p-4 [&>pre]:overflow-x-auto [&>pre]:rounded-lg",
           "[&_code]:font-mono [&_code]:leading-relaxed",
           sizeClass,

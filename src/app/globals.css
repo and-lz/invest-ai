@@ -441,7 +441,7 @@ dialog[data-closing]::backdrop {
 }
 
 .dark .shiki {
-  background-color: var(--shiki-dark-bg);
+  background-color: var(--card);
 }
 
 /* Chat Fullbleed — standalone immersive chat: hide app shell, fill viewport */
