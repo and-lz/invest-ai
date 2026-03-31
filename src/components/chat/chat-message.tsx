@@ -73,7 +73,8 @@ export function MensagemChatBolha({
   }, [isThinking, streamingPhase, hasThinkingContent]);
 
   return (
-    <div>
+    <section>
+      <h2 className="sr-only">{ehUsuario ? "Voce" : "Fortuna"}</h2>
       {/* Thinking indicator — shown while AI is reasoning, before any content */}
       {!ehUsuario && isThinking && !hasThinkingContent && !cleanContent && (
         <div className={cn(
@@ -85,9 +86,9 @@ export function MensagemChatBolha({
         </div>
       )}
 
-      {/* Collapsible reasoning block (before the message) */}
+      {/* Collapsible reasoning block (before the message) — hidden from Reader Mode */}
       {!ehUsuario && (hasThinkingContent || isThinking) && (
-        <Collapsible open={reasoningOpen} onOpenChange={setReasoningOpen}>
+        <Collapsible open={reasoningOpen} onOpenChange={setReasoningOpen} aria-hidden="true">
           <CollapsibleTrigger
             className={cn(
               "text-muted-foreground flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 transition-colors hover:bg-muted/50",
@@ -223,6 +224,6 @@ export function MensagemChatBolha({
           {formatMessageTime(mensagem.criadaEm)}
         </p>
       )}
-    </div>
+    </section>
   );
 }
