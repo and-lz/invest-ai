@@ -304,42 +304,44 @@ dialog[data-closing]::backdrop {
 
 /* Markdown Content - Chat Messages */
 .markdown-content {
-  @apply leading-relaxed;
+  @apply leading-relaxed overflow-hidden;
 }
 
-.markdown-content p {
-  @apply mb-3 last:mb-0;
-}
-
-.markdown-content p:first-child {
+/* Consistent first/last child spacing */
+.markdown-content > *:first-child {
   @apply mt-0;
 }
 
-/* Headings in markdown (rare, but supported) */
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4 {
-  @apply font-semibold mb-2 mt-4 first:mt-0;
+.markdown-content > *:last-child {
+  @apply mb-0;
 }
 
+/* Paragraphs */
+.markdown-content p {
+  @apply mb-3 last:mb-0 leading-relaxed;
+}
+
+/* Headings - clear visual hierarchy */
 .markdown-content h1 {
-  @apply text-base;
+  @apply text-lg font-semibold tracking-tight mt-5 mb-2 first:mt-0 border-b border-border/40 pb-1;
 }
 
 .markdown-content h2 {
-  @apply text-sm;
+  @apply text-base font-semibold tracking-tight mt-4 mb-2 first:mt-0;
 }
 
-.markdown-content h3,
+.markdown-content h3 {
+  @apply text-sm font-semibold mt-3 mb-1.5 first:mt-0;
+}
+
 .markdown-content h4 {
-  @apply text-sm;
+  @apply text-sm font-medium mt-2 mb-1 text-muted-foreground first:mt-0;
 }
 
-/* Lists */
+/* Lists - more breathing room */
 .markdown-content ul,
 .markdown-content ol {
-  @apply mb-3 pl-5 space-y-1;
+  @apply mb-3 pl-5;
 }
 
 .markdown-content ul {
@@ -351,7 +353,7 @@ dialog[data-closing]::backdrop {
 }
 
 .markdown-content li {
-  @apply pl-1;
+  @apply pl-0.5 leading-relaxed mb-1.5 last:mb-0;
 }
 
 .markdown-content li > p {
@@ -363,7 +365,15 @@ dialog[data-closing]::backdrop {
 .markdown-content ol ul,
 .markdown-content ul ol,
 .markdown-content ol ol {
-  @apply mt-1 mb-1;
+  @apply mt-1.5 mb-0;
+}
+
+.markdown-content ul ul {
+  list-style-type: circle;
+}
+
+.markdown-content ul ul ul {
+  list-style-type: square;
 }
 
 /* Text formatting */
@@ -379,51 +389,42 @@ dialog[data-closing]::backdrop {
   @apply line-through opacity-70;
 }
 
-/* Links - inherit color from message bubble */
+/* Links */
 .markdown-content a {
-  @apply underline underline-offset-2 hover:opacity-80 transition-opacity;
+  @apply text-primary underline-offset-4 hover:underline transition-colors;
 }
 
-/* Code inline - fallback (custom component handles primary styling) */
-.markdown-content code {
-  @apply font-mono text-xs;
-}
-
+/* Inline code */
 .markdown-content :not(pre) > code {
-  @apply px-1 py-0.5 rounded;
+  @apply bg-muted/70 text-foreground border border-border/50 rounded-md px-1.5 py-0.5 font-mono text-[0.85em];
+}
+
+/* Code blocks */
+.markdown-content pre {
+  @apply bg-muted/60 border border-border/30 rounded-lg p-4 my-3 overflow-x-auto;
+}
+
+.markdown-content pre code {
+  @apply font-mono text-[0.85em] leading-relaxed bg-transparent border-0 p-0 rounded-none;
 }
 
 /* Horizontal rule */
 .markdown-content hr {
-  @apply my-3;
+  @apply my-4 border-border/40;
 }
 
-/* Blockquotes (if AI uses them) */
+/* Blockquotes - callout style */
 .markdown-content blockquote {
-  @apply border-l-2 pl-3 italic opacity-90 my-3;
+  @apply border-l-4 border-primary/40 bg-muted/30 rounded-r-lg pl-4 pr-3 py-2.5 my-3 text-muted-foreground not-italic;
+}
+
+.markdown-content blockquote > p {
+  @apply mb-1.5 last:mb-0;
 }
 
 /* Tables - spacing (components handle structure) */
 .markdown-content table {
   @apply my-3;
-}
-
-/* Prevent overflow in chat bubble */
-.markdown-content {
-  @apply overflow-hidden;
-}
-
-.markdown-content pre {
-  @apply overflow-x-auto;
-}
-
-/* Ensure consistent spacing */
-.markdown-content > *:first-child {
-  @apply mt-0;
-}
-
-.markdown-content > *:last-child {
-  @apply mb-0;
 }
 
 /* Chat Fullbleed — standalone immersive chat: hide app shell, fill viewport */
