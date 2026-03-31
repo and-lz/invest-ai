@@ -139,7 +139,7 @@ export function ChatBody({
       <div
         ref={mergedScrollRef}
         onScroll={handleScroll}
-        className={cn("chat-scroll-area min-h-0 flex-1 overflow-y-auto", fs ? "pb-28" : "pb-20")}
+        className={cn("chat-scroll-area min-h-0 flex-1 overflow-y-auto", fs ? "pb-40" : "pb-32")}
       >
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
