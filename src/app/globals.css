@@ -464,7 +464,8 @@ dialog[data-closing]::backdrop {
 
 /* Chat auto-hide header */
 .chat-auto-header {
-  will-change: transform, opacity;
+  transform: translateY(0);
+  opacity: 1;
   transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .chat-auto-header.chat-auto-header--hidden {
@@ -475,7 +476,8 @@ dialog[data-closing]::backdrop {
 
 /* Chat auto-hide footer (floating input) */
 .chat-auto-footer {
-  will-change: transform, opacity;
+  transform: translateY(0);
+  opacity: 1;
   transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .chat-auto-footer.chat-auto-footer--hidden {
