@@ -15,6 +15,24 @@ import type { StreamingPhase } from "@/hooks/use-chat-assistant";
 
 const NEAR_BOTTOM_THRESHOLD = 100;
 
+function getDateLabel(isoString: string): string {
+  const date = new Date(isoString);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  const sameDay = (a: Date, b: Date) =>
+    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+  if (sameDay(date, today)) return "Hoje";
+  if (sameDay(date, yesterday)) return "Ontem";
+  return date.toLocaleDateString("pt-BR", { day: "numeric", month: "long" });
+}
+
+function isSameDay(a: string, b: string): boolean {
+  return a.slice(0, 10) === b.slice(0, 10);
+}
+
 interface ChatBodyProps {
   readonly mensagens: readonly MensagemChat[];
   readonly estaTransmitindo: boolean;
@@ -145,10 +163,22 @@ export function ChatBody({
         )}
         {mensagens.length > 0 && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
-            {mensagens.map((mensagem, indice) => (
-              <MensagemChatBolha
-                key={mensagem.identificador}
-                mensagem={mensagem}
+            {mensagens.map((mensagem, indice) => {
+              const prev = indice > 0 ? mensagens[indice - 1] : undefined;
+              const showDateSep = !prev || !isSameDay(mensagem.criadaEm, prev.criadaEm);
+              return (
+                <div key={mensagem.identificador}>
+                  {showDateSep && (
+                    <div className="flex items-center gap-3 py-2">
+                      <div className="h-px flex-1 bg-border/30" />
+                      <span className="text-muted-foreground shrink-0 text-[11px]">
+                        {getDateLabel(mensagem.criadaEm)}
+                      </span>
+                      <div className="h-px flex-1 bg-border/30" />
+                    </div>
+                  )}
+                  <MensagemChatBolha
+                    mensagem={mensagem}
                 estaTransmitindo={
                   estaTransmitindo &&
                   mensagem.papel === "assistente" &&
@@ -170,7 +200,9 @@ export function ChatBody({
                 isSaved={savedMessageIds?.has(mensagem.identificador)}
                 onToggleSave={onToggleSave ? () => onToggleSave(mensagem) : undefined}
               />
-            ))}
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -201,12 +233,9 @@ export function ChatBody({
         </div>
       )}
 
-      {/* Floating footer: gradient fade + input overlay */}
+      {/* Floating footer: input overlay (no background) */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
-        {/* Gradient fade from transparent → background */}
-        <div className={cn("bg-gradient-to-b from-transparent to-card", fs ? "h-10" : "h-6")} />
-        {/* Input container with solid bg so text is readable */}
-        <div className="pointer-events-auto bg-card">
+        <div className="pointer-events-auto">
           <CampoEntradaChat
             onEnviar={enviarMensagem}
             onParar={pararTransmissao}
