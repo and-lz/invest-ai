@@ -16,6 +16,7 @@ import { useChatPageContext } from "@/contexts/chat-page-context";
 import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { stripMarkdown } from "@/lib/strip-markdown";
+import { notificar } from "@/lib/notifier";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
 import { cn } from "@/lib/utils";
 import type { MensagemChat } from "@/schemas/chat.schema";
@@ -74,7 +75,7 @@ export default function ChatPage() {
 
   const userImageUrl = session?.user?.image ?? undefined;
 
-  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
+  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus, isHighQualityVoice } =
     useSpeechSynthesis();
 
   const {
@@ -196,11 +197,17 @@ export default function ChatPage() {
   }, []);
 
   const handleToggleTts = useCallback(() => {
-    setTtsEnabled((v) => {
-      if (v) stopSpeech();
-      return !v;
+    setTtsEnabled((prev) => {
+      if (prev) {
+        stopSpeech();
+      } else if (!isHighQualityVoice) {
+        notificar.warning("Voz de alta qualidade não encontrada", {
+          description: "Instale uma voz premium em Ajustes do Sistema > Acessibilidade > Conteúdo Falado.",
+        });
+      }
+      return !prev;
     });
-  }, [stopSpeech]);
+  }, [stopSpeech, isHighQualityVoice]);
 
   return (
     <div className="flex min-h-0 flex-1">
@@ -235,6 +242,7 @@ export default function ChatPage() {
           ttsSupported={ttsSupported}
           ttsEnabled={ttsEnabled}
           speechStatus={speechStatus}
+          isHighQualityVoice={isHighQualityVoice}
           onToggleTts={handleToggleTts}
           hasMessages={mensagens.length > 0}
           onClearHistory={limparHistorico}

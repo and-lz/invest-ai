@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Trash2, Volume2, VolumeX, ArrowLeft, MoreHorizontal } from "lucide-react";
+import { Menu, Trash2, Volume2, VolumeX, ArrowLeft, MoreHorizontal, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +16,7 @@ interface ChatPageHeaderProps {
   readonly ttsSupported: boolean;
   readonly ttsEnabled: boolean;
   readonly speechStatus: SpeechStatus;
+  readonly isHighQualityVoice: boolean;
   readonly onToggleTts: () => void;
   readonly hasMessages: boolean;
   readonly onClearHistory: () => void;
@@ -27,6 +28,7 @@ export function ChatPageHeader({
   onToggleSidebar,
   ttsSupported,
   ttsEnabled,
+  isHighQualityVoice,
   onToggleTts,
   hasMessages,
   onClearHistory,
@@ -60,6 +62,9 @@ export function ChatPageHeader({
                       <>
                         <Volume2 className="mr-2 h-4 w-4" />
                         Desativar leitura
+                        {!isHighQualityVoice && (
+                          <AlertTriangle className="text-warning ml-1 h-3.5 w-3.5" />
+                        )}
                       </>
                     ) : (
                       <>

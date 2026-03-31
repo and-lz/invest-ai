@@ -14,14 +14,63 @@ interface UseSpeechSynthesisOptions {
 
 export type SpeechStatus = "idle" | "loading" | "speaking" | "paused" | "error";
 
+/** Minimum score to consider a voice "high quality" (premium/enhanced/neural + pt-BR) */
+const HIGH_QUALITY_THRESHOLD = 140;
+
 interface UseSpeechSynthesisReturn {
   readonly status: SpeechStatus;
   readonly error: Error | null;
   readonly isSupported: boolean;
+  readonly isHighQualityVoice: boolean;
+  readonly selectedVoiceName: string | null;
   readonly speak: (texto: string) => void;
   readonly pause: () => void;
   readonly resume: () => void;
   readonly stop: () => void;
+}
+
+// Score a voice by quality — higher is better.
+// Goal: always pick the most powerful/natural voice the OS provides.
+function scoreVoice(voice: SpeechSynthesisVoice): number {
+  const name = voice.name.toLowerCase();
+  let score = 0;
+
+  // — Language match —
+  // Exact pt-BR is strongly preferred over pt-PT or generic pt
+  if (voice.lang === "pt-BR" || voice.lang === "pt_BR") score += 100;
+  else if (voice.lang.startsWith("pt")) score += 10;
+
+  // — Apple platform voices (macOS/iOS) —
+  // Tier: premium > enhanced > compact (com.apple.voice.{tier})
+  if (name.includes("premium")) score += 50;
+  if (name.includes("enhanced")) score += 40;
+  // Siri voices are Apple's highest-quality neural voices
+  if (name.includes("siri")) score += 48;
+
+  // — Google neural voices (Chrome/Android) —
+  if (name.includes("google")) score += 45;
+
+  // — Microsoft neural voices (Edge/Windows) —
+  // "Online (Natural)" voices are the best tier on Edge
+  if (name.includes("microsoft") && name.includes("natural")) score += 48;
+  else if (name.includes("microsoft") && name.includes("online")) score += 40;
+
+  // — Samsung voices (Android) —
+  if (name.includes("samsung")) score += 30;
+
+  // — Generic quality indicators (cross-platform) —
+  if (name.includes("neural")) score += 35;
+  if (name.includes("natural") && !name.includes("microsoft")) score += 35;
+
+  // Network voices are generally neural/high-quality
+  if (!voice.localService) score += 5;
+
+  // — Penalize low-quality voices —
+  if (name.includes("compact")) score -= 30;
+  if (name.includes("eloquence")) score -= 20;
+  if (name.includes("espeak")) score -= 40;
+
+  return score;
 }
 
 export function useSpeechSynthesis(
@@ -33,77 +82,63 @@ export function useSpeechSynthesis(
   const [error, setError] = useState<Error | null>(null);
   const [isSupported, setIsSupported] = useState(false);
 
+  // Best voice is cached and updated whenever voices change
+  const [bestVoice, setBestVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [voicesLoaded, setVoicesLoaded] = useState(false);
+
   // Detect support only on client to avoid hydration mismatch
   useEffect(() => {
     setIsSupported("speechSynthesis" in window);
   }, []);
 
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-
-  // Score a voice by quality — higher is better.
-  // Goal: always pick the most powerful/natural voice the OS provides.
-  const scoreVoice = useCallback((voice: SpeechSynthesisVoice): number => {
-    const name = voice.name.toLowerCase();
-    let score = 0;
-
-    // — Language match —
-    // Exact pt-BR is strongly preferred over pt-PT or generic pt
-    if (voice.lang === "pt-BR" || voice.lang === "pt_BR") score += 100;
-    else if (voice.lang.startsWith("pt")) score += 10;
-
-    // — Apple platform voices (macOS/iOS) —
-    // Tier: premium > enhanced > compact (com.apple.voice.{tier})
-    if (name.includes("premium")) score += 50;
-    if (name.includes("enhanced")) score += 40;
-    // Siri voices are Apple's highest-quality neural voices
-    if (name.includes("siri")) score += 48;
-
-    // — Google neural voices (Chrome/Android) —
-    if (name.includes("google")) score += 45;
-
-    // — Microsoft neural voices (Edge/Windows) —
-    // "Online (Natural)" voices are the best tier on Edge
-    if (name.includes("microsoft") && name.includes("natural")) score += 48;
-    else if (name.includes("microsoft") && name.includes("online")) score += 40;
-
-    // — Samsung voices (Android) —
-    if (name.includes("samsung")) score += 30;
-
-    // — Generic quality indicators (cross-platform) —
-    if (name.includes("neural")) score += 35;
-    if (name.includes("natural") && !name.includes("microsoft")) score += 35;
-
-    // Network voices are generally neural/high-quality
-    if (!voice.localService) score += 5;
-
-    // — Penalize low-quality voices —
-    if (name.includes("compact")) score -= 30;
-    if (name.includes("eloquence")) score -= 20;
-    if (name.includes("espeak")) score -= 40;
-
-    return score;
-  }, []);
-
   // Select the best available pt-BR voice by quality score
-  const obterMelhorVoz = useCallback((): SpeechSynthesisVoice | null => {
-    if (!isSupported) return null;
+  const refreshBestVoice = useCallback(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
 
     const voices = window.speechSynthesis.getVoices();
-    if (voices.length === 0) return null;
+    if (voices.length === 0) return;
 
-    // Filter to Portuguese voices, then sort by quality score descending
-    const portugueseVoices = voices
-      .filter((v) => v.lang.startsWith("pt"))
-      .sort((a, b) => scoreVoice(b) - scoreVoice(a));
+    setVoicesLoaded(true);
 
-    const best = portugueseVoices[0] ?? voices[0] ?? null;
+    // Sort ALL voices by score descending
+    const sorted = [...voices].sort((a, b) => scoreVoice(b) - scoreVoice(a));
 
-    if (best && process.env.NODE_ENV === "development") {
-      console.log(`[TTS] Selected voice: "${best.name}" (lang=${best.lang}, local=${best.localService}, score=${scoreVoice(best)})`);
+    if (process.env.NODE_ENV === "development") {
+      console.group("[TTS] Available voices (sorted by score)");
+      for (const v of sorted.slice(0, 15)) {
+        const s = scoreVoice(v);
+        const quality = s >= HIGH_QUALITY_THRESHOLD ? "✅" : s >= 100 ? "⚠️" : "❌";
+        console.log(`${quality} ${s.toString().padStart(3)} | ${v.name} (${v.lang}, local=${v.localService})`);
+      }
+      console.groupEnd();
     }
 
-    return best;
-  }, [isSupported, scoreVoice]);
+    // Filter to Portuguese voices first, fallback to any
+    const portugueseVoices = sorted.filter((v) => v.lang.startsWith("pt"));
+    const selected = portugueseVoices[0] ?? sorted[0] ?? null;
+
+    if (selected && process.env.NODE_ENV === "development") {
+      console.log(`[TTS] Selected: "${selected.name}" (lang=${selected.lang}, score=${scoreVoice(selected)})`);
+    }
+
+    setBestVoice(selected);
+  }, []);
+
+  // Load voices and listen for changes
+  useEffect(() => {
+    if (!isSupported) return;
+
+    // Try immediately (Chrome populates synchronously on revisit)
+    refreshBestVoice();
+
+    // Also listen for async voice loading
+    window.speechSynthesis.addEventListener("voiceschanged", refreshBestVoice);
+    return () => {
+      window.speechSynthesis.removeEventListener("voiceschanged", refreshBestVoice);
+    };
+  }, [isSupported, refreshBestVoice]);
+
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   // Falar texto
   const speak = useCallback(
@@ -118,10 +153,9 @@ export function useSpeechSynthesis(
       window.speechSynthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(texto);
-      const voz = obterMelhorVoz();
 
-      if (voz) {
-        utterance.voice = voz;
+      if (bestVoice) {
+        utterance.voice = bestVoice;
       }
 
       utterance.lang = lang;
@@ -159,7 +193,7 @@ export function useSpeechSynthesis(
         window.speechSynthesis.speak(utterance);
       }, 100);
     },
-    [isSupported, obterMelhorVoz, lang, rate, pitch, volume],
+    [isSupported, bestVoice, lang, rate, pitch, volume],
   );
 
   const pause = useCallback(() => {
@@ -181,22 +215,6 @@ export function useSpeechSynthesis(
     }
   }, [isSupported]);
 
-  // Garantir que vozes sejam carregadas
-  useEffect(() => {
-    if (!isSupported) return;
-
-    const carregarVozes = () => {
-      window.speechSynthesis.getVoices();
-    };
-
-    carregarVozes();
-    window.speechSynthesis.addEventListener("voiceschanged", carregarVozes);
-
-    return () => {
-      window.speechSynthesis.removeEventListener("voiceschanged", carregarVozes);
-    };
-  }, [isSupported]);
-
   // Limpar ao desmontar
   useEffect(() => {
     return () => {
@@ -206,10 +224,14 @@ export function useSpeechSynthesis(
     };
   }, [isSupported]);
 
+  const voiceScore = bestVoice ? scoreVoice(bestVoice) : 0;
+
   return {
     status,
     error,
     isSupported,
+    isHighQualityVoice: !voicesLoaded || voiceScore >= HIGH_QUALITY_THRESHOLD,
+    selectedVoiceName: bestVoice?.name ?? null,
     speak,
     pause,
     resume,

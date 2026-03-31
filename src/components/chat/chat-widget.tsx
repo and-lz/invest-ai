@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/ai-explain-button";
 import { cn } from "@/lib/utils";
 import { dialog } from "@/lib/design-system";
+import { notificar } from "@/lib/notifier";
 import type { MensagemChat } from "@/schemas/chat.schema";
 
 export function ChatWidget() {
@@ -56,7 +57,7 @@ export function ChatWidget() {
     : undefined;
   const userImageUrl = session?.user?.image ?? undefined;
 
-  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
+  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus, isHighQualityVoice } =
     useSpeechSynthesis();
 
   const {
@@ -260,7 +261,16 @@ export function ChatWidget() {
               onToggleSidebar={toggleSidebar}
               ttsSupported={ttsSupported}
               ttsEnabled={ttsEnabled}
-              onToggleTts={() => toggleTts(stopSpeech)}
+              isHighQualityVoice={isHighQualityVoice}
+              onToggleTts={() => {
+                const wasEnabled = ttsEnabled;
+                toggleTts(stopSpeech);
+                if (!wasEnabled && !isHighQualityVoice) {
+                  notificar.warning("Voz de alta qualidade não encontrada", {
+                    description: "Instale uma voz premium em Ajustes do Sistema > Acessibilidade > Conteúdo Falado.",
+                  });
+                }
+              }}
               speechStatus={speechStatus}
               hasMensagens={mensagens.length > 0}
               onLimparHistorico={limparHistorico}

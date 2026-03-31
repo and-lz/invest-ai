@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Trash2, Menu, Maximize2, Volume2, VolumeX } from "lucide-react";
+import { X, Trash2, Menu, Maximize2, Volume2, VolumeX, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -14,6 +14,7 @@ interface ChatHeaderProps {
   readonly ttsEnabled: boolean;
   readonly onToggleTts: () => void;
   readonly speechStatus: SpeechStatus;
+  readonly isHighQualityVoice: boolean;
   readonly hasMensagens: boolean;
   readonly onLimparHistorico: () => void;
   readonly onOpenFullscreen: () => void;
@@ -27,6 +28,7 @@ export function ChatHeader({
   ttsEnabled,
   onToggleTts,
   speechStatus,
+  isHighQualityVoice,
   hasMensagens,
   onLimparHistorico,
   onOpenFullscreen,
@@ -59,7 +61,7 @@ export function ChatHeader({
                   variant="ghost"
                   size="icon"
                   onClick={onToggleTts}
-                  className={cn(fs ? "h-10 w-10" : "h-8 w-8", ttsEnabled && "text-primary")}
+                  className={cn("relative", fs ? "h-10 w-10" : "h-8 w-8", ttsEnabled && "text-primary")}
                 >
                   {ttsEnabled ? (
                     <Volume2
@@ -71,10 +73,15 @@ export function ChatHeader({
                   ) : (
                     <VolumeX className={cn("text-muted-foreground", fs ? "h-6 w-6" : "h-4 w-4")} />
                   )}
+                  {ttsEnabled && !isHighQualityVoice && (
+                    <AlertTriangle className="text-warning absolute -right-0.5 -bottom-0.5 h-3 w-3" />
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                {ttsEnabled ? "Desativar leitura em voz alta" : "Ativar leitura em voz alta"}
+                {ttsEnabled
+                  ? (isHighQualityVoice ? "Desativar leitura em voz alta" : "Leitura ativa (voz de baixa qualidade)")
+                  : "Ativar leitura em voz alta"}
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
