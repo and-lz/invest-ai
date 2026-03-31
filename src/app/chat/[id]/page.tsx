@@ -215,7 +215,7 @@ export default function ChatPage() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          "bg-background hidden border-r border-border/20 transition-all duration-200 md:block",
+          "chat-sidebar bg-background hidden border-r border-border/20 transition-all duration-200 md:block",
           sidebarOpen ? "w-80" : "w-0 overflow-hidden border-r-0",
         )}
       >
@@ -237,6 +237,12 @@ export default function ChatPage() {
 
       {/* Main chat area */}
       <main className="relative flex flex-1 flex-col overflow-hidden">
+        {/* Print-only header — visible only when printing */}
+        <div className="chat-print-header hidden">
+          <h1>{title}</h1>
+          <time>{new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}</time>
+        </div>
+
         <ChatPageHeader
           title={title}
           onToggleSidebar={toggleSidebar}

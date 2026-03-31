@@ -174,7 +174,7 @@ export function ChatBody({
               return (
                 <div key={mensagem.identificador}>
                   {showDateSep && (
-                    <div className="flex items-center gap-3 py-2">
+                    <div className="chat-date-sep flex items-center gap-3 py-2">
                       <div className="h-px flex-1 bg-border/30" />
                       <span className="text-muted-foreground shrink-0 text-[11px]">
                         {getDateLabel(mensagem.criadaEm)}
