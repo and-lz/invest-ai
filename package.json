@@ -1,6 +1,6 @@
 {
   "name": "investimentos-app",
-  "version": "0.1.287",
+  "version": "0.1.288",
   "private": true,
   "main": "electron/dist/main.js",
   "scripts": {
