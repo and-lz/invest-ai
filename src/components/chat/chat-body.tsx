@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 import { MensagemChatBolha } from "@/components/chat/chat-message";
 import { CampoEntradaChat } from "@/components/chat/chat-input-field";
 import { SuggestionChips } from "@/components/chat/suggestion-chips";
@@ -11,6 +12,8 @@ import type { MensagemChat } from "@/schemas/chat.schema";
 import type { ChatSuggestion } from "@/lib/chat-suggestions";
 import type { ClaudeModelTier } from "@/lib/model-tiers";
 import type { StreamingPhase } from "@/hooks/use-chat-assistant";
+
+const NEAR_BOTTOM_THRESHOLD = 100;
 
 interface ChatBodyProps {
   readonly mensagens: readonly MensagemChat[];
@@ -66,11 +69,39 @@ export function ChatBody({
   estaCarregandoConversa,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
+  const [showScrollBtn, setShowScrollBtn] = useState(false);
+  const [hasNewMessages, setHasNewMessages] = useState(false);
+  const prevMsgCountRef = useRef(mensagens.length);
 
-  // Auto-scroll on new messages
-  useEffect(() => {
+  const scrollToBottom = useCallback(() => {
     if (areaScrollRef.current) {
-      areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
+      areaScrollRef.current.scrollTo({ top: areaScrollRef.current.scrollHeight, behavior: "smooth" });
+    }
+    setHasNewMessages(false);
+  }, []);
+
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_THRESHOLD;
+    isNearBottomRef.current = nearBottom;
+    setShowScrollBtn(!nearBottom);
+    if (nearBottom) setHasNewMessages(false);
+    onScroll?.(e);
+  }, [onScroll]);
+
+  // Smart auto-scroll: only scroll when user is near bottom
+  useEffect(() => {
+    const newCount = mensagens.length;
+    const hadNewMessages = newCount > prevMsgCountRef.current;
+    prevMsgCountRef.current = newCount;
+
+    if (areaScrollRef.current) {
+      if (isNearBottomRef.current) {
+        areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
+      } else if (hadNewMessages) {
+        setHasNewMessages(true);
+      }
     }
   }, [mensagens]);
 
@@ -79,7 +110,7 @@ export function ChatBody({
       {/* Messages area */}
       <div
         ref={areaScrollRef}
-        onScroll={onScroll}
+        onScroll={handleScroll}
         className={cn("min-h-0 flex-1 overflow-y-auto", fs ? "pb-28" : "pb-20")}
       >
         {estaCarregandoConversa && (
@@ -144,6 +175,24 @@ export function ChatBody({
         )}
 
       </div>
+
+      {/* Scroll-to-bottom FAB */}
+      {showScrollBtn && mensagens.length > 0 && (
+        <button
+          onClick={scrollToBottom}
+          type="button"
+          className={cn(
+            "absolute z-20 flex items-center justify-center rounded-full border bg-card shadow-md transition-all hover:bg-muted chat-scroll-btn-enter",
+            fs ? "bottom-28 right-6 h-9 w-9" : "bottom-20 right-3 h-8 w-8",
+          )}
+          aria-label="Rolar para o final"
+        >
+          <ChevronDown className={cn(fs ? "h-5 w-5" : "h-4 w-4")} />
+          {hasNewMessages && (
+            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-primary" />
+          )}
+        </button>
+      )}
 
       {/* Error banner */}
       {erro && (

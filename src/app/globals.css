@@ -499,6 +499,22 @@ dialog[data-closing]::backdrop {
   }
 }
 
+/* Chat Scroll-to-bottom FAB — fade + slide in */
+.chat-scroll-btn-enter {
+  animation: scroll-btn-enter 200ms ease-out;
+}
+
+@keyframes scroll-btn-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ─── AI Visual Identity ─── */
 
 /* Breathing glow for the Chat FAB */
