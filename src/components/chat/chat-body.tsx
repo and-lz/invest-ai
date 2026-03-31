@@ -131,7 +131,7 @@ export function ChatBody({
   return (
     <div className={cn("relative flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen")}>
       {/* Messages area */}
-      <div
+      <article
         ref={mergedScrollRef}
         onScroll={handleScroll}
         className={cn("min-h-0 flex-1 overflow-y-auto", fs ? "pb-40" : "pb-32")}
@@ -211,7 +211,7 @@ export function ChatBody({
           </div>
         )}
 
-      </div>
+      </article>
 
       {/* Scroll-to-bottom FAB */}
       {showScrollBtn && mensagens.length > 0 && (
