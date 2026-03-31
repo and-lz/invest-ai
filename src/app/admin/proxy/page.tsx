@@ -1,9 +1,10 @@
 "use client";
 
 import useSWR from "swr";
-import { Activity, Clock, Hash, Wifi, WifiOff, Loader2 } from "lucide-react";
+import { Activity, Clock, Hash, Wifi, WifiOff } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -89,10 +90,53 @@ export default function ProxyMonitorPage() {
       </div>
 
       {isLoading && (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className={icon.loadingSmall} />
-          <span className={typography.body}>Loading proxy stats...</span>
-        </div>
+        <>
+          <div className="grid gap-4 md:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-4 rounded" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-7 w-16" />
+                  <Skeleton className="mt-1 h-3 w-32" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-5 w-36" />
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead><Skeleton className="h-3.5 w-12" /></TableHead>
+                    <TableHead><Skeleton className="h-3.5 w-16" /></TableHead>
+                    <TableHead><Skeleton className="h-3.5 w-14" /></TableHead>
+                    <TableHead className="text-right"><Skeleton className="ml-auto h-3.5 w-16" /></TableHead>
+                    <TableHead className="text-right"><Skeleton className="ml-auto h-3.5 w-20" /></TableHead>
+                    <TableHead className="text-right"><Skeleton className="ml-auto h-3.5 w-20" /></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-10 rounded-full" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-14" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-12" /></TableCell>
+                      <TableCell className="text-right"><Skeleton className="ml-auto h-4 w-12" /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {!isLoading && !reachable && (
