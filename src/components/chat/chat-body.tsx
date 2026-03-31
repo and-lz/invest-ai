@@ -164,7 +164,7 @@ export function ChatBody({
         {mensagens.length > 0 && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
             {mensagens.map((mensagem, indice) => {
-              const prev = indice > 0 ? mensagens[indice - 1] : undefined;
+              const prev = mensagens[indice - 1];
               const showDateSep = !prev || !isSameDay(mensagem.criadaEm, prev.criadaEm);
               return (
                 <div key={mensagem.identificador}>
