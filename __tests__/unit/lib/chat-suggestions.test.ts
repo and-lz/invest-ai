@@ -3,8 +3,11 @@ import {
   INITIAL_SUGGESTIONS,
   parseSuggestionsFromResponse,
   stripPartialSuggestionMarker,
+  gerarSugestoesDashboard,
+  gerarBoasVindas,
 } from "@/lib/chat-suggestions";
 import { IdentificadorPaginaEnum } from "@/schemas/chat.schema";
+import type { ResumoContextoChat } from "@/schemas/chat.schema";
 
 describe("INITIAL_SUGGESTIONS", () => {
   const allPageIds = IdentificadorPaginaEnum.options;
@@ -134,5 +137,111 @@ describe("stripPartialSuggestionMarker", () => {
     const result = stripPartialSuggestionMarker(input);
 
     expect(result).toBe("Texto.");
+  });
+});
+
+function criarResumo(overrides: Partial<ResumoContextoChat> = {}): ResumoContextoChat {
+  return {
+    patrimonioTotal: 10000000, // R$ 100.000,00
+    rentabilidadeMensal: 3.21,
+    rentabilidadeCDIMensal: 1.05,
+    totalRelatorios: 3,
+    ...overrides,
+  };
+}
+
+describe("gerarSugestoesDashboard", () => {
+  it("Given a portfolio summary, When generating suggestions, Then the first chip should always be 'Análise completa da carteira'", () => {
+    const result = gerarSugestoesDashboard(criarResumo());
+
+    expect(result[0]!.label).toBe("Análise completa da carteira");
+  });
+
+  it("Given a portfolio beating CDI, When generating suggestions, Then it should include a 'Bati o CDI' chip", () => {
+    const result = gerarSugestoesDashboard(criarResumo({ rentabilidadeMensal: 3.21, rentabilidadeCDIMensal: 1.05 }));
+
+    expect(result[1]!.label).toContain("Bati o CDI");
+    expect(result[1]!.label).toContain("3,21%");
+    expect(result[1]!.label).toContain("1,05%");
+  });
+
+  it("Given a portfolio below CDI, When generating suggestions, Then it should include a 'Fiquei abaixo' chip", () => {
+    const result = gerarSugestoesDashboard(criarResumo({ rentabilidadeMensal: 0.5, rentabilidadeCDIMensal: 1.05 }));
+
+    expect(result[1]!.label).toContain("abaixo do CDI");
+  });
+
+  it("Given a portfolio with a best asset, When generating suggestions, Then it should include a chip mentioning that asset", () => {
+    const result = gerarSugestoesDashboard(criarResumo({ melhorAtivo: "PETR4", melhorAtivoRentabilidade: 8.5 }));
+
+    const chip = result.find((s) => s.label.includes("PETR4"));
+    expect(chip).toBeDefined();
+    expect(chip!.label).toContain("liderou");
+  });
+
+  it("Given a portfolio with a worst asset, When generating suggestions, Then it should include a chip mentioning that asset", () => {
+    const result = gerarSugestoesDashboard(criarResumo({ piorAtivo: "VALE3", piorAtivoRentabilidade: -4.2 }));
+
+    const chip = result.find((s) => s.label.includes("VALE3"));
+    expect(chip).toBeDefined();
+    expect(chip!.label).toContain("pior ativo");
+  });
+
+  it("Given a portfolio with a dominant allocation, When generating suggestions, Then it should include a chip about that allocation", () => {
+    const result = gerarSugestoesDashboard(criarResumo({ alocacaoDominante: "Ações" }));
+
+    const chip = result.find((s) => s.label.includes("Ações"));
+    expect(chip).toBeDefined();
+    expect(chip!.label).toContain("domina");
+  });
+
+  it("Given a portfolio without dominant allocation, When generating suggestions, Then it should fallback to generic diversification chip", () => {
+    const result = gerarSugestoesDashboard(criarResumo({ alocacaoDominante: undefined }));
+
+    const chip = result.find((s) => s.label.includes("diversificacao"));
+    expect(chip).toBeDefined();
+  });
+
+  it("Given a full portfolio summary, When generating suggestions, Then it should return at most 5 chips", () => {
+    const result = gerarSugestoesDashboard(
+      criarResumo({
+        melhorAtivo: "PETR4",
+        melhorAtivoRentabilidade: 8.5,
+        piorAtivo: "VALE3",
+        piorAtivoRentabilidade: -4.2,
+        alocacaoDominante: "Ações",
+      }),
+    );
+
+    expect(result.length).toBeLessThanOrEqual(5);
+  });
+
+  it("Given a minimal portfolio summary, When generating suggestions, Then it should return at least 3 chips (analysis + CDI + diversification)", () => {
+    const result = gerarSugestoesDashboard(criarResumo());
+
+    expect(result.length).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("gerarBoasVindas", () => {
+  it("Given a portfolio beating CDI, When generating welcome message, Then it should mention 'acima do CDI'", () => {
+    const result = gerarBoasVindas(criarResumo({ rentabilidadeMensal: 3.21, rentabilidadeCDIMensal: 1.05 }));
+
+    expect(result).toContain("acima do CDI");
+    expect(result).toContain("3,21%");
+  });
+
+  it("Given a portfolio below CDI, When generating welcome message, Then it should not mention 'acima do CDI'", () => {
+    const result = gerarBoasVindas(criarResumo({ rentabilidadeMensal: 0.5, rentabilidadeCDIMensal: 1.05 }));
+
+    expect(result).not.toContain("acima do CDI");
+    expect(result).toContain("CDI: 1,05%");
+  });
+
+  it("Given a portfolio summary, When generating welcome message, Then it should include the formatted patrimony", () => {
+    const result = gerarBoasVindas(criarResumo({ patrimonioTotal: 10000000 }));
+
+    expect(result).toContain("Carteira:");
+    expect(result).toContain("R$");
   });
 });
