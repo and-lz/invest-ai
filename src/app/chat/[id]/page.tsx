@@ -93,6 +93,8 @@ export default function ChatPage() {
     followUpSuggestions,
     reenviarUltimaMensagem,
     estaCarregandoConversa,
+    modoMercado,
+    setModoMercado,
   } = useChatAssistant({ raciocinio, modelTier });
 
   // Saved messages
@@ -100,6 +102,16 @@ export default function ChatPage() {
   const { conversas } = useConversas();
   const conversaAtual = conversas.find((c) => c.identificador === conversaAtualId);
   const title = conversaAtual?.titulo ?? "Nova conversa";
+
+  const PAGE_LABELS: Record<string, string> = {
+    dashboard: "Dashboard",
+    reports: "Relatórios",
+    insights: "Análises",
+    trends: "Tendências",
+    desempenho: "Desempenho",
+    aprender: "Aprendizado",
+  };
+  const paginaLabel = conversaAtual ? (PAGE_LABELS[conversaAtual.identificadorPagina] ?? undefined) : undefined;
 
   const handleToggleSave = useCallback(
     (mensagem: MensagemChat) => {
@@ -243,18 +255,6 @@ export default function ChatPage() {
           <time>{new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" })}</time>
         </div>
 
-        <ChatPageHeader
-          title={title}
-          onToggleSidebar={toggleSidebar}
-          ttsSupported={ttsSupported}
-          ttsEnabled={ttsEnabled}
-          speechStatus={speechStatus}
-          onToggleTts={handleToggleTts}
-          hasMessages={mensagens.length > 0}
-          onClearHistory={limparHistorico}
-          onBack={() => router.push(lastNonChatPageRef.current)}
-        />
-
         <ChatBody
           mensagens={mensagens}
           estaTransmitindo={estaTransmitindo}
@@ -272,15 +272,32 @@ export default function ChatPage() {
           onInputValueChange={setInputValue}
           onSuggestionSelect={handleSuggestionSelect}
           onSuggestionPrefill={setInputValue}
-
           raciocinio={raciocinio}
           onRaciocinioChange={handleRaciocinioChange}
+          modoMercado={modoMercado}
+          onModoMercadoChange={setModoMercado}
           modelTier={modelTier}
           onModelTierChange={handleModelTierChange}
           savedMessageIds={savedMessageIds}
           onToggleSave={handleToggleSave}
           estaCarregandoConversa={estaCarregandoConversa}
           scrollAreaRef={scrollAreaRef}
+          headerSlot={
+            <ChatPageHeader
+              title={title}
+              onToggleSidebar={toggleSidebar}
+              ttsSupported={ttsSupported}
+              ttsEnabled={ttsEnabled}
+              speechStatus={speechStatus}
+              onToggleTts={handleToggleTts}
+              hasMessages={mensagens.length > 0}
+              onClearHistory={limparHistorico}
+              onBack={() => router.push(lastNonChatPageRef.current)}
+              criadaEm={conversaAtual?.criadaEm}
+              preview={conversaAtual?.previewMensagem}
+              paginaLabel={paginaLabel}
+            />
+          }
         />
       </main>
     </div>
