@@ -1,4 +1,6 @@
-import type { IdentificadorPagina } from "@/schemas/chat.schema";
+import type { IdentificadorPagina, ResumoContextoChat } from "@/schemas/chat.schema";
+import { formatCompactCurrency } from "@/domain/value-objects/money";
+import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 
 /**
  * A suggestion chip shown to the user in the chat widget.
@@ -88,6 +90,74 @@ export const INITIAL_SUGGESTIONS: Record<IdentificadorPagina, ChatSuggestion[]> 
     },
   ],
 };
+
+/**
+ * Gera sugestoes iniciais data-driven para o dashboard baseadas nos dados reais da carteira.
+ * Retorna sugestoes estaticas se dados nao estiverem disponiveis.
+ */
+export function gerarSugestoesDashboard(resumo: ResumoContextoChat): ChatSuggestion[] {
+  const sugestoes: ChatSuggestion[] = [];
+
+  // Performance vs CDI
+  if (resumo.rentabilidadeMensal > resumo.rentabilidadeCDIMensal) {
+    sugestoes.push({
+      label: `Bati o CDI (${formatSimplePercentage(resumo.rentabilidadeMensal)} vs ${formatSimplePercentage(resumo.rentabilidadeCDIMensal)})`,
+      text: `Minha carteira rendeu ${formatSimplePercentage(resumo.rentabilidadeMensal)} esse mes enquanto o CDI foi ${formatSimplePercentage(resumo.rentabilidadeCDIMensal)}. O que explica esse outperformance?`,
+    });
+  } else {
+    sugestoes.push({
+      label: `Fiquei abaixo do CDI este mes`,
+      text: `Minha rentabilidade de ${formatSimplePercentage(resumo.rentabilidadeMensal)} ficou abaixo do CDI (${formatSimplePercentage(resumo.rentabilidadeCDIMensal)}). O que posso fazer para melhorar?`,
+    });
+  }
+
+  // Melhor ativo
+  if (resumo.melhorAtivo) {
+    sugestoes.push({
+      label: `${resumo.melhorAtivo} liderou com ${formatSimplePercentage(resumo.melhorAtivoRentabilidade ?? 0)}`,
+      text: `${resumo.melhorAtivo} foi meu melhor ativo (${formatSimplePercentage(resumo.melhorAtivoRentabilidade ?? 0)} no mes). Vale aumentar a posicao?`,
+    });
+  }
+
+  // Pior ativo
+  if (resumo.piorAtivo) {
+    sugestoes.push({
+      label: `${resumo.piorAtivo} foi o pior ativo`,
+      text: `${resumo.piorAtivo} teve ${formatSimplePercentage(resumo.piorAtivoRentabilidade ?? 0)} este mes — o pior da carteira. Devo manter, reduzir ou sair?`,
+    });
+  }
+
+  // Diversificacao / alocacao dominante
+  if (resumo.alocacaoDominante) {
+    sugestoes.push({
+      label: `${resumo.alocacaoDominante} domina minha carteira`,
+      text: `${resumo.alocacaoDominante} e minha categoria com maior participacao. Estou concentrado demais? Como diversificar?`,
+    });
+  } else {
+    sugestoes.push({
+      label: "Como esta minha diversificacao?",
+      text: "Analise minha diversificacao. Estou muito concentrado em alguma categoria ou estrategia?",
+    });
+  }
+
+  return sugestoes.slice(0, 4);
+}
+
+/**
+ * Gera uma mensagem de boas-vindas contextual baseada nos dados reais da carteira.
+ * Retorna null se dados nao estiverem disponiveis.
+ */
+export function gerarBoasVindas(resumo: ResumoContextoChat): string {
+  const patrimonio = formatCompactCurrency(resumo.patrimonioTotal);
+  const rent = formatSimplePercentage(resumo.rentabilidadeMensal);
+  const cdi = formatSimplePercentage(resumo.rentabilidadeCDIMensal);
+  const acimaCDI = resumo.rentabilidadeMensal > resumo.rentabilidadeCDIMensal;
+
+  if (acimaCDI) {
+    return `Carteira: ${patrimonio} · ${rent} no mes — acima do CDI (${cdi})`;
+  }
+  return `Carteira: ${patrimonio} · ${rent} no mes · CDI: ${cdi}`;
+}
 
 /**
  * Result of parsing `[SUGGESTIONS:a|b|c]` markers from an AI response.

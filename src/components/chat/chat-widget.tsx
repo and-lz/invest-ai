@@ -16,7 +16,7 @@ import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { useChatWidgetState } from "@/hooks/use-chat-widget-state";
 import { stripMarkdown } from "@/lib/strip-markdown";
-import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
+import { INITIAL_SUGGESTIONS, gerarSugestoesDashboard, gerarBoasVindas } from "@/lib/chat-suggestions";
 import {
   EVENTO_ABRIR_CHAT_COM_PERGUNTA,
   type EventoAbrirChatDetalhe,
@@ -48,7 +48,7 @@ export function ChatWidget() {
     toggleTts,
   } = useChatWidgetState();
 
-  const { identificadorPagina } = useChatPageContext();
+  const { identificadorPagina, resumoContexto } = useChatPageContext();
 
   const { data: session } = useSession();
 
@@ -108,17 +108,30 @@ export function ChatWidget() {
     enabled: mensagens.length > 0 && !estaTransmitindo && inputValue.trim().length >= 3,
   });
 
+  const initialSuggestions = useMemo(() => {
+    if (identificadorPagina === "dashboard" && resumoContexto) {
+      return gerarSugestoesDashboard(resumoContexto);
+    }
+    return INITIAL_SUGGESTIONS[identificadorPagina] ?? [];
+  }, [identificadorPagina, resumoContexto]);
+
   const activeSuggestions = useMemo(() => {
     if (mensagens.length === 0) {
-      return INITIAL_SUGGESTIONS[identificadorPagina] ?? [];
+      return initialSuggestions;
     }
     if (aiSuggestions.length > 0) {
       return aiSuggestions;
     }
-    return followUpSuggestions.length > 0
-      ? followUpSuggestions
-      : (INITIAL_SUGGESTIONS[identificadorPagina] ?? []);
-  }, [mensagens.length, identificadorPagina, followUpSuggestions, aiSuggestions]);
+    return followUpSuggestions.length > 0 ? followUpSuggestions : initialSuggestions;
+  }, [mensagens.length, initialSuggestions, followUpSuggestions, aiSuggestions]);
+
+  const welcomeMessage = useMemo(
+    () =>
+      identificadorPagina === "dashboard" && resumoContexto
+        ? gerarBoasVindas(resumoContexto)
+        : undefined,
+    [identificadorPagina, resumoContexto],
+  );
 
   const handleSuggestionSelect = useCallback(
     (text: string) => {
@@ -300,6 +313,7 @@ export function ChatWidget() {
               onModelTierChange={handleModelTierChange}
               savedMessageIds={savedMessageIds}
               onToggleSave={handleToggleSave}
+              welcomeMessage={welcomeMessage}
             />
           </div>
         </div>
