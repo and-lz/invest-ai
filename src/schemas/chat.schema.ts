@@ -38,6 +38,7 @@ export const RequisicaoChatSchema = z.object({
   identificadorPagina: IdentificadorPaginaEnum,
   raciocinio: z.boolean().optional(),
   modelTier: ModelTierEnum.optional(),
+  modoMercado: z.boolean().optional(),
 });
 
 /** Resumo estruturado dos dados da pagina para gerar boas-vindas e sugestoes data-driven */

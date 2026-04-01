@@ -32,6 +32,8 @@ interface CampoEntradaChatProps {
   readonly fullscreen?: boolean;
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
+  readonly modoMercado?: boolean;
+  readonly onModoMercadoChange?: (enabled: boolean) => void;
   readonly modelTier?: ClaudeModelTier;
   readonly onModelTierChange?: (tier: ClaudeModelTier) => void;
   readonly hideBorderTop?: boolean;
@@ -53,6 +55,8 @@ export function CampoEntradaChat({
   fullscreen,
   raciocinio,
   onRaciocinioChange,
+  modoMercado,
+  onModoMercadoChange,
   modelTier,
   onModelTierChange,
   hideBorderTop,
@@ -184,6 +188,27 @@ export function CampoEntradaChat({
                   ))}
                 </PopoverContent>
               </Popover>
+            )}
+
+            {/* Market mode toggle */}
+            {onModoMercadoChange && (
+              <button
+                type="button"
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  onModoMercadoChange(!modoMercado);
+                }}
+                disabled={estaTransmitindo}
+                aria-pressed={modoMercado}
+                className={cn(
+                  "rounded-full px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-50",
+                  modoMercado
+                    ? "bg-primary/15 text-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                )}
+              >
+                Mercado
+              </button>
             )}
 
             {/* Reasoning toggle */}

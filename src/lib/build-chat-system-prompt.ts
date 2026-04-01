@@ -22,6 +22,7 @@ const DESCRICOES_PAGINA: Record<IdentificadorPagina, string> = {
 export function construirInstrucaoSistemaChat(
   identificadorPagina: IdentificadorPagina,
   contextoPagina?: string,
+  marketContext?: string,
 ): string {
   const descricaoPagina = DESCRICOES_PAGINA[identificadorPagina];
 
@@ -122,6 +123,10 @@ Regras:
 
 PÁGINA ATUAL: ${descricaoPagina}
 `;
+
+  if (marketContext) {
+    instrucao += `\nCONTEXTO DE MERCADO ATUAL:\n[Estes são resultados de busca em tempo real. Incorpore essas informações naturalmente na sua análise. Ao usar dados de mercado, mencione brevemente que são dados recentes — sem disclaimers excessivos.]\n${marketContext}\n`;
+  }
 
   if (contextoPagina) {
     instrucao += `\nDADOS DE CONTEXTO DA PAGINA:\n${contextoPagina}\n`;

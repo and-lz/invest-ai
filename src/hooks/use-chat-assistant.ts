@@ -47,6 +47,8 @@ interface UseChatAssistenteRetorno {
   readonly reenviarUltimaMensagem: () => void;
   readonly acaoPendente: AcaoPendente | null;
   readonly limparAcaoPendente: () => void;
+  readonly modoMercado: boolean;
+  readonly setModoMercado: (enabled: boolean) => void;
 }
 
 export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssistenteRetorno {
@@ -60,6 +62,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
   const [estaCarregando, setEstaCarregando] = useState(false);
   const [followUpSuggestions, setFollowUpSuggestions] = useState<ChatSuggestion[]>([]);
   const [acaoPendente, setAcaoPendente] = useState<AcaoPendente | null>(null);
+  const [modoMercado, setModoMercado] = useState(false);
   const controladorAbortRef = useRef<AbortController | null>(null);
   const timeoutAutoSaveRef = useRef<NodeJS.Timeout | null>(null);
   const retryContentRef = useRef<string | null>(null);
@@ -79,6 +82,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
         mensagens: mensagensAtualizadas,
         conversaAtualId,
         identificadorPagina,
+        modoMercado,
         onConversaCriada: (id) => setConversaAtualId(id),
         onAutoSaveFail: (count) => {
           autoSaveFailCountRef.current = count;
@@ -86,7 +90,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
         autoSaveFailCount: autoSaveFailCountRef.current,
       });
     },
-    [conversaAtualId, identificadorPagina],
+    [conversaAtualId, identificadorPagina, modoMercado],
   );
 
   const enviarMensagem = useCallback(
@@ -131,6 +135,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
             identificadorPagina,
             ...(raciocinio && { raciocinio: true }),
             ...(modelTier && { modelTier }),
+            ...(modoMercado && { modoMercado: true }),
           }),
           signal: controladorAbort.signal,
         });
@@ -244,6 +249,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
       salvarConversaAutomaticamente,
       raciocinio,
       modelTier,
+      modoMercado,
     ],
   );
 
@@ -264,6 +270,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
         return false;
       }
       setMensagens(result.mensagens);
+      setModoMercado(result.modoMercado);
       setConversaAtualId(identificador);
       setErro(null);
       autoSaveFailCountRef.current = 0;
@@ -285,6 +292,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
     setErro(null);
     setFollowUpSuggestions([]);
     setAcaoPendente(null);
+    setModoMercado(false);
     autoSaveFailCountRef.current = 0;
   }, []);
 
@@ -330,5 +338,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
     reenviarUltimaMensagem,
     acaoPendente,
     limparAcaoPendente,
+    modoMercado,
+    setModoMercado,
   };
 }

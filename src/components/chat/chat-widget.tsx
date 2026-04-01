@@ -72,6 +72,8 @@ export function ChatWidget() {
     reenviarUltimaMensagem,
     acaoPendente,
     limparAcaoPendente,
+    modoMercado,
+    setModoMercado,
   } = useChatAssistant({ raciocinio, modelTier });
 
   const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
@@ -281,6 +283,8 @@ export function ChatWidget() {
 
               raciocinio={raciocinio}
               onRaciocinioChange={handleRaciocinioChange}
+              modoMercado={modoMercado}
+              onModoMercadoChange={setModoMercado}
               modelTier={modelTier}
               onModelTierChange={handleModelTierChange}
               savedMessageIds={savedMessageIds}

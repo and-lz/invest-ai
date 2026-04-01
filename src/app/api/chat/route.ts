@@ -9,6 +9,7 @@ import {
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { serializarContextoCompletoUsuario } from "@/lib/serialize-chat-context";
+import { buscarContextoMercado } from "@/infrastructure/services/web-search-service";
 import { AiApiTransientError, AiApiQuotaError } from "@/domain/errors/app-errors";
 import { resolveClaudeModelId } from "@/lib/model-tiers";
 import type { MensagemAi, ConfiguracaoGeracao } from "@/domain/interfaces/ai-provider";
@@ -45,7 +46,7 @@ export async function POST(request: Request): Promise<Response> {
       );
     }
 
-    const { mensagens, contextoPagina, identificadorPagina, raciocinio, modelTier } = resultadoValidacao.data;
+    const { mensagens, contextoPagina, identificadorPagina, raciocinio, modelTier, modoMercado } = resultadoValidacao.data;
 
     // When no page context is provided (e.g. /chat page), load portfolio data server-side
     let contextoFinal = contextoPagina;
@@ -84,7 +85,13 @@ export async function POST(request: Request): Promise<Response> {
       }
     }
 
-    const instrucaoSistema = construirInstrucaoSistemaChat(identificadorPagina, contextoFinal);
+    let marketContext: string | undefined;
+    if (modoMercado && mensagens.length > 0) {
+      const lastUserMessage = mensagens[mensagens.length - 1]!.conteudo;
+      marketContext = (await buscarContextoMercado(lastUserMessage)) ?? undefined;
+    }
+
+    const instrucaoSistema = construirInstrucaoSistemaChat(identificadorPagina, contextoFinal, marketContext);
 
     const mensagensAi: MensagemAi[] = mensagens.map((mensagem) => ({
       papel: mensagem.papel === "assistente" ? ("modelo" as const) : ("usuario" as const),

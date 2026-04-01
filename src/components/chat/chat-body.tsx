@@ -52,6 +52,8 @@ interface ChatBodyProps {
   readonly onSuggestionPrefill?: (text: string) => void;
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
+  readonly modoMercado?: boolean;
+  readonly onModoMercadoChange?: (enabled: boolean) => void;
   readonly modelTier?: ClaudeModelTier;
   readonly onModelTierChange?: (tier: ClaudeModelTier) => void;
   readonly savedMessageIds?: ReadonlySet<string>;
@@ -59,6 +61,7 @@ interface ChatBodyProps {
   readonly estaCarregandoConversa?: boolean;
   readonly scrollAreaRef?: React.RefObject<HTMLDivElement | null>;
   readonly welcomeMessage?: string;
+  readonly headerSlot?: React.ReactNode;
 }
 
 export function ChatBody({
@@ -80,6 +83,8 @@ export function ChatBody({
   onSuggestionPrefill,
   raciocinio,
   onRaciocinioChange,
+  modoMercado,
+  onModoMercadoChange,
   modelTier,
   onModelTierChange,
   savedMessageIds,
@@ -87,6 +92,7 @@ export function ChatBody({
   estaCarregandoConversa,
   scrollAreaRef,
   welcomeMessage,
+  headerSlot,
 }: ChatBodyProps) {
   const areaScrollRef = useRef<HTMLDivElement>(null);
   const mergedScrollRef = useCallback((node: HTMLDivElement | null) => {
@@ -138,6 +144,7 @@ export function ChatBody({
         onScroll={handleScroll}
         className={cn("min-h-0 flex-1 overflow-y-auto", fs ? "pb-40" : "pb-32")}
       >
+        {headerSlot}
         {estaCarregandoConversa && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
             <MessageBubbleSkeleton role="user" fullscreen={fs} contentLines={["w-3/5"]} />
@@ -276,6 +283,8 @@ export function ChatBody({
             fullscreen={fs}
             raciocinio={raciocinio}
             onRaciocinioChange={onRaciocinioChange}
+            modoMercado={modoMercado}
+            onModoMercadoChange={onModoMercadoChange}
             modelTier={modelTier}
             onModelTierChange={onModelTierChange}
             hideBorderTop

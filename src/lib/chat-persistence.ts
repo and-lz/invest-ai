@@ -1,17 +1,22 @@
 import type { MensagemChat } from "@/schemas/chat.schema";
 import { notificar } from "@/lib/notifier";
 
-/** Fetch a conversation by ID. Returns messages on success, null on 404. Throws on other errors. */
+/** Fetch a conversation by ID. Returns messages and settings on success, null on 404. Throws on other errors. */
 export async function loadConversation(
   identificador: string,
-): Promise<{ mensagens: MensagemChat[] } | null> {
+): Promise<{ mensagens: MensagemChat[]; modoMercado: boolean } | null> {
   const resposta = await fetch(`/api/conversations/${identificador}`);
   if (resposta.status === 404) return null;
   if (!resposta.ok) {
     throw new Error(`Erro ao carregar conversa: ${resposta.status}`);
   }
-  const dados = (await resposta.json()) as { conversa: { mensagens: MensagemChat[] } };
-  return { mensagens: dados.conversa.mensagens };
+  const dados = (await resposta.json()) as {
+    conversa: { mensagens: MensagemChat[]; modoMercado?: boolean };
+  };
+  return {
+    mensagens: dados.conversa.mensagens,
+    modoMercado: dados.conversa.modoMercado ?? false,
+  };
 }
 
 /** Generate a smart AI title for a conversation (fire-and-forget). */
@@ -46,6 +51,7 @@ interface AutoSaveParams {
   readonly mensagens: readonly MensagemChat[];
   readonly conversaAtualId: string | null;
   readonly identificadorPagina: string;
+  readonly modoMercado: boolean;
   readonly onConversaCriada: (id: string) => void;
   readonly onAutoSaveFail: (failCount: number) => void;
   readonly autoSaveFailCount: number;
@@ -53,7 +59,7 @@ interface AutoSaveParams {
 
 /** Auto-save conversation: creates a new one or updates existing. */
 export async function autoSaveConversation(params: AutoSaveParams): Promise<void> {
-  const { mensagens, conversaAtualId, identificadorPagina, onConversaCriada, onAutoSaveFail } =
+  const { mensagens, conversaAtualId, identificadorPagina, modoMercado, onConversaCriada, onAutoSaveFail } =
     params;
 
   if (mensagens.length === 0) return;
@@ -72,6 +78,7 @@ export async function autoSaveConversation(params: AutoSaveParams): Promise<void
           titulo,
           identificadorPagina,
           mensagens,
+          modoMercado,
         }),
       });
 
@@ -91,7 +98,7 @@ export async function autoSaveConversation(params: AutoSaveParams): Promise<void
       await fetch(`/api/conversations/${conversaAtualId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mensagens }),
+        body: JSON.stringify({ mensagens, modoMercado }),
       });
     }
     onAutoSaveFail(0);

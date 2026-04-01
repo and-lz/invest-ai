@@ -8,6 +8,7 @@ export const ConversaSchema = z.object({
   titulo: z.string().min(1).max(100),
   identificadorPagina: IdentificadorPaginaEnum,
   mensagens: z.array(MensagemChatSchema).max(100), // Limite de 100 mensagens por conversa
+  modoMercado: z.boolean().optional().default(false),
   criadaEm: z.string().datetime(),
   atualizadaEm: z.string().datetime(),
 });
@@ -28,6 +29,7 @@ export const CriarConversaSchema = ConversaSchema.omit({
 export const AtualizarConversaSchema = z.object({
   titulo: z.string().min(1).max(100).optional(),
   mensagens: z.array(MensagemChatSchema).max(100).optional(),
+  modoMercado: z.boolean().optional(),
 });
 
 // ---- Tipos inferidos ----
