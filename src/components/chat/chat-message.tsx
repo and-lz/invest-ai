@@ -112,11 +112,13 @@ export function MensagemChatBolha({
           <CollapsibleContent>
             <div
               className={cn(
-                "text-muted-foreground mt-1 ml-2 border-l-2 border-border/40 pl-3 italic whitespace-pre-wrap",
+                "text-muted-foreground mt-1 ml-2 border-l-2 border-border/40 pl-3",
                 fs ? "text-sm" : "text-xs",
               )}
             >
-              {mensagem.pensamento}
+              {mensagem.pensamento && (
+                <ConteudoMarkdownChat conteudo={mensagem.pensamento} fullscreen={fs} />
+              )}
               {isThinking && <span className="chat-thinking-cursor" />}
             </div>
           </CollapsibleContent>
