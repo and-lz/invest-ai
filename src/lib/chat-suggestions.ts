@@ -98,6 +98,12 @@ export const INITIAL_SUGGESTIONS: Record<IdentificadorPagina, ChatSuggestion[]> 
 export function gerarSugestoesDashboard(resumo: ResumoContextoChat): ChatSuggestion[] {
   const sugestoes: ChatSuggestion[] = [];
 
+  // Deep dive — always first
+  sugestoes.push({
+    label: "Análise completa da carteira",
+    text: "Faça uma análise completa da minha carteira. Quero ver situação atual, diagnóstico e recomendações prioritárias.",
+  });
+
   // Performance vs CDI
   if (resumo.rentabilidadeMensal > resumo.rentabilidadeCDIMensal) {
     sugestoes.push({
@@ -140,7 +146,7 @@ export function gerarSugestoesDashboard(resumo: ResumoContextoChat): ChatSuggest
     });
   }
 
-  return sugestoes.slice(0, 4);
+  return sugestoes.slice(0, 5);
 }
 
 /**
