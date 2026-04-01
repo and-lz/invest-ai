@@ -105,12 +105,12 @@ export function SuggestionChips({
                 onClick={() => onPrefill(suggestion.text)}
                 aria-label={`Editar sugestão: ${suggestion.label}`}
                 className={cn(
-                  "cursor-pointer rounded-r-full px-2 py-1 transition-all",
-                  "hover:bg-muted",
-                  "opacity-0 group-hover:opacity-100",
+                  "cursor-pointer rounded-r-full py-1 transition-all duration-150 hover:bg-muted",
+                  "max-w-0 overflow-hidden opacity-0 px-0",
+                  "group-hover:max-w-[2rem] group-hover:px-2 group-hover:opacity-100",
                 )}
               >
-                <Pencil className="h-3 w-3" />
+                <Pencil className="h-3 w-3 shrink-0" />
               </button>
             </>
           )}
