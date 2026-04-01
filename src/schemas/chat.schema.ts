@@ -40,6 +40,19 @@ export const RequisicaoChatSchema = z.object({
   modelTier: ModelTierEnum.optional(),
 });
 
+/** Resumo estruturado dos dados da pagina para gerar boas-vindas e sugestoes data-driven */
+export interface ResumoContextoChat {
+  patrimonioTotal: number; // em centavos
+  rentabilidadeMensal: number; // percentual (ex: 3.21)
+  rentabilidadeCDIMensal: number; // percentual CDI do mes (ex: 2.10)
+  melhorAtivo?: string; // nome do melhor ativo do mes
+  melhorAtivoRentabilidade?: number;
+  piorAtivo?: string; // nome do pior ativo do mes
+  piorAtivoRentabilidade?: number;
+  alocacaoDominante?: string; // categoria com maior % na carteira
+  totalRelatorios: number;
+}
+
 // ---- Tipos inferidos ----
 
 export type MensagemChat = z.infer<typeof MensagemChatSchema>;

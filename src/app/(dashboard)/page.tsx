@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useChatPageContext } from "@/contexts/chat-page-context";
 import { serializarContextoDashboard } from "@/lib/serialize-chat-context";
+import type { ResumoContextoChat } from "@/schemas/chat.schema";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
 import { TopPerformersTable } from "@/components/dashboard/top-performers-table";
 import { StrategyGainsTable } from "@/components/dashboard/strategy-gains-table";
@@ -85,9 +86,33 @@ export default function DashboardPage() {
     () => (dadosDashboard ? serializarContextoDashboard(dadosDashboard) : undefined),
     [dadosDashboard],
   );
+  const resumoContexto = useMemo((): ResumoContextoChat | undefined => {
+    if (!dadosDashboard) return undefined;
+    const benchmarkMes = dadosDashboard.comparacaoBenchmarksAtual.find(
+      (b) => b.periodo === "No mes",
+    );
+    const alocacaoDominante = dadosDashboard.alocacaoAtual
+      .flatMap((a) => a.categorias)
+      .reduce(
+        (max, cat) =>
+          cat.percentualDaCarteira.valor > (max?.percentualDaCarteira.valor ?? -1) ? cat : max,
+        undefined as { nomeCategoria: string; percentualDaCarteira: { valor: number } } | undefined,
+      )?.nomeCategoria;
+    return {
+      patrimonioTotal: dadosDashboard.resumoAtual.patrimonioTotal.valorEmCentavos,
+      rentabilidadeMensal: dadosDashboard.resumoAtual.rentabilidadeMensal.valor,
+      rentabilidadeCDIMensal: benchmarkMes?.cdi.valor ?? 0,
+      melhorAtivo: dadosDashboard.melhoresPerformers[0]?.nomeAtivo,
+      melhorAtivoRentabilidade: dadosDashboard.melhoresPerformers[0]?.rentabilidadeMes.valor,
+      piorAtivo: dadosDashboard.pioresPerformers[0]?.nomeAtivo,
+      piorAtivoRentabilidade: dadosDashboard.pioresPerformers[0]?.rentabilidadeMes.valor,
+      alocacaoDominante,
+      totalRelatorios: dadosDashboard.quantidadeRelatorios,
+    };
+  }, [dadosDashboard]);
   useEffect(() => {
-    definirContexto("dashboard", contextoSerializado);
-  }, [definirContexto, contextoSerializado]);
+    definirContexto("dashboard", contextoSerializado, resumoContexto);
+  }, [definirContexto, contextoSerializado, resumoContexto]);
 
   return (
     <div className="space-y-6">
