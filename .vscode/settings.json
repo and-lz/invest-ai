@@ -1,19 +1,19 @@
 {
     "workbench.colorCustomizations": {
-        "activityBar.activeBackground": "#813b6b",
-        "activityBar.background": "#813b6b",
+        "activityBar.activeBackground": "#9f4d3c",
+        "activityBar.background": "#9f4d3c",
         "activityBar.foreground": "#e7e7e7",
         "activityBar.inactiveForeground": "#e7e7e799",
-        "sash.hoverBorder": "#813b6b",
-        "editorGroup.border": "#813b6b",
-        "panel.border": "#813b6b",
-        "tab.activeBorder": "#813b6b",
-        "activityBarBadge.background": "#7f9946",
+        "sash.hoverBorder": "#9f4d3c",
+        "editorGroup.border": "#9f4d3c",
+        "panel.border": "#9f4d3c",
+        "tab.activeBorder": "#9f4d3c",
+        "activityBarBadge.background": "#46b95a",
         "activityBarBadge.foreground": "#15202b"
     },
-    "peacock.color": "#5e2b4e",
+    "peacock.color": "#7a3b2e",
     "markdown.preview.openMarkdownLinks": "inPreview",
-    "workbench.preferredDarkColorTheme": "Pantone Plum (Dark)",
-    "workbench.colorTheme": "Pantone Plum (Dark)",
+    "workbench.preferredDarkColorTheme": "Pantone Sienna (Dark)",
+    "workbench.colorTheme": "Pantone Sienna (Dark)",
     "workbench.preferredLightColorTheme": "Pantone Viva Magenta (Light)"
 }
