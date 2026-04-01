@@ -123,41 +123,47 @@ export function CampoEntradaChat({
 
   const showInlineChips = suggestions && suggestions.length > 0 && onSuggestionSelect && !valor.trim();
 
+  const chipsVisible = showInlineChips || suggestionsLoading;
+
   return (
     <div className={cn(
       "flex flex-col",
       !hideBorderTop && "border-t",
       fs ? "mx-auto w-full max-w-4xl px-5 pt-3 pb-0" : "px-3 pt-1.5 pb-3",
     )}>
-      {(showInlineChips || suggestionsLoading) && (
-        <SuggestionChips
-          suggestions={suggestions ?? []}
-          onSelect={onSuggestionSelect!}
-          filterText={suggestionsFilterText}
-          variant="quick-reply"
-          isLoading={suggestionsLoading}
-          fullscreen={fs}
-        />
-      )}
-
       {/* Claude.ai-style input container: textarea + bottom toolbar */}
       <div className={cn(
         "rounded-2xl border border-border/60 bg-card transition-colors focus-within:border-border",
         fs ? "px-4 pt-3 pb-2" : "px-3 pt-2 pb-1.5",
       )}>
-        <textarea
-          ref={textareaRef}
-          value={valor}
-          onChange={handleInput}
-          onKeyDown={handleKeyDown}
-          placeholder="Pergunte algo sobre seus investimentos..."
-          disabled={desabilitado}
-          rows={1}
-          className={cn(
-            "placeholder:text-muted-foreground w-full resize-none bg-transparent focus:ring-0 focus:outline-none disabled:opacity-50",
-            fs ? "text-base" : "text-sm",
+        {/* Textarea area with optional chips overlay */}
+        <div className="relative">
+          <textarea
+            ref={textareaRef}
+            value={valor}
+            onChange={handleInput}
+            onKeyDown={handleKeyDown}
+            placeholder={chipsVisible ? undefined : "Pergunte algo sobre seus investimentos..."}
+            disabled={desabilitado}
+            rows={1}
+            className={cn(
+              "placeholder:text-muted-foreground w-full resize-none bg-transparent focus:ring-0 focus:outline-none disabled:opacity-50",
+              fs ? "text-base" : "text-sm",
+            )}
+          />
+          {chipsVisible && (
+            <div className="pointer-events-none absolute inset-0 flex items-start">
+              <SuggestionChips
+                suggestions={suggestions ?? []}
+                onSelect={onSuggestionSelect!}
+                filterText={suggestionsFilterText}
+                variant="quick-reply"
+                isLoading={suggestionsLoading}
+                fullscreen={fs}
+              />
+            </div>
           )}
-        />
+        </div>
 
         {/* Bottom toolbar: model selector + reasoning toggle + send */}
         <div className={cn("relative z-10 flex items-center justify-between", fs ? "mt-1" : "mt-0.5")}>

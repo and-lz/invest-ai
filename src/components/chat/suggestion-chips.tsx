@@ -60,12 +60,12 @@ export function SuggestionChips({
     );
   }
 
-  // Quick-reply: horizontal wrap, inline above the textarea
+  // Quick-reply: overlay inside textarea area
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-center gap-1.5",
-        fs ? "pb-2 pt-1" : "pb-1.5 pt-0.5",
+        "pointer-events-auto flex flex-wrap items-center gap-1.5",
+        fs ? "py-0.5" : "py-px",
       )}
       role="group"
       aria-label="Sugestoes de perguntas"
@@ -80,7 +80,7 @@ export function SuggestionChips({
           onClick={() => onSelect(suggestion.text)}
           className={cn(
             "text-muted-foreground/60 hover:text-muted-foreground",
-            "rounded-full border border-border/40 bg-card cursor-pointer transition-colors",
+            "rounded-full border border-border/40 cursor-pointer transition-colors",
             fs ? "text-xs px-3 py-1" : "text-xs px-2.5 py-0.5",
           )}
         >
