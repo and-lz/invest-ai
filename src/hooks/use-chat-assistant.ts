@@ -15,6 +15,9 @@ import {
   findLastUserContent,
   removeLastUserAssistantPair,
   buildMessagesForApi,
+  parsearAcaoPendente,
+  stripPartialAcaoMarker,
+  type AcaoPendente,
 } from "@/lib/chat-stream-utils";
 import { autoSaveConversation, loadConversation } from "@/lib/chat-persistence";
 
@@ -42,6 +45,8 @@ interface UseChatAssistenteRetorno {
   readonly carregarConversa: (identificador: string) => Promise<boolean>;
   readonly followUpSuggestions: readonly ChatSuggestion[];
   readonly reenviarUltimaMensagem: () => void;
+  readonly acaoPendente: AcaoPendente | null;
+  readonly limparAcaoPendente: () => void;
 }
 
 export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssistenteRetorno {
@@ -54,6 +59,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
   const [conversaAtualId, setConversaAtualId] = useState<string | null>(null);
   const [estaCarregando, setEstaCarregando] = useState(false);
   const [followUpSuggestions, setFollowUpSuggestions] = useState<ChatSuggestion[]>([]);
+  const [acaoPendente, setAcaoPendente] = useState<AcaoPendente | null>(null);
   const controladorAbortRef = useRef<AbortController | null>(null);
   const timeoutAutoSaveRef = useRef<NodeJS.Timeout | null>(null);
   const retryContentRef = useRef<string | null>(null);
@@ -90,6 +96,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
       setErro(null);
       setEstaTransmitindo(true);
       setFollowUpSuggestions([]);
+      setAcaoPendente(null);
 
       const mensagemUsuario: MensagemChat = {
         identificador: crypto.randomUUID(),
@@ -166,8 +173,12 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
           const { cleanText: textoSemSugestoes } = parseSuggestionsFromResponse(textoAcumulado);
           const textoSemParciais = stripPartialSuggestionMarker(textoSemSugestoes);
 
+          // Strip complete action markers + partial ones (streaming)
+          const { cleanText: textoSemAcao } = parsearAcaoPendente(textoSemParciais);
+          const textoSemAcaoParcial = stripPartialAcaoMarker(textoSemAcao);
+
           // Processar highlights e remover marcadores
-          const textoLimpo = processHighlights(textoSemParciais);
+          const textoLimpo = processHighlights(textoSemAcaoParcial);
 
           // Atualizar mensagem do assistente progressivamente
           setMensagens((anteriores) =>
@@ -183,6 +194,10 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
         const { cleanText: textoFinalSemSugestoes, suggestions } =
           parseSuggestionsFromResponse(textoAcumulado);
         setFollowUpSuggestions(suggestions);
+
+        // Extract pending action from completed response
+        const { acaoPendente: novaAcao } = parsearAcaoPendente(textoFinalSemSugestoes);
+        if (novaAcao) setAcaoPendente(novaAcao);
 
         // Auto-save debounced: aguardar 2s apos streaming concluir
         if (timeoutAutoSaveRef.current) {
@@ -269,8 +284,11 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
     setConversaAtualId(null);
     setErro(null);
     setFollowUpSuggestions([]);
+    setAcaoPendente(null);
     autoSaveFailCountRef.current = 0;
   }, []);
+
+  const limparAcaoPendente = useCallback(() => setAcaoPendente(null), []);
 
   // Keep a ref to enviarMensagem so the retry effect always calls the latest version
   const enviarMensagemRef = useRef(enviarMensagem);
@@ -310,5 +328,7 @@ export function useChatAssistant(opcoes?: UseChatAssistenteOpcoes): UseChatAssis
     carregarConversa,
     followUpSuggestions,
     reenviarUltimaMensagem,
+    acaoPendente,
+    limparAcaoPendente,
   };
 }

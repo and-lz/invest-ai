@@ -60,6 +60,54 @@ export function processHighlights(texto: string): string {
   return texto.replace(regex, "");
 }
 
+/** A pending action extracted from [ACAO:texto|tipo|ativos] markers in assistant responses */
+export interface AcaoPendente {
+  readonly texto: string;
+  readonly tipo: "positivo" | "atencao" | "neutro";
+  readonly ativos: string[];
+}
+
+/** Parse [ACAO:texto|tipo|ativos] marker from assistant response.
+ * Returns the extracted action and the cleaned text (marker removed).
+ * Returns null for acaoPendente if no valid marker found. */
+export function parsearAcaoPendente(text: string): {
+  cleanText: string;
+  acaoPendente: AcaoPendente | null;
+} {
+  const regex = /\[ACAO:([^|\]]+)\|([^|\]]+)\|([^\]]*)\]/;
+  const match = regex.exec(text);
+
+  if (!match) {
+    return { cleanText: text, acaoPendente: null };
+  }
+
+  const rawTexto = match[1]?.trim() ?? "";
+  const rawTipo = match[2]?.trim() ?? "";
+  const rawAtivos = match[3]?.trim() ?? "";
+
+  const tiposValidos = ["positivo", "atencao", "neutro"] as const;
+  const tipo = tiposValidos.includes(rawTipo as (typeof tiposValidos)[number])
+    ? (rawTipo as AcaoPendente["tipo"])
+    : "neutro";
+
+  const ativos = rawAtivos
+    ? rawAtivos
+        .split(",")
+        .map((a) => a.trim())
+        .filter(Boolean)
+    : [];
+
+  const acaoPendente: AcaoPendente = { texto: rawTexto, tipo, ativos };
+  const cleanText = text.replace(regex, "").trimEnd();
+
+  return { cleanText, acaoPendente };
+}
+
+/** Strips incomplete [ACAO:... markers during streaming (closing ] not yet arrived). */
+export function stripPartialAcaoMarker(text: string): string {
+  return text.replace(/\[ACAO:[^\]]*$/, "").trimEnd();
+}
+
 /** Find the content of the last user message in a list. */
 export function findLastUserContent(mensagens: readonly MensagemChat[]): string | null {
   for (let i = mensagens.length - 1; i >= 0; i--) {
