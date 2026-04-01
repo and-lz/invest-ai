@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
@@ -11,12 +11,11 @@ import { useChatAssistant } from "@/hooks/use-chat-assistant";
 import { useSavedMessages } from "@/hooks/use-saved-messages";
 import { useConversas } from "@/hooks/use-conversations";
 import { useChatPageContext } from "@/contexts/chat-page-context";
-import { useChatSuggestions } from "@/hooks/use-chat-suggestions";
+import { useChatUiState } from "@/hooks/use-chat-ui-state";
 import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { useNativeDialog } from "@/hooks/use-native-dialog";
 import { useChatWidgetState } from "@/hooks/use-chat-widget-state";
 import { stripMarkdown } from "@/lib/strip-markdown";
-import { INITIAL_SUGGESTIONS, gerarSugestoesDashboard, gerarBoasVindas } from "@/lib/chat-suggestions";
 import {
   EVENTO_ABRIR_CHAT_COM_PERGUNTA,
   type EventoAbrirChatDetalhe,
@@ -25,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { dialog } from "@/lib/design-system";
 import { notificar } from "@/lib/notifier";
 import type { MensagemChat } from "@/schemas/chat.schema";
+import { AcaoPendenteCard } from "@/components/chat/acao-pendente-card";
 
 export function ChatWidget() {
   const pathname = usePathname();
@@ -52,13 +52,10 @@ export function ChatWidget() {
 
   const { data: session } = useSession();
 
-  const userInitials = session?.user?.name
-    ? session.user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : undefined;
+  const userInitials = session?.user?.name ? session.user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : undefined;
   const userImageUrl = session?.user?.image ?? undefined;
 
-  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } =
-    useSpeechSynthesis();
+  const { isSupported: ttsSupported, speak, stop: stopSpeech, status: speechStatus } = useSpeechSynthesis();
 
   const {
     mensagens,
@@ -73,6 +70,8 @@ export function ChatWidget() {
     carregarConversa,
     followUpSuggestions,
     reenviarUltimaMensagem,
+    acaoPendente,
+    limparAcaoPendente,
   } = useChatAssistant({ raciocinio, modelTier });
 
   const { savedMessageIds, saveMessage, unsaveMessage } = useSavedMessages();
@@ -96,42 +95,14 @@ export function ChatWidget() {
     [savedMessageIds, unsaveMessage, saveMessage, conversaAtualId, conversas],
   );
 
-  const recentMessages = useMemo(
-    () => mensagens.slice(-4).map((m) => m.conteudo.slice(0, 200)),
-    [mensagens],
-  );
-
-  const { suggestions: aiSuggestions, isLoading: aiSuggestionsLoading } = useChatSuggestions({
-    input: inputValue,
-    pageId: identificadorPagina,
-    recentMessages,
-    enabled: mensagens.length > 0 && !estaTransmitindo && inputValue.trim().length >= 3,
+  const { activeSuggestions, aiSuggestions, aiSuggestionsLoading, welcomeMessage } = useChatUiState({
+    identificadorPagina,
+    resumoContexto,
+    mensagens,
+    estaTransmitindo,
+    inputValue,
+    followUpSuggestions,
   });
-
-  const initialSuggestions = useMemo(() => {
-    if (identificadorPagina === "dashboard" && resumoContexto) {
-      return gerarSugestoesDashboard(resumoContexto);
-    }
-    return INITIAL_SUGGESTIONS[identificadorPagina] ?? [];
-  }, [identificadorPagina, resumoContexto]);
-
-  const activeSuggestions = useMemo(() => {
-    if (mensagens.length === 0) {
-      return initialSuggestions;
-    }
-    if (aiSuggestions.length > 0) {
-      return aiSuggestions;
-    }
-    return followUpSuggestions.length > 0 ? followUpSuggestions : initialSuggestions;
-  }, [mensagens.length, initialSuggestions, followUpSuggestions, aiSuggestions]);
-
-  const welcomeMessage = useMemo(
-    () =>
-      identificadorPagina === "dashboard" && resumoContexto
-        ? gerarBoasVindas(resumoContexto)
-        : undefined,
-    [identificadorPagina, resumoContexto],
-  );
 
   const handleSuggestionSelect = useCallback(
     (text: string) => {
@@ -315,6 +286,11 @@ export function ChatWidget() {
               onToggleSave={handleToggleSave}
               welcomeMessage={welcomeMessage}
             />
+
+            {/* Pending action confirmation card */}
+            {acaoPendente && !estaTransmitindo && (
+              <AcaoPendenteCard acao={acaoPendente} onConcluir={limparAcaoPendente} />
+            )}
           </div>
         </div>
       </dialog>
