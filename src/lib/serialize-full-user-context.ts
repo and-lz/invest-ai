@@ -1,8 +1,15 @@
 import type { DashboardData } from "@/application/use-cases/get-dashboard-data";
+import type { InsightsResponse } from "@/schemas/insights.schema";
+import type { ItemPlanoAcao } from "@/schemas/action-plan.schema";
 import { formatarMoeda } from "@/domain/value-objects/money";
 import { formatSimplePercentage } from "@/domain/value-objects/percentage";
 
 const LIMITE_CARACTERES_CONTEXTO = 15_000;
+
+interface SuplementoContexto {
+  insights?: InsightsResponse | null;
+  itensPendentes?: ItemPlanoAcao[];
+}
 
 function truncar(texto: string): string {
   return texto.length > LIMITE_CARACTERES_CONTEXTO
@@ -13,8 +20,12 @@ function truncar(texto: string): string {
 /**
  * Serializa dados completos do usuario (todos os campos do DashboardData)
  * para contexto do chat quando nao ha contexto de pagina especifico.
+ * @param suplemento - Dados opcionais de insights e plano de acao para enriquecer o contexto
  */
-export function serializarContextoCompletoUsuario(dados: DashboardData): string {
+export function serializarContextoCompletoUsuario(
+  dados: DashboardData,
+  suplemento?: SuplementoContexto,
+): string {
   const linhas: string[] = [];
 
   // === Resumo principal (same as serializarContextoDashboard) ===
@@ -58,6 +69,52 @@ export function serializarContextoCompletoUsuario(dados: DashboardData): string 
     linhas.push(
       `- Eventos Financeiros no Mes: ${formatarMoeda(dados.resumoAtual.eventosFinanceirosNoMes.valorEmCentavos)}`,
     );
+  }
+
+  // === Insights ativos (alta prioridade) ===
+  if (suplemento?.insights) {
+    const insights = suplemento.insights;
+    const insightsAlta = insights.insights.filter(
+      (i) => i.prioridade === "alta" && i.statusAcao !== "ignorada",
+    );
+    const insightsMedia = insights.insights.filter(
+      (i) => i.prioridade === "media" && i.statusAcao !== "ignorada",
+    );
+    linhas.push("");
+    linhas.push(`## Insights Ativos (${insights.mesReferencia})`);
+    if (insights.alertas.length > 0) {
+      for (const alerta of insights.alertas) {
+        linhas.push(`- [${alerta.tipo.toUpperCase()}] ${alerta.mensagem}`);
+      }
+    }
+    if (insightsAlta.length > 0) {
+      linhas.push("### Alta Prioridade");
+      for (const insight of insightsAlta.slice(0, 4)) {
+        const acao = insight.acaoSugerida ? ` → ${insight.acaoSugerida}` : "";
+        linhas.push(`- ${insight.titulo}: ${insight.descricao}${acao}`);
+      }
+    }
+    if (insightsMedia.length > 0) {
+      linhas.push(`### Media Prioridade (${insightsMedia.length} insights)`);
+      for (const insight of insightsMedia.slice(0, 3)) {
+        linhas.push(`- ${insight.titulo}`);
+      }
+    }
+    if (insights.recomendacoesLongoPrazo.length > 0) {
+      linhas.push("### Recomendacoes de Longo Prazo");
+      for (const rec of insights.recomendacoesLongoPrazo.slice(0, 3)) {
+        linhas.push(`- ${rec}`);
+      }
+    }
+  }
+
+  // === Plano de acao pendente ===
+  if (suplemento?.itensPendentes && suplemento.itensPendentes.length > 0) {
+    linhas.push("");
+    linhas.push("## Plano de Acao Pendente");
+    for (const item of suplemento.itensPendentes.slice(0, 5)) {
+      linhas.push(`- [${item.identificador.slice(0, 8)}] (${item.tipoConclusao}) ${item.textoOriginal}`);
+    }
   }
 
   // === Benchmarks ===

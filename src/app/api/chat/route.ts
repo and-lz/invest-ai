@@ -1,5 +1,11 @@
 import { requireAuth } from "@/lib/auth-utils";
-import { criarProvedorAi, obterAiConfigParaUsuario, obterGetDashboardDataUseCase } from "@/lib/container";
+import {
+  criarProvedorAi,
+  obterAiConfigParaUsuario,
+  obterGetDashboardDataUseCase,
+  obterReportRepository,
+  obterPlanoAcaoRepository,
+} from "@/lib/container";
 import { RequisicaoChatSchema } from "@/schemas/chat.schema";
 import { construirInstrucaoSistemaChat } from "@/lib/build-chat-system-prompt";
 import { serializarContextoCompletoUsuario } from "@/lib/serialize-chat-context";
@@ -45,10 +51,32 @@ export async function POST(request: Request): Promise<Response> {
     let contextoFinal = contextoPagina;
     if (!contextoFinal) {
       try {
-        const dashboardUseCase = await obterGetDashboardDataUseCase();
-        const dadosDashboard = await dashboardUseCase.executar();
+        const userId = verificacaoAuth.session.user.userId;
+        const [dashboardUseCase, reportRepo, planoAcaoRepo] = await Promise.all([
+          obterGetDashboardDataUseCase(),
+          obterReportRepository(),
+          obterPlanoAcaoRepository(),
+        ]);
+
+        const [dadosDashboard, insightsMetadados, itensPendentes] = await Promise.all([
+          dashboardUseCase.executar(),
+          reportRepo.listarInsightsMetadados().catch(() => []),
+          planoAcaoRepo.listarItensDoUsuario(userId).catch(() => []),
+        ]);
+
         if (dadosDashboard) {
-          contextoFinal = serializarContextoCompletoUsuario(dadosDashboard);
+          // Load most recent monthly insights (not consolidated)
+          const metadadosMaisRecente = insightsMetadados
+            .filter((m) => m.identificador !== "consolidado")
+            .sort((a, b) => b.mesReferencia.localeCompare(a.mesReferencia))[0];
+          const insights = metadadosMaisRecente
+            ? await reportRepo.obterInsights(metadadosMaisRecente.identificador).catch(() => null)
+            : null;
+
+          contextoFinal = serializarContextoCompletoUsuario(dadosDashboard, {
+            insights,
+            itensPendentes: itensPendentes.filter((i) => i.status === "pendente"),
+          });
         }
       } catch (erro) {
         console.error("[Chat] Falha ao carregar dados do portfolio:", erro);
