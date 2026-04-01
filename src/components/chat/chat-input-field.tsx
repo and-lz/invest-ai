@@ -4,11 +4,9 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Square, ChevronDown, Check, Zap, Cpu, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SuggestionChips } from "@/components/chat/suggestion-chips";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CLAUDE_MODEL_TIER_OPTIONS } from "@/lib/model-tiers";
 import type { ClaudeModelTier } from "@/lib/model-tiers";
-import type { ChatSuggestion } from "@/lib/chat-suggestions";
 
 /** Maps tier to display label shown in the input toolbar */
 const TIER_LABELS: Record<ClaudeModelTier, string> = {
@@ -37,10 +35,6 @@ interface CampoEntradaChatProps {
   readonly modelTier?: ClaudeModelTier;
   readonly onModelTierChange?: (tier: ClaudeModelTier) => void;
   readonly hideBorderTop?: boolean;
-  readonly suggestions?: readonly ChatSuggestion[];
-  readonly suggestionsLoading?: boolean;
-  readonly onSuggestionSelect?: (text: string) => void;
-  readonly suggestionsFilterText?: string;
 }
 
 function ehDispositivoTouch(): boolean {
@@ -62,10 +56,6 @@ export function CampoEntradaChat({
   modelTier,
   onModelTierChange,
   hideBorderTop,
-  suggestions,
-  suggestionsLoading,
-  onSuggestionSelect,
-  suggestionsFilterText,
 }: CampoEntradaChatProps) {
   const [internalValue, setInternalValue] = useState("");
   const isControlled = controlledValue !== undefined;
@@ -121,10 +111,6 @@ export function CampoEntradaChat({
     [setValor, fs],
   );
 
-  const showInlineChips = suggestions && suggestions.length > 0 && onSuggestionSelect && !valor.trim();
-
-  const chipsVisible = showInlineChips || suggestionsLoading;
-
   return (
     <div className={cn(
       "flex flex-col",
@@ -136,34 +122,20 @@ export function CampoEntradaChat({
         "rounded-2xl border border-border/60 bg-card transition-colors focus-within:border-border",
         fs ? "px-4 pt-3 pb-2" : "px-3 pt-2 pb-1.5",
       )}>
-        {/* Textarea area with optional chips overlay */}
-        <div className="relative">
-          <textarea
-            ref={textareaRef}
-            value={valor}
-            onChange={handleInput}
-            onKeyDown={handleKeyDown}
-            placeholder={chipsVisible ? undefined : "Pergunte algo sobre seus investimentos..."}
-            disabled={desabilitado}
-            rows={1}
-            className={cn(
-              "placeholder:text-muted-foreground w-full resize-none bg-transparent focus:ring-0 focus:outline-none disabled:opacity-50",
-              fs ? "text-base" : "text-sm",
-            )}
-          />
-          {chipsVisible && (
-            <div className="pointer-events-none absolute inset-0 flex items-start">
-              <SuggestionChips
-                suggestions={suggestions ?? []}
-                onSelect={onSuggestionSelect!}
-                filterText={suggestionsFilterText}
-                variant="quick-reply"
-                isLoading={suggestionsLoading}
-                fullscreen={fs}
-              />
-            </div>
+        {/* Textarea */}
+        <textarea
+          ref={textareaRef}
+          value={valor}
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          placeholder="Pergunte algo sobre seus investimentos..."
+          disabled={desabilitado}
+          rows={1}
+          className={cn(
+            "placeholder:text-muted-foreground w-full resize-none bg-transparent focus:ring-0 focus:outline-none disabled:opacity-50",
+            fs ? "text-base" : "text-sm",
           )}
-        </div>
+        />
 
         {/* Bottom toolbar: model selector + reasoning toggle + send */}
         <div className={cn("relative z-10 flex items-center justify-between", fs ? "mt-1" : "mt-0.5")}>

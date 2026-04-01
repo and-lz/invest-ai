@@ -95,7 +95,7 @@ export function ChatWidget() {
     [savedMessageIds, unsaveMessage, saveMessage, conversaAtualId, conversas],
   );
 
-  const { activeSuggestions, aiSuggestions, aiSuggestionsLoading, welcomeMessage } = useChatUiState({
+  const { activeSuggestions, aiSuggestionsLoading, welcomeMessage } = useChatUiState({
     identificadorPagina,
     resumoContexto,
     mensagens,
@@ -277,7 +277,8 @@ export function ChatWidget() {
               inputValue={inputValue}
               onInputValueChange={setInputValue}
               onSuggestionSelect={handleSuggestionSelect}
-              aiSuggestions={aiSuggestions}
+              onSuggestionPrefill={setInputValue}
+
               raciocinio={raciocinio}
               onRaciocinioChange={handleRaciocinioChange}
               modelTier={modelTier}

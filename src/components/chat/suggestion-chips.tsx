@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChatSuggestion } from "@/lib/chat-suggestions";
 
 interface SuggestionChipsProps {
   readonly suggestions: readonly ChatSuggestion[];
   readonly onSelect: (text: string) => void;
+  readonly onPrefill?: (text: string) => void;
   readonly filterText?: string;
   readonly variant: "empty-state" | "quick-reply";
   readonly isLoading?: boolean;
@@ -17,6 +18,7 @@ interface SuggestionChipsProps {
 export function SuggestionChips({
   suggestions,
   onSelect,
+  onPrefill,
   filterText,
   variant,
   isLoading,
@@ -60,12 +62,12 @@ export function SuggestionChips({
     );
   }
 
-  // Quick-reply: overlay inside textarea area
+  // Quick-reply: standalone horizontal scrollable row above the input
   return (
     <div
       className={cn(
-        "pointer-events-none flex flex-wrap items-center gap-1.5",
-        fs ? "py-0.5" : "py-px",
+        "flex items-center justify-center gap-1.5 overflow-x-auto scrollbar-none pb-1",
+        fs ? "px-5" : "px-3",
       )}
       role="group"
       aria-label="Sugestoes de perguntas"
@@ -74,19 +76,45 @@ export function SuggestionChips({
         <Loader2 className="text-muted-foreground h-3.5 w-3.5 shrink-0 animate-spin" />
       )}
       {filtered.map((suggestion) => (
-        <button
+        <div
           key={suggestion.label}
-          type="button"
-          onClick={() => onSelect(suggestion.text)}
           className={cn(
-            "pointer-events-auto",
-            "text-muted-foreground/60 hover:text-muted-foreground",
-            "rounded-full border border-border/40 cursor-pointer transition-colors",
-            fs ? "text-xs px-3 py-1" : "text-xs px-2.5 py-0.5",
+            "group flex shrink-0 items-center",
+            "rounded-full border border-primary/40 bg-card",
+            "text-primary",
+            fs ? "text-xs" : "text-xs",
           )}
         >
-          {suggestion.label}
-        </button>
+          <button
+            type="button"
+            onClick={() => onSelect(suggestion.text)}
+            aria-label={`Enviar: ${suggestion.label}`}
+            className={cn(
+              "cursor-pointer rounded-l-full px-3 py-1 transition-colors",
+              "hover:bg-muted transition-colors",
+              onPrefill ? "rounded-r-none pr-2" : "rounded-r-full",
+            )}
+          >
+            {suggestion.label}
+          </button>
+          {onPrefill && (
+            <>
+              <span className="h-3 w-px shrink-0 bg-border/40 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => onPrefill(suggestion.text)}
+                aria-label={`Editar sugestão: ${suggestion.label}`}
+                className={cn(
+                  "cursor-pointer rounded-r-full px-2 py-1 transition-all",
+                  "hover:bg-muted",
+                  "opacity-0 group-hover:opacity-100",
+                )}
+              >
+                <Pencil className="h-3 w-3" />
+              </button>
+            </>
+          )}
+        </div>
       ))}
     </div>
   );

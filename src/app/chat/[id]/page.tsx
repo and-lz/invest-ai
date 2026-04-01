@@ -271,7 +271,8 @@ export default function ChatPage() {
           inputValue={inputValue}
           onInputValueChange={setInputValue}
           onSuggestionSelect={handleSuggestionSelect}
-          aiSuggestions={aiSuggestions}
+          onSuggestionPrefill={setInputValue}
+
           raciocinio={raciocinio}
           onRaciocinioChange={handleRaciocinioChange}
           modelTier={modelTier}

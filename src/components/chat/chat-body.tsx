@@ -49,7 +49,7 @@ interface ChatBodyProps {
   readonly inputValue: string;
   readonly onInputValueChange: (value: string) => void;
   readonly onSuggestionSelect: (text: string) => void;
-  readonly aiSuggestions: readonly ChatSuggestion[];
+  readonly onSuggestionPrefill?: (text: string) => void;
   readonly raciocinio?: boolean;
   readonly onRaciocinioChange?: (enabled: boolean) => void;
   readonly modelTier?: ClaudeModelTier;
@@ -77,7 +77,7 @@ export function ChatBody({
   inputValue,
   onInputValueChange,
   onSuggestionSelect,
-  aiSuggestions,
+  onSuggestionPrefill,
   raciocinio,
   onRaciocinioChange,
   modelTier,
@@ -254,8 +254,19 @@ export function ChatBody({
       )}
 
       {/* Floating footer: input overlay with gradient fade */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-20">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-28">
         <div className="pointer-events-auto">
+          {/* Quick reply chips — rendered above the input box */}
+          {(activeSuggestions.length > 0 || aiSuggestionsLoading) && mensagens.length > 0 && !estaTransmitindo && (
+            <SuggestionChips
+              suggestions={activeSuggestions}
+              onSelect={onSuggestionSelect}
+              onPrefill={onSuggestionPrefill}
+              variant="quick-reply"
+              isLoading={aiSuggestionsLoading}
+              fullscreen={fs}
+            />
+          )}
           <CampoEntradaChat
             onEnviar={enviarMensagem}
             onParar={pararTransmissao}
@@ -268,10 +279,6 @@ export function ChatBody({
             modelTier={modelTier}
             onModelTierChange={onModelTierChange}
             hideBorderTop
-            suggestions={mensagens.length > 0 && !estaTransmitindo ? activeSuggestions : undefined}
-            suggestionsLoading={mensagens.length > 0 && !estaTransmitindo ? aiSuggestionsLoading : false}
-            onSuggestionSelect={onSuggestionSelect}
-            suggestionsFilterText={aiSuggestions.length > 0 ? undefined : inputValue}
           />
         </div>
       </div>
