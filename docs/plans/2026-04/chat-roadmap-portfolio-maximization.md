@@ -449,3 +449,48 @@ npm run test    # incluindo novos testes para gerarSugestoesDashboard + parsearA
 Steps 1→2→3 (Cluster A) → Steps 4→5 (Cluster B) → Steps 6→7 (Cluster C)
 
 Cada cluster pode ser commitado independentemente. Se a sessão acabar entre clusters, o build continua funcionando.
+
+---
+
+## Implementation
+
+**Status**: Complete ✅
+
+**Rollback point**: `bd9e025`
+
+### Step Results
+
+| Step | Commit | Files Changed | Notes |
+|------|--------|---------------|-------|
+| 1 — ResumoContextoChat | `219bc82` | `chat.schema.ts`, `chat-page-context.tsx`, `(dashboard)/page.tsx` | CDI from `comparacaoBenchmarksAtual`, top/worst from performers arrays |
+| 2 — Contexto enriquecido | `a5b70f1` | `serialize-full-user-context.ts`, `api/chat/route.ts` | Insights (top 4 high-priority) + pending action items injected server-side |
+| 3 — Sugestões data-driven | `cf567f7` | `chat-suggestions.ts`, `chat-widget.tsx`, `chat-body.tsx` | `gerarSugestoesDashboard()` + `gerarBoasVindas()` functions |
+| 4 — System prompt profundo | `a8b1ccb` | `build-chat-system-prompt.ts` | 4-block analysis + rebalancing table + [ACAO:] marker instructions |
+| 5 — Chip análise completa | `f3336c9` | `chat-suggestions.ts` | "Análise completa da carteira" always first; label length increased to 60 |
+| 6 — Parsing [ACAO:] | `e09c51f` | `chat-stream-utils.ts`, `use-chat-assistant.ts` | `parsearAcaoPendente()`, `stripPartialAcaoMarker()`, `acaoPendente` state |
+| 7 — UI card + persistência | `1b11867` | `acao-pendente-card.tsx` (new), `chat-widget.tsx`, `use-chat-ui-state.ts` (new) | Self-contained card; extracted `useChatUiState` hook to stay under max-lines |
+
+---
+
+## Post-Mortem
+
+### What went well
+- All 7 steps shipped with clean commits and zero test regressions (714 tests passing throughout)
+- The marker pattern (`[ACAO:]`, `[SUGGESTIONS:]`, `[HIGHLIGHT:]`) proved to be a robust protocol — easy to extend
+- Server-side context enrichment (Step 2) required zero client-side changes and works transparently
+- The `ResumoContextoChat` abstraction cleanly separated data computation (dashboard page) from presentation (chat widget)
+
+### What was harder than expected
+- **`max-lines: 300` ESLint rule**: `chat-widget.tsx` hit 331 lines after Step 7. Required extracting `useChatUiState` hook to hold suggestions + welcome message memos. Not planned in the original scope.
+- **Step 2 insights loading**: The existing `InsightsRepository` didn't have a "get most recent" method — had to load all metadata and sort client-side in the route handler.
+- **`formatCompactCurrency` naming**: Wrong function name (`formatarMoedaCompacta`) used initially in `chat-suggestions.ts`, caught immediately by TypeScript.
+
+### Deviations from plan
+- Step 7 also created `acao-pendente-card.tsx` as a new file (originally planned as inline JSX in widget) — necessary to keep widget under 300 lines
+- Step 7 also created `use-chat-ui-state.ts` (not in original file list) — extracted for same reason
+- `handleCriarAcao` fetch logic was moved into `AcaoPendenteCard` itself (prop `onConcluir` vs original `onCriar`/`onIgnorar`) — cleaner API
+
+### Remaining work (future sessions)
+- Unit tests for `gerarSugestoesDashboard()` and `parsearAcaoPendente()` (noted in cross-cutting concerns — deferred)
+- Monitor if LLM actually uses `[ACAO:]` marker in practice — may need prompt tuning
+- Consider rate-limiting the `[ACAO:]` card to once per conversation (currently fires on every qualifying response)
