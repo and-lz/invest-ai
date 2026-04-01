@@ -64,7 +64,7 @@ export function SuggestionChips({
   return (
     <div
       className={cn(
-        "pointer-events-auto flex flex-wrap items-center gap-1.5",
+        "pointer-events-none flex flex-wrap items-center gap-1.5",
         fs ? "py-0.5" : "py-px",
       )}
       role="group"
@@ -79,6 +79,7 @@ export function SuggestionChips({
           type="button"
           onClick={() => onSelect(suggestion.text)}
           className={cn(
+            "pointer-events-auto",
             "text-muted-foreground/60 hover:text-muted-foreground",
             "rounded-full border border-border/40 cursor-pointer transition-colors",
             fs ? "text-xs px-3 py-1" : "text-xs px-2.5 py-0.5",

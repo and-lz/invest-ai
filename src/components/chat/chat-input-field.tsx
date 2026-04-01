@@ -237,7 +237,7 @@ export function CampoEntradaChat({
             {/* Send / Stop button */}
             {estaTransmitindo ? (
               <Button variant="ghost" size="icon" onClick={onParar} className="h-7 w-7 shrink-0">
-                <Square className="h-3.5 w-3.5" />
+                <Square className="h-3.5 w-3.5 fill-current" />
                 <span className="sr-only">Parar transmissao</span>
               </Button>
             ) : (
