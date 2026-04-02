@@ -183,7 +183,7 @@ export function ChatBody({
       )}
 
       {/* Floating footer: input overlay with gradient fade */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-28">
+      <div className={cn("pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-background via-background/90 to-transparent pt-28", fs && "pb-4")}>
         <div className="pointer-events-auto">
           {/* Quick reply chips — rendered above the input box */}
           {(activeSuggestions.length > 0 || aiSuggestionsLoading) && mensagens.length > 0 && !estaTransmitindo && (
