@@ -245,7 +245,7 @@ export default function ChatPage() {
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}
-          className="text-muted-foreground hover:text-foreground hover:bg-muted hidden h-10 w-10 shrink-0 items-center justify-center transition-colors md:inline-flex"
+          className="text-muted-foreground hover:text-foreground hover:bg-muted hidden h-9 w-9 shrink-0 self-start items-center justify-center mt-2 ml-1 rounded-md transition-colors md:inline-flex"
           aria-label="Abrir sidebar"
         >
           <PanelLeft className="h-4 w-4" />
