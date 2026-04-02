@@ -1,37 +1,18 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
-import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { MensagemChatBolha } from "@/components/chat/chat-message";
 import { CampoEntradaChat } from "@/components/chat/chat-input-field";
 import { SuggestionChips } from "@/components/chat/suggestion-chips";
-import { Skeleton } from "@/components/ui/skeleton";
+import { MessageBubbleSkeleton } from "@/components/chat/chat-body-skeleton";
+import { ChatEmptyState } from "@/components/chat/chat-empty-state";
+import { useAutoScroll } from "@/hooks/use-auto-scroll";
+import { getDateLabel, isSameDay } from "@/lib/chat-date-utils";
 import { cn } from "@/lib/utils";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import type { ChatSuggestion } from "@/lib/chat-suggestions";
 import type { ClaudeModelTier } from "@/lib/model-tiers";
 import type { StreamingPhase } from "@/hooks/use-chat-assistant";
-
-const NEAR_BOTTOM_THRESHOLD = 100;
-
-function getDateLabel(isoString: string): string {
-  const date = new Date(isoString);
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
-
-  const sameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-
-  if (sameDay(date, today)) return "Hoje";
-  if (sameDay(date, yesterday)) return "Ontem";
-  return date.toLocaleDateString("pt-BR", { day: "numeric", month: "long" });
-}
-
-function isSameDay(a: string, b: string): boolean {
-  return a.slice(0, 10) === b.slice(0, 10);
-}
 
 interface ChatBodyProps {
   readonly mensagens: readonly MensagemChat[];
@@ -96,47 +77,8 @@ export function ChatBody({
   welcomeMessage,
   headerSlot,
 }: ChatBodyProps) {
-  const areaScrollRef = useRef<HTMLDivElement>(null);
-  const mergedScrollRef = useCallback((node: HTMLDivElement | null) => {
-    (areaScrollRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-    if (scrollAreaRef) {
-      (scrollAreaRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-    }
-  }, [scrollAreaRef]);
-  const isNearBottomRef = useRef(true);
-  const [showScrollBtn, setShowScrollBtn] = useState(false);
-  const [hasNewMessages, setHasNewMessages] = useState(false);
-  const prevMsgCountRef = useRef(mensagens.length);
-
-  const scrollToBottom = useCallback(() => {
-    if (areaScrollRef.current) {
-      areaScrollRef.current.scrollTo({ top: areaScrollRef.current.scrollHeight, behavior: "smooth" });
-    }
-    setHasNewMessages(false);
-  }, []);
-
-  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < NEAR_BOTTOM_THRESHOLD;
-    isNearBottomRef.current = nearBottom;
-    setShowScrollBtn(!nearBottom);
-    if (nearBottom) setHasNewMessages(false);
-  }, []);
-
-  // Smart auto-scroll: only scroll when user is near bottom and there are messages
-  useEffect(() => {
-    const newCount = mensagens.length;
-    const hadNewMessages = newCount > prevMsgCountRef.current;
-    prevMsgCountRef.current = newCount;
-
-    if (newCount === 0 || !areaScrollRef.current) return;
-
-    if (isNearBottomRef.current) {
-      areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
-    } else if (hadNewMessages) {
-      setHasNewMessages(true);
-    }
-  }, [mensagens]);
+  const { mergedScrollRef, showScrollBtn, hasNewMessages, scrollToBottom, handleScroll } =
+    useAutoScroll({ messageCount: mensagens.length, scrollAreaRef });
 
   return (
     <div className={cn("relative flex min-h-0 flex-1 flex-col", fs && "chat-fullscreen")}>
@@ -156,26 +98,12 @@ export function ChatBody({
           </div>
         )}
         {!estaCarregandoConversa && mensagens.length === 0 && (
-          <div className={cn(
-            "flex h-full flex-col items-center justify-center text-center",
-            fs ? "mx-auto max-w-4xl gap-6" : "gap-4",
-          )}>
-            <Image src="/fortuna-minimal.png" alt="Fortuna" width={64} height={64} className={cn(fs ? "h-16 w-16" : "h-12 w-12")} />
-            <div>
-              <p className={cn("font-medium", fs ? "text-lg" : "text-sm")}>
-                {welcomeMessage ?? "Ola! Sou a Fortuna, sua assistente de investimentos."}
-              </p>
-              <p className={cn("text-muted-foreground mt-1", fs ? "text-sm" : "text-xs")}>
-                Pergunte sobre seus investimentos, e eu te ajudo a entender.
-              </p>
-            </div>
-            <SuggestionChips
-              suggestions={activeSuggestions}
-              onSelect={onSuggestionSelect}
-              variant="empty-state"
-              fullscreen={fs}
-            />
-          </div>
+          <ChatEmptyState
+            fullscreen={fs}
+            welcomeMessage={welcomeMessage}
+            suggestions={activeSuggestions}
+            onSuggestionSelect={onSuggestionSelect}
+          />
         )}
         {mensagens.length > 0 && (
           <div className={cn("space-y-3", fs ? "mx-auto max-w-[80ch] space-y-4 p-4 pt-12" : "p-3")}>
@@ -195,32 +123,32 @@ export function ChatBody({
                   )}
                   <MensagemChatBolha
                     mensagem={mensagem}
-                estaTransmitindo={
-                  estaTransmitindo &&
-                  mensagem.papel === "assistente" &&
-                  indice === mensagens.length - 1
-                }
-                streamingPhase={
-                  estaTransmitindo && indice === mensagens.length - 1
-                    ? streamingPhase
-                    : "idle"
-                }
-                userImageUrl={userImageUrl}
-                userInitials={userInitials}
-                onRetry={
-                  mensagem.papel === "assistente" && indice === mensagens.length - 1
-                    ? reenviarUltimaMensagem
-                    : undefined
-                }
-                onRegenerate={
-                  mensagem.papel === "assistente" && indice === mensagens.length - 1
-                    ? onRegenerate
-                    : undefined
-                }
-                fullscreen={fs}
-                isSaved={savedMessageIds?.has(mensagem.identificador)}
-                onToggleSave={onToggleSave ? () => onToggleSave(mensagem) : undefined}
-              />
+                    estaTransmitindo={
+                      estaTransmitindo &&
+                      mensagem.papel === "assistente" &&
+                      indice === mensagens.length - 1
+                    }
+                    streamingPhase={
+                      estaTransmitindo && indice === mensagens.length - 1
+                        ? streamingPhase
+                        : "idle"
+                    }
+                    userImageUrl={userImageUrl}
+                    userInitials={userInitials}
+                    onRetry={
+                      mensagem.papel === "assistente" && indice === mensagens.length - 1
+                        ? reenviarUltimaMensagem
+                        : undefined
+                    }
+                    onRegenerate={
+                      mensagem.papel === "assistente" && indice === mensagens.length - 1
+                        ? onRegenerate
+                        : undefined
+                    }
+                    fullscreen={fs}
+                    isSaved={savedMessageIds?.has(mensagem.identificador)}
+                    onToggleSave={onToggleSave ? () => onToggleSave(mensagem) : undefined}
+                  />
                 </div>
               );
             })}
@@ -285,17 +213,6 @@ export function ChatBody({
           />
         </div>
       </div>
-    </div>
-  );
-}
-
-function MessageBubbleSkeleton({ fullscreen: fs, contentLines }: {
-  readonly role: "user" | "assistant"; readonly fullscreen: boolean;
-  readonly contentLines: readonly string[];
-}) {
-  return (
-    <div className={cn("w-full space-y-2", fs ? "py-2" : "py-1.5")}>
-      {contentLines.map((w, i) => <Skeleton key={i} className={cn("rounded", w, fs ? "h-4" : "h-3.5")} />)}
     </div>
   );
 }
