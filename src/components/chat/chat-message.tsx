@@ -172,14 +172,16 @@ export function MensagemChatBolha({
             )
           )}
 
-          {/* Bookmark — appears on hover outside the message */}
+          {/* Bookmark — user messages: inside bubble at bottom-right; assistant: outside bubble at top-right */}
           {onToggleSave && !estaTransmitindo && cleanContent && (
             <button
               onClick={onToggleSave}
               type="button"
               className={cn(
-                "absolute top-0 transition-opacity",
-                ehUsuario ? "-left-8" : "-right-8",
+                "absolute transition-opacity",
+                ehUsuario
+                  ? "bottom-2 right-2" // Inside bubble for user messages
+                  : "top-0 -right-8", // Outside bubble for assistant messages
                 fs ? "h-7 w-7" : "h-6 w-6",
                 "inline-flex items-center justify-center rounded-md hover:bg-muted",
                 isSaved
