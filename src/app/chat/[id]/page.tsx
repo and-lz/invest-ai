@@ -212,7 +212,7 @@ export default function ChatPage() {
       {/* Desktop sidebar — independent from header */}
       <aside
         className={cn(
-          "chat-sidebar bg-background hidden border-r border-border/20 transition-all duration-200 md:flex",
+          "chat-sidebar bg-muted/10 hidden border-r border-border/20 transition-all duration-200 md:flex",
           sidebarOpen ? "w-80" : "w-0 overflow-hidden border-r-0",
         )}
       >
