@@ -12,8 +12,8 @@ import type { SpeechStatus } from "@/hooks/use-speech-synthesis";
 
 interface ChatPageHeaderProps {
   readonly title: string;
-  readonly onToggleSidebar: () => void;
   readonly onNovaConversa: () => void;
+  readonly onOpenMobileSidebar?: () => void;
   readonly ttsSupported: boolean;
   readonly ttsEnabled: boolean;
   readonly speechStatus: SpeechStatus;
@@ -25,8 +25,8 @@ interface ChatPageHeaderProps {
 
 export function ChatPageHeader({
   title,
-  onToggleSidebar,
   onNovaConversa,
+  onOpenMobileSidebar,
   ttsSupported,
   ttsEnabled,
   onToggleTts,
@@ -39,9 +39,12 @@ export function ChatPageHeader({
   return (
     <header className="chat-page-nav shrink-0">
       <div className="flex items-center px-4 py-2">
-        <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="h-9 w-9 shrink-0">
-          <Menu className="h-4 w-4" />
-        </Button>
+        {/* Mobile-only menu button — desktop sidebar manages itself */}
+        {onOpenMobileSidebar && (
+          <Button variant="ghost" size="icon" onClick={onOpenMobileSidebar} className="h-9 w-9 shrink-0 md:hidden">
+            <Menu className="h-4 w-4" />
+          </Button>
+        )}
 
         <div className="min-w-0 flex-1 px-3">
           <h1 className="text-muted-foreground truncate text-sm font-medium">{title}</h1>

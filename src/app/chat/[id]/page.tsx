@@ -18,6 +18,7 @@ import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import { stripMarkdown } from "@/lib/strip-markdown";
 import { notificar } from "@/lib/notifier";
 import { INITIAL_SUGGESTIONS } from "@/lib/chat-suggestions";
+import { PanelLeft, PanelLeftClose } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import type { ClaudeModelTier } from "@/lib/model-tiers";
@@ -192,13 +193,6 @@ export default function ChatPage() {
     router.push("/chat");
   }, [criarNovaConversa, router]);
 
-  const toggleSidebar = useCallback(() => {
-    if (window.innerWidth < 768) {
-      mobileSidebarRef.current?.open();
-    } else {
-      setSidebarOpen((v) => !v);
-    }
-  }, []);
 
   const handleToggleTts = useCallback(() => {
     setTtsEnabled((prev) => {
@@ -215,21 +209,48 @@ export default function ChatPage() {
 
   return (
     <div className="flex min-h-0 flex-1">
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — independent from header */}
       <aside
         className={cn(
-          "chat-sidebar bg-background hidden border-r border-border/20 transition-all duration-200 md:block",
+          "chat-sidebar bg-background hidden border-r border-border/20 transition-all duration-200 md:flex",
           sidebarOpen ? "w-80" : "w-0 overflow-hidden border-r-0",
         )}
       >
-        <SidebarTabs
-          conversaAtualId={conversaAtualId}
-          onSelecionarConversa={handleSelecionarConversa}
-          onNovaConversa={handleNovaConversa}
-          fullscreen
-          useLinks
-        />
+        <div className="flex h-full w-80 flex-col">
+          {/* Sidebar collapse button */}
+          <div className="flex items-center justify-end px-2 py-1.5">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(false)}
+              className="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors"
+              aria-label="Fechar sidebar"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1">
+            <SidebarTabs
+              conversaAtualId={conversaAtualId}
+              onSelecionarConversa={handleSelecionarConversa}
+              onNovaConversa={handleNovaConversa}
+              fullscreen
+              useLinks
+            />
+          </div>
+        </div>
       </aside>
+
+      {/* Sidebar expand button — shown when collapsed (desktop only) */}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          className="text-muted-foreground hover:text-foreground hover:bg-muted hidden h-10 w-10 shrink-0 items-center justify-center transition-colors md:inline-flex"
+          aria-label="Abrir sidebar"
+        >
+          <PanelLeft className="h-4 w-4" />
+        </button>
+      )}
 
       <ChatMobileSidebar
         ref={mobileSidebarRef}
@@ -277,8 +298,8 @@ export default function ChatPage() {
           headerSlot={
             <ChatPageHeader
               title={title}
-              onToggleSidebar={toggleSidebar}
               onNovaConversa={handleNovaConversa}
+              onOpenMobileSidebar={() => mobileSidebarRef.current?.open()}
               ttsSupported={ttsSupported}
               ttsEnabled={ttsEnabled}
               speechStatus={speechStatus}
