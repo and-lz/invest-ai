@@ -58,6 +58,7 @@ interface ChatBodyProps {
   readonly onModelTierChange?: (tier: ClaudeModelTier) => void;
   readonly savedMessageIds?: ReadonlySet<string>;
   readonly onToggleSave?: (mensagem: MensagemChat) => void;
+  readonly onRegenerate?: () => void;
   readonly estaCarregandoConversa?: boolean;
   readonly scrollAreaRef?: React.RefObject<HTMLDivElement | null>;
   readonly welcomeMessage?: string;
@@ -89,6 +90,7 @@ export function ChatBody({
   onModelTierChange,
   savedMessageIds,
   onToggleSave,
+  onRegenerate,
   estaCarregandoConversa,
   scrollAreaRef,
   welcomeMessage,
@@ -121,18 +123,18 @@ export function ChatBody({
     if (nearBottom) setHasNewMessages(false);
   }, []);
 
-  // Smart auto-scroll: only scroll when user is near bottom
+  // Smart auto-scroll: only scroll when user is near bottom and there are messages
   useEffect(() => {
     const newCount = mensagens.length;
     const hadNewMessages = newCount > prevMsgCountRef.current;
     prevMsgCountRef.current = newCount;
 
-    if (areaScrollRef.current) {
-      if (isNearBottomRef.current) {
-        areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
-      } else if (hadNewMessages) {
-        setHasNewMessages(true);
-      }
+    if (newCount === 0 || !areaScrollRef.current) return;
+
+    if (isNearBottomRef.current) {
+      areaScrollRef.current.scrollTop = areaScrollRef.current.scrollHeight;
+    } else if (hadNewMessages) {
+      setHasNewMessages(true);
     }
   }, [mensagens]);
 
@@ -223,6 +225,11 @@ export function ChatBody({
                     ? reenviarUltimaMensagem
                     : undefined
                 }
+                onRegenerate={
+                  mensagem.papel === "assistente" && indice === mensagens.length - 1
+                    ? onRegenerate
+                    : undefined
+                }
                 fullscreen={fs}
                 isSaved={savedMessageIds?.has(mensagem.identificador)}
                 onToggleSave={onToggleSave ? () => onToggleSave(mensagem) : undefined}
@@ -295,26 +302,13 @@ export function ChatBody({
   );
 }
 
-/** Mirrors the exact DOM of MensagemChatBolha but with skeleton placeholders. */
-function MessageBubbleSkeleton({
-  fullscreen: fs,
-  contentLines,
-}: {
-  readonly role: "user" | "assistant";
-  readonly fullscreen: boolean;
-  /** Width classes for each skeleton text line (e.g. ["w-full", "w-4/5"]) */
+function MessageBubbleSkeleton({ fullscreen: fs, contentLines }: {
+  readonly role: "user" | "assistant"; readonly fullscreen: boolean;
   readonly contentLines: readonly string[];
 }) {
   return (
-    <div className={cn("w-full", fs ? "py-2" : "py-1.5")}>
-      <div className={cn("space-y-2", fs ? "text-base leading-relaxed" : "text-sm leading-relaxed")}>
-        {contentLines.map((widthCls, i) => (
-          <Skeleton
-            key={i}
-            className={cn("rounded", widthCls, fs ? "h-4" : "h-3.5")}
-          />
-        ))}
-      </div>
+    <div className={cn("w-full space-y-2", fs ? "py-2" : "py-1.5")}>
+      {contentLines.map((w, i) => <Skeleton key={i} className={cn("rounded", w, fs ? "h-4" : "h-3.5")} />)}
     </div>
   );
 }

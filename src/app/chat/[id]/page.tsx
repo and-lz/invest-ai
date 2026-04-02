@@ -103,15 +103,6 @@ export default function ChatPage() {
   const conversaAtual = conversas.find((c) => c.identificador === conversaAtualId);
   const title = conversaAtual?.titulo ?? "Nova conversa";
 
-  const PAGE_LABELS: Record<string, string> = {
-    dashboard: "Dashboard",
-    reports: "Relatórios",
-    insights: "Análises",
-    trends: "Tendências",
-    desempenho: "Desempenho",
-    aprender: "Aprendizado",
-  };
-  const paginaLabel = conversaAtual ? (PAGE_LABELS[conversaAtual.identificadorPagina] ?? undefined) : undefined;
 
   const handleToggleSave = useCallback(
     (mensagem: MensagemChat) => {
@@ -280,12 +271,14 @@ export default function ChatPage() {
           onModelTierChange={handleModelTierChange}
           savedMessageIds={savedMessageIds}
           onToggleSave={handleToggleSave}
+          onRegenerate={reenviarUltimaMensagem}
           estaCarregandoConversa={estaCarregandoConversa}
           scrollAreaRef={scrollAreaRef}
           headerSlot={
             <ChatPageHeader
               title={title}
               onToggleSidebar={toggleSidebar}
+              onNovaConversa={handleNovaConversa}
               ttsSupported={ttsSupported}
               ttsEnabled={ttsEnabled}
               speechStatus={speechStatus}
@@ -293,9 +286,6 @@ export default function ChatPage() {
               hasMessages={mensagens.length > 0}
               onClearHistory={limparHistorico}
               onBack={() => router.push(lastNonChatPageRef.current)}
-              criadaEm={conversaAtual?.criadaEm}
-              preview={conversaAtual?.previewMensagem}
-              paginaLabel={paginaLabel}
             />
           }
         />
