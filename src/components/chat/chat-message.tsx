@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { AlertCircle, Bookmark, Brain, ChevronRight, RefreshCw } from "lucide-react";
+import { AlertCircle, Bookmark, Brain, Check, ChevronRight, Copy, RefreshCw } from "lucide-react";
 import type { MensagemChat } from "@/schemas/chat.schema";
 import type { StreamingPhase } from "@/hooks/use-chat-assistant";
 import { ConteudoMarkdownChat } from "@/components/chat/chat-markdown-content";
@@ -34,6 +34,7 @@ interface MensagemChatBolhaProps {
   readonly userImageUrl?: string;
   readonly userInitials?: string;
   readonly onRetry?: () => void;
+  readonly onRegenerate?: () => void;
   readonly fullscreen?: boolean;
   readonly isSaved?: boolean;
   readonly onToggleSave?: () => void;
@@ -44,12 +45,14 @@ export function MensagemChatBolha({
   estaTransmitindo,
   streamingPhase = "idle",
   onRetry,
+  onRegenerate,
   fullscreen,
   isSaved,
   onToggleSave,
 }: MensagemChatBolhaProps) {
   const ehUsuario = mensagem.papel === "usuario";
   const fs = fullscreen;
+  const [copied, setCopied] = useState(false);
 
   // Detect stream errors embedded in assistant messages
   const errorMatch = !ehUsuario ? mensagem.conteudo.match(STREAM_ERROR_REGEX) : null;
@@ -73,7 +76,7 @@ export function MensagemChatBolha({
   }, [isThinking, streamingPhase, hasThinkingContent]);
 
   return (
-    <section data-role={ehUsuario ? "user" : "assistant"}>
+    <section data-role={ehUsuario ? "user" : "assistant"} className="group/msg">
       <h2 className="sr-only">{ehUsuario ? "Voce" : "Fortuna"}</h2>
       {/* Thinking indicator — shown while AI is reasoning, before any content */}
       {!ehUsuario && isThinking && !hasThinkingContent && !cleanContent && (
@@ -128,14 +131,13 @@ export function MensagemChatBolha({
       {/* Message content */}
       <div
         className={cn(
-          "group/msg w-full flex",
+          "w-full flex",
           fs ? "py-2" : "py-1.5",
           ehUsuario ? "justify-end" : "justify-start",
         )}
       >
         <div
           className={cn(
-            "relative",
             fs ? "text-base leading-relaxed" : "text-sm leading-relaxed",
             ehUsuario
               ? "bg-muted/40 rounded-2xl rounded-br-sm max-w-[85%] px-4 py-2.5"
@@ -172,26 +174,7 @@ export function MensagemChatBolha({
             )
           )}
 
-          {/* Bookmark — appears on hover outside the message, top-right for both roles */}
-          {onToggleSave && !estaTransmitindo && cleanContent && (
-            <button
-              onClick={onToggleSave}
-              type="button"
-              className={cn(
-                "absolute top-0 -right-8 transition-opacity",
-                fs ? "h-7 w-7" : "h-6 w-6",
-                "inline-flex items-center justify-center rounded-md hover:bg-muted",
-                isSaved
-                  ? "text-primary opacity-100"
-                  : "text-muted-foreground opacity-0 group-hover/msg:opacity-100",
-              )}
-              aria-label={isSaved ? "Remover dos salvos" : "Salvar mensagem"}
-            >
-              <Bookmark
-                className={cn(fs ? "h-4 w-4" : "h-3.5 w-3.5", isSaved && "fill-current")}
-              />
-            </button>
-          )}
+          {/* Action bar — appears on hover below the message */}
 
           {/* Stream error with retry */}
           {streamError && (
@@ -215,15 +198,78 @@ export function MensagemChatBolha({
         </div>
       </div>
 
-      {/* Timestamp */}
+      {/* Timestamp + action bar row */}
       {!estaTransmitindo && cleanContent && (
-        <p className={cn(
-          "text-muted-foreground mt-0.5 px-1",
-          fs ? "text-[11px]" : "text-[10px]",
-          ehUsuario ? "text-right" : "text-left",
+        <div className={cn(
+          "mt-0.5 flex items-center gap-2 px-1",
+          ehUsuario ? "flex-row-reverse" : "flex-row",
         )}>
-          {formatMessageTime(mensagem.criadaEm)}
-        </p>
+          <span className={cn(
+            "text-muted-foreground",
+            fs ? "text-[11px]" : "text-[10px]",
+          )}>
+            {formatMessageTime(mensagem.criadaEm)}
+          </span>
+
+          {/* Action buttons — visible on message hover */}
+          <div className={cn(
+            "flex items-center gap-0.5 print:hidden",
+            "opacity-0 transition-opacity group-hover/msg:opacity-100",
+            isSaved && "opacity-100",
+          )}>
+            {/* Copy */}
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard.writeText(mensagem.conteudo);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1500);
+              }}
+              className={cn(
+                "text-muted-foreground hover:text-foreground inline-flex items-center justify-center rounded-md hover:bg-muted",
+                fs ? "h-7 w-7" : "h-6 w-6",
+              )}
+              aria-label="Copiar mensagem"
+            >
+              {copied ? (
+                <Check className={cn(fs ? "h-3.5 w-3.5" : "h-3 w-3", "text-success")} />
+              ) : (
+                <Copy className={cn(fs ? "h-3.5 w-3.5" : "h-3 w-3")} />
+              )}
+            </button>
+
+            {/* Regenerate — assistant messages only */}
+            {!ehUsuario && onRegenerate && (
+              <button
+                type="button"
+                onClick={onRegenerate}
+                className={cn(
+                  "text-muted-foreground hover:text-foreground inline-flex items-center justify-center rounded-md hover:bg-muted",
+                  fs ? "h-7 w-7" : "h-6 w-6",
+                )}
+                aria-label="Regenerar resposta"
+              >
+                <RefreshCw className={cn(fs ? "h-3.5 w-3.5" : "h-3 w-3")} />
+              </button>
+            )}
+
+            {/* Bookmark */}
+            {onToggleSave && (
+              <button
+                type="button"
+                onClick={onToggleSave}
+                className={cn(
+                  "inline-flex items-center justify-center rounded-md hover:bg-muted",
+                  fs ? "h-7 w-7" : "h-6 w-6",
+                  isSaved ? "text-primary" : "text-muted-foreground hover:text-foreground",
+                )}
+                aria-label={isSaved ? "Remover dos salvos" : "Salvar mensagem"}
+              >
+                <Bookmark className={cn(fs ? "h-3.5 w-3.5" : "h-3 w-3", isSaved && "fill-current")} />
+              </button>
+            )}
+          </div>
+        </div>
       )}
     </section>
   );
