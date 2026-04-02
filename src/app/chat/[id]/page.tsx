@@ -240,16 +240,18 @@ export default function ChatPage() {
         </div>
       </aside>
 
-      {/* Sidebar expand button — shown when collapsed (desktop only) */}
+      {/* Sidebar expand strip — shown when collapsed (desktop only) */}
       {!sidebarOpen && (
-        <button
-          type="button"
-          onClick={() => setSidebarOpen(true)}
-          className="text-muted-foreground hover:text-foreground hover:bg-muted hidden h-9 w-9 shrink-0 self-start items-center justify-center mt-2 ml-1 rounded-md transition-colors md:inline-flex"
-          aria-label="Abrir sidebar"
-        >
-          <PanelLeft className="h-4 w-4" />
-        </button>
+        <div className="bg-muted/30 hidden border-r border-border/20 px-1 pt-2 md:block">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            className="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors"
+            aria-label="Abrir sidebar"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </button>
+        </div>
       )}
 
       <ChatMobileSidebar
