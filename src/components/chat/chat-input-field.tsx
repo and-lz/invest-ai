@@ -123,7 +123,7 @@ export function CampoEntradaChat({
     )}>
       {/* Claude.ai-style input container: textarea + bottom toolbar */}
       <div className={cn(
-        "rounded-2xl border border-border/60 bg-card transition-colors focus-within:border-border",
+        "rounded-2xl border border-border/60 bg-card transition-[colors,box-shadow] focus-within:border-border focus-within:ring-1 focus-within:ring-primary/30 focus-within:shadow-[0_0_12px_-3px] focus-within:shadow-primary/20",
         fs ? "px-4 pt-3 pb-2" : "px-3 pt-2 pb-1.5",
       )}>
         {/* Textarea */}

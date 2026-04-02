@@ -160,27 +160,14 @@ export function ChatBody({
             "flex h-full flex-col items-center justify-center text-center",
             fs ? "mx-auto max-w-4xl gap-6" : "gap-4",
           )}>
-            <Image src="/fortuna-minimal.png" alt="Fortuna" width={48} height={48} className={cn("opacity-60", fs ? "h-12 w-12" : "h-10 w-10")} />
+            <Image src="/fortuna-minimal.png" alt="Fortuna" width={64} height={64} className={cn(fs ? "h-16 w-16" : "h-12 w-12")} />
             <div>
-              {welcomeMessage ? (
-                <>
-                  <p className={cn("font-medium", fs ? "text-base" : "text-sm")}>
-                    {welcomeMessage}
-                  </p>
-                  <p className={cn("text-muted-foreground mt-1", fs ? "text-sm" : "text-xs")}>
-                    O que quer analisar hoje?
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className={cn("text-muted-foreground", fs ? "text-base" : "text-sm")}>
-                    Pergunte sobre seus investimentos.
-                  </p>
-                  <p className={cn("text-muted-foreground mt-1", fs ? "text-sm" : "text-xs")}>
-                    A Fortuna tem acesso aos dados da pagina atual.
-                  </p>
-                </>
-              )}
+              <p className={cn("font-medium", fs ? "text-lg" : "text-sm")}>
+                {welcomeMessage ?? "Ola! Sou a Fortuna, sua assistente de investimentos."}
+              </p>
+              <p className={cn("text-muted-foreground mt-1", fs ? "text-sm" : "text-xs")}>
+                Pergunte sobre seus investimentos, e eu te ajudo a entender.
+              </p>
             </div>
             <SuggestionChips
               suggestions={activeSuggestions}
